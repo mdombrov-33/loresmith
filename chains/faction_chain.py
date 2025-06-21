@@ -3,6 +3,18 @@ from models.faction import Faction
 
 
 async def generate_faction() -> Faction:
+    """
+    Generate a post -apocalyptic faction by sequentially prompting the AI for
+    name, ideology, appearance, and a final summary.
+
+    Returns:
+        Faction: A dataclass instance with faction attributes.
+
+    Raises:
+        httpx.RequestError: On network or API errors.
+        httpx.HTTPStatusError: On HTTP errors.
+    """
+
     # 1. Name
     name_prompt = "Invent a unique name for a post-apocalyptic faction."
     name = await ask_openrouter(name_prompt)
