@@ -1,15 +1,11 @@
 import asyncio
-from dataclasses import asdict
-from chains.faction_chain import generate_faction
+from chains.orchestrator import generate_faction_and_npc
 
 
 async def main():
-    faction = await generate_faction()
-    print("Faction Name:", faction.name)
-    faction_data = asdict(faction)
-    for key, value in faction_data.items():
-        if key != "name":
-            print(f"{key.capitalize()}: {value}")
+    data = await generate_faction_and_npc()
+    print("Faction:", data["faction"].appearance)
+    print("NPC:", data["npc"])
 
 
 if __name__ == "__main__":
