@@ -16,7 +16,7 @@ async def ask_openrouter(prompt: str) -> str:
     json_data = {
         "model": "openai/gpt-4o-mini",
         "messages": [
-            {role: "user", "content": prompt}
+            {"role": "user", "content": prompt}
         ]
     }
 
