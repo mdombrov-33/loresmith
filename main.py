@@ -4,8 +4,7 @@ from chains.orchestrator import generate_faction_and_npc
 
 async def main():
     data = await generate_faction_and_npc()
-    print("Faction:", data["faction"].appearance)
-    print("NPC:", data["npc"])
+    print(data)
 
 
 if __name__ == "__main__":
