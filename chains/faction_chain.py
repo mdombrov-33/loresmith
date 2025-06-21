@@ -1,5 +1,4 @@
 from openrouter_client import ask_openrouter
-from typing import Awaitable
 from models.faction import Faction
 
 
