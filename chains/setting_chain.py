@@ -12,8 +12,10 @@ async def generate_setting() -> Setting:
         " Invent a unique name for a post-apocalyptic setting."
         " Respond only with plain text, no markdown or special characters."
         " Do not include newlines; write all output in a single paragraph."
+        " It should be 2-4 words long, no more."
+        " The result must be a name only, not a sentence or description."
     )
-    name_raw = await ask_openrouter(name_prompt)
+    name_raw = await ask_openrouter(name_prompt, 50)
     name = clean_ai_text(name_raw)
 
     landscape_prompt = (
@@ -21,8 +23,10 @@ async def generate_setting() -> Setting:
         " Include terrain, climate, and notable features."
         " Respond only with plain text, no markdown or special characters."
         " Do not include newlines; write all output in a single paragraph."
+        " Respond in exactly 2 sentences, no more."
+        " This 2 sentences should be descriptive, medium length, and provide a vivid image of the setting."
     )
-    landscape_raw = await ask_openrouter(landscape_prompt)
+    landscape_raw = await ask_openrouter(landscape_prompt, 150)
     landscape = clean_ai_text(landscape_raw)
 
     dangers_prompt = (
@@ -30,8 +34,11 @@ async def generate_setting() -> Setting:
         " Include environmental hazards, creatures, or other challenges."
         " Respond only with plain text, no markdown or special characters."
         " Do not include newlines; write all output in a single paragraph."
+        " Respond in exactly 1 sentence, no more."
+        " This 1 sentence should describe the dangers in a concise and impactful way."
+        " This 1 sentence should describe 2-3 dangers or threats max."
     )
-    dangers_raw = await ask_openrouter(dangers_prompt)
+    dangers_raw = await ask_openrouter(dangers_prompt, 80)
     dangers = clean_ai_text(dangers_raw)
 
     summary_prompt = (
@@ -41,7 +48,7 @@ async def generate_setting() -> Setting:
         " Respond only with plain text, no markdown or special characters."
         " Do not include newlines; write all output in a single paragraph."
     )
-    summary_raw = await ask_openrouter(summary_prompt)
+    summary_raw = await ask_openrouter(summary_prompt, 150)
     summary = clean_ai_text(summary_raw)
 
     return Setting(

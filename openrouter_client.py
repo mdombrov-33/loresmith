@@ -35,12 +35,13 @@ async def ask_openrouter_with_retries(prompt: str, max_retries: int = 3) -> str:
             raise
 
 
-async def ask_openrouter(prompt: str) -> str:
+async def ask_openrouter(prompt: str, max_tokens: int = 500) -> str:
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
 
     json_data = {
         "model": "openai/gpt-4o-mini",
         "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens,
     }
 
     try:
