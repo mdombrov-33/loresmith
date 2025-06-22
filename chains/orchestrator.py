@@ -1,29 +1,37 @@
 import asyncio
+import logging
 
-from chains.character_chain import generate_character
-from chains.event_chain import generate_event
-from chains.faction_chain import generate_faction
-from chains.relic_chain import generate_relic
-from chains.setting_chain import generate_setting
-from models.generated_lore_bundle import GeneratedLoreBundle  # you create this
+from chains.multi_variant import (
+    generate_multiple_characters,
+    generate_multiple_factions,
+    generate_multiple_settings,
+    generate_multiple_events,
+    generate_multiple_relics,
+)
+from models.lore_piece import LorePiece
+
+logger = logging.getLogger(__name__)
 
 
-async def generate_all() -> GeneratedLoreBundle:
-    # Run all 5 generators concurrently
-    character_task = asyncio.create_task(generate_character())
-    faction_task = asyncio.create_task(generate_faction())
-    setting_task = asyncio.create_task(generate_setting())
-    event_task = asyncio.create_task(generate_event())
-    relic_task = asyncio.create_task(generate_relic())
+async def generate_all_variants(count: int = 3) -> dict[str, list[LorePiece]]:
+    try:
+        character_task = generate_multiple_characters(count)
+        faction_task = generate_multiple_factions(count)
+        setting_task = generate_multiple_settings(count)
+        event_task = generate_multiple_events(count)
+        relic_task = generate_multiple_relics(count)
 
-    character, faction, setting, event, relic = await asyncio.gather(
-        character_task, faction_task, setting_task, event_task, relic_task
-    )
+        characters, factions, settings, events, relics = await asyncio.gather(
+            character_task, faction_task, setting_task, event_task, relic_task
+        )
 
-    return GeneratedLoreBundle(
-        character=character,
-        faction=faction,
-        setting=setting,
-        event=event,
-        relic=relic,
-    )
+        return {
+            "characters": characters,
+            "factions": factions,
+            "settings": settings,
+            "events": events,
+            "relics": relics,
+        }
+
+    except Exception as e:
+        logger.error(f"Error generating all variants: {e}", exc_info=True)
