@@ -29,6 +29,7 @@ async def ask_openrouter_with_retries(prompt: str, max_retries: int = 3) -> str:
             logger.info(f"Waiting {delay} seconds before retrying...")
             await asyncio.sleep(delay)
             delay *= 2
+
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
             raise
@@ -53,10 +54,12 @@ async def ask_openrouter(prompt: str) -> str:
         logger.error(
             f"HTTP error occurred: {e.response.status_code} - {e.response.text}"
         )
+        raise
         # Network error or timeout
     except httpx.RequestError as e:
         logger.error(f"Request error occurred: {e}")
+        raise
         # Other unexpected errors
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
-        return ""
+        raise
