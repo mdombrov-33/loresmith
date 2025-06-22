@@ -45,7 +45,7 @@ async def ask_openrouter(prompt: str, max_tokens: int = 500) -> str:
     }
 
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(API_URL, headers=headers, json=json_data)
             response.raise_for_status()
             data = response.json()
