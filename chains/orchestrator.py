@@ -1,17 +1,28 @@
 import asyncio
+from chains.character_chain import generate_character
 from chains.faction_chain import generate_faction
-from chains.character_chain import generate_npc
 from chains.setting_chain import generate_setting
-from models.generated_lore import GeneratedLore
+from chains.event_chain import generate_event
+from chains.relic_chain import generate_relic
+from models.generated_lore_bundle import GeneratedLoreBundle  # you create this
 
 
-async def generate_all() -> GeneratedLore:
-    # Run faction and setting concurrently first
+async def generate_all() -> GeneratedLoreBundle:
+    # Run all 5 generators concurrently
+    character_task = asyncio.create_task(generate_character())
     faction_task = asyncio.create_task(generate_faction())
     setting_task = asyncio.create_task(generate_setting())
+    event_task = asyncio.create_task(generate_event())
+    relic_task = asyncio.create_task(generate_relic())
 
-    # Once faction is ready, generate NPC which depends on faction
-    faction, setting = await asyncio.gather(faction_task, setting_task)
-    npc = await generate_npc(faction)
+    character, faction, setting, event, relic = await asyncio.gather(
+        character_task, faction_task, setting_task, event_task, relic_task
+    )
 
-    return GeneratedLore(faction=faction, npc=npc, setting=setting)
+    return GeneratedLoreBundle(
+        character=character,
+        faction=faction,
+        setting=setting,
+        event=event,
+        relic=relic,
+    )
