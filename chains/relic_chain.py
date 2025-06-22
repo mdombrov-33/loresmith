@@ -1,9 +1,13 @@
-from openrouter_client import ask_openrouter_with_retries as ask_openrouter
-from models.lore_piece import LorePiece
-from utils.clean_ai_text import clean_ai_text
 import logging
 
+from models.lore_piece import LorePiece
+from openrouter_client import ask_openrouter_with_retries as ask_openrouter
+from utils.blacklist import BLACKLIST
+from utils.clean_ai_text import clean_ai_text
+
 logger = logging.getLogger(__name__)
+
+blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
 async def generate_relic() -> LorePiece:
@@ -14,7 +18,7 @@ async def generate_relic() -> LorePiece:
     try:
         # Name prompt
         name_prompt = (
-            "Invent a unique name for a mysterious post-apocalyptic relic or artifact."
+            f"Invent a unique name for a mysterious post-apocalyptic relic or artifact that does NOT contain or match any of the following words or names: {blacklist_str}. "
             " Respond only with plain text, no markdown or special characters."
             " No newlines; output a single paragraph."
             " Name should be 2-4 words only."

@@ -1,9 +1,10 @@
 import asyncio
+
 from chains.character_chain import generate_character
-from chains.faction_chain import generate_faction
-from chains.setting_chain import generate_setting
 from chains.event_chain import generate_event
+from chains.faction_chain import generate_faction
 from chains.relic_chain import generate_relic
+from chains.setting_chain import generate_setting
 from models.generated_lore_bundle import GeneratedLoreBundle  # you create this
 
 
