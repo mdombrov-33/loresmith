@@ -1,7 +1,9 @@
 BLACKLIST = {
     "words": [
         "ashen",
+        "cinder",
         "thorn",
+        "veil",
         "wraith",
         "covenant",
         "echo",
