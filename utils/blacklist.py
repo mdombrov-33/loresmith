@@ -1,5 +1,3 @@
-# blacklist.py
-
 BLACKLIST = {
     "words": [
         "ashen",
