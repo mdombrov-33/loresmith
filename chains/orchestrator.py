@@ -1,6 +1,6 @@
 import asyncio
 from chains.faction_chain import generate_faction
-from chains.npc_chain import generate_npc
+from chains.character_chain import generate_npc
 from chains.setting_chain import generate_setting
 from models.generated_lore import GeneratedLore
 

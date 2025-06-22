@@ -1,65 +1,73 @@
 from openrouter_client import ask_openrouter_with_retries as ask_openrouter
-from models.setting import Setting
+from models.lore_piece import LorePiece
 from utils.clean_ai_text import clean_ai_text
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-async def generate_setting() -> Setting:
+async def generate_setting() -> LorePiece:
     """
-    Generate a post-apocalyptic setting with name, landscape, dangers, and summary.
+    Generate a setting by prompting for:
+    name, landscape description, dangers, and summary.
     """
     try:
+        # Name prompt
         name_prompt = (
-            " Invent a unique name for a post-apocalyptic setting."
+            "Invent a unique name for a post-apocalyptic setting."
             " Respond only with plain text, no markdown or special characters."
-            " Do not include newlines; write all output in a single paragraph."
-            " It should be 2-4 words long, no more."
-            " The result must be a name only, not a sentence or description."
+            " No newlines; output a single paragraph."
+            " Name should be 2-4 words only."
         )
-        name_raw = await ask_openrouter(name_prompt, 50)
+        name_raw = await ask_openrouter(name_prompt, max_tokens=50)
         name = clean_ai_text(name_raw)
 
+        # Landscape prompt
         landscape_prompt = (
-            f" Describe the primary landscape of the setting '{name}'."
-            " Include terrain, climate, and notable features."
-            " Respond only with plain text, no markdown or special characters."
-            " Do not include newlines; write all output in a single paragraph."
-            " Respond in exactly 2 sentences, no more."
-            " This 2 sentences should be descriptive, medium length, and provide a vivid image of the setting."
+            f"Describe the primary landscape of the setting '{name}',"
+            " including terrain, climate, and notable features."
+            " Respond only with plain text, no markdown."
+            " No newlines; output a single paragraph."
+            " Respond in exactly 2 sentences."
         )
-        landscape_raw = await ask_openrouter(landscape_prompt, 150)
+        landscape_raw = await ask_openrouter(landscape_prompt, max_tokens=150)
         landscape = clean_ai_text(landscape_raw)
 
+        # Dangers prompt
         dangers_prompt = (
-            f" What are the main dangers and threats in the setting '{name}'?"
-            " Include environmental hazards, creatures, or other challenges."
-            " Respond only with plain text, no markdown or special characters."
-            " Do not include newlines; write all output in a single paragraph."
-            " Respond in exactly 1 sentence, no more."
-            " This 1 sentence should describe the dangers in a concise and impactful way."
-            " This 1 sentence should describe 2-3 dangers or threats max."
+            f"List the main dangers and threats in the setting '{name}',"
+            " including environmental hazards, creatures, or other challenges."
+            " Respond only with plain text, no markdown."
+            " No newlines; output a single paragraph."
+            " Respond in exactly 1 sentence."
+            " Describe 2-3 dangers or threats."
         )
-        dangers_raw = await ask_openrouter(dangers_prompt, 80)
+        dangers_raw = await ask_openrouter(dangers_prompt, max_tokens=80)
         dangers = clean_ai_text(dangers_raw)
 
+        # Summary prompt
         summary_prompt = (
-            f" Write a short lore summary for the setting '{name}' using:"
+            f"Write a concise lore summary for the setting '{name}', using:"
             f"\n\nLandscape: {landscape}\nDangers: {dangers}\n\n"
-            " Keep it concise, no more than 2 sentences."
+            " Keep it no more than 2 sentences."
             " Respond only with plain text, no markdown or special characters."
-            " Do not include newlines; write all output in a single paragraph."
+            " No newlines; output a single paragraph."
         )
-        summary_raw = await ask_openrouter(summary_prompt, 150)
+        summary_raw = await ask_openrouter(summary_prompt, max_tokens=150)
         summary = clean_ai_text(summary_raw)
 
-        return Setting(
-            name=name,
-            landscape=landscape,
-            dangers=dangers,
-            summary=summary,
-        )
     except Exception as e:
-        logger.error(f"Error generating setting: {e}", exc_info=True)
+        logger.error(f"Failed to generate setting: {e}", exc_info=True)
         raise
+
+    details = {
+        "landscape": landscape,
+        "dangers": dangers,
+    }
+
+    return LorePiece(
+        name=name,
+        description=summary,
+        details=details,
+        type="setting",
+    )
