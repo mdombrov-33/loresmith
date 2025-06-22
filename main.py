@@ -1,9 +1,9 @@
 import asyncio
-from chains.orchestrator import generate_faction_and_npc
+from chains.orchestrator import generate_all
 
 
 async def main():
-    data = await generate_faction_and_npc()
+    data = await generate_all()
     print(data)
 
 
