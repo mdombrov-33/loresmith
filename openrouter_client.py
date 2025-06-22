@@ -1,6 +1,7 @@
 import asyncio  # async sleep
 import logging  # better error messages
 import os  # read environment variables
+import random  # for jitter in retries
 
 import httpx  # async http client, async native
 from dotenv import load_dotenv  # load environment variables from .env file
@@ -14,24 +15,32 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 # Wrapper function to handle retries for the OpenRouter API call
-async def ask_openrouter_with_retries(prompt: str, max_retries: int = 3) -> str:
-    delay = 1  # initial delay
+async def ask_openrouter_with_retries(
+    prompt: str, max_retries: int = 3, **kwargs
+) -> str:
+
+    delay = 1  # initial delay in seconds
 
     for attempt in range(max_retries):
         try:
-            response = await ask_openrouter(prompt)
+            response = await ask_openrouter(prompt, **kwargs)
+            if attempt > 0:
+                logger.info(f"Success on retry attempt {attempt + 1}")
             return response
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            logger.warning(f"Attempt {attempt + 1} failed with error: {e}")
+            logger.warning(
+                f"Attempt {attempt + 1} failed with error: {e}", exc_info=True
+            )
             if attempt == max_retries - 1:
-                logger.error("Max retries reached. Raising the exception.")
+                logger.error(
+                    "Max retries reached. Raising the exception.", exc_info=True
+                )
                 raise
-            logger.info(f"Waiting {delay} seconds before retrying...")
-            await asyncio.sleep(delay)
-            delay *= 2
-
+            logger.info(f"Waiting {delay:.1f}s before retrying...")
+            await asyncio.sleep(delay + random.uniform(0, 0.5))  # add jitter
+            delay *= 2  # exponential backoff
         except Exception as e:
-            logger.error(f"Unexpected error occurred: {e}")
+            logger.error(f"Unexpected error occurred during retry: {e}", exc_info=True)
             raise
 
 
@@ -53,14 +62,21 @@ async def ask_openrouter(prompt: str, max_tokens: int = 500) -> str:
         # Api returned an error status code
     except httpx.HTTPStatusError as e:
         logger.error(
-            f"HTTP error occurred: {e.response.status_code} - {e.response.text}"
+            f"HTTP error {e.response.status_code} for prompt: {prompt}\nResponse: {e.response.text}",
+            exc_info=True,
         )
         raise
-        # Network error or timeout
+    # Network error or timeout
     except httpx.RequestError as e:
-        logger.error(f"Request error occurred: {e}")
+        logger.error(
+            f"Request error occurred while sending prompt: {prompt}\nError: {e}",
+            exc_info=True,
+        )
         raise
+
         # Other unexpected errors
     except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
+        logger.error(
+            f"Unexpected error occurred during OpenRouter call: {e}", exc_info=True
+        )
         raise
