@@ -12,6 +12,7 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_DB=0
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   redis:
