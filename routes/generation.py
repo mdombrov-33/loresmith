@@ -37,7 +37,9 @@ async def generate_all(
 
 @router.get("/generate/characters", response_model=List[LorePiece])
 async def generate_characters(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
+    regenerate: bool = False,
 ):
     """
     Generate a list of character lore pieces.
@@ -48,12 +50,14 @@ async def generate_characters(
     Returns:
     A list of generated character lore pieces.
     """
-    return await generate_multiple_characters(count, theme)
+    return await generate_multiple_characters(count, theme, regenerate)
 
 
 @router.get("/generate/factions", response_model=List[LorePiece])
 async def generate_factions(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
+    regenerate: bool = False,
 ):
     """
     Generate a list of faction lore pieces.
@@ -64,12 +68,14 @@ async def generate_factions(
     Returns:
     A list of generated faction lore pieces.
     """
-    return await generate_multiple_factions(count, theme)
+    return await generate_multiple_factions(count, theme, regenerate)
 
 
 @router.get("/generate/settings", response_model=List[LorePiece])
 async def generate_settings(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
+    regenerate: bool = False,
 ):
     """
     Generate a list of setting lore pieces.
@@ -80,12 +86,14 @@ async def generate_settings(
     Returns:
     A list of generated setting lore pieces.
     """
-    return await generate_multiple_settings(count, theme)
+    return await generate_multiple_settings(count, theme, regenerate)
 
 
 @router.get("/generate/events", response_model=List[LorePiece])
 async def generate_events(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
+    regenerate: bool = False,
 ):
     """
     Generate a list of event lore pieces.
@@ -96,12 +104,14 @@ async def generate_events(
     Returns:
     A list of generated event lore pieces.
     """
-    return await generate_multiple_events(count, theme)
+    return await generate_multiple_events(count, theme, regenerate)
 
 
 @router.get("/generate/relics", response_model=List[LorePiece])
 async def generate_relics(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
+    regenerate: bool = False,
 ):
     """
     Generate a list of relic lore pieces.
@@ -112,7 +122,7 @@ async def generate_relics(
     Returns:
     A list of generated relic lore pieces.
     """
-    return await generate_multiple_relics(count, theme)
+    return await generate_multiple_relics(count, theme, regenerate)
 
 
 @router.post("/generate/full-story", response_model=FullStory)

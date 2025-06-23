@@ -11,43 +11,54 @@ import json
 
 
 async def generate_multiple_characters(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> list[LorePiece]:
-    # Build a unique cache key based on theme and count
-    # Example: "characters:post_apocalyptic:3"
+    """
+    Generate multiple character lore pieces, using Redis cache to avoid
+    repeated generation unless `regenerate` is True.
+
+    Parameters:
+    - count: how many characters to generate
+    - theme: theme of the lore
+    - regenerate: if True, bypass cache and generate fresh data
+
+    Caching:
+    - Redis key is built from `characters:{theme}:{count}`
+    - If cached data exists and regenerate=False, return cached data
+    - Otherwise generate fresh data, cache it for 1 hour, then return
+    """
+
     cache_key = f"characters:{theme}:{count}"
 
-    # Attempt to fetch cached data from Redis
-    cached = await redis_client.get(cache_key)
-    if cached:
-        # If cache exists, decode the JSON string back into Python list of dicts
-        data = json.loads(cached)
-        # Convert each dict back into a LorePiece Pydantic model
-        return [LorePiece.model_validate(item) for item in data]
+    if not regenerate:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            data = json.loads(cached)
+            return [LorePiece.model_validate(item) for item in data]
 
-    # If no cached data, generate new character lore pieces in parallel
     characters = await asyncio.gather(
         *(generate_character(theme) for _ in range(count))
     )
 
-    # Convert list of Pydantic models into plain dicts and encode to JSON string
     json_data = json.dumps([char.model_dump() for char in characters])
-
-    # Store the result in Redis cache with a 1-hour expiration (TTL)
     await redis_client.set(cache_key, json_data, ex=3600)
 
-    # Return the freshly generated data
     return characters
 
 
 async def generate_multiple_factions(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> list[LorePiece]:
+    """
+    Same caching logic as generate_multiple_characters.
+    """
     cache_key = f"factions:{theme}:{count}"
-    cached = await redis_client.get(cache_key)
-    if cached:
-        data = json.loads(cached)
-        return [LorePiece.model_validate(item) for item in data]
+
+    if not regenerate:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            data = json.loads(cached)
+            return [LorePiece.model_validate(item) for item in data]
 
     factions = await asyncio.gather(*(generate_faction(theme) for _ in range(count)))
     json_data = json.dumps([f.model_dump() for f in factions])
@@ -56,13 +67,18 @@ async def generate_multiple_factions(
 
 
 async def generate_multiple_settings(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> list[LorePiece]:
+    """
+    Same caching logic as generate_multiple_characters.
+    """
     cache_key = f"settings:{theme}:{count}"
-    cached = await redis_client.get(cache_key)
-    if cached:
-        data = json.loads(cached)
-        return [LorePiece.model_validate(item) for item in data]
+
+    if not regenerate:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            data = json.loads(cached)
+            return [LorePiece.model_validate(item) for item in data]
 
     settings = await asyncio.gather(*(generate_setting(theme) for _ in range(count)))
     json_data = json.dumps([s.model_dump() for s in settings])
@@ -71,13 +87,18 @@ async def generate_multiple_settings(
 
 
 async def generate_multiple_events(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> list[LorePiece]:
+    """
+    Same caching logic as generate_multiple_characters.
+    """
     cache_key = f"events:{theme}:{count}"
-    cached = await redis_client.get(cache_key)
-    if cached:
-        data = json.loads(cached)
-        return [LorePiece.model_validate(item) for item in data]
+
+    if not regenerate:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            data = json.loads(cached)
+            return [LorePiece.model_validate(item) for item in data]
 
     events = await asyncio.gather(*(generate_event(theme) for _ in range(count)))
     json_data = json.dumps([e.model_dump() for e in events])
@@ -86,13 +107,18 @@ async def generate_multiple_events(
 
 
 async def generate_multiple_relics(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> list[LorePiece]:
+    """
+    Same caching logic as generate_multiple_characters.
+    """
     cache_key = f"relics:{theme}:{count}"
-    cached = await redis_client.get(cache_key)
-    if cached:
-        data = json.loads(cached)
-        return [LorePiece.model_validate(item) for item in data]
+
+    if not regenerate:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            data = json.loads(cached)
+            return [LorePiece.model_validate(item) for item in data]
 
     relics = await asyncio.gather(*(generate_relic(theme) for _ in range(count)))
     json_data = json.dumps([r.model_dump() for r in relics])
