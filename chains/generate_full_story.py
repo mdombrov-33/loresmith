@@ -3,7 +3,7 @@ import logging
 from constants.themes import Theme
 from models.full_story import FullStory
 from models.selected_lore_pieces import SelectedLorePieces
-from openrouter_client import ask_openrouter_with_retries as ask_openrouter
+from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.text_formatting import clean_ai_text, format_details
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import logging
 
 from models.lore_piece import LorePiece
-from openrouter_client import ask_openrouter_with_retries as ask_openrouter
+from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
 
