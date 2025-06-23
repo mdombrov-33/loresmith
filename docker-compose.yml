@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: .
+    container_name: echoforge-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  redis:
+    image: redis:8
+    container_name: echoforge-redis
+    ports:
+      - "6379:6379"
