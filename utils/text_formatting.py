@@ -13,3 +13,15 @@ def clean_ai_text(text: str) -> str:
     # Collapse multiple spaces
     text = re.sub(r"\s{2,}", " ", text)
     return text.strip()
+
+
+def format_details(details):
+    """
+    Format details from lore pieces into a readable string.
+    Handles both lists and dictionaries, returning a comma-separated string.
+    """
+    if isinstance(details, list):
+        return ", ".join(details)
+    elif isinstance(details, dict):
+        return ", ".join(f"{k}: {v}" for k, v in details.items())
+    return str(details)

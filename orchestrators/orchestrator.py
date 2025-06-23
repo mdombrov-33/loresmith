@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from models.generated_lore_bundle import GeneratedLoreBundle
+
 from chains.multi_variant import (
     generate_multiple_characters,
     generate_multiple_factions,
@@ -29,13 +31,13 @@ async def generate_all_variants(
             character_task, faction_task, setting_task, event_task, relic_task
         )
 
-        return {
-            "characters": characters,
-            "factions": factions,
-            "settings": settings,
-            "events": events,
-            "relics": relics,
-        }
+        return GeneratedLoreBundle(
+            characters=characters,
+            factions=factions,
+            settings=settings,
+            events=events,
+            relics=relics,
+        )
 
     except Exception as e:
         logger.error(f"Error generating all variants: {e}", exc_info=True)

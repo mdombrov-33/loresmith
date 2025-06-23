@@ -5,8 +5,8 @@ from models.lore_piece import LorePiece
 
 @dataclass
 class GeneratedLoreBundle:
-    character: List[LorePiece]
-    faction: List[LorePiece]
-    setting: List[LorePiece]
-    event: List[LorePiece]
-    relic: List[LorePiece]
+    characters: List[LorePiece]
+    factions: List[LorePiece]
+    settings: List[LorePiece]
+    events: List[LorePiece]
+    relics: List[LorePiece]

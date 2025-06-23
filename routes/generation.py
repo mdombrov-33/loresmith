@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 from orchestrators.orchestrator import generate_all_variants
 from models.lore_piece import LorePiece
-from typing import List, Dict
+from typing import List
 from chains.multi_variant import (
     generate_multiple_characters,
     generate_multiple_factions,
@@ -10,11 +10,12 @@ from chains.multi_variant import (
     generate_multiple_relics,
 )
 from constants.themes import Theme
+from models.generated_lore_bundle import GeneratedLoreBundle
 
 router = APIRouter()
 
 
-@router.get("/generate/all", response_model=Dict[str, List[LorePiece]])
+@router.get("/generate/all", response_model=GeneratedLoreBundle)
 async def generate_all(
     count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
 ):
