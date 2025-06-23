@@ -17,7 +17,7 @@ from fastapi import HTTPException
 logger = logging.getLogger(__name__)
 
 
-async def generate_all_variants(
+async def generate_lore_variants(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> dict[str, list[LorePiece]]:
     try:

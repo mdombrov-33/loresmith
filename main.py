@@ -1,5 +1,5 @@
 import asyncio
-from orchestrators.orchestrator import generate_all_variants
+from orchestrators import generate_lore_variants
 from fastapi import FastAPI
 from routes import generation
 
@@ -9,7 +9,7 @@ app.include_router(generation.router, prefix="/api", tags=["generation"])
 
 
 if __name__ == "__main__":
-    variants = asyncio.run(generate_all_variants())
+    variants = asyncio.run(generate_lore_variants())
     from pprint import pprint
 
     pprint(variants)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-from orchestrators.orchestrator import generate_all_variants
+from orchestrators import generate_lore_variants
 from models.lore_piece import LorePiece
 from typing import List
 from chains.multi_variant import (
@@ -28,7 +28,7 @@ async def generate_all(
     Returns:
     A dictionary containing lists of generated lore pieces.
     """
-    return await generate_all_variants(count, theme)
+    return await generate_lore_variants(count, theme)
 
 
 @router.get("/generate/characters", response_model=List[LorePiece])
