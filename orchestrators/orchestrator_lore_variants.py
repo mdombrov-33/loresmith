@@ -40,5 +40,5 @@ async def generate_lore_variants(
         )
 
     except Exception as e:
-        logger.error(f"Error generating all variants: {e}", exc_info=True)
+        logger.error(f"Error generating lore variants: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Lore generation failed")

@@ -65,10 +65,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         logger.error(f"Failed to generate setting: {e}", exc_info=True)
         raise
 
-    details = {
-        "landscape": landscape,
-        "dangers": dangers,
-    }
+    details = [
+        f"Landscape: {landscape}",
+        f"Dangers: {dangers}",
+    ]
 
     return LorePiece(
         name=name,

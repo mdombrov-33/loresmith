@@ -51,9 +51,9 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         logger.error(f"Failed to generate event: {e}", exc_info=True)
         raise
 
-    details = {
-        "impact": impact,
-    }
+    details = [
+        f"Impact: {impact}",
+    ]
 
     return LorePiece(
         name=name,

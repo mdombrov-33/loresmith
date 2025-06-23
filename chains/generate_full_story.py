@@ -71,13 +71,7 @@ Respond only with plain text, no markdown or special characters.
             title="Full Story",
             content=full_story_content,
             theme=theme,
-            pieces=SelectedLorePieces(
-                character=character,
-                faction=faction,
-                setting=setting,
-                event=event,
-                relic=relic,
-            ),
+            pieces=selected_pieces,
         )
 
     except Exception as e:

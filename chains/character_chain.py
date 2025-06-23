@@ -65,10 +65,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.error(f"Failed to generate character: {e}", exc_info=True)
         raise
 
-    details = {
-        "personality": personality,
-        "appearance": appearance,
-    }
+    details = [
+        f"Personality: {personality}",
+        f"Appearance: {appearance}",
+    ]
 
     return LorePiece(
         name=name,

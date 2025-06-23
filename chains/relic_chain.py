@@ -51,9 +51,9 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
         logger.error(f"Failed to generate relic: {e}", exc_info=True)
         raise
 
-    details = {
-        "history": history,
-    }
+    details = [
+        f"History: {history}",
+    ]
 
     return LorePiece(
         name=name,

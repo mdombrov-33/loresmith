@@ -1,10 +1,9 @@
-from dataclasses import dataclass
 from typing import Optional
 from models.lore_piece import LorePiece
+from pydantic import BaseModel
 
 
-@dataclass
-class SelectedLorePieces:
+class SelectedLorePieces(BaseModel):
     character: Optional[LorePiece] = None
     faction: Optional[LorePiece] = None
     setting: Optional[LorePiece] = None

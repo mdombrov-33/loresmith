@@ -1,9 +1,8 @@
-from dataclasses import dataclass
 from typing import List, Literal
+from pydantic import BaseModel
 
 
-@dataclass
-class LorePiece:
+class LorePiece(BaseModel):
     name: str
     description: str
     details: List[str]

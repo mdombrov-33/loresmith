@@ -60,10 +60,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         logger.error(f"Failed to generate faction: {e}", exc_info=True)
         raise
 
-    details = {
-        "ideology": ideology,
-        "appearance": appearance,
-    }
+    details = [
+        f"Ideology: {ideology}",
+        f"Appearance: {appearance}",
+    ]
 
     return LorePiece(
         name=name,
