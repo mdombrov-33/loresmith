@@ -70,4 +70,85 @@ redis-server
   ```
 
 7. Open [http://localhost:8000/docs](http://localhost:8000/docs) in your browser to explore and test the API.
-   
+
+---
+
+## Using Docker Compose 🐳
+
+This project uses Docker Compose to run the backend service alongside Redis.
+
+To start the application:
+- Run the following command in your terminal:
+
+```bash
+docker-compose up --build
+```
+- This command will:
+  - Build the backend Docker image from Dockerfile
+  - Start a Redis container
+  - Launch the FastAPI backend accessible at [http://localhost:8000](http://localhost:8000)
+
+To stop the containers:
+- Use the command:
+```bash
+docker-compose down
+```
+
+---
+
+## API Endpoints
+
+The backend exposes RESTful endpoints for generating different lore pieces and full stories.
+
+### Generate Multiple Lore Pieces
+
+- **GET** `/generate/characters`
+
+  Generate a list of character lore pieces.
+
+  **Query parameters:**
+
+  - `count` (int, optional): Number of items to generate. Default is 3. Range: 1-10.
+  - `theme` (string, optional): Theme for generation. Default is `post_apocalyptic`.
+  - `regenerate` (bool, optional): If `true`, bypass cache and generate fresh data.
+
+- **GET** `/generate/factions`
+
+  Similar to `/generate/characters` but for factions.
+
+- **GET** `/generate/settings`
+
+  Similar to above, for settings.
+
+- **GET** `/generate/events`
+
+  Similar to above, for events.
+
+- **GET** `/generate/relics`
+
+  Similar to above, for relics.
+
+### Generate Full Lore Bundle
+
+- **GET** `/generate/all`
+
+  Generates all lore variants: characters, factions, settings, events, and relics at once.
+
+  **Query parameters:**
+
+  - `count` (int, optional): Number of items to generate for each lore type. Default is 3. Range: 1-10.
+  - `theme` (string, optional): Theme for generation. Default is `post_apocalyptic`
+
+### Generate Full Story
+
+- **POST** `/generate/full-story`
+
+  Generate a full story based on selected lore pieces.
+
+  **Request body:**
+
+  - JSON object with selected lore pieces (`SelectedLorePieces` model).
+
+  **Query parameters:**
+
+  - `theme` (string, optional): Theme for story generation. Default is `post_apocalyptic`.
