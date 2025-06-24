@@ -6,7 +6,7 @@ from chains.event_chain import generate_event
 from chains.relic_chain import generate_relic
 from models.lore_piece import LorePiece
 from constants.themes import Theme
-from services.redis_client import redis_client
+from services.redis_utils import redis_get_with_retries, redis_set_with_retries
 import json
 
 
@@ -31,7 +31,7 @@ async def generate_multiple_characters(
     cache_key = f"characters:{theme}:{count}"
 
     if not regenerate:
-        cached = await redis_client.get(cache_key)
+        cached = await redis_get_with_retries(cache_key)
         if cached:
             data = json.loads(cached)
             return [LorePiece.model_validate(item) for item in data]
@@ -41,7 +41,7 @@ async def generate_multiple_characters(
     )
 
     json_data = json.dumps([char.model_dump() for char in characters])
-    await redis_client.set(cache_key, json_data, ex=3600)
+    await redis_set_with_retries(cache_key, json_data, ex=3600)
 
     return characters
 
@@ -55,14 +55,14 @@ async def generate_multiple_factions(
     cache_key = f"factions:{theme}:{count}"
 
     if not regenerate:
-        cached = await redis_client.get(cache_key)
+        cached = await redis_get_with_retries(cache_key)
         if cached:
             data = json.loads(cached)
             return [LorePiece.model_validate(item) for item in data]
 
     factions = await asyncio.gather(*(generate_faction(theme) for _ in range(count)))
     json_data = json.dumps([f.model_dump() for f in factions])
-    await redis_client.set(cache_key, json_data, ex=3600)
+    await redis_set_with_retries(cache_key, json_data, ex=3600)
     return factions
 
 
@@ -75,14 +75,14 @@ async def generate_multiple_settings(
     cache_key = f"settings:{theme}:{count}"
 
     if not regenerate:
-        cached = await redis_client.get(cache_key)
+        cached = await redis_get_with_retries(cache_key)
         if cached:
             data = json.loads(cached)
             return [LorePiece.model_validate(item) for item in data]
 
     settings = await asyncio.gather(*(generate_setting(theme) for _ in range(count)))
     json_data = json.dumps([s.model_dump() for s in settings])
-    await redis_client.set(cache_key, json_data, ex=3600)
+    await redis_set_with_retries(cache_key, json_data, ex=3600)
     return settings
 
 
@@ -95,14 +95,14 @@ async def generate_multiple_events(
     cache_key = f"events:{theme}:{count}"
 
     if not regenerate:
-        cached = await redis_client.get(cache_key)
+        cached = await redis_get_with_retries(cache_key)
         if cached:
             data = json.loads(cached)
             return [LorePiece.model_validate(item) for item in data]
 
     events = await asyncio.gather(*(generate_event(theme) for _ in range(count)))
     json_data = json.dumps([e.model_dump() for e in events])
-    await redis_client.set(cache_key, json_data, ex=3600)
+    await redis_set_with_retries(cache_key, json_data, ex=3600)
     return events
 
 
@@ -115,12 +115,12 @@ async def generate_multiple_relics(
     cache_key = f"relics:{theme}:{count}"
 
     if not regenerate:
-        cached = await redis_client.get(cache_key)
+        cached = await redis_get_with_retries(cache_key)
         if cached:
             data = json.loads(cached)
             return [LorePiece.model_validate(item) for item in data]
 
     relics = await asyncio.gather(*(generate_relic(theme) for _ in range(count)))
     json_data = json.dumps([r.model_dump() for r in relics])
-    await redis_client.set(cache_key, json_data, ex=3600)
+    await redis_set_with_retries(cache_key, json_data, ex=3600)
     return relics
