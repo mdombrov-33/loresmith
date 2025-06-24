@@ -4,6 +4,7 @@ from models.lore_piece import LorePiece
 from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
+from utils.load_prompt_from_file import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -18,42 +19,39 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Name prompt
-        name_prompt = (
-            f"Invent a unique name for a significant {theme} event that does NOT contain or match any of the following words or names: {blacklist_str}. "
-            "Respond only with plain text, no markdown or special characters."
-            "No newlines; output a single paragraph."
-            "Name should be 2-5 words only."
+        name_prompt = load_prompt(
+            "event/event_name.txt",
+            theme=theme,
+            blacklist=blacklist_str,
         )
         name_raw = await ask_openrouter(name_prompt, max_tokens=50)
         name = clean_ai_text(name_raw)
 
         # Description prompt
-        description_prompt = (
-            f"Describe the event named '{name}' in 2-3 sentences in a {theme} setting."
-            "Include what happened and key details."
-            "Respond only with plain text, no markdown."
-            "No newlines; output a single paragraph."
+        description_prompt = load_prompt(
+            "event/event_description.txt",
+            theme=theme,
+            name=name,
         )
-        description_raw = await ask_openrouter(description_prompt, max_tokens=150)
+
+        description_raw = await ask_openrouter(description_prompt, max_tokens=200)
         description = clean_ai_text(description_raw)
 
         # Impact prompt
-        impact_prompt = (
-            f"Explain the impact or consequences of the event '{name}' in a {theme} world."
-            "Respond only with plain text, no markdown."
-            "No newlines; output a single paragraph."
-            "Respond in exactly 1 sentence."
+        impact_prompt = load_prompt(
+            "event/event_impact.txt",
+            theme=theme,
+            name=name,
+            description=description,
         )
-        impact_raw = await ask_openrouter(impact_prompt, max_tokens=70)
+        impact_raw = await ask_openrouter(impact_prompt, max_tokens=150)
         impact = clean_ai_text(impact_raw)
 
     except Exception as e:
         logger.error(f"Failed to generate event: {e}", exc_info=True)
         raise
 
-    details = [
-        f"Impact: {impact}",
-    ]
+    details = {"impact": impact}
 
     return LorePiece(
         name=name,

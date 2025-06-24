@@ -1,0 +1,1 @@
+Describe the primary landscape of the setting {name} in a {theme} world, including terrain, climate, and notable features. Respond only with plain text, no markdown. No newlines; output a single paragraph. Respond in exactly 2 sentences.

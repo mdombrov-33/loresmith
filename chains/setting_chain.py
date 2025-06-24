@@ -4,6 +4,7 @@ from models.lore_piece import LorePiece
 from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
+from utils.load_prompt_from_file import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -18,57 +19,52 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Name prompt
-        name_prompt = (
-            f"Invent a unique name for a {theme} setting that does NOT contain or match any of the following words or names: {blacklist_str}. "
-            "Respond only with plain text, no markdown or special characters."
-            "No newlines; output a single paragraph."
-            "Name should be 2-4 words only."
+        name_prompt = load_prompt(
+            "setting/setting_name.txt",
+            theme=theme,
+            blacklist=blacklist_str,
         )
         name_raw = await ask_openrouter(name_prompt, max_tokens=50)
         name = clean_ai_text(name_raw)
 
         # Landscape prompt
-        landscape_prompt = (
-            f"Describe the primary landscape of the setting '{name}' in a {theme} world, "
-            "including terrain, climate, and notable features."
-            "Respond only with plain text, no markdown."
-            "No newlines; output a single paragraph."
-            "Respond in exactly 2 sentences."
+        landscape_prompt = load_prompt(
+            "setting/setting_landscape.txt",
+            theme=theme,
+            name=name,
         )
         landscape_raw = await ask_openrouter(landscape_prompt, max_tokens=150)
         landscape = clean_ai_text(landscape_raw)
 
         # Dangers prompt
-        dangers_prompt = (
-            f"List the main dangers and threats in the setting '{name}' in a {theme} world, "
-            "including environmental hazards, creatures, or other challenges."
-            "Respond only with plain text, no markdown."
-            "No newlines; output a single paragraph."
-            "Respond in exactly 1 sentence."
-            "Describe 2-3 dangers or threats."
+        dangers_prompt = load_prompt(
+            "setting/setting_dangers.txt",
+            theme=theme,
+            name=name,
+            landscape=landscape,
         )
-        dangers_raw = await ask_openrouter(dangers_prompt, max_tokens=80)
+        dangers_raw = await ask_openrouter(dangers_prompt, max_tokens=150)
         dangers = clean_ai_text(dangers_raw)
 
         # Summary prompt
-        summary_prompt = (
-            f"Write a concise lore summary for the setting '{name}' in a {theme} world, using:"
-            f"\n\nLandscape: {landscape}\nDangers: {dangers}\n\n"
-            "Keep it no more than 2 sentences."
-            "Respond only with plain text, no markdown or special characters."
-            "No newlines; output a single paragraph."
+        summary_prompt = load_prompt(
+            "setting/setting_summary.txt",
+            theme=theme,
+            name=name,
+            landscape=landscape,
+            dangers=dangers,
         )
-        summary_raw = await ask_openrouter(summary_prompt, max_tokens=150)
+        summary_raw = await ask_openrouter(summary_prompt, max_tokens=200)
         summary = clean_ai_text(summary_raw)
 
     except Exception as e:
         logger.error(f"Failed to generate setting: {e}", exc_info=True)
         raise
 
-    details = [
-        f"Landscape: {landscape}",
-        f"Dangers: {dangers}",
-    ]
+    details = {
+        "landscape": landscape,
+        "dangers": dangers,
+    }
 
     return LorePiece(
         name=name,

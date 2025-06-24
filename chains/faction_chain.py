@@ -4,6 +4,7 @@ from models.lore_piece import LorePiece
 from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
+from utils.load_prompt_from_file import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -18,52 +19,52 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Name prompt
-        name_prompt = (
-            f"Invent a unique name for a {theme} faction that does NOT contain or match any of the following words or names: {blacklist_str}. "
-            "Respond only with plain text, no markdown."
-            "No newlines; output a single paragraph."
-            "Name should be 2-3 words only."
+        name_prompt = load_prompt(
+            "faction/faction_name.txt",
+            theme=theme,
+            blacklist=blacklist_str,
         )
         name_raw = await ask_openrouter(name_prompt, max_tokens=50)
         name = clean_ai_text(name_raw)
 
         # Ideology prompt
-        ideology_prompt = (
-            f"Describe the core beliefs and goals of the {theme} faction named '{name}'."
-            " Respond only with plain text, no markdown."
-            " No newlines; output exactly 1 sentence."
+        ideology_prompt = load_prompt(
+            "faction/faction_ideology.txt",
+            theme=theme,
+            name=name,
         )
-        ideology_raw = await ask_openrouter(ideology_prompt, max_tokens=70)
+        ideology_raw = await ask_openrouter(ideology_prompt, max_tokens=100)
         ideology = clean_ai_text(ideology_raw)
 
         # Appearance prompt
-        appearance_prompt = (
-            f"Describe the typical appearance of members of the faction '{name}',"
-            f" including attire, symbols, or colors typical in a {theme} setting."
-            " Respond only with plain text, no markdown."
-            " No newlines; output exactly 1 sentence."
+        appearance_prompt = load_prompt(
+            "faction/faction_appearance.txt",
+            theme=theme,
+            name=name,
+            ideology=ideology,
         )
-        appearance_raw = await ask_openrouter(appearance_prompt, max_tokens=70)
+        appearance_raw = await ask_openrouter(appearance_prompt, max_tokens=150)
         appearance = clean_ai_text(appearance_raw)
 
         # Summary prompt
-        summary_prompt = (
-            f"Write a brief lore summary for the {theme} faction '{name}' based on ideology and appearance."
-            " Keep it to 2 sentences."
-            " Respond only with plain text, no markdown."
-            " No newlines; output a single paragraph."
+        summary_prompt = load_prompt(
+            "faction/faction_summary.txt",
+            theme=theme,
+            name=name,
+            ideology=ideology,
+            appearance=appearance,
         )
-        summary_raw = await ask_openrouter(summary_prompt, max_tokens=150)
+        summary_raw = await ask_openrouter(summary_prompt, max_tokens=200)
         summary = clean_ai_text(summary_raw)
 
     except Exception as e:
         logger.error(f"Failed to generate faction: {e}", exc_info=True)
         raise
 
-    details = [
-        f"Ideology: {ideology}",
-        f"Appearance: {appearance}",
-    ]
+    details = {
+        "ideology": ideology,
+        "appearance": appearance,
+    }
 
     return LorePiece(
         name=name,
