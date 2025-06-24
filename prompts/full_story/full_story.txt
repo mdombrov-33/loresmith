@@ -1,0 +1,31 @@
+You are an expert storyteller creating a lore-rich narrative in a {theme} world.
+Combine the following elements into a cohesive and immersive story summary:
+
+Character:
+Name: {character_name}
+Description: {character_description}
+Details: {character_details}
+
+Faction:
+Name: {faction_name}
+Description: {faction_description}
+Details: {faction_details}
+
+Setting:
+Name: {setting_name}
+Description: {setting_description}
+Details: {setting_details}
+
+Event:
+Name: {event_name}
+Description: {event_description}
+Details: {event_details}
+
+Relic:
+Name: {relic_name}
+Description: {relic_description}
+Details: {relic_details}
+
+Write a creative story summary connecting all these elements naturally.
+Use vivid language and keep it under 5 sentences.
+Respond only with plain text, no markdown or special characters.
