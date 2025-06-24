@@ -2,9 +2,9 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-purple)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-purple)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
-![Redis](https://img.shields.io/badge/Redis-8.0.2-red?logo=redis)
+![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
+[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
 
 ## Overview
 
@@ -102,7 +102,7 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
 
 ### Generate Multiple Lore Pieces
 
-- **GET** `/generate/characters`
+- **GET** `/api/generate/characters`
 
   Generate a list of character lore pieces.
 
@@ -112,25 +112,25 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
   - `theme` (string, optional): Theme for generation. Default is `post_apocalyptic`.
   - `regenerate` (bool, optional): If `true`, bypass cache and generate fresh data.
 
-- **GET** `/generate/factions`
+- **GET** `/api/generate/factions`
 
-  Similar to `/generate/characters` but for factions.
+  Similar to `/api/generate/characters` but for factions.
 
-- **GET** `/generate/settings`
+- **GET** `/api/generate/settings`
 
   Similar to above, for settings.
 
-- **GET** `/generate/events`
+- **GET** `/api/generate/events`
 
   Similar to above, for events.
 
-- **GET** `/generate/relics`
+- **GET** `/api/generate/relics`
 
   Similar to above, for relics.
 
 ### Generate Full Lore Bundle
 
-- **GET** `/generate/all`
+- **GET** `/api/generate/all`
 
   Generates all lore variants: characters, factions, settings, events, and relics at once.
 
@@ -141,7 +141,7 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
 
 ### Generate Full Story
 
-- **POST** `/generate/full-story`
+- **POST** `/api/generate/full-story`
 
   Generate a full story based on selected lore pieces.
 
