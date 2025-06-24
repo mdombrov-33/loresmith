@@ -2,9 +2,9 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-purple)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-purple)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
-![Redis](https://img.shields.io/badge/Redis-8.0.2-red?logo=redis)
+![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
+[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
 
 ## Overview
 
