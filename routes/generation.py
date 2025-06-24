@@ -1,6 +1,7 @@
 from typing import List
+from services.rate_limiter import is_rate_limited
 
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body, Query, Request, HTTPException, status
 
 from chains.multi_variant import (
     generate_multiple_characters,
@@ -16,12 +17,15 @@ from models.lore_piece import LorePiece
 from models.selected_lore_pieces import SelectedLorePieces
 from orchestrators import generate_full_story, generate_lore_variants
 
+
 router = APIRouter()
 
 
 @router.get("/generate/all", response_model=GeneratedLoreBundle)
 async def generate_all(
-    count: int = Query(3, ge=1, le=10), theme: Theme = Theme.post_apocalyptic
+    request: Request,
+    count: int = Query(3, ge=1, le=10),
+    theme: Theme = Theme.post_apocalyptic,
 ):
     """
     Generate all lore variants including characters, factions, settings, events, and relics.
@@ -32,11 +36,21 @@ async def generate_all(
     Returns:
     A dictionary containing lists of generated lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_lore_variants(count, theme)
 
 
 @router.get("/generate/characters", response_model=List[LorePiece])
 async def generate_characters(
+    request: Request,
     count: int = Query(3, ge=1, le=10),
     theme: Theme = Theme.post_apocalyptic,
     regenerate: bool = False,
@@ -50,11 +64,21 @@ async def generate_characters(
     Returns:
     A list of generated character lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_multiple_characters(count, theme, regenerate)
 
 
 @router.get("/generate/factions", response_model=List[LorePiece])
 async def generate_factions(
+    request: Request,
     count: int = Query(3, ge=1, le=10),
     theme: Theme = Theme.post_apocalyptic,
     regenerate: bool = False,
@@ -68,11 +92,21 @@ async def generate_factions(
     Returns:
     A list of generated faction lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_multiple_factions(count, theme, regenerate)
 
 
 @router.get("/generate/settings", response_model=List[LorePiece])
 async def generate_settings(
+    request: Request,
     count: int = Query(3, ge=1, le=10),
     theme: Theme = Theme.post_apocalyptic,
     regenerate: bool = False,
@@ -86,11 +120,21 @@ async def generate_settings(
     Returns:
     A list of generated setting lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_multiple_settings(count, theme, regenerate)
 
 
 @router.get("/generate/events", response_model=List[LorePiece])
 async def generate_events(
+    request: Request,
     count: int = Query(3, ge=1, le=10),
     theme: Theme = Theme.post_apocalyptic,
     regenerate: bool = False,
@@ -104,11 +148,21 @@ async def generate_events(
     Returns:
     A list of generated event lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_multiple_events(count, theme, regenerate)
 
 
 @router.get("/generate/relics", response_model=List[LorePiece])
 async def generate_relics(
+    request: Request,
     count: int = Query(3, ge=1, le=10),
     theme: Theme = Theme.post_apocalyptic,
     regenerate: bool = False,
@@ -122,11 +176,21 @@ async def generate_relics(
     Returns:
     A list of generated relic lore pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_multiple_relics(count, theme, regenerate)
 
 
 @router.post("/generate/full-story", response_model=FullStory)
 async def generate_story(
+    request: Request,
     selected_pieces: SelectedLorePieces = Body(...),
     theme: Theme = Query(Theme.post_apocalyptic),
 ):
@@ -140,4 +204,13 @@ async def generate_story(
     Returns:
     A full story combining all selected pieces.
     """
+
+    client_ip = request.client.host
+
+    if await is_rate_limited(client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again later.",
+        )
+
     return await generate_full_story(selected_pieces, theme)
