@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-purple)](https://fastapi.tiangolo.com/)
 ![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
-[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
+[![Docker](https://img.shields.io/badge/docker-28.1-purple?logo=docker)](https://www.docker.com/)
 
 ## Overview
 
