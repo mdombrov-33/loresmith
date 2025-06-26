@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-purple)](https://fastapi.tiangolo.com/)
 ![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
-[![Docker](https://img.shields.io/badge/docker-28.1-blue?logo=docker)](https://www.docker.com/)
+[![Docker](https://img.shields.io/badge/docker-28.1-purple?logo=docker)](https://www.docker.com/)
 
 ## Overview
 
@@ -152,3 +152,26 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
   **Query parameters:**
 
   - `theme` (string, optional): Theme for story generation. Default is `post_apocalyptic`.
+
+---
+
+### Example API Response
+Below is a sample JSON response from the `/api/generate/characters` endpoint illustrating the structure and content returned by the AI lore generator.
+
+`/api/generate/characters?count=1&theme=steampunk&regenerate=false'`
+
+```json
+[
+  {
+    "name": "Cylindra Quicksprocket",
+    "description": "Cylindra Quicksprocket, a spirited inventor hailing from the bustling airship docks of Mechanica, spent her childhood dismantling and reassembling her father's intricate clockwork gadgets, fueling her insatiable curiosity. With a heart full of wanderlust and a knack for crafting ingenious contraptions from scrap metal, she now traverses the cloud-laden skies on her steam-powered skiff, seeking daring escapades and the rarest blueprints to elevate her inventions to unimaginable heights.",
+    "details": {
+      "personality": "Inventive, resourceful, adventurous",
+      "appearance": "Cylindra Quicksprocket has a slender, elongated figure adorned with intricate mechanical tattoos that shimmer with metallic hues, her long auburn hair is styled in elaborate braids interwoven with copper wires and tiny gears, she wears a fitted corset made of deep burgundy leather, accented by delicate lace and brass buckles, her skirts are layered with ruffled fabrics, showcasing a blend of rich greens and earthy browns, she sports knee-high lace-up boots made of sturdy yet elegant materials, her goggles, perched on her forehead, feature stained glass lenses that shift colors with the light, and her fingers are often adorned with steampunk-inspired rings, featuring clockwork designs and tiny gemstones, her expressive green eyes glint with curiosity and mischief, reflecting her adventurous spirit."
+    },
+    "type": "character"
+  }
+]
+
+
+
