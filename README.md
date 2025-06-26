@@ -1,7 +1,7 @@
-# EchoForge - Modular AI-Powered Lore Generator
+# LoreSmith - Modular AI-Powered Lore Generator
 
 <p align="center">
-  <img src="assets/logo.png" alt="EchoForge Logo" width="200" />
+  <img src="assets/logo.png" alt="LoreSmith Logo" width="200" />
 </p>
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-purple)](https://www.python.org/)
@@ -12,7 +12,7 @@
 
 ## Overview
 
-EchoForge is a backend service that generates modular AI-driven lore pieces - characters, factions, settings, events, and relics, using asynchronous chains and OpenRouter API.
+LoreSmith is a backend service that generates modular AI-driven lore pieces - characters, factions, settings, events, and relics, using asynchronous chains and OpenRouter API.
 
 The system supports caching generated lore variants in Redis for improved performance and includes a mechanism to regenerate lore on demand, bypassing cache when needed.
 
@@ -31,7 +31,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 
 ## AI Feature Roadmap
 
-This roadmap outlines planned AI-powered features for EchoForge, designed to progressively enhance lore generation, interactivity, and immersion.
+This roadmap outlines planned AI-powered features for LoreSmith, designed to progressively enhance lore generation, interactivity, and immersion.
 
 ### Phase 1: Core Extensions
 - **Lore Extensions**  
@@ -69,8 +69,8 @@ This roadmap outlines planned AI-powered features for EchoForge, designed to pro
 1. Clone the repository and navigate into it:
 
 ```bash
-git clone https://github.com/mdombrov-33/echoforge.git
-cd echoforge
+git clone https://github.com/mdombrov-33/loresmith.git
+cd loresmith
 ```
 
 2. Create and activate Python virtual environment:
