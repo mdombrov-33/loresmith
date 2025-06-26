@@ -27,6 +27,35 @@ The system supports caching generated lore variants in Redis for improved perfor
 - Easily extendable architecture to add new lore categories or themes
 - Docker-ready for easy deployment and development with Redis integration
 
+---
+
+## AI Feature Roadmap
+
+This roadmap outlines planned AI-powered features for EchoForge, designed to progressively enhance lore generation, interactivity, and immersion.
+
+### Phase 1: Core Extensions
+- **Lore Extensions**  
+  Generate short thematic story hooks or rumors based on existing lore pieces to add depth and flavor.
+- **Basic NPC Chatbot**  
+  Provide a chat endpoint seeded with individual character or faction data, enabling simple interactive dialogues.
+- **Thematic Name Generator**  
+  Generate character and place names guided by user-provided style or mood input for thematic consistency.
+
+### Phase 2: Immersion & Localization
+- **Procedural World Description Generator**  
+  Automatically generate text-based world or region descriptions to enrich lore settings.
+- **Multi-Language Support**  
+  Add a `language` query parameter to output generated content in multiple languages, broadening accessibility.
+
+### Phase 3: Advanced UX & Experimental
+- **Enhanced NPC Dialogues with Memory**  
+  Implement session state and conversation history for NPC chatbots to allow richer, context-aware interactions.
+- **Lore Consistency Checker**  
+  Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
+- **AI Visual Storytelling**  
+  Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
+
+
 ## Running Locally
 
 ### Prerequisites
