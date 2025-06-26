@@ -1,5 +1,9 @@
 # EchoForge - Modular AI-Powered Lore Generator
 
+<p align="center">
+  <img src="assets/logo.png" alt="EchoForge Logo" width="200" />
+</p>
+
 [![Python](https://img.shields.io/badge/python-3.10%2B-purple)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-purple)](https://fastapi.tiangolo.com/)
 ![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
@@ -48,26 +52,30 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
 3. Install Python dependencies:
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 4. Start your Redis server locally (or ensure remote Redis is accessible):
+
 ```bash
 redis-server
 ```
 
 5. Set ENV variables, example:
+
    - OPENROUTER_API_KEY=your_api_key
    - REDIS_HOST=localhost
    - REDIS_PORT=6379
    - REDIS_DB=0
-  
+
 6. Run the FastAPI application:
-  ```bash
-  uvicorn main:app --reload --host 0.0.0.0 --port 8000
-  ```
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
 7. Open [http://localhost:8000/docs](http://localhost:8000/docs) in your browser to explore and test the API.
 
@@ -78,18 +86,22 @@ redis-server
 This project uses Docker Compose to run the backend service alongside Redis.
 
 To start the application:
+
 - Run the following command in your terminal:
 
 ```bash
 docker-compose up --build
 ```
+
 - This command will:
   - Build the backend Docker image from Dockerfile
   - Start a Redis container
   - Launch the FastAPI backend accessible at [http://localhost:8000](http://localhost:8000)
 
 To stop the containers:
+
 - Use the command:
+
 ```bash
 docker-compose down
 ```
@@ -156,6 +168,7 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
 ---
 
 ### Example API Response
+
 Below is a sample JSON response from the `/api/generate/characters` endpoint illustrating the structure and content returned by the AI lore generator.
 
 `/api/generate/characters?count=1&theme=steampunk&regenerate=false'`
@@ -172,6 +185,4 @@ Below is a sample JSON response from the `/api/generate/characters` endpoint ill
     "type": "character"
   }
 ]
-
-
-
+```
