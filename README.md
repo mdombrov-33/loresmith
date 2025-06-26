@@ -200,7 +200,7 @@ The backend exposes RESTful endpoints for generating different lore pieces and f
 
 ### Example API Response
 
-Below is a sample JSON response from the `/api/generate/characters` endpoint illustrating the structure and content returned by the AI lore generator.
+Below is a sample JSON responses from the endpoints illustrating the structure and content returned by the AI lore generator.
 
 `/api/generate/characters?count=1&theme=steampunk&regenerate=false'`
 
@@ -216,4 +216,60 @@ Below is a sample JSON response from the `/api/generate/characters` endpoint ill
     "type": "character"
   }
 ]
+```
+
+`/api/generate/full-story?theme=post-apocalyptic`
+
+```json
+{
+  "title": "Full Story",
+  "content": "In the ash-choked expanse of Ashfall City, where collapsed skyscrapers loom like forgotten giants and toxic rivers snake through the rubble, Echo, a cautious scavenger draped in a dust-covered cloak, inches through the remnants of a world lost to The Collapse. As she navigates the perilous terrain of radioactive zones and rogue drones, her reflective goggles catch the faint glow of a legendary artifact rumored to possess the key to a future—or a curse: the Pathseeker Map, a shimmering relic that could unlock the secrets of pre-war technology. Yet, the relentless Steel Reclaimers, clad in armored uniforms and marked by their metallic insignia, hunt her with ruthless intent, believing that only through the control of such relics can order rise from chaos. Burdened by the memories of a world she once knew, Echo must race against time to embrace the map's potential, defending it from those who would see it bent to tyranny. In a city laden with the ghosts of the past, her choices will determine whether the flicker of hope within the ruins can ignite a new dawn or extinguish beneath the weight of oppression.",
+  "theme": "post-apocalyptic",
+  "pieces": {
+    "character": {
+      "name": "Echo",
+      "description": "A skilled scavenger navigating the ruins of a fallen city.",
+      "details": {
+        "personality": "Cautious, intelligent, burdened by the past",
+        "appearance": "Dust-covered cloak, reflective goggles, scavenged tech gear"
+      },
+      "type": "character"
+    },
+    "faction": {
+      "name": "Steel Reclaimers",
+      "description": "A militant faction obsessed with recovering pre-war technology.",
+      "details": {
+        "ideology": "Technology must be controlled to enforce order",
+        "appearance": "Armored uniforms, metallic insignia, glowing visors"
+      },
+      "type": "faction"
+    },
+    "setting": {
+      "name": "Ashfall City",
+      "description": "A ruined megacity buried in ash and fog.",
+      "details": {
+        "landscape": "Collapsed skyscrapers, toxic rivers, ash storms",
+        "dangers": "Radioactive zones, rogue drones, scavenger gangs"
+      },
+      "type": "setting"
+    },
+    "event": {
+      "name": "The Collapse",
+      "description": "The catastrophic shutdown of global power grids that marked the end of the old world.",
+      "details": {
+        "impact": "Plunged the world into chaos and birthed new powers"
+      },
+      "type": "event"
+    },
+    "relic": {
+      "name": "The Pathseeker Map",
+      "description": "A shimmering, semi-holographic map once used for space exploration.",
+      "details": {
+        "history": "Said to hold data that could restart civilization",
+        "appearance": "Translucent surface, faint glowing constellations"
+      },
+      "type": "relic"
+    }
+  }
+}
 ```
