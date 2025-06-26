@@ -1,7 +1,7 @@
-# EchoForge - Modular AI-Powered Lore Generator
+# LoreSmith - Modular AI-Powered Lore Generator
 
 <p align="center">
-  <img src="assets/logo.png" alt="EchoForge Logo" width="200" />
+  <img src="assets/logo.png" alt="LoreSmith Logo" width="200" />
 </p>
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-purple)](https://www.python.org/)
@@ -12,7 +12,7 @@
 
 ## Overview
 
-EchoForge is a backend service that generates modular AI-driven lore pieces - characters, factions, settings, events, and relics, using asynchronous chains and OpenRouter API.
+LoreSmith is a backend service that generates modular AI-driven lore pieces - characters, factions, settings, events, and relics, using asynchronous chains and OpenRouter API.
 
 The system supports caching generated lore variants in Redis for improved performance and includes a mechanism to regenerate lore on demand, bypassing cache when needed.
 
@@ -31,9 +31,10 @@ The system supports caching generated lore variants in Redis for improved perfor
 
 ## AI Feature Roadmap
 
-This roadmap outlines planned AI-powered features for EchoForge, designed to progressively enhance lore generation, interactivity, and immersion.
+This roadmap outlines planned AI-powered features for LoreSmith, designed to progressively enhance lore generation, interactivity, and immersion.
 
 ### Phase 1: Core Extensions
+
 - **Lore Extensions**  
   Generate short thematic story hooks or rumors based on existing lore pieces to add depth and flavor.
 - **Basic NPC Chatbot**  
@@ -42,19 +43,20 @@ This roadmap outlines planned AI-powered features for EchoForge, designed to pro
   Generate character and place names guided by user-provided style or mood input for thematic consistency.
 
 ### Phase 2: Immersion & Localization
+
 - **Procedural World Description Generator**  
   Automatically generate text-based world or region descriptions to enrich lore settings.
 - **Multi-Language Support**  
   Add a `language` query parameter to output generated content in multiple languages, broadening accessibility.
 
 ### Phase 3: Advanced UX & Experimental
+
 - **Enhanced NPC Dialogues with Memory**  
   Implement session state and conversation history for NPC chatbots to allow richer, context-aware interactions.
 - **Lore Consistency Checker**  
   Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
-
 
 ## Running Locally
 
@@ -69,8 +71,8 @@ This roadmap outlines planned AI-powered features for EchoForge, designed to pro
 1. Clone the repository and navigate into it:
 
 ```bash
-git clone https://github.com/mdombrov-33/echoforge.git
-cd echoforge
+git clone https://github.com/mdombrov-33/loresmith.git
+cd loresmith
 ```
 
 2. Create and activate Python virtual environment:
