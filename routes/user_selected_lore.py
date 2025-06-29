@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,13 +5,14 @@ from db.lore_piece.schemas import UserSelectedLoreRead
 from db.session import get_async_db
 from db.lore_piece.crud import create_lore_selection, get_lore_selections_by_user
 from models.selected_lore_pieces import LoreSelectionCreate
+from typing import List
 
 router = APIRouter()
 
 
 @router.post(
     "/user-selected-lore",
-    response_model=List[UserSelectedLoreRead],
+    response_model=UserSelectedLoreRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new lore selection for a user",
 )
