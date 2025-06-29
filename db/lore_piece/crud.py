@@ -1,4 +1,7 @@
+from typing import List
+
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from db.user_selected_lore.models import UserSelectedLore
 from models.selected_lore_pieces import LoreSelectionCreate
@@ -15,3 +18,12 @@ async def create_lore_selection(
     await db.commit()
     await db.refresh(new_selection)
     return new_selection
+
+
+async def get_lore_selections_by_user(
+    db: AsyncSession, user_id: str
+) -> List[UserSelectedLore]:
+    result = await db.execute(
+        select(UserSelectedLore).where(UserSelectedLore.user_id == user_id)
+    )
+    return result.scalars().all()
