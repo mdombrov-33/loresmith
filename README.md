@@ -30,7 +30,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 
 ---
 
-## 🛠️ Tech Stack & Tooling
+## Tech Stack & Tooling 🛠️ 
 
 LoreSmith uses a modern Python backend stack optimized for asynchronous workflows and production readiness:
 
