@@ -1,10 +1,7 @@
-# This defines the base class for all SQLAlchemy models
-# All tables in DB will inherit from this Base
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, JSON
+from db.base import Base
 
-# Create a base class from which all models will inherit
-Base = declarative_base()
+# Describe the table structure for lore pieces in the database
 
 # This class represents a table in database called 'lore_pieces'
 # It will store the actual lore pieces
