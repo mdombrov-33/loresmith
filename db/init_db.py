@@ -3,7 +3,7 @@ from db.base import Base
 from db.session import engine
 
 # Import it here because postgres needs to know about the models before creating tables
-from db.lore_piece_db import LorePiece
+from db.lore_piece.models import LorePiece
 
 
 async def init_db():

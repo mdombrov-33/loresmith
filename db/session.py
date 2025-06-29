@@ -1,12 +1,9 @@
-# import asyncio
-
 # Grab ENV like DB credentials
 import os
 
 # Import the async engine + session maker tools from SQLAlchemy
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-# from sqlalchemy import text
 
 # Define POSTGRES connection string
 # Format: "postgresql+asyncpg://<user>:<password>@<host>:<port>/<database>"
@@ -29,13 +26,3 @@ async_session = async_sessionmaker(
     expire_on_commit=False,  # don't expire objects after commit
     class_=AsyncSession      # tells SQLAlchemy to use the async version of sessions
 )
-
-
-# async def test_connection():
-#     async with async_session() as session:
-#         # Run a simple raw SQL query to check connection
-#         result = await session.execute(text("SELECT 1"))
-#         print("Test query result:", result.scalar())
-
-# if __name__ == "__main__":
-#     asyncio.run(test_connection())
