@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, JSON
+from sqlalchemy import JSON, Column, Integer, String
+from sqlalchemy.orm import relationship
+
 from db.base import Base
 
 # Describe the table structure for lore pieces in the database
@@ -26,3 +28,5 @@ class LorePiece(Base):
     # Details dictionary stored as JSON (e.g. {"appearance": "...", "ideology": "..."})
     # This lets us store flexible nested data without creating extra tables
     details = Column(JSON, nullable=True)
+
+    selected_by_users = relationship("UserSelectedLore", back_populates="lore_piece", cascade="all, delete-orphan")
