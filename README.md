@@ -9,6 +9,7 @@
 ![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
 [![Docker](https://img.shields.io/badge/docker-28.1-purple?logo=docker)](https://www.docker.com/)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-purple?logo=postgresql)
 
 ## Overview
 
@@ -57,6 +58,14 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
   Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
+
+### PostgreSQL Integration (**WIP**)
+
+- Async PostgreSQL support via SQLAlchemy 2.x + asyncpg
+- Storing generated lore for persistence and analytics
+- Designed with production features like retry logic, error logging, and Docker-managed services
+
+---
 
 ## Running Locally
 
