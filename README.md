@@ -9,6 +9,7 @@
 ![Redis](https://img.shields.io/badge/Redis-8.0.2-purple?logo=redis)
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
 [![Docker](https://img.shields.io/badge/docker-28.1-purple?logo=docker)](https://www.docker.com/)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-purple?logo=postgresql)
 
 ## Overview
 
