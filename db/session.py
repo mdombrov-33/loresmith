@@ -1,6 +1,8 @@
 # Grab ENV like DB credentials
 import os
 
+from typing import AsyncGenerator
+
 # Import the async engine + session maker tools from SQLAlchemy
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -26,3 +28,7 @@ async_session = async_sessionmaker(
     expire_on_commit=False,  # don't expire objects after commit
     class_=AsyncSession      # tells SQLAlchemy to use the async version of sessions
 )
+
+async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session

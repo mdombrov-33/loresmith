@@ -16,3 +16,11 @@ class LorePieceRead(LorePieceCreate):
 
     class Config:
         orm_mode = True
+
+class UserSelectedLoreRead(BaseModel):
+    id: int
+    user_id: str
+    lore_piece_id: int
+
+    class Config:
+        orm_mode = True
