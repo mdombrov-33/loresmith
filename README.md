@@ -43,6 +43,14 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 - **Thematic Name Generator**  
   Generate character and place names guided by user-provided style or mood input for thematic consistency.
 
+- **PostgreSQL Integration (WIP)**  
+  Introducing persistent storage of AI-generated lore using PostgreSQL with SQLAlchemy 2.x and asyncpg.  
+  This enables saving user-selected content, tracking generations, and supporting future analytics.
+
+  - Async support with SQLAlchemy 2.x (Declarative + `async_session`)
+  - Store generated lore and user selections in a normalized schema
+  - Designed for production with retry logic, error handling, and Docker-managed services
+
 ### Phase 2: Immersion & Localization
 
 - **Procedural World Description Generator**  
@@ -58,13 +66,7 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
   Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
-
-### PostgreSQL Integration (**WIP**)
-
-- Async PostgreSQL support via SQLAlchemy 2.x + asyncpg
-- Storing generated lore for persistence and analytics
-- Designed with production features like retry logic, error logging, and Docker-managed services
-
+  
 ---
 
 ## Running Locally
