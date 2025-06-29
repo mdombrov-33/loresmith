@@ -6,7 +6,7 @@ import os
 # Import the async engine + session maker tools from SQLAlchemy
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from sqlalchemy import text
+# from sqlalchemy import text
 
 # Define POSTGRES connection string
 # Format: "postgresql+asyncpg://<user>:<password>@<host>:<port>/<database>"
