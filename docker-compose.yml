@@ -8,11 +8,17 @@ services:
       - .:/app
     depends_on:
       - redis
+      - postgres
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=loresmith
+      - POSTGRES_USER=loresmith_user
+      - POSTGRES_PASSWORD=somepassword
     command:
       ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
@@ -21,3 +27,18 @@ services:
     container_name: loresmith-redis
     ports:
       - "6379:6379"
+
+  postgres:
+    image: postgres:16
+    container_name: loresmith-postgres
+    environment:
+      POSTGRES_DB: loresmith
+      POSTGRES_USER: loresmith_user
+      POSTGRES_PASSWORD: somepassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
