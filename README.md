@@ -58,6 +58,14 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
 
+### PostgreSQL Integration (**WIP**)
+
+- Async PostgreSQL support via SQLAlchemy 2.x + asyncpg
+- Storing generated lore for persistence and analytics
+- Designed with production features like retry logic, error logging, and Docker-managed services
+
+---
+
 ## Running Locally
 
 ### Prerequisites
