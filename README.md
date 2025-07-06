@@ -88,6 +88,18 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
   
 ---
 
+## Future Enhancements & Infrastructure Roadmap
+
+To further enhance LoreSmith's scalability, resilience, and operational insights, the following integrations are planned:
+
+* **Orchestration (Kubernetes):** Future deployment will leverage **Kubernetes** for container orchestration, enabling advanced scaling, self-healing, and efficient resource management.
+* **Observability Stack:** Integration of a comprehensive observability suite, including:
+    * **Prometheus** for metrics collection and time-series data.
+    * **Grafana** for rich data visualization and dashboarding.
+    * **OpenTelemetry** for distributed tracing and enhanced insight into application performance.
+
+---
+
 ## Running Locally
 
 ### Prerequisites
