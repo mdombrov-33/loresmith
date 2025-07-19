@@ -1,14 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from db.session import get_async_db
-from db.user.models import User
-from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr
+from db.user import crud
 from utils.security import hash_password, verify_password
-from utils.jwt import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-import uuid
-
+from utils.jwt import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, verify_jwt_token
+from pydantic import BaseModel, EmailStr
 
 router = APIRouter()
 
@@ -23,27 +19,20 @@ class UserLogin(BaseModel):
     password: str
 
 
+router = APIRouter()
+
+
 @router.post("/users", status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_async_db)):
-    # Check if user already exists
-    result = await db.execute(select(User).where(User.email == user.email))
-    existing_user = result.scalars().first()
+    existing_user = await crud.get_user_by_email(db, user.email)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
+            status_code=400, detail="User with this email already exists"
         )
 
-    # Hash the password before storing
     hashed_password = hash_password(user.password)
+    new_user = await crud.create_user(db, user.email, hashed_password)
 
-    new_user = User(
-        id=str(uuid.uuid4()), email=user.email, hashed_password=hashed_password
-    )
-
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
     return {"id": new_user.id, "email": new_user.email}
 
 
@@ -51,50 +40,48 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_async_db)
 async def login_user(
     user: UserLogin, response: Response, db: AsyncSession = Depends(get_async_db)
 ):
-    # Find user by email
-    result = await db.execute(select(User).where(User.email == user.email))
-    db_user = result.scalars().first()
+    db_user = await crud.get_user_by_email(db, user.email)
+    if not db_user or not verify_password(user.password, db_user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    if not db_user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
-
-    # Verify the password
-    if not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
-
-    # Create JWT
     access_token = create_access_token({"sub": db_user.id})
-
-    # Set JWT as HTTP only cookie
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # seconds
-        secure=True,  # Set to True if using HTTPS
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        secure=True,
         samesite="lax",
         path="/",
     )
-
     return {"message": "Login successful", "user_id": db_user.id}
+
+
+@router.get("/me")
+async def get_current_user(request: Request, db: AsyncSession = Depends(get_async_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    payload = verify_jwt_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user_id = payload.get("sub")
+    user = await crud.get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"id": str(user.id), "email": user.email}
 
 
 @router.post("/users/logout")
 def logout_user(response: Response):
-    """
-    Log out the user by clearing the access token cookie.
-    """
     response.delete_cookie(
         key="access_token",
-        path="/",  # must match path used when setting it
-        samesite="lax",  # must match samesite used when setting it
-        httponly=True,  # was set to True, must match here too
-        secure=True,  # must match; use False if running without HTTPS
+        path="/",
+        samesite="lax",
+        httponly=True,
+        secure=True,
     )
     return {"message": "Logout successful"}
