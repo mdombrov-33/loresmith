@@ -73,18 +73,18 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 ### Phase 2: Immersion & Localization
 
 - **Procedural World Description Generator**  
-  Automatically generate text-based world or region descriptions to enrich lore settings
+  Automatically generate text-based world or region descriptions to enrich lore settings.
 - **Multi-Language Support**  
-  Add a `language` query parameter to output generated content in multiple languages, broadening accessibility
+  Add a `language` query parameter to output generated content in multiple languages, broadening accessibility.
 
 ### Phase 3: Advanced UX & Experimental
 
 - **Enhanced NPC Dialogues with Memory**  
-  Implement session state and conversation history for NPC chatbots to allow richer, context-aware interactions
+  Implement session state and conversation history for NPC chatbots to allow richer, context-aware interactions.
 - **Lore Consistency Checker**  
-  Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence
+  Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
 - **AI Visual Storytelling**  
-  Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion
+  Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
   
 ---
 
