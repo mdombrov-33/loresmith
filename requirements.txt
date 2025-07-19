@@ -7,3 +7,6 @@ redis==5.0.4
 SQLAlchemy==2.0.41
 asyncpg==0.30.0
 alembic==1.16.2
+passlib==1.7.4
+bcrypt==4.3.0
+email_validator==2.2.0
