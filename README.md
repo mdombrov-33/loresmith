@@ -38,14 +38,8 @@ LoreSmith uses a modern Python backend stack optimized for asynchronous workflow
 - **SQLAlchemy** - Declarative, type-safe ORM for interacting with PostgreSQL
 - **Alembic** - Schema migration tool for SQLAlchemy, used to version and manage database changes
 - **PostgreSQL** - Relational database for persistent lore and user data
-- **asyncpg** - Fast PostgreSQL driver optimized for asyncio
 - **Redis** - Used for caching AI-generated content and improving performance
 - **Docker & Docker Compose** - Containerized development environment with built-in Redis/PostgreSQL support
-- **Uvicorn** - Lightning-fast ASGI server powering FastAPI
-
-Additional tooling:
-- **Pydantic** - For request/response validation and data modeling
-- **HTTPX** - Async HTTP client for communicating with the OpenRouter API
 
 ---
 
