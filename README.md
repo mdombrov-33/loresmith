@@ -35,7 +35,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 LoreSmith uses a modern Python backend stack optimized for asynchronous workflows and production readiness:
 
 - **FastAPI** - High-performance web framework for building async APIs
-- **SQLAlchemy 2.x (async)** - Declarative, type-safe ORM for interacting with PostgreSQL
+- **SQLAlchemy** - Declarative, type-safe ORM for interacting with PostgreSQL
 - **Alembic** - Schema migration tool for SQLAlchemy, used to version and manage database changes
 - **PostgreSQL** - Relational database for persistent lore and user data
 - **asyncpg** - Fast PostgreSQL driver optimized for asyncio
@@ -86,6 +86,18 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
   
+---
+
+## Future Enhancements & Infrastructure Roadmap
+
+To further enhance LoreSmith's scalability, resilience, and operational insights, the following integrations are planned:
+
+* **Orchestration (Kubernetes):** Future deployment will leverage **Kubernetes** for container orchestration, enabling advanced scaling, self-healing, and efficient resource management
+* **Observability Stack:** Integration of a comprehensive observability suite, including:
+    * **Prometheus** for metrics collection and time-series data
+    * **Grafana** for rich data visualization and dashboarding
+    * **OpenTelemetry** for distributed tracing and enhanced insight into application performance
+
 ---
 
 ## Running Locally
