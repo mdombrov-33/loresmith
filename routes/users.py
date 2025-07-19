@@ -83,3 +83,18 @@ async def login_user(
     )
 
     return {"message": "Login successful", "user_id": db_user.id}
+
+
+@router.post("/users/logout")
+def logout_user(response: Response):
+    """
+    Log out the user by clearing the access token cookie.
+    """
+    response.delete_cookie(
+        key="access_token",
+        path="/",  # must match path used when setting it
+        samesite="lax",  # must match samesite used when setting it
+        httponly=True,  # was set to True, must match here too
+        secure=True,  # must match; use False if running without HTTPS
+    )
+    return {"message": "Logout successful"}
