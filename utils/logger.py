@@ -1,14 +1,18 @@
 import logging
 import sys
 
-FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-logging.basicConfig(
-    level=logging.INFO,
-    format=FORMAT,
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-    ],
-)
+def configure_logger(name: str = "loresmith") -> logging.Logger:
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+    return logger
 
-logger = logging.getLogger("loresmith")
+
+logger = configure_logger()
