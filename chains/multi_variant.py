@@ -11,7 +11,7 @@ from chains.event_chain import generate_event
 from chains.relic_chain import generate_relic
 
 from services.redis_utils import redis_get_with_retries, redis_set_with_retries
-from utils.exceptions import RedisGetError, RedisSetError
+from utils.exceptions.redis import RedisGetError, RedisSetError
 from utils.logger import logger
 
 

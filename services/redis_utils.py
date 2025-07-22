@@ -3,7 +3,7 @@ from utils.logger import logger
 import random
 
 from redis.exceptions import RedisError  # Redis client exception base
-from utils.exceptions import RedisGetError, RedisSetError
+from utils.exceptions.redis import RedisGetError, RedisSetError
 
 from services.redis_client import redis_client
 
