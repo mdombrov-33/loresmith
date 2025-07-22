@@ -6,7 +6,8 @@ from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
 from utils.load_prompt_from_file import load_prompt
 
-logger = logging.getLogger(__name__)
+from utils.logger import logger
+from utils.exceptions.generation import EventGenerationError
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -49,7 +50,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
 
     except Exception as e:
         logger.error(f"Failed to generate event: {e}", exc_info=True)
-        raise
+        raise EventGenerationError(str(e))
 
     details = {"impact": impact}
 

@@ -1,12 +1,11 @@
-import logging
-
 from models.lore_piece import LorePiece
 from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
 from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
 from utils.load_prompt_from_file import load_prompt
 
-logger = logging.getLogger(__name__)
+from utils.logger import logger
+from utils.exceptions.generation import CharacterGenerationError
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -58,7 +57,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
 
     except Exception as e:
         logger.error(f"Failed to generate character: {e}", exc_info=True)
-        raise
+        raise CharacterGenerationError(str(e))
 
     details = {
         "personality": personality,

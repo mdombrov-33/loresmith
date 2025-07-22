@@ -1,4 +1,4 @@
-from exceptions.base import LoreSmithException
+from utils.exceptions.base import LoreSmithException
 
 
 class RedisGetError(LoreSmithException):

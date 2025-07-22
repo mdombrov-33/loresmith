@@ -6,7 +6,8 @@ from utils.blacklist import BLACKLIST
 from utils.text_formatting import clean_ai_text
 from utils.load_prompt_from_file import load_prompt
 
-logger = logging.getLogger(__name__)
+from utils.logger import logger
+from utils.exceptions.generation import RelicGenerationError
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -48,7 +49,7 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
 
     except Exception as e:
         logger.error(f"Failed to generate relic: {e}", exc_info=True)
-        raise
+        raise RelicGenerationError(str(e))
 
     details = {
         "history": history,
