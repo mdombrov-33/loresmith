@@ -138,6 +138,22 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 
 ---
 
+## ⚠️ Known Issues
+
+The PostgreSQL database integration is currently unstable and partially broken in this project.
+
+- Some database connection issues may cause runtime errors or 500 Internal Server Errors
+
+- Persistent storage and schema migrations are incomplete or not fully tested
+
+- Use caution if relying on database persistence for lore or user data — data loss or connection failures are possible
+
+- The database setup in Kubernetes and local environments requires further refinement
+
+- This project is primarily focused on AI lore generation and caching via Redis for now
+
+---
+
 ## 🚀 Kubernetes Deployment
 
 LoreSmith runs on Kubernetes to leverage its inherent capabilities like container orchestration, self-healing, and resource management. The current deployment follows core Kubernetes patterns focused on reliability, with plans to add explicit resource allocation and autoscaling configurations.
