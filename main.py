@@ -6,8 +6,10 @@ from routes import generation, user_selected_lore, users
 app = FastAPI()
 
 app.include_router(generation.router, prefix="/api", tags=["generation"])
-app.include_router(user_selected_lore.router, prefix="/api", tags=["user-selected-lore"]) 
-app.include_router(users.router, prefix="/api", tags=["users"]) 
+app.include_router(
+    user_selected_lore.router, prefix="/api", tags=["user-selected-lore"]
+)
+app.include_router(users.router, prefix="/api", tags=["users"])
 
 
 if __name__ == "__main__":

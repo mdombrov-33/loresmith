@@ -11,6 +11,7 @@ class SelectedLorePieces(BaseModel):
     event: Optional[LorePiece] = None
     relic: Optional[LorePiece] = None
 
+
 # For DB insertion
 class LoreSelectionCreate(BaseModel):
     user_id: str

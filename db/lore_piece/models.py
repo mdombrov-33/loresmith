@@ -5,6 +5,7 @@ from db.base import Base
 
 # Describe the table structure for lore pieces in the database
 
+
 # This class represents a table in database called 'lore_pieces'
 # It will store the actual lore pieces
 class LorePiece(Base):
@@ -29,4 +30,6 @@ class LorePiece(Base):
     # This lets us store flexible nested data without creating extra tables
     details = Column(JSON, nullable=True)
 
-    selected_by_users = relationship("UserSelectedLore", back_populates="lore_piece", cascade="all, delete-orphan")
+    selected_by_users = relationship(
+        "UserSelectedLore", back_populates="lore_piece", cascade="all, delete-orphan"
+    )

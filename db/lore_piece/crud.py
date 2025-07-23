@@ -16,8 +16,7 @@ async def create_lore_selection(
         return None
 
     new_selection = UserSelectedLore(
-        user_id=selection.user_id,
-        lore_piece_id=selection.lore_piece_id
+        user_id=selection.user_id, lore_piece_id=selection.lore_piece_id
     )
     db.add(new_selection)
     await db.commit()
