@@ -221,6 +221,7 @@ To further enhance LoreSmith's operational capabilities, the following integrati
     * **Prometheus** for metrics collection and time-series data
     * **Grafana** for rich data visualization and dashboarding  
     * **OpenTelemetry** for distributed tracing and performance insights
+    * **Mezmo (LogDNA)** for centralized log aggregation and analysis
 * **Service Mesh**: Consider **Istio** integration for advanced traffic management and security
 * **GitOps**: **ArgoCD** implementation for declarative, automated deployments
 
