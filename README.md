@@ -56,7 +56,7 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 - **Thematic Name Generator**  
   Generate character and place names guided by user-provided style or mood input for thematic consistency.
 
-- **PostgreSQL Integration (WIP)**  
+- **PostgreSQL Integration** ✅  
   Introducing persistent storage of AI-generated lore using PostgreSQL with SQLAlchemy 2.x and asyncpg.  
   This enables saving user-selected content, tracking generations, and supporting future analytics.
 
