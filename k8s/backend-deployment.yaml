@@ -25,12 +25,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: loresmith-secrets
-                  key: api-key
+                  key: API-KEY
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: loresmith-secrets
-                  key: postgres_password
+                  key: POSTGRES_PASSWORD
 
             # ConfigMap keys for non-sensitive env vars
             - name: REDIS_HOST

@@ -25,7 +25,10 @@ spec:
             - name: POSTGRES_USER
               value: loresmith_user
             - name: POSTGRES_PASSWORD
-              value: somepassword
+              valueFrom:
+                secretKeyRef:
+                  name: loresmith-secrets
+                  key: POSTGRES_PASSWORD
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-storage
