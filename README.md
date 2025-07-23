@@ -28,7 +28,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 - RESTful API with clear endpoints for each lore type and full lore bundles
 - Easily extendable architecture to add new lore categories or themes
 - Docker-ready for easy deployment and development with Redis integration
-- Production-ready Kubernetes deployment with auto-scaling and high availability
+- Designed for production deployment on Kubernetes with support for scaling and high availability
 
 ---
 
@@ -63,10 +63,6 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
   Introducing persistent storage of AI-generated lore using PostgreSQL with SQLAlchemy 2.x and asyncpg.  
   This enables saving user-selected content, tracking generations, and supporting future analytics.
 
-  - Async support with SQLAlchemy 2.x (Declarative + `async_session`)
-  - Store generated lore and user selections in a normalized schema
-  - Designed for production with retry logic, error handling, and Docker-managed services
-
 ### Phase 2: Immersion & Localization
 
 - **Procedural World Description Generator**  
@@ -87,7 +83,7 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 
 ## Kubernetes Deployment 🚀
 
-LoreSmith is designed to be production-ready using Kubernetes orchestration, which offers scalable container management, self-healing, and resource allocation capabilities. While the current deployment uses core Kubernetes patterns for reliability, resource requests/limits and autoscaling are to be configured as needed.
+LoreSmith runs on Kubernetes to leverage its inherent capabilities like container orchestration, self-healing, and resource management. The current deployment follows core Kubernetes patterns focused on reliability, with plans to add explicit resource allocation and autoscaling configurations.
 
 ### Architecture Overview
 
@@ -104,7 +100,7 @@ The Kubernetes setup leverages a microservices approach with the following core 
 - **Container Image**: `vexenbay/loresmith-backend:latest`
 - **Environment Configuration**: Injected via Kubernetes Secrets and ConfigMaps for secure credential management
 - **Pod Management**: Automated lifecycle management, health checks, and rolling updates
-- **Resource Allocation**: Configurable CPU/memory limits and requests for optimal cluster utilization
+- **Resource Allocation**: Resource allocation can be configured through CPU and memory requests/limits to optimize cluster usage.
 
 #### Service & Networking
 - **ClusterIP Service**: `loresmith-backend` exposes backend pods internally on port 80
@@ -153,12 +149,10 @@ To run LoreSmith on your local Kubernetes cluster:
 
 This Kubernetes architecture provides:
 
-- **High Availability**: Automatic pod restart and health monitoring ensure minimal downtime
-- **Horizontal Scaling**: Easily scale backend pods based on traffic demands
-- **Resource Efficiency**: Optimized resource allocation and cluster-wide load balancing  
-- **Security**: Secrets management and network policies for secure credential handling
-- **Observability**: Built-in logging, metrics, and monitoring integration points
-- **CI/CD Ready**: Seamless integration with deployment pipelines and GitOps workflows
+- **High Availability**: Kubernetes automatically restarts failed pods and monitors pod health to minimize downtime
+- **Stable Networking**: Internal service discovery and load balancing ensure reliable communication between components
+- **Extensibility**: The current architecture enables adding features like autoscaling, resource limits, and advanced security policies
+- **CI/CD Compatibility**: Kubernetes deployment integrates well with modern deployment pipelines and GitOps workflows
 
 ---
 
