@@ -54,9 +54,22 @@ jobs:
       - name: Push Docker image
         run: docker push vexenbay/loresmith-backend:latest
 
-      - name: Deploy to Kubernetes
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-        run: |
-          kubectl apply -f k8s/
-          kubectl rollout restart deployment/loresmith-backend
+        # --- ❌ Kubernetes Deployment Disabled ❌ ---
+      # GitHub Actions runners cannot access local Minikube cluster.
+      # This step fails with "connection refused" because the Kubernetes API
+      # is running only on your local machine.
+      #
+      # Once we move to a cloud K8s cluster or set up a self-hosted runner,
+      # we can re-enable this step for full automation.
+      #
+      # ✅ Manual replacement:
+      # Run this from your terminal to apply changes manually:
+      #   kubectl apply -f k8s/
+      #   kubectl rollout restart deployment/loresmith-backend
+      #
+      # - name: Deploy to Kubernetes
+      #   env:
+      #     KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      #   run: |
+      #     kubectl apply -f k8s/
+      #     kubectl rollout restart deployment/loresmith-backend
