@@ -16,7 +16,7 @@
 
 LoreSmith is a backend service that generates modular AI-driven lore pieces - characters, factions, settings, events, and relics, using asynchronous chains and OpenRouter API.
 
-The system supports caching generated lore variants in Redis for improved performance and includes a mechanism to regenerate lore on demand, bypassing cache when needed.
+The system supports caching generated lore variants in Redis for improved performance and includes a mechanism to regenerate lore on demand bypassing cache when needed.
 
 ## Features
 
@@ -29,6 +29,63 @@ The system supports caching generated lore variants in Redis for improved perfor
 - Easily extendable architecture to add new lore categories or themes
 - Docker-ready for easy deployment and development with Redis integration
 - Designed for production deployment on Kubernetes with support for scaling and high availability
+
+---
+
+## ⚙️ Continuous Integration (CI/CD)
+
+LoreSmith uses GitHub Actions for CI/CD to ensure code quality, formatting consistency, and automated Docker deployment.
+
+### ✅ What's Automated
+
+When you push to `main` branch:
+
+1. **Code is linted** using `ruff`
+2. **Code is formatted** (checked) using `black`
+3. **Tests run** with `pytest`
+4. **Docker image is built** and tagged as `vexenbay/loresmith-backend:latest`
+5. **Docker image is pushed** to Docker Hub
+
+All of the above steps run automatically via GitHub Actions on push or pull request.
+
+### 🔧 Pre-commit Hooks
+
+This project uses pre-commit to auto-format Python files before commits using **black**.
+
+To enable locally:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+You can run it manually with:
+
+```bash
+pre-commit run --all-files
+```
+
+### 🐳 Kubernetes Deployment (Manual)
+
+Although the Docker image is automatically built and pushed, Kubernetes deployment remains manual for security and control reasons.
+
+You can deploy locally with Minikube:
+
+```bash
+kubectl apply -f k8s/
+kubectl rollout restart deployment/loresmith-backend
+```
+
+**Why Manual Deployment?**
+
+The Kubernetes deployment step is intentionally kept manual and commented out in the CI workflow (`.github/workflows/ci.yml`) for several important reasons:
+
+- **Local Environment Isolation**: GitHub runners don't have access to your local Minikube cluster, making automated K8s deployment impractical for local development setups
+- **Security Considerations**: Automated cluster deployments require sensitive credentials and cluster access tokens that shouldn't be exposed in CI environments
+- **Deployment Control**: Manual deployment allows for proper verification of changes, rollback capabilities, and staged deployments in production environments
+- **Environment-Specific Configuration**: Different environments (dev, staging, prod) often require different configurations that are better handled through dedicated deployment processes
+
+When you're ready to implement automated Kubernetes deployments, consider using dedicated tools like ArgoCD, Flux, or environment-specific deployment pipelines with proper security measures in place.
 
 ---
 
