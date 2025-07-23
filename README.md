@@ -10,6 +10,7 @@
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
 [![Docker](https://img.shields.io/badge/docker-28.1-purple?logo=docker)](https://www.docker.com/)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-purple?logo=postgresql)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-purple?logo=kubernetes)
 
 ## Overview
 
@@ -27,6 +28,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 - RESTful API with clear endpoints for each lore type and full lore bundles
 - Easily extendable architecture to add new lore categories or themes
 - Docker-ready for easy deployment and development with Redis integration
+- Production-ready Kubernetes deployment with auto-scaling and high availability
 
 ---
 
@@ -40,6 +42,7 @@ LoreSmith uses a modern Python backend stack optimized for asynchronous workflow
 - **PostgreSQL** - Relational database for persistent lore and user data
 - **Redis** - Used for caching AI-generated content and improving performance
 - **Docker & Docker Compose** - Containerized development environment with built-in Redis/PostgreSQL support
+- **Kubernetes** - Container orchestration for production deployments with scaling and reliability
 
 ---
 
@@ -79,18 +82,96 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
   Analyze lore pieces to detect contradictions or inconsistencies, improving story coherence.
 - **AI Visual Storytelling**  
   Integrate text-to-image AI to generate character portraits or concept art, enhancing visual immersion.
-  
+
 ---
 
-## Future Enhancements & Infrastructure Roadmap
+## Kubernetes Deployment 🚀
 
-To further enhance LoreSmith's scalability, resilience, and operational insights, the following integrations are planned:
+LoreSmith is designed to be production-ready using Kubernetes orchestration, which offers scalable container management, self-healing, and resource allocation capabilities. While the current deployment uses core Kubernetes patterns for reliability, resource requests/limits and autoscaling are to be configured as needed.
 
-* **Orchestration (Kubernetes):** Future deployment will leverage **Kubernetes** for container orchestration, enabling advanced scaling, self-healing, and efficient resource management
-* **Observability Stack:** Integration of a comprehensive observability suite, including:
+### Architecture Overview
+
+The Kubernetes setup leverages a microservices approach with the following core components:
+
+- **Backend Deployment** - Manages the FastAPI application pods with automatic scaling and health monitoring
+- **Service Layer** - Provides stable internal networking and load balancing across backend instances  
+- **Ingress Controller** - Handles external traffic routing and SSL termination through NGINX
+- **Configuration Management** - Uses ConfigMaps and Secrets for environment variables and sensitive data
+
+### Key Components
+
+#### Backend Deployment
+- **Container Image**: `vexenbay/loresmith-backend:latest`
+- **Environment Configuration**: Injected via Kubernetes Secrets and ConfigMaps for secure credential management
+- **Pod Management**: Automated lifecycle management, health checks, and rolling updates
+- **Resource Allocation**: Configurable CPU/memory limits and requests for optimal cluster utilization
+
+#### Service & Networking
+- **ClusterIP Service**: `loresmith-backend` exposes backend pods internally on port 80
+- **Traffic Forwarding**: Routes external requests to container port 8000 seamlessly  
+- **Internal DNS**: Kubernetes DNS resolution enables stable service-to-service communication
+- **Database Connectivity**: Backend connects to Redis and PostgreSQL using their service DNS names (`redis`, `postgres`)
+
+#### Ingress & External Access
+- **NGINX Ingress Controller**: Manages HTTP/HTTPS traffic routing based on hostname rules
+- **Local Development**: Hostname `loresmith.local` mapped to Minikube cluster IP via hosts file
+- **Tunnel Access**: `minikube tunnel` creates network bridge for local development and testing
+- **API Endpoints**: Full API accessible at `http://loresmith.local/api/generate/all`
+
+### Local Development Setup
+
+To run LoreSmith on your local Kubernetes cluster:
+
+1. **Start Minikube** (if using Minikube):
+   ```bash
+   minikube start
+   minikube addons enable ingress
+   ```
+
+2. **Deploy the application**:
+   ```bash
+   kubectl apply -f k8s/
+   ```
+
+3. **Set up local access**:
+   ```bash
+   # Get Minikube IP
+   minikube ip
+   
+   # Add to /etc/hosts (replace with your Minikube IP)
+   echo "192.168.49.2 loresmith.local" | sudo tee -a /etc/hosts
+   ```
+
+4. **Enable tunnel access**:
+   ```bash
+   minikube tunnel
+   ```
+
+5. **Access the API**: Navigate to `http://loresmith.local/docs` for the interactive API documentation
+
+### Production Benefits
+
+This Kubernetes architecture provides:
+
+- **High Availability**: Automatic pod restart and health monitoring ensure minimal downtime
+- **Horizontal Scaling**: Easily scale backend pods based on traffic demands
+- **Resource Efficiency**: Optimized resource allocation and cluster-wide load balancing  
+- **Security**: Secrets management and network policies for secure credential handling
+- **Observability**: Built-in logging, metrics, and monitoring integration points
+- **CI/CD Ready**: Seamless integration with deployment pipelines and GitOps workflows
+
+---
+
+## Future Infrastructure Enhancements
+
+To further enhance LoreSmith's operational capabilities, the following integrations are planned:
+
+* **Observability Stack**: Integration of a comprehensive monitoring suite:
     * **Prometheus** for metrics collection and time-series data
-    * **Grafana** for rich data visualization and dashboarding
-    * **OpenTelemetry** for distributed tracing and enhanced insight into application performance
+    * **Grafana** for rich data visualization and dashboarding  
+    * **OpenTelemetry** for distributed tracing and performance insights
+* **Service Mesh**: Consider **Istio** integration for advanced traffic management and security
+* **GitOps**: **ArgoCD** implementation for declarative, automated deployments
 
 ---
 
@@ -150,7 +231,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ## Using Docker Compose 🐳
 
-This project uses Docker Compose to run the backend service alongside Redis.
+This project uses Docker Compose to run the backend service alongside Redis and PostgreSQL.
 
 To start the application:
 
@@ -162,7 +243,7 @@ docker-compose up --build
 
 - This command will:
   - Build the backend Docker image from Dockerfile
-  - Start a Redis container
+  - Start Redis and PostgreSQL containers
   - Launch the FastAPI backend accessible at [http://localhost:8000](http://localhost:8000)
 
 To stop the containers:
