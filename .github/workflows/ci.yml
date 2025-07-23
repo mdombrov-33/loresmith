@@ -53,3 +53,9 @@ jobs:
 
       - name: Push Docker image
         run: docker push vexenbay/loresmith-backend:latest
+
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          kubectl apply -f k8s/
