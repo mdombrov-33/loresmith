@@ -27,6 +27,11 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run Ruff Linter
+        run: |
+          source venv/bin/activate
+          ruff check .
+
       - name: Run tests
         run: |
           source venv/bin/activate
