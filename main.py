@@ -2,6 +2,7 @@ import asyncio
 from orchestrators import generate_lore_variants
 from fastapi import FastAPI
 from routes import generation, user_selected_lore, users
+
 from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
