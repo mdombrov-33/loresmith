@@ -89,7 +89,7 @@ When you're ready to implement automated Kubernetes deployments, consider using 
 
 ---
 
-## Tech Stack & Tooling 🛠️ 
+## 🛠️ Tech Stack & Tooling
 
 LoreSmith uses a modern Python backend stack optimized for asynchronous workflows and production readiness:
 
@@ -138,7 +138,7 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 
 ---
 
-## Kubernetes Deployment 🚀
+## 🚀 Kubernetes Deployment
 
 LoreSmith runs on Kubernetes to leverage its inherent capabilities like container orchestration, self-healing, and resource management. The current deployment follows core Kubernetes patterns focused on reliability, with plans to add explicit resource allocation and autoscaling configurations.
 
@@ -280,7 +280,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-## Using Docker Compose 🐳
+## 🐳 Using Docker Compose
 
 This project uses Docker Compose to run the backend service alongside Redis and PostgreSQL.
 
