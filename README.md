@@ -169,7 +169,7 @@ The Kubernetes setup leverages a microservices approach with the following core 
 - **NGINX Ingress Controller**: Manages HTTP/HTTPS traffic routing based on hostname rules
 - **Local Development**: Hostname `loresmith.local` mapped to Minikube cluster IP via hosts file
 - **Tunnel Access**: `minikube tunnel` creates network bridge for local development and testing
-- **API Endpoints**: Full API accessible at `http://loresmith.local/api/generate/all`
+- **API Endpoints**: Full API accessible at `http://loresmith.local/docs`
 
 ### Local Development Setup
 
