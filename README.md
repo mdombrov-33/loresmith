@@ -10,7 +10,7 @@
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-purple)
 [![Docker](https://img.shields.io/badge/Docker-28.1-purple?logo=docker)](https://www.docker.com/)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-purple?logo=postgresql)
-![Kubernetes](https://img.shields.io/badge/K8s-purple?logo=kubernetes)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-purple?logo=kubernetes)
 
 ## Overview
 
