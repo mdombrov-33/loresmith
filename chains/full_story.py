@@ -1,5 +1,3 @@
-import logging
-
 from constants.themes import Theme
 from models.full_story import FullStory
 from models.selected_lore_pieces import SelectedLorePieces

@@ -4,10 +4,13 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
+# Import the Base class and models to ensure they are registered with Alembic
+# This is necessary for Alembic to be aware of the models and their metadata
+# noqa: F401 is used to ignore unused import warnings
 from db.base import Base
-from db.lore_piece.models import LorePiece
-from db.user.models import User
-from db.user_selected_lore.models import UserSelectedLore
+from db.lore_piece.models import LorePiece  # noqa: F401
+from db.user.models import User  # noqa: F401
+from db.user_selected_lore.models import UserSelectedLore  # noqa: F401
 
 # Alembic Config object
 config = context.config
