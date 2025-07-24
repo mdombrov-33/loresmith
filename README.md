@@ -135,10 +135,6 @@ docker-compose down
 
 LoreSmith includes a comprehensive monitoring stack integrated into the Docker Compose setup, providing deep insights into application performance, system health, and user behavior.
 
-### 🔍 Monitoring Components
-
-### 🔍 Monitoring Components
-
 #### **Prometheus** - Metrics Collection ✅
 - **Endpoint**: [http://localhost:9090](http://localhost:9090)
 - **Purpose**: Time-series metrics collection and alerting
