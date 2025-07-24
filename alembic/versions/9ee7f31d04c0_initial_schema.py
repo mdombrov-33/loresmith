@@ -32,6 +32,15 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
     op.create_table(
+        "lore_pieces",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("type", sa.String(), nullable=False),
+        sa.Column("content", sa.Text(), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("now()")
+        ),
+    )
+    op.create_table(
         "user_selected_lore",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.String(), nullable=False),

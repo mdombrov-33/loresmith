@@ -29,6 +29,7 @@ async def add_lore_selection(
 @router.get(
     "/user-selected-lore/{user_id}",
     response_model=List[UserSelectedLoreRead],
+    status_code=status.HTTP_200_OK,
     summary="Get all lore selections by a user",
 )
 async def read_user_selected_lore(
