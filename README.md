@@ -137,24 +137,21 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
 
 ### 🔍 Monitoring Components
 
+### 🔍 Monitoring Components
+
 #### **Prometheus** - Metrics Collection ✅
 - **Endpoint**: [http://localhost:9090](http://localhost:9090)
 - **Purpose**: Time-series metrics collection and alerting
 - **Metrics Tracked**:
-  - API request rates and response times
-  - Cache hit/miss ratios for Redis
-  - Database connection pool status
-  - AI generation latency and success rates
-  - System resource utilization (CPU, memory, disk)
+  - Total number of lore generation requests by theme and lore type
+  - AI generation success and failure counts by model and error type
 
-#### **Grafana** - Data Visualization
+#### **Grafana** - Data Visualization ✅
 - **Endpoint**: [http://localhost:3000](http://localhost:3000)
 - **Credentials**: `admin` / `admin` (change on first login)
-- **Pre-configured Dashboards**:
-  - **LoreSmith Overview** - High-level application metrics
-  - **API Performance** - Request latency, throughput, and error rates
-  - **Database Health** - PostgreSQL and Redis performance metrics
-  - **System Resources** - Container resource usage and alerts
+- **Dashboards**:
+  - Visualization of lore generation request volumes
+  - AI generation success and failure trends
 
 #### **OpenTelemetry** - Distributed Tracing
 - **Integration**: Built into FastAPI application
@@ -172,26 +169,13 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
   - Request/response logging
   - AI generation audit trails
 
-### 📈 Key Metrics & Dashboards
-
-The monitoring setup tracks essential metrics for production readiness:
-
-**Application Metrics:**
-- Request count and rate by endpoint
-- Response time percentiles (p50, p95, p99)
-- Error rates and HTTP status codes
-- AI generation success/failure rates
-
-**Infrastructure Metrics:**
-- Container CPU and memory usage
-- Database connection pool metrics
-- Redis cache performance
-- Disk I/O and network throughput
-
-**Business Metrics:**
-- Lore generation patterns by theme
-- Cache efficiency and cost savings
-- API usage trends and popular endpoints
+#### **Sentry** - Error Monitoring
+- **Purpose**: Real-time error tracking and alerting
+- **Features**:
+  - Automatic capture of exceptions and errors
+  - Contextual breadcrumbs for debugging
+  - Performance monitoring integration
+  - Alert notifications via email, Slack, etc.
 
 ### 🚨 Alerting & Health Checks
 
@@ -206,22 +190,6 @@ The monitoring setup tracks essential metrics for production readiness:
 - `/health` - Basic application health
 - `/metrics` - Prometheus metrics endpoint
 - `/ready` - Readiness probe for orchestration
-
-### 🛠️ Customizing Monitoring
-
-**Adding Custom Metrics:**
-```python
-# Example: Custom business metric
-from prometheus_client import Counter
-lore_generations = Counter('lore_generations_total', 'Total lore pieces generated', ['theme', 'type'])
-```
-
-**Dashboard Customization:**
-- Import additional Grafana dashboards from `monitoring/dashboards/`
-- Modify existing dashboards through the Grafana UI
-- Export and version control dashboard configurations
-
-This monitoring setup provides production-grade observability suitable for both development and production environments, enabling proactive issue detection and performance optimization.
 
 ---
 
