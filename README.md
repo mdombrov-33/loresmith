@@ -28,7 +28,7 @@ The system supports caching generated lore variants in Redis for improved perfor
 - RESTful API with clear endpoints for each lore type and full lore bundles
 - Easily extendable architecture to add new lore categories or themes
 - Docker Compose setup for streamlined development with integrated monitoring and observability
-- Production-ready Kubernetes deployment available for scalable infrastructure
+- Optional Kubernetes deployment available for scalable infrastructure
 
 ---
 
