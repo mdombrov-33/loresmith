@@ -27,8 +27,8 @@ The system supports caching generated lore variants in Redis for improved perfor
 - Option to regenerate lore on demand, bypassing cache when users want fresh content
 - RESTful API with clear endpoints for each lore type and full lore bundles
 - Easily extendable architecture to add new lore categories or themes
-- Docker-ready for easy deployment and development with Redis integration
-- Designed for production deployment on Kubernetes with support for scaling and high availability
+- Docker Compose setup for streamlined development with integrated monitoring and observability
+- Production-ready Kubernetes deployment available for scalable infrastructure
 
 ---
 
@@ -65,28 +65,6 @@ You can run it manually with:
 pre-commit run --all-files
 ```
 
-### 🐳 Kubernetes Deployment (Manual)
-
-Although the Docker image is automatically built and pushed, Kubernetes deployment remains manual for security and control reasons.
-
-You can deploy locally with Minikube:
-
-```bash
-kubectl apply -f k8s/
-kubectl rollout restart deployment/loresmith-backend
-```
-
-**Why Manual Deployment?**
-
-The Kubernetes deployment step is intentionally kept manual and commented out in the CI workflow (`.github/workflows/ci.yml`) for several important reasons:
-
-- **Local Environment Isolation**: GitHub runners don't have access to your local Minikube cluster, making automated K8s deployment impractical for local development setups
-- **Security Considerations**: Automated cluster deployments require sensitive credentials and cluster access tokens that shouldn't be exposed in CI environments
-- **Deployment Control**: Manual deployment allows for proper verification of changes, rollback capabilities, and staged deployments in production environments
-- **Environment-Specific Configuration**: Different environments (dev, staging, prod) often require different configurations that are better handled through dedicated deployment processes
-
-When you're ready to implement automated Kubernetes deployments, consider using dedicated tools like ArgoCD, Flux, or environment-specific deployment pipelines with proper security measures in place.
-
 ---
 
 ## 🛠️ Tech Stack & Tooling
@@ -98,8 +76,245 @@ LoreSmith uses a modern Python backend stack optimized for asynchronous workflow
 - **Alembic** - Schema migration tool for SQLAlchemy, used to version and manage database changes
 - **PostgreSQL** - Relational database for persistent lore and user data
 - **Redis** - Used for caching AI-generated content and improving performance
-- **Docker & Docker Compose** - Containerized development environment with built-in Redis/PostgreSQL support
-- **Kubernetes** - Container orchestration for production deployments with scaling and reliability
+- **Docker & Docker Compose** - Containerized development environment with built-in Redis/PostgreSQL support and integrated monitoring stack
+- **Kubernetes** - Optional container orchestration for production deployments requiring high availability and auto-scaling
+
+---
+
+## 🐳 Getting Started with Docker Compose
+
+The easiest way to run LoreSmith is using Docker Compose, which provides a complete development environment with all dependencies and monitoring tools.
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- OpenRouter API key
+
+### Quick Start
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/mdombrov-33/loresmith.git
+   cd loresmith
+   ```
+
+2. **Set up environment variables**:
+   ```bash
+   # Create .env file with your configuration
+   echo "OPENROUTER_API_KEY=your_api_key_here" > .env
+   ```
+
+3. **Start the application**:
+   ```bash
+   docker-compose up --build
+   ```
+
+4. **Access the services**:
+   - **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - **Grafana Dashboard**: [http://localhost:3000](http://localhost:3000) (admin/admin)
+   - **Prometheus Metrics**: [http://localhost:9090](http://localhost:9090)
+
+### What's Included
+
+The Docker Compose setup provides:
+
+- **Backend API** - FastAPI application with hot reload for development
+- **PostgreSQL** - Persistent database for lore storage
+- **Redis** - Caching layer for improved performance
+- **Monitoring Stack** - Comprehensive observability tools (Prometheus, Grafana, etc.)
+
+To stop all services:
+
+```bash
+docker-compose down
+```
+
+---
+
+## 📊 Monitoring & Observability
+
+LoreSmith includes a comprehensive monitoring stack integrated into the Docker Compose setup, providing deep insights into application performance, system health, and user behavior.
+
+### 🔍 Monitoring Components
+
+#### **Prometheus** - Metrics Collection
+- **Endpoint**: [http://localhost:9090](http://localhost:9090)
+- **Purpose**: Time-series metrics collection and alerting
+- **Metrics Tracked**:
+  - API request rates and response times
+  - Cache hit/miss ratios for Redis
+  - Database connection pool status
+  - AI generation latency and success rates
+  - System resource utilization (CPU, memory, disk)
+
+#### **Grafana** - Data Visualization
+- **Endpoint**: [http://localhost:3000](http://localhost:3000)
+- **Credentials**: `admin` / `admin` (change on first login)
+- **Pre-configured Dashboards**:
+  - **LoreSmith Overview** - High-level application metrics
+  - **API Performance** - Request latency, throughput, and error rates
+  - **Database Health** - PostgreSQL and Redis performance metrics
+  - **System Resources** - Container resource usage and alerts
+
+#### **OpenTelemetry** - Distributed Tracing
+- **Integration**: Built into FastAPI application
+- **Capabilities**:
+  - End-to-end request tracing across services
+  - AI generation pipeline visibility
+  - Database query performance analysis
+  - Cache operation tracing
+
+#### **Loki** - Centralized Logging
+- **Purpose**: Log aggregation and search
+- **Features**:
+  - Structured application logs
+  - Error tracking and alerting
+  - Request/response logging
+  - AI generation audit trails
+
+### 📈 Key Metrics & Dashboards
+
+The monitoring setup tracks essential metrics for production readiness:
+
+**Application Metrics:**
+- Request count and rate by endpoint
+- Response time percentiles (p50, p95, p99)
+- Error rates and HTTP status codes
+- AI generation success/failure rates
+
+**Infrastructure Metrics:**
+- Container CPU and memory usage
+- Database connection pool metrics
+- Redis cache performance
+- Disk I/O and network throughput
+
+**Business Metrics:**
+- Lore generation patterns by theme
+- Cache efficiency and cost savings
+- API usage trends and popular endpoints
+
+### 🚨 Alerting & Health Checks
+
+**Automated Alerts:**
+- High error rates (>5% over 5 minutes)
+- Slow response times (>2s p95 latency)
+- Database connection failures
+- Redis cache unavailability
+- High system resource usage (>80% CPU/memory)
+
+**Health Check Endpoints:**
+- `/health` - Basic application health
+- `/metrics` - Prometheus metrics endpoint
+- `/ready` - Readiness probe for orchestration
+
+### 🛠️ Customizing Monitoring
+
+**Adding Custom Metrics:**
+```python
+# Example: Custom business metric
+from prometheus_client import Counter
+lore_generations = Counter('lore_generations_total', 'Total lore pieces generated', ['theme', 'type'])
+```
+
+**Dashboard Customization:**
+- Import additional Grafana dashboards from `monitoring/dashboards/`
+- Modify existing dashboards through the Grafana UI
+- Export and version control dashboard configurations
+
+This monitoring setup provides production-grade observability suitable for both development and production environments, enabling proactive issue detection and performance optimization.
+
+---
+
+## Running Locally (Development)
+
+For development without Docker, you can run LoreSmith directly with Python:
+
+### Prerequisites
+
+- Python 3.10 or higher
+- Redis server running locally or accessible remotely
+- PostgreSQL database (optional, for persistence)
+- OpenRouter API key set as environment variable
+
+### Steps
+
+1. **Clone and setup**:
+   ```bash
+   git clone https://github.com/mdombrov-33/loresmith.git
+   cd loresmith
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+3. **Start Redis locally**:
+   ```bash
+   redis-server
+   ```
+
+4. **Set environment variables**:
+   - `OPENROUTER_API_KEY=your_api_key`
+   - `REDIS_HOST=localhost`
+   - `REDIS_PORT=6379`
+   - `REDIS_DB=0`
+
+5. **Run the application**:
+   ```bash
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+6. **Access the API**: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+## 🚀 Production Deployment Options
+
+### Docker Compose (Recommended for most use cases)
+
+The Docker Compose setup is production-ready and includes:
+- Health checks and restart policies
+- Persistent volumes for data
+- Integrated monitoring and logging
+- Resource limits and security configurations
+
+### Kubernetes (For enterprise/high-scale deployments)
+
+For organizations requiring advanced orchestration, auto-scaling, and high availability, Kubernetes deployment files are available in the `k8s/` folder.
+
+**Kubernetes Benefits:**
+- Automatic pod scaling and self-healing
+- Advanced traffic management and load balancing
+- Integration with cloud provider services
+- GitOps-compatible deployment workflows
+
+**To deploy on Kubernetes:**
+
+```bash
+# Local development with Minikube
+minikube start
+minikube addons enable ingress
+kubectl apply -f k8s/
+
+# Production deployment
+kubectl apply -f k8s/
+kubectl rollout restart deployment/loresmith-backend
+```
+
+The Kubernetes setup includes ingress configuration for external access and can be extended with service mesh (Istio) and GitOps tools (ArgoCD) for advanced production requirements.
+
+**Manual Deployment Approach:**
+
+Kubernetes deployment remains manual for security and control reasons:
+
+- **Local Environment Isolation**: GitHub runners don't have access to local Minikube clusters
+- **Security Considerations**: Automated deployments require sensitive credentials
+- **Deployment Control**: Manual deployment allows proper verification and rollback capabilities
+- **Environment-Specific Configuration**: Different environments require tailored configurations
 
 ---
 
@@ -140,187 +355,12 @@ This roadmap outlines planned AI-powered features for LoreSmith, designed to pro
 
 ## ⚠️ Known Issues
 
-The PostgreSQL database integration is currently unstable and partially broken in this project.
+The PostgreSQL database integration has some known issues in the Kubernetes deployment.
 
-- Some database connection issues may cause runtime errors or 500 Internal Server Errors
-
-- Persistent storage and schema migrations are incomplete or not fully tested
-
-- Use caution if relying on database persistence for lore or user data — data loss or connection failures are possible
-
-- The database setup in Kubernetes and local environments requires further refinement
-
-- This project is primarily focused on AI lore generation and caching via Redis for now
-
----
-
-## 🚀 Kubernetes Deployment
-
-LoreSmith runs on Kubernetes to leverage its inherent capabilities like container orchestration, self-healing, and resource management. The current deployment follows core Kubernetes patterns focused on reliability, with plans to add explicit resource allocation and autoscaling configurations.
-
-### Architecture Overview
-
-The Kubernetes setup leverages a microservices approach with the following core components:
-
-- **Backend Deployment** - Manages the FastAPI application pods with automatic scaling and health monitoring
-- **Service Layer** - Provides stable internal networking and load balancing across backend instances  
-- **Ingress Controller** - Handles external traffic routing and SSL termination through NGINX
-- **Configuration Management** - Uses ConfigMaps and Secrets for environment variables and sensitive data
-
-### Key Components
-
-#### Backend Deployment
-- **Container Image**: `vexenbay/loresmith-backend:latest`
-- **Environment Configuration**: Injected via Kubernetes Secrets and ConfigMaps for secure credential management
-- **Pod Management**: Automated lifecycle management, health checks, and rolling updates
-- **Resource Allocation**: Resource allocation can be configured through CPU and memory requests/limits to optimize cluster usage.
-
-#### Service & Networking
-- **ClusterIP Service**: `loresmith-backend` exposes backend pods internally on port 80
-- **Traffic Forwarding**: Routes external requests to container port 8000 seamlessly  
-- **Internal DNS**: Kubernetes DNS resolution enables stable service-to-service communication
-- **Database Connectivity**: Backend connects to Redis and PostgreSQL using their service DNS names (`redis`, `postgres`)
-
-#### Ingress & External Access
-- **NGINX Ingress Controller**: Manages HTTP/HTTPS traffic routing based on hostname rules
-- **Local Development**: Hostname `loresmith.local` mapped to Minikube cluster IP via hosts file
-- **Tunnel Access**: `minikube tunnel` creates network bridge for local development and testing
-- **API Endpoints**: Full API accessible at `http://loresmith.local/docs`
-
-### Local Development Setup
-
-To run LoreSmith on your local Kubernetes cluster:
-
-1. **Start Minikube** (if using Minikube):
-   ```bash
-   minikube start
-   minikube addons enable ingress
-   ```
-
-2. **Deploy the application**:
-   ```bash
-   kubectl apply -f k8s/
-   ```
-
-3. **Set up local access**:
-   ```bash
-   # Get Minikube IP
-   minikube ip
-   
-   # Add to /etc/hosts (replace with your Minikube IP)
-   echo "192.168.49.2 loresmith.local" | sudo tee -a /etc/hosts
-   ```
-
-4. **Enable tunnel access**:
-   ```bash
-   minikube tunnel
-   ```
-
-5. **Access the API**: Navigate to `http://loresmith.local/docs` for the interactive API documentation
-
-### Production Benefits
-
-This Kubernetes architecture provides:
-
-- **High Availability**: Kubernetes automatically restarts failed pods and monitors pod health to minimize downtime
-- **Stable Networking**: Internal service discovery and load balancing ensure reliable communication between components
-- **Extensibility**: The current architecture enables adding features like autoscaling, resource limits, and advanced security policies
-- **CI/CD Compatibility**: Kubernetes deployment integrates well with modern deployment pipelines and GitOps workflows
-
----
-
-## Future Infrastructure Enhancements
-
-To further enhance LoreSmith's operational capabilities, the following integrations are planned:
-
-* **Observability Stack**: Integration of a comprehensive monitoring suite:
-    * **Prometheus** for metrics collection and time-series data
-    * **Grafana** for rich data visualization and dashboarding  
-    * **OpenTelemetry** for distributed tracing and performance insights
-    * **Mezmo (LogDNA)** for centralized log aggregation and analysis
-* **Service Mesh**: Consider **Istio** integration for advanced traffic management and security
-* **GitOps**: **ArgoCD** implementation for declarative, automated deployments
-
----
-
-## Running Locally
-
-### Prerequisites
-
-- Python 3.10 or higher
-- Redis server running locally or accessible remotely
-- OpenRouter API key set as environment variable
-
-### Steps
-
-1. Clone the repository and navigate into it:
-
-```bash
-git clone https://github.com/mdombrov-33/loresmith.git
-cd loresmith
-```
-
-2. Create and activate Python virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-
-3. Install Python dependencies:
-
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-4. Start your Redis server locally (or ensure remote Redis is accessible):
-
-```bash
-redis-server
-```
-
-5. Set ENV variables, example:
-
-   - OPENROUTER_API_KEY=your_api_key
-   - REDIS_HOST=localhost
-   - REDIS_PORT=6379
-   - REDIS_DB=0
-
-6. Run the FastAPI application:
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-7. Open [http://localhost:8000/docs](http://localhost:8000/docs) in your browser to explore and test the API.
-
----
-
-## 🐳 Using Docker Compose
-
-This project uses Docker Compose to run the backend service alongside Redis and PostgreSQL.
-
-To start the application:
-
-- Run the following command in your terminal:
-
-```bash
-docker-compose up --build
-```
-
-- This command will:
-  - Build the backend Docker image from Dockerfile
-  - Start Redis and PostgreSQL containers
-  - Launch the FastAPI backend accessible at [http://localhost:8000](http://localhost:8000)
-
-To stop the containers:
-
-- Use the command:
-
-```bash
-docker-compose down
-```
+- Kubernetes database connection may cause runtime errors or 500 Internal Server Errors
+- Database persistence in K8s environments requires further configuration refinement
+- Local development with Docker Compose works reliably
+- The project primarily focuses on AI lore generation and caching via Redis
 
 ---
 
