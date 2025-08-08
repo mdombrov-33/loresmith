@@ -1,6 +1,5 @@
 import asyncio
-import logging
-
+from utils.logger import logger
 from models.generated_lore_bundle import GeneratedLoreBundle
 
 from chains.multi_variant import (
@@ -12,8 +11,6 @@ from chains.multi_variant import (
 )
 from constants.themes import Theme
 from fastapi import HTTPException
-
-logger = logging.getLogger(__name__)
 
 
 async def generate_lore_variants(

@@ -1,11 +1,9 @@
-import logging
+from utils.logger import logger
 from models.full_story import FullStory
 from models.selected_lore_pieces import SelectedLorePieces
 from constants.themes import Theme
 from chains.full_story import generate_full_story
 from fastapi import HTTPException
-
-logger = logging.getLogger(__name__)
 
 
 async def generate_full_story_orchestrator(
