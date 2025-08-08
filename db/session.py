@@ -18,11 +18,13 @@ DATABASE_URL = os.getenv(
 
 # Fix Railway DATABASE_URL: convert postgresql:// to postgresql+asyncpg://
 if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    print(f"BEFORE conversion: {DATABASE_URL[:50]}...")
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+    print(f"AFTER conversion: {DATABASE_URL[:50]}...")
 
 # Debug: Print what DATABASE_URL we're using (remove password for security)
 print(
-    f"Using DATABASE_URL: {DATABASE_URL.replace(':', ':***', 1) if DATABASE_URL else 'None'}"
+    f"Final DATABASE_URL: {DATABASE_URL.replace(':', ':***', 1) if DATABASE_URL else 'None'}"
 )
 
 # Create an async engine using the URL above
