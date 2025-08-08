@@ -5,7 +5,7 @@ import os  # To read environment variables
 # Railway uses REDISHOST, Docker Compose uses REDIS_HOST
 REDIS_HOST = os.getenv("REDISHOST") or os.getenv("REDIS_HOST", "localhost")
 
-# Read Redis port from environment  
+# Read Redis port from environment
 # Railway uses REDISPORT, Docker Compose uses REDIS_PORT
 REDIS_PORT = int(os.getenv("REDISPORT") or os.getenv("REDIS_PORT", 6379))
 
