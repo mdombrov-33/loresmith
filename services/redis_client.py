@@ -1,11 +1,13 @@
 import redis.asyncio as redis  # Async Redis client for Python
 import os  # To read environment variables
 
-# Read Redis host from environment, default to 'localhost' if not set
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+# Read Redis host from environment
+# Railway uses REDISHOST, Docker Compose uses REDIS_HOST
+REDIS_HOST = os.getenv("REDISHOST") or os.getenv("REDIS_HOST", "localhost")
 
-# Read Redis port from environment, default to 6379 (Redis default port)
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+# Read Redis port from environment  
+# Railway uses REDISPORT, Docker Compose uses REDIS_PORT
+REDIS_PORT = int(os.getenv("REDISPORT") or os.getenv("REDIS_PORT", 6379))
 
 # Read Redis database index, default to 0 (Redis can have multiple logical DBs)
 REDIS_DB = int(os.getenv("REDIS_DB", 0))

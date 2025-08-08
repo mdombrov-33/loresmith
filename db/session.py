@@ -16,6 +16,13 @@ DATABASE_URL = os.getenv(
     "postgresql+asyncpg://loresmith_user:somepassword@localhost:5432/loresmith",  # Local fallback
 )
 
+# Fix Railway DATABASE_URL: convert postgresql:// to postgresql+asyncpg://
+if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# Debug: Print what DATABASE_URL we're using (remove password for security)
+print(f"Using DATABASE_URL: {DATABASE_URL.replace(':', ':***', 1) if DATABASE_URL else 'None'}")
+
 # Create an async engine using the URL above
 # echo=True will log all SQL queries to the console (for debugging)
 try:
