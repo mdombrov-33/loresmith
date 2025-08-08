@@ -10,7 +10,6 @@ from chains.multi_variant import (
     generate_multiple_events,
     generate_multiple_relics,
 )
-from models.lore_piece import LorePiece
 from constants.themes import Theme
 from fastapi import HTTPException
 
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 async def generate_lore_variants(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
-) -> dict[str, list[LorePiece]]:
+) -> GeneratedLoreBundle:
     try:
         character_task = generate_multiple_characters(count, theme)
         faction_task = generate_multiple_factions(count, theme)
