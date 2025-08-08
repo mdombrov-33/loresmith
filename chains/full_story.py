@@ -13,62 +13,14 @@ async def generate_full_story(
     selected_pieces: SelectedLorePieces, theme: Theme
 ) -> FullStory:
     """
-        Generate a full story based on the selected lore pieces and theme.
+    Generate a full story based on the selected lore pieces and theme.
 
-        Parameters:
-        - selected_pieces: A SelectedLorePieces dataclass containing the selected lore pieces
-        - theme: The theme for the story generation.
+    Parameters:
+    - selected_pieces: A SelectedLorePieces dataclass containing the selected lore pieces
+    - theme: The theme for the story generation.
 
-        Returns:
-        A FullStory dataclass containing the generated story and the selected pieces.
-
-        JSON Body example:
-        {
-      "character": {
-        "name": "Echo",
-        "description": "A skilled scavenger navigating the ruins of a fallen city.",
-        "details": {
-          "personality": "Cautious, intelligent, burdened by the past",
-          "appearance": "Dust-covered cloak, reflective goggles, scavenged tech gear"
-        },
-        "type": "character"
-      },
-      "faction": {
-        "name": "Steel Reclaimers",
-        "description": "A militant faction obsessed with recovering pre-war technology.",
-        "details": {
-          "ideology": "Technology must be controlled to enforce order",
-          "appearance": "Armored uniforms, metallic insignia, glowing visors"
-        },
-        "type": "faction"
-      },
-      "setting": {
-        "name": "Ashfall City",
-        "description": "A ruined megacity buried in ash and fog.",
-        "details": {
-          "landscape": "Collapsed skyscrapers, toxic rivers, ash storms",
-          "dangers": "Radioactive zones, rogue drones, scavenger gangs"
-        },
-        "type": "setting"
-      },
-      "event": {
-        "name": "The Collapse",
-        "description": "The catastrophic shutdown of global power grids that marked the end of the old world.",
-        "details": {
-          "impact": "Plunged the world into chaos and birthed new powers"
-        },
-        "type": "event"
-      },
-      "relic": {
-        "name": "The Pathseeker Map",
-        "description": "A shimmering, semi-holographic map once used for space exploration.",
-        "details": {
-          "history": "Said to hold data that could restart civilization",
-          "appearance": "Translucent surface, faint glowing constellations"
-        },
-        "type": "relic"
-      }
-    }
+    Returns:
+    A FullStory containing the generated story and the selected pieces.
     """
     try:
         # Extract each piece from the selected_pieces dictionary, fallback to dummy data
