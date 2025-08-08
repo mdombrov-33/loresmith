@@ -1,1 +1,0 @@
-Write a brief backstory for the character named {name}, who lives in a {theme} world and has the following personality traits: {personality}. Use 1-2 sentences max. Keep it concise and lore-friendly. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph.

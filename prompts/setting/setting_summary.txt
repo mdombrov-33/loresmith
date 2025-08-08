@@ -1,8 +1,0 @@
-Write a concise lore summary for the setting {name} in a {theme} world, using:
-
-Landscape: {landscape}
-Dangers: {dangers}
-
-Keep it no more than 2 sentences.
-Respond only with plain text, no markdown or special characters.
-No newlines; output a single paragraph.

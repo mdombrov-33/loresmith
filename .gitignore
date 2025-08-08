@@ -1,13 +1,132 @@
-# Python virtual environment
-venv/
+# Root Gitignore for LoreSmith v2
+# Combines Go + Python + common tooling + env/secrets + DB/cache
 
-# Environment variables
-.env
-
-# OS & editor junk
-__pycache__/
-*.pyc
+# --- General OS / Editor ---
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+*.log
+logs/
 
-# VSCode
+# IDEs / Editors
 .vscode/
+.idea/
+*.code-workspace
+
+# Direnv
+.direnv/
+
+# --- Env & Secrets ---
+.env
+.env.*
+!.env.example
+!.env.*.example
+.envrc
+*.pem
+*.key
+secrets.*.yaml
+
+# Optional local overrides
+*.local.yaml
+*.local.yml
+*.local.json
+
+# --- Docker / Compose / Runtime ---
+.docker/
+*.pid
+.tmp/
+/tmp/
+pgdata/
+# Local override files
+docker-compose.override.yml
+
+# --- Redis persistence ---
+dump.rdb
+appendonly.aof
+appendonly*.aof
+
+# --- SQLite / Databases ---
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# --- Node (if any tooling appears) ---
+node_modules/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distributions / packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+MANIFEST
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# Testing / coverage / typecheck
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+pytestdebug.log
+coverage.xml
+coverage/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Pyenv / asdf
+.python-version
+.tool-versions
+
+# --- Go ---
+# Binaries / build artifacts
+bin/
+build/
+out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.syso
+coverage.out
+coverage.txt
+
+# Modules vendor (if used)
+vendor/
+
+# Go build cache (not typically in repo root, but ignore if present)
+.gocache/
+
+# --- Kubernetes / local configs ---
+.kube/
+kubeconfig
+
+# --- Legacy code bucket ---
+legacy/

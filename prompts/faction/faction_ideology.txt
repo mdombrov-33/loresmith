@@ -1,1 +1,0 @@
-Describe the core beliefs and goals of the {theme} faction named {name}. Respond only with plain text, no markdown. No newlines; output exactly 1 sentence.
