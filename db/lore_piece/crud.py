@@ -43,9 +43,7 @@ async def get_lore_pieces_by_type(
 ) -> List[LorePiece]:
     """Get lore pieces by type only"""
     result = await db.execute(
-        select(LorePiece)
-        .where(LorePiece.type == lore_type)
-        .limit(limit)
+        select(LorePiece).where(LorePiece.type == lore_type).limit(limit)
     )
     return list(result.scalars().all())
 
@@ -55,9 +53,7 @@ async def get_lore_pieces_by_theme(
 ) -> List[LorePiece]:
     """Get lore pieces by theme only"""
     result = await db.execute(
-        select(LorePiece)
-        .where(LorePiece.theme == theme)
-        .limit(limit)
+        select(LorePiece).where(LorePiece.theme == theme).limit(limit)
     )
     return list(result.scalars().all())
 

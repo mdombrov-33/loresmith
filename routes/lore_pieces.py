@@ -40,21 +40,21 @@ async def get_available_lore_pieces(
     db: AsyncSession = Depends(get_async_db),
 ):
     """Get available lore pieces for user selection with flexible filtering"""
-    
+
     # If both filters are provided
     if lore_type and theme:
         return await get_lore_pieces_by_type_and_theme(
             db, lore_type, theme.value, limit
         )
-    
+
     # If only lore_type is provided
     elif lore_type:
         return await get_lore_pieces_by_type(db, lore_type, limit)
-    
+
     # If only theme is provided
     elif theme:
         return await get_lore_pieces_by_theme(db, theme.value, limit)
-    
+
     # If no filters are provided
     else:
         return await get_all_lore_pieces(db, limit)
