@@ -4,20 +4,7 @@ from db.session import get_async_db
 from db.user import crud
 from utils.security import hash_password, verify_password
 from utils.jwt import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, verify_jwt_token
-from pydantic import BaseModel, EmailStr
-
-router = APIRouter()
-
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
+from models.users import UserCreate, UserLogin
 
 router = APIRouter()
 
@@ -41,7 +28,7 @@ async def login_user(
     user: UserLogin, response: Response, db: AsyncSession = Depends(get_async_db)
 ):
     db_user = await crud.get_user_by_email(db, user.email)
-    if not db_user or not verify_password(user.password, db_user.hashed_password):
+    if not db_user or not verify_password(user.password, str(db_user.hashed_password)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     access_token = create_access_token({"sub": db_user.id})
@@ -68,6 +55,8 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_asyn
         raise HTTPException(status_code=401, detail="Invalid token")
 
     user_id = payload.get("sub")
+    if not isinstance(user_id, str):
+        raise HTTPException(status_code=401, detail="Invalid token")
     user = await crud.get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
