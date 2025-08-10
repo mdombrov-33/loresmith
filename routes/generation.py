@@ -2,6 +2,7 @@ from typing import List
 from services.rate_limiter import is_rate_limited
 
 from fastapi import APIRouter, Body, Query, Request, HTTPException, status
+from prometheus_client import Counter
 
 from chains.multi_variant import (
     generate_multiple_characters,
@@ -20,6 +21,12 @@ from orchestrators import generate_full_story, generate_lore_variants
 
 router = APIRouter()
 
+lore_request_counter = Counter(
+    "loresmith_lore_requests_total",
+    "Total number of lore generation requests by theme and lore type",
+    ["theme", "lore_type"],
+)
+
 
 @router.get("/generate/all", response_model=GeneratedLoreBundle)
 async def generate_all(
@@ -36,6 +43,7 @@ async def generate_all(
     Returns:
     A dictionary containing lists of generated lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="all").inc()
 
     client_ip = request.client.host
 
@@ -64,6 +72,7 @@ async def generate_characters(
     Returns:
     A list of generated character lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="characters").inc()
 
     client_ip = request.client.host
 
@@ -92,6 +101,7 @@ async def generate_factions(
     Returns:
     A list of generated faction lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="factions").inc()
 
     client_ip = request.client.host
 
@@ -120,6 +130,7 @@ async def generate_settings(
     Returns:
     A list of generated setting lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="settings").inc()
 
     client_ip = request.client.host
 
@@ -148,6 +159,7 @@ async def generate_events(
     Returns:
     A list of generated event lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="events").inc()
 
     client_ip = request.client.host
 
@@ -176,6 +188,7 @@ async def generate_relics(
     Returns:
     A list of generated relic lore pieces.
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="relics").inc()
 
     client_ip = request.client.host
 
@@ -252,6 +265,7 @@ async def generate_story(
       }
     }
     """
+    lore_request_counter.labels(theme=theme.value, lore_type="full_story").inc()
 
     client_ip = request.client.host
 
