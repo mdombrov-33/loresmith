@@ -1,5 +1,5 @@
 # Use official Python slim image as base for smaller image size
-FROM python:3.13-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 # Set environment variables:
 # - PYTHONDONTWRITEBYTECODE: prevents Python from writing .pyc files (bytecode)
