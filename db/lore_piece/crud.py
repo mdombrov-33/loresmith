@@ -38,6 +38,30 @@ async def get_lore_pieces_by_type_and_theme(
     return list(result.scalars().all())
 
 
+async def get_lore_pieces_by_type(
+    db: AsyncSession, lore_type: str, limit: int = 50
+) -> List[LorePiece]:
+    """Get lore pieces by type only"""
+    result = await db.execute(
+        select(LorePiece)
+        .where(LorePiece.type == lore_type)
+        .limit(limit)
+    )
+    return list(result.scalars().all())
+
+
+async def get_lore_pieces_by_theme(
+    db: AsyncSession, theme: str, limit: int = 50
+) -> List[LorePiece]:
+    """Get lore pieces by theme only"""
+    result = await db.execute(
+        select(LorePiece)
+        .where(LorePiece.theme == theme)
+        .limit(limit)
+    )
+    return list(result.scalars().all())
+
+
 async def get_all_lore_pieces(db: AsyncSession, limit: int = 100) -> List[LorePiece]:
     """Get all lore pieces"""
     result = await db.execute(select(LorePiece).limit(limit))
@@ -57,7 +81,14 @@ async def create_lore_selection(
     db.add(new_selection)
     await db.commit()
     await db.refresh(new_selection)
-    return new_selection
+
+    # Load the relationship explicitly
+    result = await db.execute(
+        select(UserSelectedLore)
+        .where(UserSelectedLore.id == new_selection.id)
+        .options(selectinload(UserSelectedLore.lore_piece))
+    )
+    return result.scalar_one()
 
 
 async def get_lore_selections_by_user(

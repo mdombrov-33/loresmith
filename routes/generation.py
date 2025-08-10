@@ -1,8 +1,7 @@
 from typing import List
 from services.rate_limiter import is_rate_limited
 
-from fastapi import APIRouter, Body, Query, Request, HTTPException, status, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Body, Query, Request, HTTPException, status
 
 from chains.multi_variant import (
     generate_multiple_characters,
@@ -17,10 +16,6 @@ from models.generated_lore_bundle import GeneratedLoreBundle
 from models.lore_piece import LorePiece
 from models.selected_lore_pieces import SelectedLorePieces
 from orchestrators import generate_full_story, generate_lore_variants
-from db.session import get_async_db
-from db.lore_piece.crud import create_lore_piece
-from db.lore_piece.schemas import LorePieceRead
-from utils.lore_conversion import convert_generated_lore_to_db
 
 
 router = APIRouter()
@@ -267,38 +262,3 @@ async def generate_story(
         )
 
     return await generate_full_story(selected_pieces, theme)
-
-
-@router.post("/save-lore-piece", response_model=LorePieceRead)
-async def save_lore_piece_to_db(
-    lore_piece: LorePiece,
-    theme: Theme,
-    db: AsyncSession = Depends(get_async_db),
-):
-    """Save a generated lore piece to the database for user selection"""
-    db_lore_piece = convert_generated_lore_to_db(lore_piece, theme)
-    saved_lore = await create_lore_piece(db, db_lore_piece)
-    return saved_lore
-
-
-@router.get("/lore-pieces", response_model=List[LorePieceRead])
-async def get_available_lore_pieces(
-    lore_type: str = Query(
-        None, description="Filter by lore type (character, faction, etc.)"
-    ),
-    theme: Theme = Query(None, description="Filter by theme"),
-    limit: int = Query(50, ge=1, le=100),
-    db: AsyncSession = Depends(get_async_db),
-):
-    """Get available lore pieces for user selection"""
-    from db.lore_piece.crud import (
-        get_lore_pieces_by_type_and_theme,
-        get_all_lore_pieces,
-    )
-
-    if lore_type and theme:
-        return await get_lore_pieces_by_type_and_theme(
-            db, lore_type, theme.value, limit
-        )
-    else:
-        return await get_all_lore_pieces(db, limit)

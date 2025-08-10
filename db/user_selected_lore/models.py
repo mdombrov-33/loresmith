@@ -21,6 +21,4 @@ class UserSelectedLore(Base):
 
     # Relationships to enable ORM navigation
     user = relationship("User", back_populates="selected_lore")
-    lore_piece = relationship(
-        "LorePiece", back_populates="selected_by_users", lazy="raise"
-    )
+    lore_piece = relationship("LorePiece", back_populates="selected_by_users")
