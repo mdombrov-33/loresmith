@@ -24,9 +24,9 @@ async def test_user_selected_lore_flow():
     schema_fields = UserSelectedLoreRead.__fields__.keys()
     expected_fields = {"id", "user_id", "lore_piece_id", "selected_at", "lore_piece"}
 
-    assert expected_fields.issubset(schema_fields), (
-        f"Missing fields: {expected_fields - schema_fields}"
-    )
+    assert expected_fields.issubset(
+        schema_fields
+    ), f"Missing fields: {expected_fields - schema_fields}"
 
 
 @pytest.mark.asyncio
