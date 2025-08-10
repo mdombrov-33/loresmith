@@ -1,6 +1,4 @@
 import pytest
-from unittest.mock import AsyncMock, patch
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
 
 from routes.user_selected_lore import router
