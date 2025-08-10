@@ -1,4 +1,5 @@
 from typing import Optional, Dict
+from datetime import datetime
 from pydantic import BaseModel
 from constants.themes import Theme
 
@@ -22,6 +23,8 @@ class UserSelectedLoreRead(BaseModel):
     id: int
     user_id: str
     lore_piece_id: int
+    selected_at: datetime
+    lore_piece: LorePieceRead
 
     class Config:
         orm_mode = True

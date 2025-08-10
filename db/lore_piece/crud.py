@@ -2,10 +2,46 @@ from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from db.user_selected_lore.models import UserSelectedLore
 from db.lore_piece.models import LorePiece
+from db.lore_piece.schemas import LorePieceCreate
 from models.selected_lore_pieces import LoreSelectionCreate
+
+
+async def create_lore_piece(db: AsyncSession, lore_piece: LorePieceCreate) -> LorePiece:
+    """Create a new lore piece in the database"""
+    db_lore_piece = LorePiece(**lore_piece.dict())
+    db.add(db_lore_piece)
+    await db.commit()
+    await db.refresh(db_lore_piece)
+    return db_lore_piece
+
+
+async def get_lore_piece_by_id(
+    db: AsyncSession, lore_piece_id: int
+) -> Optional[LorePiece]:
+    """Get a lore piece by ID"""
+    return await db.get(LorePiece, lore_piece_id)
+
+
+async def get_lore_pieces_by_type_and_theme(
+    db: AsyncSession, lore_type: str, theme: str, limit: int = 50
+) -> List[LorePiece]:
+    """Get lore pieces by type and theme"""
+    result = await db.execute(
+        select(LorePiece)
+        .where(LorePiece.type == lore_type, LorePiece.theme == theme)
+        .limit(limit)
+    )
+    return list(result.scalars().all())
+
+
+async def get_all_lore_pieces(db: AsyncSession, limit: int = 100) -> List[LorePiece]:
+    """Get all lore pieces"""
+    result = await db.execute(select(LorePiece).limit(limit))
+    return list(result.scalars().all())
 
 
 async def create_lore_selection(
@@ -28,6 +64,8 @@ async def get_lore_selections_by_user(
     db: AsyncSession, user_id: str
 ) -> List[UserSelectedLore]:
     result = await db.execute(
-        select(UserSelectedLore).where(UserSelectedLore.user_id == user_id)
+        select(UserSelectedLore)
+        .where(UserSelectedLore.user_id == user_id)
+        .options(selectinload(UserSelectedLore.lore_piece))
     )
-    return result.scalars().all()
+    return list(result.scalars().all())
