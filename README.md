@@ -93,18 +93,41 @@ The easiest way to run LoreSmith is using Docker Compose, which provides a compl
 ### Quick Start
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/mdombrov-33/loresmith.git
    cd loresmith
    ```
 
 2. **Set up environment variables**:
-   ```bash
-   # Create .env file with your configuration
-   echo "OPENROUTER_API_KEY=your_api_key_here" > .env
-   ```
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+# OpenRouter API Configuration
+OPENROUTER_API_KEY=your_api_key_here
+
+# Redis Configuration
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+
+# PostgreSQL Configuration
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=loresmith
+POSTGRES_USER=loresmith_user
+POSTGRES_PASSWORD=somepassword
+
+# Database URL (optional, usually constructed automatically)
+DATABASE_URL=postgresql+asyncpg://loresmith_user:somepassword@postgres:5432/loresmith
+
+# Sentry (Error Monitoring)
+SENTRY_DSN=your_sentry_dsn_here
+```
 
 3. **Start the application**:
+
    ```bash
    docker-compose up --build
    ```
@@ -136,6 +159,7 @@ docker-compose down
 LoreSmith includes a comprehensive monitoring stack integrated into the Docker Compose setup, providing deep insights into application performance, system health, and user behavior.
 
 #### **Prometheus** - Metrics Collection ✅
+
 - **Endpoint**: [http://localhost:9090](http://localhost:9090)
 - **Purpose**: Time-series metrics collection and alerting
 - **Metrics Tracked**:
@@ -143,6 +167,7 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
   - AI generation success and failure counts by model and error type
 
 #### **Grafana** - Data Visualization ✅
+
 - **Endpoint**: [http://localhost:3000](http://localhost:3000)
 - **Credentials**: `admin` / `admin` (change on first login)
 - **Dashboards**:
@@ -150,6 +175,7 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
   - AI generation success and failure trends
 
 #### **OpenTelemetry** - Distributed Tracing
+
 - **Integration**: Built into FastAPI application
 - **Capabilities**:
   - End-to-end request tracing across services
@@ -158,6 +184,7 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
   - Cache operation tracing
 
 #### **Loki** - Centralized Logging
+
 - **Purpose**: Log aggregation and search
 - **Features**:
   - Structured application logs
@@ -165,7 +192,8 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
   - Request/response logging
   - AI generation audit trails
 
-#### **Sentry** - Error Monitoring
+#### **Sentry** - Error Monitoring ✅
+
 - **Purpose**: Real-time error tracking and alerting
 - **Features**:
   - Automatic capture of exceptions and errors
@@ -176,6 +204,7 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
 ### 🚨 Alerting & Health Checks
 
 **Automated Alerts:**
+
 - High error rates (>5% over 5 minutes)
 - Slow response times (>2s p95 latency)
 - Database connection failures
@@ -183,6 +212,7 @@ LoreSmith includes a comprehensive monitoring stack integrated into the Docker C
 - High system resource usage (>80% CPU/memory)
 
 **Health Check Endpoints:**
+
 - `/health` - Basic application health
 - `/metrics` - Prometheus metrics endpoint
 - `/ready` - Readiness probe for orchestration
@@ -203,6 +233,7 @@ For development without Docker, you can run LoreSmith directly with Python:
 ### Steps
 
 1. **Clone and setup**:
+
    ```bash
    git clone https://github.com/mdombrov-33/loresmith.git
    cd loresmith
@@ -211,23 +242,27 @@ For development without Docker, you can run LoreSmith directly with Python:
    ```
 
 2. **Install dependencies**:
+
    ```bash
    pip install --upgrade pip
    pip install -r requirements.txt
    ```
 
 3. **Start Redis locally**:
+
    ```bash
    redis-server
    ```
 
 4. **Set environment variables**:
+
    - `OPENROUTER_API_KEY=your_api_key`
    - `REDIS_HOST=localhost`
    - `REDIS_PORT=6379`
    - `REDIS_DB=0`
 
 5. **Run the application**:
+
    ```bash
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
@@ -241,6 +276,7 @@ For development without Docker, you can run LoreSmith directly with Python:
 ### Docker Compose (Recommended for most use cases)
 
 The Docker Compose setup is production-ready and includes:
+
 - Health checks and restart policies
 - Persistent volumes for data
 - Integrated monitoring and logging
@@ -251,6 +287,7 @@ The Docker Compose setup is production-ready and includes:
 For organizations requiring advanced orchestration, auto-scaling, and high availability, Kubernetes deployment files are available in the `k8s/` folder.
 
 **Kubernetes Benefits:**
+
 - Automatic pod scaling and self-healing
 - Advanced traffic management and load balancing
 - Integration with cloud provider services

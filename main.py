@@ -1,6 +1,14 @@
 from fastapi import FastAPI
 from routes import generation, user_selected_lore, users, lore_pieces, health
 from prometheus_fastapi_instrumentator import Instrumentator
+import os
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN"),
+    send_default_pii=True,  # Sends user info, IP, etc.
+    traces_sample_rate=0.1,
+)
 
 
 app = FastAPI()
