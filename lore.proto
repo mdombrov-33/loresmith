@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/mdombrov-33/loresmith/go-service/gen/lorepb";
+
 package lore;
 
 service LoreService {
