@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package lore;
+
+service LoreService {
+  rpc GenerateCharacters (CharactersRequest) returns (CharactersResponse);
+  rpc GenerateFactions (FactionsRequest) returns (FactionsResponse);
+  rpc GenerateSettings (SettingsRequest) returns (SettingsResponse);
+  rpc GenerateEvents (EventsRequest) returns (EventsResponse);
+  rpc GenerateRelics (RelicsRequest) returns (RelicsResponse);
+  rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
+}
+
+message CharactersRequest {
+  string theme = 1;
+  int32 count = 2;
+}
+message FactionsRequest {
+  string theme = 1;
+  int32 count = 2;
+}
+
+message SettingsRequest {
+  string theme = 1;
+  int32 count = 2;
+}
+
+message EventsRequest {
+  string theme = 1;
+  int32 count = 2;
+}
+
+message RelicsRequest {
+  string theme = 1;
+  int32 count = 2;
+}
+
+message LorePiece {
+  string name = 1;
+  string description = 2;
+  map<string, string> details = 3;
+  string type = 4;
+}
+
+message CharactersResponse {
+  repeated LorePiece characters = 1;
+}
+
+message FactionsResponse {
+  repeated LorePiece factions = 1;
+}
+
+message SettingsResponse {
+  repeated LorePiece settings = 1;
+}
+
+message EventsResponse {
+  repeated LorePiece events = 1;
+}
+
+message RelicsResponse {
+  repeated LorePiece relics = 1;
+}
+
+message SelectedLorePieces {
+  repeated LorePiece characters = 1;
+  repeated LorePiece factions = 2;
+  repeated LorePiece settings = 3;
+  repeated LorePiece events = 4;
+  repeated LorePiece relics = 5;
+}
+
+message FullStory {
+  string title = 1;
+  string content = 2;
+  string theme = 3;
+  SelectedLorePieces pieces = 4;
+}
+
+message FullStoryRequest {
+  SelectedLorePieces pieces = 1;
+  string theme = 2;
+}
+
+message FullStoryResponse {
+  FullStory story = 1;
+}
