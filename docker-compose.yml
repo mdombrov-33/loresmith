@@ -1,71 +1,32 @@
 services:
-  backend:
-    build: .
-    container_name: loresmith-backend
+  go-service:
+    build:
+      context: ./go-service
+      dockerfile: Dockerfile
+    container_name: loresmith-go-service
     ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    depends_on:
-      - redis
-      - postgres
+      - "8080:8080"
     environment:
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=0
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=loresmith
-      - POSTGRES_USER=loresmith_user
-      - POSTGRES_PASSWORD=somepassword
-    command:
-      ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-
-  redis:
-    image: redis:8
-    container_name: loresmith-redis
-    ports:
-      - "6379:6379"
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
 
   postgres:
-    image: postgres:16
+    image: postgres:12.4-alpine
     container_name: loresmith-postgres
-    environment:
-      POSTGRES_DB: loresmith
-      POSTGRES_USER: loresmith_user
-      POSTGRES_PASSWORD: somepassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: loresmith-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: loresmith-grafana
-    ports:
-      - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - prometheus
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: unless-stopped
 
 volumes:
-  pgdata:
-  prometheus_data:
-  grafana_data:
+  postgres_data:
