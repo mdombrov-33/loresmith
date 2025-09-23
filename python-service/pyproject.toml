@@ -1,0 +1,27 @@
+[project]
+name = "python-service"
+version = "0.1.0"
+description = "Python Service for Loresmith"
+authors = [
+    {name = "Maksym Dombrov",email = "maksymdombrov@gmail.com"}
+]
+readme = "README.md"
+dependencies = [
+    "grpcio (>=1.75.0,<2.0.0)",
+    "grpcio-tools (>=1.75.0,<2.0.0)",
+    "redis (>=6.4.0,<7.0.0)",
+    "prometheus-client (>=0.23.1,<0.24.0)",
+    "sentry-sdk (>=2.38.0,<3.0.0)"
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.2"
+black = "^25.9.0"
+ruff = "^0.13.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
