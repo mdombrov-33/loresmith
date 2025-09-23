@@ -7,13 +7,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/mdombrov-33/loresmith/go-service/internal/api"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/migrations"
 )
 
 type Application struct {
-	Logger *log.Logger
-	DB     *sql.DB
+	Logger      *log.Logger
+	UserHandler *api.UserHandler
+	DB          *sql.DB
 }
 
 func NewApplication() (*Application, error) {
@@ -29,13 +31,16 @@ func NewApplication() (*Application, error) {
 
 	logger := log.New((os.Stdout), "", log.Ldate|log.Ltime)
 
-	// our stores go here
+	//* Stores
+	userStore := store.NewPostgresUserStore(pgDB)
 
-	// our handlers go here
+	//* Handlers
+	userHandler := api.NewUserHandler(userStore, logger)
 
 	app := &Application{
-		Logger: logger,
-		DB:     pgDB,
+		Logger:      logger,
+		UserHandler: userHandler,
+		DB:          pgDB,
 	}
 
 	return app, nil
