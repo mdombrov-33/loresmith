@@ -1,0 +1,1 @@
+Invent a unique name for a {theme} faction that does NOT contain or match any of the following words or names: {blacklist}. Respond only with plain text, no markdown. No newlines; output a single paragraph. Name should be 2-3 words only.
