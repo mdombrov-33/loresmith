@@ -81,8 +81,8 @@ LoreSmith generates thematic lore pieces for storytelling or world-building. It 
 
 All require JWT auth (except `/health`, `/register`, `/login`).
 
-- `POST /register` - Register user
-- `POST /login` - Login, get JWT
+- `POST /register` - Register user (body: `{"username": "string", "email": "string", "password": "string"}`)
+- `POST /login` - Login (body: `{"username": "string", "password": "string"}`) → returns `{"token": "jwt"}`
 - `GET /generate/characters`
 - `GET /generate/factions`
 - `GET /generate/settings`
