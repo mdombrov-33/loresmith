@@ -46,9 +46,9 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	characters := make([]map[string]interface{}, len(grpcResp.Characters))
+	characters := make([]map[string]any, len(grpcResp.Characters))
 	for i, piece := range grpcResp.Characters {
-		characters[i] = map[string]interface{}{
+		characters[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
 			"details":     piece.Details, // map[string]string
