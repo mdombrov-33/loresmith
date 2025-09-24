@@ -25,6 +25,7 @@ type password struct {
 type UserStore interface {
 	CreateUser(*User) error
 	GetUserByUsername(username string) (*User, error)
+	GetUserByID(id int64) (*User, error)
 }
 
 type PostgresUserStore struct {
@@ -84,6 +85,36 @@ func (s *PostgresUserStore) GetUserByUsername(username string) (*User, error) {
 	`
 
 	err := s.db.QueryRow(query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.PasswordHash.hash,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (s *PostgresUserStore) GetUserByID(id int64) (*User, error) {
+	user := &User{
+		PasswordHash: password{},
+	}
+
+	query := `
+	SELECT id, username, email, password_hash, created_at, updated_at
+	FROM users
+	WHERE id = $1
+	`
+
+	err := s.db.QueryRow(query, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,

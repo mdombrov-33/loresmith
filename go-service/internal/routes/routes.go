@@ -8,14 +8,16 @@ import (
 func SetupRoutes(app *app.Application) *chi.Mux {
 	r := chi.NewRouter()
 
+	r.Group(func(r chi.Router) {
+		r.Use(app.Middleware.Authenticate)
+		r.Get("/generate/characters", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateCharacters))
+		r.Get("/generate/settings", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateSettings))
+		r.Get("/generate/events", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateEvents))
+		r.Get("/generate/relics", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateRelics))
+		r.Get("/generate/factions", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateFactions))
+	})
+
 	r.Get("/health", app.HealthCheck)
-
-	r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
-	r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
-	r.Get("/generate/events", app.LoreHandler.HandleGenerateEvents)
-	r.Get("/generate/relics", app.LoreHandler.HandleGenerateRelics)
-	r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
-
 	r.Post("/register", app.UserHandler.HandleRegisterUser)
 	r.Post("/login", app.UserHandler.HandleLoginUser)
 	return r

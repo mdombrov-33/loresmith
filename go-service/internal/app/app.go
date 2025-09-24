@@ -10,6 +10,7 @@ import (
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
+	"github.com/mdombrov-33/loresmith/go-service/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/migrations"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,6 +21,7 @@ type Application struct {
 	UserHandler *api.UserHandler
 	LoreHandler *api.LoreHandler
 	LoreClient  lorepb.LoreServiceClient
+	Middleware  middleware.UserMiddleware
 	DB          *sql.DB
 }
 
@@ -48,12 +50,14 @@ func NewApplication() (*Application, error) {
 	//* Handlers
 	userHandler := api.NewUserHandler(userStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
+	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
 
 	app := &Application{
 		Logger:      logger,
 		LoreClient:  loreClient,
 		LoreHandler: loreHandler,
 		UserHandler: userHandler,
+		Middleware:  middlewareHandler,
 		DB:          pgDB,
 	}
 
