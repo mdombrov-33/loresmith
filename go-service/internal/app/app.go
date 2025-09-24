@@ -7,14 +7,19 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/migrations"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Application struct {
 	Logger      *log.Logger
 	UserHandler *api.UserHandler
+	LoreHandler *api.LoreHandler
+	LoreClient  lorepb.LoreServiceClient
 	DB          *sql.DB
 }
 
@@ -31,14 +36,23 @@ func NewApplication() (*Application, error) {
 
 	logger := log.New((os.Stdout), "", log.Ldate|log.Ltime)
 
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to Python gRPC: %w", err)
+	}
+	loreClient := lorepb.NewLoreServiceClient(conn)
+
 	//* Stores
 	userStore := store.NewPostgresUserStore(pgDB)
 
 	//* Handlers
 	userHandler := api.NewUserHandler(userStore, logger)
+	loreHandler := api.NewLoreHandler(loreClient, logger)
 
 	app := &Application{
 		Logger:      logger,
+		LoreClient:  loreClient,
+		LoreHandler: loreHandler,
 		UserHandler: userHandler,
 		DB:          pgDB,
 	}
