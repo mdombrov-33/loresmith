@@ -1,1 +1,0 @@
-List the main dangers and threats in the setting {name} in a {theme} world, considering the landscape described as {landscape}. Include environmental hazards, creatures, or other challenges. Respond only with plain text, no markdown. No newlines; output a single paragraph. Respond in exactly 1 sentence. Describe 2-3 dangers or threats.

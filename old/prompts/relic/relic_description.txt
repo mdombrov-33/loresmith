@@ -1,1 +1,0 @@
-Describe the appearance and notable features of the relic named {name} in a {theme} setting. Respond only with plain text, no markdown. No newlines; output a single paragraph. Respond in exactly 2 sentences.

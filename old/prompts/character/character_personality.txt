@@ -1,1 +1,0 @@
- List exactly 3 personality traits of the character named {name}, who exists in a {theme} world. Separate the traits with commas. Respond only with plain text. No newlines; output a single paragraph.

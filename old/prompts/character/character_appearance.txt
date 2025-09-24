@@ -1,1 +1,0 @@
-Describe key physical appearance traits of the character named {name}, considering they live in a {theme} world. Include clothing, body, or other visual features. Separate traits with commas. Respond only with plain text. No newlines; output a single paragraph.
