@@ -3,6 +3,7 @@ import asyncio
 import lore_pb2  # type: ignore
 import lore_pb2_grpc  # type: ignore
 from chains.multi_variant import generate_multiple_characters
+from utils.logger import logger
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -23,16 +24,17 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return lore_pb2.CharactersResponse(characters=grpc_characters)  # type: ignore
         except Exception as e:
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Generation failed: {str(e)}")
+            context.set_details(f"Error generating characters: {str(e)}")
+            logger.error(f"gRPC GenerateCharacters error: {e}", exc_info=True)
             return lore_pb2.CharactersResponse()  # type: ignore
 
 
 async def serve():
     server = grpc.aio.server()
     lore_pb2_grpc.add_LoreServiceServicer_to_server(LoreServicer(), server)
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port("0.0.0.0:50051")
     await server.start()
-    print("gRPC server running on port 50051")
+    logger.info("gRPC server running on port 50051")
     await server.wait_for_termination()
 
 

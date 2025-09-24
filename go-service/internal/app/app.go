@@ -36,7 +36,7 @@ func NewApplication() (*Application, error) {
 
 	logger := log.New((os.Stdout), "", log.Ldate|log.Ltime)
 
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("python-service:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Python gRPC: %w", err)
 	}
