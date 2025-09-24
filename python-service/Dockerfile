@@ -8,10 +8,10 @@ COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false
 
-RUN poetry install --no-dev --no-interaction --no-ansi
+RUN poetry install --only main --no-root --no-interaction --no-ansi
 
 COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "loresmith-python-service.py"]
+CMD ["python", "lore_servicer.py"]
