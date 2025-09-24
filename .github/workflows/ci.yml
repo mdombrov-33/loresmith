@@ -32,7 +32,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           cd python-service
-          poetry install --with dev
+          poetry install --with dev --no-root --no-interaction --no-ansi
 
       - name: Run Ruff Linter (Python)
         run: |
