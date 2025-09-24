@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: CI Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.5"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Go dependencies
+        run: cd go-service && go mod download
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install Python dependencies
+        run: |
+          cd python-service
+          poetry install --with dev
+
+      - name: Run Ruff Linter (Python)
+        run: |
+          cd python-service
+          poetry run ruff check .
+
+      - name: Run Black Formatter (Python)
+        run: |
+          cd python-service
+          poetry run black --check .
+
+      - name: Build Go service
+        run: cd go-service && go build -o loresmith-go-service ./main.go
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Go service Docker image
+        run: |
+          docker build -t vexenbay/loresmith-go-service:latest ./go-service
+          docker push vexenbay/loresmith-go-service:latest
+
+      - name: Build and push Python service Docker image
+        run: |
+          docker build -t vexenbay/loresmith-python-service:latest ./python-service
+          docker push vexenbay/loresmith-python-service:latest
