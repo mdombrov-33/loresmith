@@ -12,6 +12,6 @@ RUN poetry install --only main --no-root --no-interaction --no-ansi
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 50051
 
 CMD ["python", "lore_servicer.py"]
