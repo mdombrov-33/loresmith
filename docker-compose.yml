@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     container_name: loresmith-python-service
     ports:
-      - "5000:5000"
+      - "50051:50051"
     env_file: .env
     depends_on:
       - redis

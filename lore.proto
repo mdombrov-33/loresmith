@@ -16,25 +16,30 @@ service LoreService {
 message CharactersRequest {
   string theme = 1;
   int32 count = 2;
+  bool regenerate = 3;
 }
 message FactionsRequest {
   string theme = 1;
   int32 count = 2;
+  bool regenerate = 3;
 }
 
 message SettingsRequest {
   string theme = 1;
   int32 count = 2;
+  bool regenerate = 3;
 }
 
 message EventsRequest {
   string theme = 1;
   int32 count = 2;
+  bool regenerate = 3;
 }
 
 message RelicsRequest {
   string theme = 1;
   int32 count = 2;
+  bool regenerate = 3;
 }
 
 message LorePiece {
