@@ -1,9 +1,9 @@
 package api
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
@@ -15,8 +15,9 @@ type LoreHandler struct {
 }
 
 type generateCharactersRequest struct {
-	Theme string `json:"theme"`
-	Count int32  `json:"count"`
+	Theme      string
+	Count      int32
+	Regenerate bool
 }
 
 func NewLoreHandler(loreClient lorepb.LoreServiceClient, logger *log.Logger) *LoreHandler {
@@ -24,19 +25,33 @@ func NewLoreHandler(loreClient lorepb.LoreServiceClient, logger *log.Logger) *Lo
 }
 
 func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Request) {
-	var req generateCharactersRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	req := generateCharactersRequest{
+		Theme: "post-apocalyptic", // Default
+		Count: 3,                  // Default
+	}
 
-	if err != nil {
-		h.logger.Printf("ERROR: decoding generate characters request: %v", err)
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request payload"})
-		return
+	if theme := r.URL.Query().Get("theme"); theme != "" {
+		req.Theme = theme
+	}
+
+	if countStr := r.URL.Query().Get("count"); countStr != "" {
+		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
+			req.Count = int32(parsed)
+		} else {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			return
+		}
+	}
+
+	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
+		req.Regenerate = true
 	}
 
 	ctx := r.Context()
 	grpcReq := &lorepb.CharactersRequest{
-		Theme: req.Theme,
-		Count: req.Count,
+		Theme:      req.Theme,
+		Count:      req.Count,
+		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateCharacters(ctx, grpcReq)
