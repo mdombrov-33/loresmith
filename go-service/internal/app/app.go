@@ -9,8 +9,8 @@ import (
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
+	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
-	"github.com/mdombrov-33/loresmith/go-service/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/migrations"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
