@@ -42,7 +42,7 @@ jobs:
       - name: Run Black Formatter (Python)
         run: |
           cd python-service
-          poetry run black --check --exclude 'lore_pb2*.py' .
+          poetry run black --check --exclude 'lore_pb2(_grpc)?\.py' .
 
       - name: Build Go service
         run: cd go-service && go build -o loresmith-go-service ./main.go
