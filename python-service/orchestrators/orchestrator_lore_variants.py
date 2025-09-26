@@ -14,14 +14,14 @@ from exceptions.generation import LoreVariantsGenerationError
 
 
 async def generate_lore_variants(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
 ) -> GeneratedLoreBundle:
     try:
-        character_task = generate_multiple_characters(count, theme)
-        faction_task = generate_multiple_factions(count, theme)
-        setting_task = generate_multiple_settings(count, theme)
-        event_task = generate_multiple_events(count, theme)
-        relic_task = generate_multiple_relics(count, theme)
+        character_task = generate_multiple_characters(count, theme, regenerate)
+        faction_task = generate_multiple_factions(count, theme, regenerate)
+        setting_task = generate_multiple_settings(count, theme, regenerate)
+        event_task = generate_multiple_events(count, theme, regenerate)
+        relic_task = generate_multiple_relics(count, theme, regenerate)
 
         characters, factions, settings, events, relics = await asyncio.gather(
             character_task, faction_task, setting_task, event_task, relic_task
