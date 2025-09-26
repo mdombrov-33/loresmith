@@ -15,6 +15,7 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Get("/generate/events", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateEvents))
 		r.Get("/generate/relics", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateRelics))
 		r.Get("/generate/factions", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateFactions))
+		r.Get("/generate/all", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateAll))
 	})
 
 	r.Get("/health", app.HealthCheck)
