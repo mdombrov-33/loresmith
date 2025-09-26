@@ -88,6 +88,7 @@ All require JWT auth (except `/health`, `/register`, `/login`).
 - `GET /generate/settings`
 - `GET /generate/events`
 - `GET /generate/relics`
+- `GET /generate/all`
 - `GET /health` - Health check
 
 **Query Params** (for `/generate/*` endpoints):
