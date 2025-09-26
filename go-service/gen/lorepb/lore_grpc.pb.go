@@ -8,7 +8,6 @@ package lorepb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -25,6 +24,7 @@ const (
 	LoreService_GenerateSettings_FullMethodName   = "/lore.LoreService/GenerateSettings"
 	LoreService_GenerateEvents_FullMethodName     = "/lore.LoreService/GenerateEvents"
 	LoreService_GenerateRelics_FullMethodName     = "/lore.LoreService/GenerateRelics"
+	LoreService_GenerateAll_FullMethodName        = "/lore.LoreService/GenerateAll"
 	LoreService_GenerateFullStory_FullMethodName  = "/lore.LoreService/GenerateFullStory"
 )
 
@@ -37,6 +37,7 @@ type LoreServiceClient interface {
 	GenerateSettings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error)
 	GenerateEvents(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (*EventsResponse, error)
 	GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (*RelicsResponse, error)
+	GenerateAll(ctx context.Context, in *AllRequest, opts ...grpc.CallOption) (*AllResponse, error)
 	GenerateFullStory(ctx context.Context, in *FullStoryRequest, opts ...grpc.CallOption) (*FullStoryResponse, error)
 }
 
@@ -98,6 +99,16 @@ func (c *loreServiceClient) GenerateRelics(ctx context.Context, in *RelicsReques
 	return out, nil
 }
 
+func (c *loreServiceClient) GenerateAll(ctx context.Context, in *AllRequest, opts ...grpc.CallOption) (*AllResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AllResponse)
+	err := c.cc.Invoke(ctx, LoreService_GenerateAll_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *loreServiceClient) GenerateFullStory(ctx context.Context, in *FullStoryRequest, opts ...grpc.CallOption) (*FullStoryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(FullStoryResponse)
@@ -117,6 +128,7 @@ type LoreServiceServer interface {
 	GenerateSettings(context.Context, *SettingsRequest) (*SettingsResponse, error)
 	GenerateEvents(context.Context, *EventsRequest) (*EventsResponse, error)
 	GenerateRelics(context.Context, *RelicsRequest) (*RelicsResponse, error)
+	GenerateAll(context.Context, *AllRequest) (*AllResponse, error)
 	GenerateFullStory(context.Context, *FullStoryRequest) (*FullStoryResponse, error)
 	mustEmbedUnimplementedLoreServiceServer()
 }
@@ -142,6 +154,9 @@ func (UnimplementedLoreServiceServer) GenerateEvents(context.Context, *EventsReq
 }
 func (UnimplementedLoreServiceServer) GenerateRelics(context.Context, *RelicsRequest) (*RelicsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateRelics not implemented")
+}
+func (UnimplementedLoreServiceServer) GenerateAll(context.Context, *AllRequest) (*AllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateAll not implemented")
 }
 func (UnimplementedLoreServiceServer) GenerateFullStory(context.Context, *FullStoryRequest) (*FullStoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateFullStory not implemented")
@@ -257,6 +272,24 @@ func _LoreService_GenerateRelics_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LoreService_GenerateAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LoreServiceServer).GenerateAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LoreService_GenerateAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LoreServiceServer).GenerateAll(ctx, req.(*AllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _LoreService_GenerateFullStory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FullStoryRequest)
 	if err := dec(in); err != nil {
@@ -301,6 +334,10 @@ var LoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateRelics",
 			Handler:    _LoreService_GenerateRelics_Handler,
+		},
+		{
+			MethodName: "GenerateAll",
+			Handler:    _LoreService_GenerateAll_Handler,
 		},
 		{
 			MethodName: "GenerateFullStory",

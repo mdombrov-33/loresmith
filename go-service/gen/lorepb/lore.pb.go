@@ -7,12 +7,11 @@
 package lorepb
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -610,6 +609,142 @@ func (x *RelicsResponse) GetRelics() []*LorePiece {
 	return nil
 }
 
+type AllRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
+	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AllRequest) Reset() {
+	*x = AllRequest{}
+	mi := &file_lore_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AllRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AllRequest) ProtoMessage() {}
+
+func (x *AllRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AllRequest.ProtoReflect.Descriptor instead.
+func (*AllRequest) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AllRequest) GetTheme() string {
+	if x != nil {
+		return x.Theme
+	}
+	return ""
+}
+
+func (x *AllRequest) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *AllRequest) GetRegenerate() bool {
+	if x != nil {
+		return x.Regenerate
+	}
+	return false
+}
+
+type AllResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Characters    []*LorePiece           `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty"`
+	Factions      []*LorePiece           `protobuf:"bytes,2,rep,name=factions,proto3" json:"factions,omitempty"`
+	Settings      []*LorePiece           `protobuf:"bytes,3,rep,name=settings,proto3" json:"settings,omitempty"`
+	Events        []*LorePiece           `protobuf:"bytes,4,rep,name=events,proto3" json:"events,omitempty"`
+	Relics        []*LorePiece           `protobuf:"bytes,5,rep,name=relics,proto3" json:"relics,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AllResponse) Reset() {
+	*x = AllResponse{}
+	mi := &file_lore_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AllResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AllResponse) ProtoMessage() {}
+
+func (x *AllResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AllResponse.ProtoReflect.Descriptor instead.
+func (*AllResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *AllResponse) GetCharacters() []*LorePiece {
+	if x != nil {
+		return x.Characters
+	}
+	return nil
+}
+
+func (x *AllResponse) GetFactions() []*LorePiece {
+	if x != nil {
+		return x.Factions
+	}
+	return nil
+}
+
+func (x *AllResponse) GetSettings() []*LorePiece {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+func (x *AllResponse) GetEvents() []*LorePiece {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
+func (x *AllResponse) GetRelics() []*LorePiece {
+	if x != nil {
+		return x.Relics
+	}
+	return nil
+}
+
 type SelectedLorePieces struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Characters    []*LorePiece           `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty"`
@@ -623,7 +758,7 @@ type SelectedLorePieces struct {
 
 func (x *SelectedLorePieces) Reset() {
 	*x = SelectedLorePieces{}
-	mi := &file_lore_proto_msgTypes[11]
+	mi := &file_lore_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -635,7 +770,7 @@ func (x *SelectedLorePieces) String() string {
 func (*SelectedLorePieces) ProtoMessage() {}
 
 func (x *SelectedLorePieces) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[11]
+	mi := &file_lore_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -648,7 +783,7 @@ func (x *SelectedLorePieces) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectedLorePieces.ProtoReflect.Descriptor instead.
 func (*SelectedLorePieces) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{11}
+	return file_lore_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SelectedLorePieces) GetCharacters() []*LorePiece {
@@ -698,7 +833,7 @@ type FullStory struct {
 
 func (x *FullStory) Reset() {
 	*x = FullStory{}
-	mi := &file_lore_proto_msgTypes[12]
+	mi := &file_lore_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -710,7 +845,7 @@ func (x *FullStory) String() string {
 func (*FullStory) ProtoMessage() {}
 
 func (x *FullStory) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[12]
+	mi := &file_lore_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -723,7 +858,7 @@ func (x *FullStory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStory.ProtoReflect.Descriptor instead.
 func (*FullStory) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{12}
+	return file_lore_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *FullStory) GetTitle() string {
@@ -764,7 +899,7 @@ type FullStoryRequest struct {
 
 func (x *FullStoryRequest) Reset() {
 	*x = FullStoryRequest{}
-	mi := &file_lore_proto_msgTypes[13]
+	mi := &file_lore_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -776,7 +911,7 @@ func (x *FullStoryRequest) String() string {
 func (*FullStoryRequest) ProtoMessage() {}
 
 func (x *FullStoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[13]
+	mi := &file_lore_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -789,7 +924,7 @@ func (x *FullStoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStoryRequest.ProtoReflect.Descriptor instead.
 func (*FullStoryRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{13}
+	return file_lore_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *FullStoryRequest) GetPieces() *SelectedLorePieces {
@@ -815,7 +950,7 @@ type FullStoryResponse struct {
 
 func (x *FullStoryResponse) Reset() {
 	*x = FullStoryResponse{}
-	mi := &file_lore_proto_msgTypes[14]
+	mi := &file_lore_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -827,7 +962,7 @@ func (x *FullStoryResponse) String() string {
 func (*FullStoryResponse) ProtoMessage() {}
 
 func (x *FullStoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[14]
+	mi := &file_lore_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -840,7 +975,7 @@ func (x *FullStoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStoryResponse.ProtoReflect.Descriptor instead.
 func (*FullStoryResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{14}
+	return file_lore_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *FullStoryResponse) GetStory() *FullStory {
@@ -905,7 +1040,22 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eEventsResponse\x12'\n" +
 	"\x06events\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06events\"9\n" +
 	"\x0eRelicsResponse\x12'\n" +
-	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"\xf1\x01\n" +
+	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"X\n" +
+	"\n" +
+	"AllRequest\x12\x14\n" +
+	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
+	"\n" +
+	"regenerate\x18\x03 \x01(\bR\n" +
+	"regenerate\"\xea\x01\n" +
+	"\vAllResponse\x12/\n" +
+	"\n" +
+	"characters\x18\x01 \x03(\v2\x0f.lore.LorePieceR\n" +
+	"characters\x12+\n" +
+	"\bfactions\x18\x02 \x03(\v2\x0f.lore.LorePieceR\bfactions\x12+\n" +
+	"\bsettings\x18\x03 \x03(\v2\x0f.lore.LorePieceR\bsettings\x12'\n" +
+	"\x06events\x18\x04 \x03(\v2\x0f.lore.LorePieceR\x06events\x12'\n" +
+	"\x06relics\x18\x05 \x03(\v2\x0f.lore.LorePieceR\x06relics\"\xf1\x01\n" +
 	"\x12SelectedLorePieces\x12/\n" +
 	"\n" +
 	"characters\x18\x01 \x03(\v2\x0f.lore.LorePieceR\n" +
@@ -923,13 +1073,14 @@ const file_lore_proto_rawDesc = "" +
 	"\x06pieces\x18\x01 \x01(\v2\x18.lore.SelectedLorePiecesR\x06pieces\x12\x14\n" +
 	"\x05theme\x18\x02 \x01(\tR\x05theme\":\n" +
 	"\x11FullStoryResponse\x12%\n" +
-	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story2\x9c\x03\n" +
+	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story2\xd0\x03\n" +
 	"\vLoreService\x12G\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
 	"\x10GenerateSettings\x12\x15.lore.SettingsRequest\x1a\x16.lore.SettingsResponse\x12;\n" +
 	"\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n" +
-	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x12D\n" +
+	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x122\n" +
+	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
 	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
@@ -945,7 +1096,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
@@ -958,44 +1109,53 @@ var file_lore_proto_goTypes = []any{
 	(*SettingsResponse)(nil),   // 8: lore.SettingsResponse
 	(*EventsResponse)(nil),     // 9: lore.EventsResponse
 	(*RelicsResponse)(nil),     // 10: lore.RelicsResponse
-	(*SelectedLorePieces)(nil), // 11: lore.SelectedLorePieces
-	(*FullStory)(nil),          // 12: lore.FullStory
-	(*FullStoryRequest)(nil),   // 13: lore.FullStoryRequest
-	(*FullStoryResponse)(nil),  // 14: lore.FullStoryResponse
-	nil,                        // 15: lore.LorePiece.DetailsEntry
+	(*AllRequest)(nil),         // 11: lore.AllRequest
+	(*AllResponse)(nil),        // 12: lore.AllResponse
+	(*SelectedLorePieces)(nil), // 13: lore.SelectedLorePieces
+	(*FullStory)(nil),          // 14: lore.FullStory
+	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
+	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
+	nil,                        // 17: lore.LorePiece.DetailsEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	15, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	17, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
 	5,  // 4: lore.EventsResponse.events:type_name -> lore.LorePiece
 	5,  // 5: lore.RelicsResponse.relics:type_name -> lore.LorePiece
-	5,  // 6: lore.SelectedLorePieces.characters:type_name -> lore.LorePiece
-	5,  // 7: lore.SelectedLorePieces.factions:type_name -> lore.LorePiece
-	5,  // 8: lore.SelectedLorePieces.settings:type_name -> lore.LorePiece
-	5,  // 9: lore.SelectedLorePieces.events:type_name -> lore.LorePiece
-	5,  // 10: lore.SelectedLorePieces.relics:type_name -> lore.LorePiece
-	11, // 11: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	11, // 12: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
-	12, // 13: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	0,  // 14: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 15: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 16: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 17: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 18: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	13, // 19: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	6,  // 20: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 21: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 22: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 23: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 24: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	14, // 25: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	20, // [20:26] is the sub-list for method output_type
-	14, // [14:20] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	5,  // 6: lore.AllResponse.characters:type_name -> lore.LorePiece
+	5,  // 7: lore.AllResponse.factions:type_name -> lore.LorePiece
+	5,  // 8: lore.AllResponse.settings:type_name -> lore.LorePiece
+	5,  // 9: lore.AllResponse.events:type_name -> lore.LorePiece
+	5,  // 10: lore.AllResponse.relics:type_name -> lore.LorePiece
+	5,  // 11: lore.SelectedLorePieces.characters:type_name -> lore.LorePiece
+	5,  // 12: lore.SelectedLorePieces.factions:type_name -> lore.LorePiece
+	5,  // 13: lore.SelectedLorePieces.settings:type_name -> lore.LorePiece
+	5,  // 14: lore.SelectedLorePieces.events:type_name -> lore.LorePiece
+	5,  // 15: lore.SelectedLorePieces.relics:type_name -> lore.LorePiece
+	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
+	13, // 17: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
+	14, // 18: lore.FullStoryResponse.story:type_name -> lore.FullStory
+	0,  // 19: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 20: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 21: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 22: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 23: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	11, // 24: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	15, // 25: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	6,  // 26: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 27: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 28: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 29: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 30: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 31: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 32: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	26, // [26:33] is the sub-list for method output_type
+	19, // [19:26] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
@@ -1009,7 +1169,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

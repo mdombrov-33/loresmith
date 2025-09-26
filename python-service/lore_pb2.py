@@ -4,65 +4,72 @@
 # source: lore.proto
 # Protobuf Python Version: 6.31.1
 """Generated protocol buffer code."""
-
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC, 6, 31, 1, "", "lore.proto"
+    _runtime_version.Domain.PUBLIC,
+    6,
+    31,
+    1,
+    '',
+    'lore.proto'
 )
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\nlore.proto\x12\x04lore"E\n\x11\x43haractersRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08"C\n\x0f\x46\x61\x63tionsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08"C\n\x0fSettingsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08"A\n\rEventsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08"A\n\rRelicsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08"\x9b\x01\n\tLorePiece\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12-\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x1c.lore.LorePiece.DetailsEntry\x12\x0c\n\x04type\x18\x04 \x01(\t\x1a.\n\x0c\x44\x65tailsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01"9\n\x12\x43haractersResponse\x12#\n\ncharacters\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece"5\n\x10\x46\x61\x63tionsResponse\x12!\n\x08\x66\x61\x63tions\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece"5\n\x10SettingsResponse\x12!\n\x08settings\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece"1\n\x0e\x45ventsResponse\x12\x1f\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece"1\n\x0eRelicsResponse\x12\x1f\n\x06relics\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece"\xc1\x01\n\x12SelectedLorePieces\x12#\n\ncharacters\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08\x66\x61\x63tions\x18\x02 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08settings\x18\x03 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06\x65vents\x18\x04 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06relics\x18\x05 \x03(\x0b\x32\x0f.lore.LorePiece"d\n\tFullStory\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12\r\n\x05theme\x18\x03 \x01(\t\x12(\n\x06pieces\x18\x04 \x01(\x0b\x32\x18.lore.SelectedLorePieces"K\n\x10\x46ullStoryRequest\x12(\n\x06pieces\x18\x01 \x01(\x0b\x32\x18.lore.SelectedLorePieces\x12\r\n\x05theme\x18\x02 \x01(\t"3\n\x11\x46ullStoryResponse\x12\x1e\n\x05story\x18\x01 \x01(\x0b\x32\x0f.lore.FullStory2\x9c\x03\n\x0bLoreService\x12G\n\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12\x41\n\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12\x41\n\x10GenerateSettings\x12\x15.lore.SettingsRequest\x1a\x16.lore.SettingsResponse\x12;\n\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x12\x44\n\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponseB\x0cZ\ngen/lorepbb\x06proto3'
-)
+
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nlore.proto\x12\x04lore\"E\n\x11\x43haractersRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"C\n\x0f\x46\x61\x63tionsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"C\n\x0fSettingsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"A\n\rEventsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"A\n\rRelicsRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"\x9b\x01\n\tLorePiece\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12-\n\x07\x64\x65tails\x18\x03 \x03(\x0b\x32\x1c.lore.LorePiece.DetailsEntry\x12\x0c\n\x04type\x18\x04 \x01(\t\x1a.\n\x0c\x44\x65tailsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"9\n\x12\x43haractersResponse\x12#\n\ncharacters\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\"5\n\x10\x46\x61\x63tionsResponse\x12!\n\x08\x66\x61\x63tions\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\"5\n\x10SettingsResponse\x12!\n\x08settings\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\"1\n\x0e\x45ventsResponse\x12\x1f\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\"1\n\x0eRelicsResponse\x12\x1f\n\x06relics\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\">\n\nAllRequest\x12\r\n\x05theme\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x12\n\nregenerate\x18\x03 \x01(\x08\"\xba\x01\n\x0b\x41llResponse\x12#\n\ncharacters\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08\x66\x61\x63tions\x18\x02 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08settings\x18\x03 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06\x65vents\x18\x04 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06relics\x18\x05 \x03(\x0b\x32\x0f.lore.LorePiece\"\xc1\x01\n\x12SelectedLorePieces\x12#\n\ncharacters\x18\x01 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08\x66\x61\x63tions\x18\x02 \x03(\x0b\x32\x0f.lore.LorePiece\x12!\n\x08settings\x18\x03 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06\x65vents\x18\x04 \x03(\x0b\x32\x0f.lore.LorePiece\x12\x1f\n\x06relics\x18\x05 \x03(\x0b\x32\x0f.lore.LorePiece\"d\n\tFullStory\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12\r\n\x05theme\x18\x03 \x01(\t\x12(\n\x06pieces\x18\x04 \x01(\x0b\x32\x18.lore.SelectedLorePieces\"K\n\x10\x46ullStoryRequest\x12(\n\x06pieces\x18\x01 \x01(\x0b\x32\x18.lore.SelectedLorePieces\x12\r\n\x05theme\x18\x02 \x01(\t\"3\n\x11\x46ullStoryResponse\x12\x1e\n\x05story\x18\x01 \x01(\x0b\x32\x0f.lore.FullStory2\xd0\x03\n\x0bLoreService\x12G\n\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12\x41\n\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12\x41\n\x10GenerateSettings\x12\x15.lore.SettingsRequest\x1a\x16.lore.SettingsResponse\x12;\n\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x12\x32\n\x0bGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12\x44\n\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponseB\x0cZ\ngen/lorepbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "lore_pb2", _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'lore_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-    _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = b"Z\ngen/lorepb"
-    _globals["_LOREPIECE_DETAILSENTRY"]._loaded_options = None
-    _globals["_LOREPIECE_DETAILSENTRY"]._serialized_options = b"8\001"
-    _globals["_CHARACTERSREQUEST"]._serialized_start = 20
-    _globals["_CHARACTERSREQUEST"]._serialized_end = 89
-    _globals["_FACTIONSREQUEST"]._serialized_start = 91
-    _globals["_FACTIONSREQUEST"]._serialized_end = 158
-    _globals["_SETTINGSREQUEST"]._serialized_start = 160
-    _globals["_SETTINGSREQUEST"]._serialized_end = 227
-    _globals["_EVENTSREQUEST"]._serialized_start = 229
-    _globals["_EVENTSREQUEST"]._serialized_end = 294
-    _globals["_RELICSREQUEST"]._serialized_start = 296
-    _globals["_RELICSREQUEST"]._serialized_end = 361
-    _globals["_LOREPIECE"]._serialized_start = 364
-    _globals["_LOREPIECE"]._serialized_end = 519
-    _globals["_LOREPIECE_DETAILSENTRY"]._serialized_start = 473
-    _globals["_LOREPIECE_DETAILSENTRY"]._serialized_end = 519
-    _globals["_CHARACTERSRESPONSE"]._serialized_start = 521
-    _globals["_CHARACTERSRESPONSE"]._serialized_end = 578
-    _globals["_FACTIONSRESPONSE"]._serialized_start = 580
-    _globals["_FACTIONSRESPONSE"]._serialized_end = 633
-    _globals["_SETTINGSRESPONSE"]._serialized_start = 635
-    _globals["_SETTINGSRESPONSE"]._serialized_end = 688
-    _globals["_EVENTSRESPONSE"]._serialized_start = 690
-    _globals["_EVENTSRESPONSE"]._serialized_end = 739
-    _globals["_RELICSRESPONSE"]._serialized_start = 741
-    _globals["_RELICSRESPONSE"]._serialized_end = 790
-    _globals["_SELECTEDLOREPIECES"]._serialized_start = 793
-    _globals["_SELECTEDLOREPIECES"]._serialized_end = 986
-    _globals["_FULLSTORY"]._serialized_start = 988
-    _globals["_FULLSTORY"]._serialized_end = 1088
-    _globals["_FULLSTORYREQUEST"]._serialized_start = 1090
-    _globals["_FULLSTORYREQUEST"]._serialized_end = 1165
-    _globals["_FULLSTORYRESPONSE"]._serialized_start = 1167
-    _globals["_FULLSTORYRESPONSE"]._serialized_end = 1218
-    _globals["_LORESERVICE"]._serialized_start = 1221
-    _globals["_LORESERVICE"]._serialized_end = 1633
+  _globals['DESCRIPTOR']._loaded_options = None
+  _globals['DESCRIPTOR']._serialized_options = b'Z\ngen/lorepb'
+  _globals['_LOREPIECE_DETAILSENTRY']._loaded_options = None
+  _globals['_LOREPIECE_DETAILSENTRY']._serialized_options = b'8\001'
+  _globals['_CHARACTERSREQUEST']._serialized_start=20
+  _globals['_CHARACTERSREQUEST']._serialized_end=89
+  _globals['_FACTIONSREQUEST']._serialized_start=91
+  _globals['_FACTIONSREQUEST']._serialized_end=158
+  _globals['_SETTINGSREQUEST']._serialized_start=160
+  _globals['_SETTINGSREQUEST']._serialized_end=227
+  _globals['_EVENTSREQUEST']._serialized_start=229
+  _globals['_EVENTSREQUEST']._serialized_end=294
+  _globals['_RELICSREQUEST']._serialized_start=296
+  _globals['_RELICSREQUEST']._serialized_end=361
+  _globals['_LOREPIECE']._serialized_start=364
+  _globals['_LOREPIECE']._serialized_end=519
+  _globals['_LOREPIECE_DETAILSENTRY']._serialized_start=473
+  _globals['_LOREPIECE_DETAILSENTRY']._serialized_end=519
+  _globals['_CHARACTERSRESPONSE']._serialized_start=521
+  _globals['_CHARACTERSRESPONSE']._serialized_end=578
+  _globals['_FACTIONSRESPONSE']._serialized_start=580
+  _globals['_FACTIONSRESPONSE']._serialized_end=633
+  _globals['_SETTINGSRESPONSE']._serialized_start=635
+  _globals['_SETTINGSRESPONSE']._serialized_end=688
+  _globals['_EVENTSRESPONSE']._serialized_start=690
+  _globals['_EVENTSRESPONSE']._serialized_end=739
+  _globals['_RELICSRESPONSE']._serialized_start=741
+  _globals['_RELICSRESPONSE']._serialized_end=790
+  _globals['_ALLREQUEST']._serialized_start=792
+  _globals['_ALLREQUEST']._serialized_end=854
+  _globals['_ALLRESPONSE']._serialized_start=857
+  _globals['_ALLRESPONSE']._serialized_end=1043
+  _globals['_SELECTEDLOREPIECES']._serialized_start=1046
+  _globals['_SELECTEDLOREPIECES']._serialized_end=1239
+  _globals['_FULLSTORY']._serialized_start=1241
+  _globals['_FULLSTORY']._serialized_end=1341
+  _globals['_FULLSTORYREQUEST']._serialized_start=1343
+  _globals['_FULLSTORYREQUEST']._serialized_end=1418
+  _globals['_FULLSTORYRESPONSE']._serialized_start=1420
+  _globals['_FULLSTORYRESPONSE']._serialized_end=1471
+  _globals['_LORESERVICE']._serialized_start=1474
+  _globals['_LORESERVICE']._serialized_end=1938
 # @@protoc_insertion_point(module_scope)

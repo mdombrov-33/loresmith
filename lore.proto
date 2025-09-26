@@ -10,6 +10,7 @@ service LoreService {
   rpc GenerateSettings (SettingsRequest) returns (SettingsResponse);
   rpc GenerateEvents (EventsRequest) returns (EventsResponse);
   rpc GenerateRelics (RelicsRequest) returns (RelicsResponse);
+  rpc GenerateAll (AllRequest) returns (AllResponse);
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
 }
 
@@ -67,6 +68,20 @@ message EventsResponse {
 
 message RelicsResponse {
   repeated LorePiece relics = 1;
+}
+
+message AllRequest {
+  string theme = 1;
+  int32 count = 2;
+  bool regenerate = 3;
+}
+
+message AllResponse {
+  repeated LorePiece characters = 1;
+  repeated LorePiece factions = 2;
+  repeated LorePiece settings = 3;
+  repeated LorePiece events = 4;
+  repeated LorePiece relics = 5;
 }
 
 message SelectedLorePieces {
