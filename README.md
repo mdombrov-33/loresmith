@@ -1,5 +1,3 @@
-# LoreSmith
-
 [![Go](https://img.shields.io/badge/go-1.24+-blue)](https://golang.org/)
 [![Python](https://img.shields.io/badge/python-3.12+-blue)](https://www.python.org/)
 [![gRPC](https://img.shields.io/badge/grpc-1.75+-blue)](https://grpc.io/)
@@ -7,26 +5,43 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-8-blue)](https://redis.io/)
 
-A microservices AI-powered lore generator that creates characters, factions, settings, events, and relics using Go (HTTP) and Python (gRPC + AI chains). Supports JWT auth, caching, regeneration, and Docker orchestration.
+An AI-powered narrative game engine that transforms generated lore into interactive adventures. Built with Go microservices and Python AI chains, featuring world generation, party management, and session-based gameplay.
 
-## Overview
+## What is LoreSmith?
 
-LoreSmith generates thematic lore pieces for storytelling or world-building. It uses AI prompts via OpenRouter, caches in Redis, and stores in PostgreSQL. Architecture: Go service handles HTTP/auth, Python service handles gRPC-based generation.
+LoreSmith is a **dual-purpose platform**:
 
-## Features
+1. **World Building API**: Generate cohesive lore (characters, factions, settings, events, relics) for storytelling and tabletop gaming
+2. **Interactive Adventure Engine**: Transform generated worlds into playable text-based adventures with party management, inventory systems, and AI-driven encounters
 
-- **Lore Generation**: Characters, factions, settings, events, relics with themes (e.g., post-apocalyptic, cyberpunk).
-- **AI Integration**: OpenRouter API for prompt chaining and text generation.
-- **Caching & Auth**: Redis caching; JWT-based auth for protected endpoints.
-- **Microservices**: Go (HTTP server) + Python (gRPC server) via Docker Compose.
-- **Observability**: Prometheus, Grafana, Sentry.
+## Architecture
+
+**Microservices Design**: Go handles HTTP/auth/sessions/game state, Python handles AI generation and narrative processing
+**AI-Driven**: OpenRouter integration with custom prompt chains for world coherence
+**Session Management**: Redis-based game state persistence and caching
+**Scalable**: Docker orchestration with observability (Prometheus, Grafana, Sentry)
+
+## Key Features
+
+### World Building (API Mode)
+
+- **Thematic Generation**: Create lore for multiple genres (post-apocalyptic, fantasy, cyberpunk, etc.)
+- **Narrative Coherence**: Full story generation weaves disconnected pieces into coherent worlds
+- **Flexible Output**: Individual components or complete world bundles
+
+### Adventure Gaming (Interactive Mode)
+
+- **World Initialization**: Generated lore becomes playable adventure setting
+- **Party Management**: Character selection, health/stress tracking, inventory systems
+- **Dynamic Encounters**: AI generates contextual encounters based on established world lore
+- **Session Persistence**: Save/resume adventures with full game state management
 
 ## Tech Stack
 
-- **Go Service**: HTTP server, JWT auth, Chi router.
-- **Python Service**: gRPC server, AI chains, OpenRouter client.
-- **Database**: PostgreSQL (users/lore), Redis (caching).
-- **Deployment**: Docker Compose.
+- **Go Service**: HTTP server, JWT auth, Chi router, session management, game state logic
+- **Python Service**: gRPC server, AI chains, narrative processing, OpenRouter client
+- **Database**: PostgreSQL (users/world data), Redis (sessions/caching)
+- **Deployment**: Docker Compose with multi-service orchestration
 
 ## Getting Started
 
@@ -37,15 +52,7 @@ LoreSmith generates thematic lore pieces for storytelling or world-building. It 
 
 ### Setup
 
-1. Clone and switch to branch:
-
-   ```bash
-   git clone https://github.com/mdombrov-33/loresmith.git
-   cd loresmith
-   git checkout revamp-go-python
-   ```
-
-2. Copy `.env.example` to `.env` and fill secrets:
+1. Copy `.env.example` to `.env` and configure:
 
    ```env
    OPENROUTER_API_KEY=your_api_key_here
@@ -59,59 +66,120 @@ LoreSmith generates thematic lore pieces for storytelling or world-building. It 
    JWT_SECRET=your_secret
    ```
 
-3. Run:
+2. Run:
 
    ```bash
    docker-compose up --build
    ```
 
-4. Access:
-   - Go service: http://localhost:8080
+3. Access:
+   - API: http://localhost:8080
    - Health: http://localhost:8080/health
 
-## How It Works
+## API Usage
 
-1. **Request**: GET to Go service (e.g., `/generate/characters?count=3&theme=post-apocalyptic&regenerate=false`).
-2. **Auth**: JWT checked via middleware.
-3. **gRPC Call**: Go calls Python service for generation.
-4. **AI Processing**: Python loads prompts, calls OpenRouter, cleans text, returns lore.
-5. **Response**: JSON with lore pieces.
+### World Building Endpoints
 
-## API Endpoints (Go Service)
+All generation endpoints require JWT auth (except `/health`, `/register`, `/login`).
 
-All require JWT auth (except `/health`, `/register`, `/login`).
+**Authentication:**
 
-- `POST /register` - Register user (body: `{"username": "string", "email": "string", "password": "string"}`)
-- `POST /login` - Login (body: `{"username": "string", "password": "string"}`) → returns `{"token": "jwt"}`
-- `GET /generate/characters`
-- `GET /generate/factions`
-- `GET /generate/settings`
-- `GET /generate/events`
-- `GET /generate/relics`
-- `GET /generate/all`
-- `GET /health` - Health check
+- `POST /register` - Register user
+- `POST /login` - Login and receive JWT token
 
-**Query Params** (for `/generate/*` endpoints):
+**Lore Generation:**
 
-- `count`: Number of items (1-10).
-- `theme`: See [`constants/themes.py`](python-service/constants/themes.py) for options (e.g., post-apocalyptic, fantasy).
-- `regenerate`: Bool; if true, skip Redis cache for fresh generation.
+- `GET /generate/characters` - Generate character profiles
+- `GET /generate/factions` - Generate faction descriptions
+- `GET /generate/settings` - Generate location details
+- `GET /generate/events` - Generate historical events
+- `GET /generate/relics` - Generate artifact descriptions
+- `GET /generate/all` - Generate complete world bundle
+- `POST /generate/full-story` - Create narrative from selected lore pieces
 
-Example Response:
+**Query Parameters:**
+
+- `count`: Number of items (1-10)
+- `theme`: World theme (post-apocalyptic, fantasy, cyberpunk, etc.)
+- `regenerate`: Skip cache for fresh generation
+
+### Adventure Gaming Endpoints
+
+**Adventure Management:**
+
+- `POST /adventure/initialize` - Create new adventure world
+- `POST /adventure/start` - Begin adventure with selected party
+- `GET /adventure/encounter` - Get current encounter and choices
+- `POST /adventure/choice` - Process player decision
+- `GET /adventure/status` - Get current game state
+
+**Example World Generation Response:**
 
 ```json
 {
   "characters": [
     {
-      "name": "Frost Vesper",
-      "description": "Resilient scavenger...",
-      "details": { "appearance": "...", "personality": "..." },
-      "type": "character"
+      "name": "Echo",
+      "description": "A skilled scavenger navigating ruins...",
+      "details": {
+        "personality": "Cautious, intelligent, burdened by past",
+        "appearance": "Dust-covered cloak, reflective goggles",
+        "health": 100,
+        "stress": 20,
+        "skills": ["scavenging", "stealth", "tech-savvy"]
+      }
     }
-  ]
+  ],
+  "full_story": {
+    "title": "The Last Signal",
+    "content": "In Ashfall City, Echo discovers the Pathseeker Map while avoiding the militant Steel Reclaimers..."
+  }
 }
 ```
 
+## How It Works
+
+### World Building Flow
+
+1. **Generation**: AI creates thematic lore pieces using custom prompt chains
+2. **Coherence**: Full story generation weaves pieces into narrative
+3. **Caching**: Redis stores results for performance
+4. **Export**: JSON API or adventure initialization
+
+### Adventure Gaming Flow
+
+1. **Initialization**: Generate world bundle → create full story → establish context
+2. **Party Selection**: Choose characters from generated cast
+3. **Session Creation**: Store world context and party state in Redis
+4. **Adventure Loop**: Generate encounters → present choices → update state → repeat
+5. **State Management**: Track health, stress, inventory, relationships, world progress
+
+## Development Roadmap
+
+### Current Status
+
+- ✅ Core lore generation system
+- ✅ Full story narrative weaving
+- ✅ Microservices architecture
+- 🔄 Adventure game engine (in development)
+
+### Planned Features
+
+- **Enhanced UI**: Multi-panel adventure interface with visual components
+- **Inventory System**: Item management, crafting, trading
+- **Faction Dynamics**: Reputation tracking, political consequences
+- **Environmental Systems**: Weather, hazards, resource management
+- **Multiplayer Support**: Shared adventures, party cooperation
+
+## Contributing
+
+LoreSmith is open to contributions! Whether you're interested in:
+
+- AI prompt engineering and chain optimization
+- Adventure game mechanics and balance
+- Frontend development for game interface
+- Performance optimization and scaling
+
 ## CI/CD
 
-GitHub Actions lint (Ruff/Black), build Go/Python, push Docker images on pushes/PRs.
+GitHub Actions handle linting (Ruff/Black), testing, and Docker image builds on pushes/PRs.
