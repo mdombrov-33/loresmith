@@ -6,7 +6,7 @@
 [![Redis](https://img.shields.io/badge/redis-purple)](https://redis.io/)
 
 <p align="center">
-  <img src="logo.png" alt="LoreSmith Logo" width="200"/>
+  <img src="logo.png" alt="LoreSmith Logo" width="400"/>
 </p>
 
 An AI-powered narrative game engine that transforms generated lore into interactive adventures. Built with Go microservices and Python AI chains, featuring world generation, party management, and session-based gameplay.
