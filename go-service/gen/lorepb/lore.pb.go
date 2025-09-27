@@ -747,11 +747,11 @@ func (x *AllResponse) GetRelics() []*LorePiece {
 
 type SelectedLorePieces struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Characters    []*LorePiece           `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty"`
-	Factions      []*LorePiece           `protobuf:"bytes,2,rep,name=factions,proto3" json:"factions,omitempty"`
-	Settings      []*LorePiece           `protobuf:"bytes,3,rep,name=settings,proto3" json:"settings,omitempty"`
-	Events        []*LorePiece           `protobuf:"bytes,4,rep,name=events,proto3" json:"events,omitempty"`
-	Relics        []*LorePiece           `protobuf:"bytes,5,rep,name=relics,proto3" json:"relics,omitempty"`
+	Characters    map[string]string      `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Factions      map[string]string      `protobuf:"bytes,2,rep,name=factions,proto3" json:"factions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Settings      map[string]string      `protobuf:"bytes,3,rep,name=settings,proto3" json:"settings,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Events        map[string]string      `protobuf:"bytes,4,rep,name=events,proto3" json:"events,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Relics        map[string]string      `protobuf:"bytes,5,rep,name=relics,proto3" json:"relics,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -786,35 +786,35 @@ func (*SelectedLorePieces) Descriptor() ([]byte, []int) {
 	return file_lore_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *SelectedLorePieces) GetCharacters() []*LorePiece {
+func (x *SelectedLorePieces) GetCharacters() map[string]string {
 	if x != nil {
 		return x.Characters
 	}
 	return nil
 }
 
-func (x *SelectedLorePieces) GetFactions() []*LorePiece {
+func (x *SelectedLorePieces) GetFactions() map[string]string {
 	if x != nil {
 		return x.Factions
 	}
 	return nil
 }
 
-func (x *SelectedLorePieces) GetSettings() []*LorePiece {
+func (x *SelectedLorePieces) GetSettings() map[string]string {
 	if x != nil {
 		return x.Settings
 	}
 	return nil
 }
 
-func (x *SelectedLorePieces) GetEvents() []*LorePiece {
+func (x *SelectedLorePieces) GetEvents() map[string]string {
 	if x != nil {
 		return x.Events
 	}
 	return nil
 }
 
-func (x *SelectedLorePieces) GetRelics() []*LorePiece {
+func (x *SelectedLorePieces) GetRelics() map[string]string {
 	if x != nil {
 		return x.Relics
 	}
@@ -1055,15 +1055,30 @@ const file_lore_proto_rawDesc = "" +
 	"\bfactions\x18\x02 \x03(\v2\x0f.lore.LorePieceR\bfactions\x12+\n" +
 	"\bsettings\x18\x03 \x03(\v2\x0f.lore.LorePieceR\bsettings\x12'\n" +
 	"\x06events\x18\x04 \x03(\v2\x0f.lore.LorePieceR\x06events\x12'\n" +
-	"\x06relics\x18\x05 \x03(\v2\x0f.lore.LorePieceR\x06relics\"\xf1\x01\n" +
-	"\x12SelectedLorePieces\x12/\n" +
+	"\x06relics\x18\x05 \x03(\v2\x0f.lore.LorePieceR\x06relics\"\x91\x05\n" +
+	"\x12SelectedLorePieces\x12H\n" +
 	"\n" +
-	"characters\x18\x01 \x03(\v2\x0f.lore.LorePieceR\n" +
-	"characters\x12+\n" +
-	"\bfactions\x18\x02 \x03(\v2\x0f.lore.LorePieceR\bfactions\x12+\n" +
-	"\bsettings\x18\x03 \x03(\v2\x0f.lore.LorePieceR\bsettings\x12'\n" +
-	"\x06events\x18\x04 \x03(\v2\x0f.lore.LorePieceR\x06events\x12'\n" +
-	"\x06relics\x18\x05 \x03(\v2\x0f.lore.LorePieceR\x06relics\"\x83\x01\n" +
+	"characters\x18\x01 \x03(\v2(.lore.SelectedLorePieces.CharactersEntryR\n" +
+	"characters\x12B\n" +
+	"\bfactions\x18\x02 \x03(\v2&.lore.SelectedLorePieces.FactionsEntryR\bfactions\x12B\n" +
+	"\bsettings\x18\x03 \x03(\v2&.lore.SelectedLorePieces.SettingsEntryR\bsettings\x12<\n" +
+	"\x06events\x18\x04 \x03(\v2$.lore.SelectedLorePieces.EventsEntryR\x06events\x12<\n" +
+	"\x06relics\x18\x05 \x03(\v2$.lore.SelectedLorePieces.RelicsEntryR\x06relics\x1a=\n" +
+	"\x0fCharactersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a;\n" +
+	"\rFactionsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a;\n" +
+	"\rSettingsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
+	"\vEventsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
+	"\vRelicsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x83\x01\n" +
 	"\tFullStory\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
@@ -1096,7 +1111,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
@@ -1116,6 +1131,11 @@ var file_lore_proto_goTypes = []any{
 	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
 	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
 	nil,                        // 17: lore.LorePiece.DetailsEntry
+	nil,                        // 18: lore.SelectedLorePieces.CharactersEntry
+	nil,                        // 19: lore.SelectedLorePieces.FactionsEntry
+	nil,                        // 20: lore.SelectedLorePieces.SettingsEntry
+	nil,                        // 21: lore.SelectedLorePieces.EventsEntry
+	nil,                        // 22: lore.SelectedLorePieces.RelicsEntry
 }
 var file_lore_proto_depIdxs = []int32{
 	17, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
@@ -1129,11 +1149,11 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 8: lore.AllResponse.settings:type_name -> lore.LorePiece
 	5,  // 9: lore.AllResponse.events:type_name -> lore.LorePiece
 	5,  // 10: lore.AllResponse.relics:type_name -> lore.LorePiece
-	5,  // 11: lore.SelectedLorePieces.characters:type_name -> lore.LorePiece
-	5,  // 12: lore.SelectedLorePieces.factions:type_name -> lore.LorePiece
-	5,  // 13: lore.SelectedLorePieces.settings:type_name -> lore.LorePiece
-	5,  // 14: lore.SelectedLorePieces.events:type_name -> lore.LorePiece
-	5,  // 15: lore.SelectedLorePieces.relics:type_name -> lore.LorePiece
+	18, // 11: lore.SelectedLorePieces.characters:type_name -> lore.SelectedLorePieces.CharactersEntry
+	19, // 12: lore.SelectedLorePieces.factions:type_name -> lore.SelectedLorePieces.FactionsEntry
+	20, // 13: lore.SelectedLorePieces.settings:type_name -> lore.SelectedLorePieces.SettingsEntry
+	21, // 14: lore.SelectedLorePieces.events:type_name -> lore.SelectedLorePieces.EventsEntry
+	22, // 15: lore.SelectedLorePieces.relics:type_name -> lore.SelectedLorePieces.RelicsEntry
 	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
 	13, // 17: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 18: lore.FullStoryResponse.story:type_name -> lore.FullStory
@@ -1169,7 +1189,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
