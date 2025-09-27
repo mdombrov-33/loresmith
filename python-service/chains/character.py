@@ -1,3 +1,4 @@
+from typing import Union
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
 from utils.load_prompt import load_prompt
@@ -54,15 +55,29 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         backstory_raw = await ask_openrouter(backstory_prompt, 200)
         backstory = clean_ai_text(backstory_raw)
 
+        # Skills prompt
+        skills_prompt = load_prompt(
+            "character/character_skills.txt",
+            theme=theme,
+            name=name,
+            personality=personality,
+            appearance=appearance,
+        )
+        skills_raw = await ask_openrouter(skills_prompt, 70)
+        skills = clean_ai_text(skills_raw)
+
     except Exception as e:
         logger.error(f"Character generation error: {e}", exc_info=True)
         raise CharacterGenerationError(
             f"Failed to generate character for theme {theme}: {str(e)}"
         )
 
-    details = {
+    details: dict[str, Union[str, int]] = {
         "personality": personality,
         "appearance": appearance,
+        "health": "100",
+        "stress": "0",
+        "skills": skills,
     }
 
     return LorePiece(
