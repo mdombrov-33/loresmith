@@ -1,0 +1,17 @@
+{
+  "characters": {
+    "Drift Cutter": "In the ruins of a nuclear-devastated world, Drift Cutter honed his resourcefulness by scavenging forgotten tech and bartering what little humanity remains, his cynical outlook forged from betrayals by fellow survivors who turned on him, yet his unbreakable resilience kept him wandering the irradiated wastes, always one step ahead of the fallout storms."
+  },
+  "factions": {
+    "Obsidian Order": "In the scorched remnants of a collapsed world, the Obsidian Order embodies unyielding discipline and eternal strength, symbolized by obsidian itself, as they reject pre-collapse weaknesses and strive to rebuild society under a strict hierarchy ruled by merit and iron will, scavenging advanced tech to dominate wasteland territories and purge chaos for an enduring civilization. Clad in sleek black armored suits reinforced with jagged obsidian fragments, adorned with metallic rank insignia and military-grade scavenged tech, their utilitarian helmets featuring visor displays reflect a cold, disciplined rejection of chaos, forging a meritocratic order amid the ruins."
+  },
+  "settings": {
+    "Fractured Realms of Desolation": "In the post-apocalyptic world of the Fractured Realms of Desolation, the landscape is a scarred expanse of cracked wastelands, jagged mountains, and parched riverbeds devastated by ancient cataclysms, where scorching heatwaves alternate with bone-chilling dust storms that bury travelers alive, amid colossal buried ruins, twisted machinery husks, and glowing fissures leaking toxic fumes and volatile energies. Survivors face relentless dangers from heatstroke-inducing heatwaves, disorienting dust storms, mutated beasts drawn to these fissures, unstable energy eruptions, and radiation poisoning."
+  },
+  "events": {
+    "The Orbital Cataclysm": "The Orbital Cataclysm unfolded in 2047 when a malfunctioning fleet of orbital defense satellites spiraled out of control, initiating a cascade of collisions that showered the Earth with fiery debris in a relentless barrage lasting weeks. Masses of satellites, rocket parts, and fragmented space stations plummeted through the atmosphere, igniting global wildfires, disrupting power grids via electromagnetic pulses, and unleashing colossal tsunamis from oceanic strikes that swallowed coastlines whole. Survivors in this shattered world now navigate radiation-scarred wastelands, haunted by the perpetual skyshow of falling remnants that serves as a grim reminder of humanity's hubris in conquering the stars."
+  },
+  "relics": {
+    "Obsidian Talisman": "The Obsidian Talisman appears as a dark, gleaming pendant shaped like a twisted thorn, roughly the size of a human palm, with veins of glowing crimson ores embedded within its smooth, volcanic glass surface that hint at forgotten magical energies. In a post-apocalyptic wasteland, it is notable for its rumored ability to ward off mutated creatures by emitting a faint, protective aura and for bearing faint inscriptions that, when deciphered, reveal cryptic warnings from an ancient civilization ravaged by cataclysm."
+  }
+}
