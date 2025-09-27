@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -368,4 +369,50 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		"events":     events,
 		"relics":     relics,
 	})
+}
+
+func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		return
+	}
+
+	var selectedLorePieces lorepb.SelectedLorePieces
+	if err := json.NewDecoder(r.Body).Decode(&selectedLorePieces); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		return
+	}
+
+	theme := r.URL.Query().Get("theme")
+	if theme == "" {
+		theme = "post-apocalyptic"
+	}
+
+	grpcReq := &lorepb.FullStoryRequest{
+		Pieces: &selectedLorePieces,
+		Theme:  theme,
+	}
+
+	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
+	if err != nil {
+		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate full story"})
+		return
+	}
+
+	pieces := map[string]any{
+		"characters": grpcResp.Story.Pieces.Characters,
+		"factions":   grpcResp.Story.Pieces.Factions,
+		"settings":   grpcResp.Story.Pieces.Settings,
+		"events":     grpcResp.Story.Pieces.Events,
+		"relics":     grpcResp.Story.Pieces.Relics,
+	}
+	response := map[string]any{
+		"title":   grpcResp.Story.Title,
+		"content": grpcResp.Story.Content,
+		"theme":   grpcResp.Story.Theme,
+		"pieces":  pieces,
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"story": response})
 }
