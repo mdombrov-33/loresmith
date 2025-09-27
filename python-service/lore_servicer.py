@@ -205,31 +205,37 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
 
             # Convert back to gRPC maps
             grpc_pieces = lore_pb2.SelectedLorePieces(  # type: ignore
-                characters={
-                    full_story.pieces.character.name: full_story.pieces.character.description
-                }
-                if full_story.pieces.character
-                else {},
-                factions={
-                    full_story.pieces.faction.name: full_story.pieces.faction.description
-                }
-                if full_story.pieces.faction
-                else {},
-                settings={
-                    full_story.pieces.setting.name: full_story.pieces.setting.description
-                }
-                if full_story.pieces.setting
-                else {},
-                events={
-                    full_story.pieces.event.name: full_story.pieces.event.description
-                }
-                if full_story.pieces.event
-                else {},
-                relics={
-                    full_story.pieces.relic.name: full_story.pieces.relic.description
-                }
-                if full_story.pieces.relic
-                else {},
+                characters=(
+                    {
+                        full_story.pieces.character.name: full_story.pieces.character.description
+                    }
+                    if full_story.pieces.character
+                    else {}
+                ),
+                factions=(
+                    {
+                        full_story.pieces.faction.name: full_story.pieces.faction.description
+                    }
+                    if full_story.pieces.faction
+                    else {}
+                ),
+                settings=(
+                    {
+                        full_story.pieces.setting.name: full_story.pieces.setting.description
+                    }
+                    if full_story.pieces.setting
+                    else {}
+                ),
+                events=(
+                    {full_story.pieces.event.name: full_story.pieces.event.description}
+                    if full_story.pieces.event
+                    else {}
+                ),
+                relics=(
+                    {full_story.pieces.relic.name: full_story.pieces.relic.description}
+                    if full_story.pieces.relic
+                    else {}
+                ),
             )
             grpc_story = lore_pb2.FullStory(  # type: ignore
                 title=full_story.title,
