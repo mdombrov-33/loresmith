@@ -1,0 +1,1 @@
+Based on this character's description: {description}, appearance: {appearance}, personality: {personality}, and skills: {skills}, assign initial health (50-150) and stress (0-50) as realistic starting values for a {theme} character. Output in format: health:X, stress:Y
