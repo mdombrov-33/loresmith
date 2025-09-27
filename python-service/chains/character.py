@@ -66,6 +66,38 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         skills_raw = await ask_openrouter(skills_prompt, 70)
         skills = clean_ai_text(skills_raw)
 
+        # Stats prompt
+        stats_prompt = load_prompt(
+            "character/character_stats.txt",
+            theme=theme,
+            name=name,
+            personality=personality,
+            appearance=appearance,
+            description=backstory,
+            skills=skills,
+        )
+        stats_raw = await ask_openrouter(stats_prompt, 70)
+        stats = clean_ai_text(stats_raw)
+
+        health = 100
+        stress = 0
+        import re
+
+        health_match = re.search(r"health[:\s]*(\d+)", stats, re.IGNORECASE)
+        if health_match:
+            try:
+                health = int(health_match.group(1))
+                health = max(50, min(150, health))
+            except Exception as e:
+                logger.warning(f"Failed to parse health: {e}")
+        stress_match = re.search(r"stress[:\s]*(\d+)", stats, re.IGNORECASE)
+        if stress_match:
+            try:
+                stress = int(stress_match.group(1))
+                stress = max(0, min(50, stress))
+            except Exception as e:
+                logger.warning(f"Failed to parse stress: {e}")
+
     except Exception as e:
         logger.error(f"Character generation error: {e}", exc_info=True)
         raise CharacterGenerationError(
@@ -79,6 +111,9 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "stress": "0",
         "skills": skills,
     }
+
+    details["health"] = str(health)
+    details["stress"] = str(stress)
 
     return LorePiece(
         name=name,
