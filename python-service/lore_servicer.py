@@ -10,6 +10,10 @@ from chains.multi_variant import (
     generate_multiple_relics,
 )
 from orchestrators.orchestrator_lore_variants import generate_lore_variants
+from orchestrators.orchestrator_full_story import generate_full_story_orchestrator
+from models.selected_lore_pieces import SelectedLorePieces
+from models.lore_piece import LorePiece
+from constants.themes import Theme
 from utils.logger import logger
 
 
@@ -176,6 +180,87 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Full lore generation failed: {str(e)}")
             return lore_pb2.AllResponse()  # type: ignore
+
+    async def GenerateFullStory(self, request, context):
+        try:
+            # Convert gRPC SelectedLorePieces to Python model
+            def get_lore_piece(piece_map, piece_type):
+                if piece_map:
+                    name, desc = next(iter(piece_map.items()))
+                    return LorePiece(
+                        name=name, description=desc, type=piece_type, details={}
+                    )
+                return None
+
+            selected_pieces = SelectedLorePieces(
+                character=get_lore_piece(request.pieces.characters, "character"),
+                faction=get_lore_piece(request.pieces.factions, "faction"),
+                setting=get_lore_piece(request.pieces.settings, "setting"),
+                event=get_lore_piece(request.pieces.events, "event"),
+                relic=get_lore_piece(request.pieces.relics, "relic"),
+            )
+            theme = Theme(request.theme)
+
+            full_story = await generate_full_story_orchestrator(selected_pieces, theme)
+
+            # Convert back to gRPC maps
+            grpc_pieces = lore_pb2.SelectedLorePieces(  # type: ignore
+                characters={
+                    full_story.pieces.character.name: full_story.pieces.character.description
+                }
+                if full_story.pieces.character
+                else {},
+                factions={
+                    full_story.pieces.faction.name: full_story.pieces.faction.description
+                }
+                if full_story.pieces.faction
+                else {},
+                settings={
+                    full_story.pieces.setting.name: full_story.pieces.setting.description
+                }
+                if full_story.pieces.setting
+                else {},
+                events={
+                    full_story.pieces.event.name: full_story.pieces.event.description
+                }
+                if full_story.pieces.event
+                else {},
+                relics={
+                    full_story.pieces.relic.name: full_story.pieces.relic.description
+                }
+                if full_story.pieces.relic
+                else {},
+            )
+            grpc_story = lore_pb2.FullStory(  # type: ignore
+                title=full_story.title,
+                content=full_story.content,
+                theme=full_story.theme.value,
+                pieces=grpc_pieces,
+            )
+            return lore_pb2.FullStoryResponse(story=grpc_story)  # type: ignore
+        except Exception as e:
+            logger.error(f"Full story generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Full story generation failed: {str(e)}")
+            return lore_pb2.FullStoryResponse()  # type: ignore
+
+
+def convert_lore_piece(grpc_piece):
+    return LorePiece(
+        name=grpc_piece.name,
+        description=grpc_piece.description,
+        details=dict(grpc_piece.details),
+        type=grpc_piece.type,
+    )
+
+
+def convert_to_grpc_lore_piece(piece):
+    return lore_pb2.LorePiece(  # type: ignore
+        name=piece.name,
+        description=piece.description,
+        details=piece.details,
+        type=piece.type,
+    )
 
 
 async def serve():
