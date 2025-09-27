@@ -85,11 +85,11 @@ message AllResponse {
 }
 
 message SelectedLorePieces {
-  repeated LorePiece characters = 1;
-  repeated LorePiece factions = 2;
-  repeated LorePiece settings = 3;
-  repeated LorePiece events = 4;
-  repeated LorePiece relics = 5;
+  map<string, string> characters = 1;
+  map<string, string> factions = 2;
+  map<string, string> settings = 3;
+  map<string, string> events = 4;
+  map<string, string> relics = 5;
 }
 
 message FullStory {
