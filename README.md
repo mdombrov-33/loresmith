@@ -1,9 +1,13 @@
-[![Go](https://img.shields.io/badge/go-1.24+-blue)](https://golang.org/)
-[![Python](https://img.shields.io/badge/python-3.12+-blue)](https://www.python.org/)
-[![gRPC](https://img.shields.io/badge/grpc-1.75+-blue)](https://grpc.io/)
-[![Docker](https://img.shields.io/badge/docker-28+-blue)](https://www.docker.com/)
-[![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/redis-8-blue)](https://redis.io/)
+[![Go](https://img.shields.io/badge/go-purple)](https://golang.org/)
+[![Python](https://img.shields.io/badge/python-purple)](https://www.python.org/)
+[![gRPC](https://img.shields.io/badge/grpc-purple)](https://grpc.io/)
+[![Docker](https://img.shields.io/badge/docker-purple)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-purple)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/redis-purple)](https://redis.io/)
+
+<p align="center">
+  <img src="logo.png" alt="LoreSmith Logo" width="200"/>
+</p>
 
 An AI-powered narrative game engine that transforms generated lore into interactive adventures. Built with Go microservices and Python AI chains, featuring world generation, party management, and session-based gameplay.
 
@@ -170,15 +174,6 @@ All generation endpoints require JWT auth (except `/health`, `/register`, `/logi
 - **Faction Dynamics**: Reputation tracking, political consequences
 - **Environmental Systems**: Weather, hazards, resource management
 - **Multiplayer Support**: Shared adventures, party cooperation
-
-## Contributing
-
-LoreSmith is open to contributions! Whether you're interested in:
-
-- AI prompt engineering and chain optimization
-- Adventure game mechanics and balance
-- Frontend development for game interface
-- Performance optimization and scaling
 
 ## CI/CD
 
