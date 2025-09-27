@@ -72,7 +72,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             f"Failed to generate character for theme {theme}: {str(e)}"
         )
 
-    details: dict[str, Union[str, int]] = {
+    details: dict[str, Union[str, str]] = {
         "personality": personality,
         "appearance": appearance,
         "health": "100",
