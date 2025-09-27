@@ -1,11 +1,10 @@
-from typing import List
 from models.lore_piece import LorePiece
 from pydantic import BaseModel
 
 
 class GeneratedLoreBundle(BaseModel):
-    characters: List[LorePiece]
-    factions: List[LorePiece]
-    settings: List[LorePiece]
-    events: List[LorePiece]
-    relics: List[LorePiece]
+    characters: list[LorePiece]
+    factions: list[LorePiece]
+    settings: list[LorePiece]
+    events: list[LorePiece]
+    relics: list[LorePiece]
