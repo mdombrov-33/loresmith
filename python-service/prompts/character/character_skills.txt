@@ -1,9 +1,9 @@
 Generate 3-4 unique, specific skills for {name} in a {theme} world based on their personality: {personality} and appearance: {appearance}. Each skill should be distinctive and reflect their background story. Assign proficiency 1-100.
 
-Format as a comma-separated list: skill_description:proficiency, skill_description:proficiency
+Format as a comma-separated list: skill_name (proficiency), skill_name (proficiency)
 Output only the comma-separated list, no other text or thought processes.
 
 Examples:
-- deciphering pre-war computer codes:75, surviving on scavenged food:85, negotiating with desperate traders:60
+- Frost Hammer Combat (90), Pre-War Tech Hacking (75), Wasteland Scavenging (85)
 
-Make each skill feel personal to this character's story. Do not add extra text or bullets.
+Make each skill feel personal to this character's story. Use flavorful, thematic skill names (2-4 words) suitable for checks and encounters. Do not add extra text or bullets.

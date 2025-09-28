@@ -1,1 +1,11 @@
- List exactly 3 personality traits of the character named {name}, who exists in a {theme} world. Separate the traits with commas. Respond only with plain text. No newlines; output a single paragraph.
+ List exactly 3 personality traits of the character named {name}, who exists in a {theme} world and has the appearance: {appearance}. Separate the traits with commas. Respond only with plain text. No newlines; output a single paragraph.
+
+ Examples:
+- Adventurous, resilient, empathetic
+- Cunning, resourceful, distrustful
+- Stoic, honorable, pragmatic
+- Charismatic, ambitious, ruthless
+- Compassionate, intuitive, haunted
+- Analytical, methodical, cynical
+- Brave, loyal, impulsive
+- Mysterious, calculating, vengeful
