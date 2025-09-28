@@ -27,15 +27,6 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         name_raw = await ask_openrouter(name_prompt, 50)
         name = clean_ai_text(name_raw)
 
-        # Personality prompt
-        personality_prompt = load_prompt(
-            "character/character_personality.txt",
-            theme=theme,
-            name=name,
-        )
-        personality_raw = await ask_openrouter(personality_prompt, 70)
-        personality = clean_ai_text(personality_raw)
-
         # Appearance prompt
         appearance_prompt = load_prompt(
             "character/character_appearance.txt",
@@ -44,6 +35,16 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
         appearance_raw = await ask_openrouter(appearance_prompt, 150)
         appearance = clean_ai_text(appearance_raw)
+
+        # Personality prompt
+        personality_prompt = load_prompt(
+            "character/character_personality.txt",
+            theme=theme,
+            name=name,
+            appearance=appearance,
+        )
+        personality_raw = await ask_openrouter(personality_prompt, 70)
+        personality = clean_ai_text(personality_raw)
 
         # Backstory prompt
         backstory_prompt = load_prompt(
