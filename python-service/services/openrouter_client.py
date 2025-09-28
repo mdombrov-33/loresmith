@@ -31,7 +31,7 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 async def ask_openrouter_with_retries(
     prompt: str,
     max_retries: int = 3,
-    model: str = "x-ai/grok-code-fast-1",
+    model: str = "openai/gpt-4",
     **kwargs,
 ) -> str:
     delay = 1
@@ -75,7 +75,7 @@ async def ask_openrouter_with_retries(
 
 
 async def ask_openrouter(
-    prompt: str, model: str = "x-ai/grok-code-fast-1", max_tokens: int = 500
+    prompt: str, model: str = "openai/gpt-4", max_tokens: int = 500
 ) -> str:
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
     json_data = {
