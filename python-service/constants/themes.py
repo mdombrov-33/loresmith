@@ -5,5 +5,5 @@ class Theme(str, Enum):
     post_apocalyptic = "post-apocalyptic"
     fantasy = "fantasy"
     cyberpunk = "cyberpunk"
-    mythic = "mythic"
+    norse_mythology = "norse-mythology"
     steampunk = "steampunk"
