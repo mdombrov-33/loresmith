@@ -8,3 +8,4 @@ class FullStory(BaseModel):
     content: str
     theme: Theme
     pieces: SelectedLorePieces
+    quest: dict[str, str]

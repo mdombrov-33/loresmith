@@ -85,11 +85,11 @@ message AllResponse {
 }
 
 message SelectedLorePieces {
-  map<string, string> characters = 1;
-  map<string, string> factions = 2;
-  map<string, string> settings = 3;
-  map<string, string> events = 4;
-  map<string, string> relics = 5;
+  LorePiece character = 1;
+  LorePiece faction = 2;
+  LorePiece setting = 3;
+  LorePiece event = 4;
+  LorePiece relic = 5;
 }
 
 message FullStory {
@@ -97,6 +97,7 @@ message FullStory {
   string content = 2;
   string theme = 3;
   SelectedLorePieces pieces = 4;
+  map<string, string> quest = 5;
 }
 
 message FullStoryRequest {

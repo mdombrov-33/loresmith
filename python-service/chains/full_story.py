@@ -19,7 +19,7 @@ async def generate_full_story(
     - theme: The theme for the story generation.
 
     Returns:
-    A FullStory containing the generated story and the selected pieces.
+    A FullStory containing the generated story, selected pieces, quest title, and quest description.
     """
     try:
         # Extract each piece from the selected_pieces dictionary, fallback to dummy data
@@ -29,7 +29,8 @@ async def generate_full_story(
         event = selected_pieces.event
         relic = selected_pieces.relic
 
-        prompt = load_prompt(
+        # Full story prompt
+        full_story_prompt = load_prompt(
             "full_story/full_story.txt",
             theme=theme,
             character_name=character.name if character else "N/A",
@@ -49,14 +50,37 @@ async def generate_full_story(
             relic_details=format_details(relic.details) if relic else "N/A",
         )
 
-        full_story_raw = await ask_openrouter(prompt, max_tokens=500)
+        full_story_raw = await ask_openrouter(full_story_prompt, max_tokens=500)
         full_story_content = clean_ai_text(full_story_raw)
+
+        # Quest title prompt
+        quest_title_prompt = load_prompt(
+            "full_story/quest_title.txt",
+            theme=theme,
+            story_content=full_story_content,
+        )
+
+        quest_title_raw = await ask_openrouter(quest_title_prompt, max_tokens=50)
+        quest_title = clean_ai_text(quest_title_raw)
+
+        # Quest description prompt
+        quest_description_prompt = load_prompt(
+            "full_story/quest_description.txt",
+            theme=theme,
+            story_content=full_story_content,
+            quest_title=quest_title,
+        )
+        quest_description_raw = await ask_openrouter(
+            quest_description_prompt, max_tokens=150
+        )
+        quest_description = clean_ai_text(quest_description_raw)
 
         return FullStory(
             title="Full Story",
             content=full_story_content,
             theme=theme,
             pieces=selected_pieces,
+            quest={"title": quest_title, "description": quest_description},
         )
 
     except Exception as e:

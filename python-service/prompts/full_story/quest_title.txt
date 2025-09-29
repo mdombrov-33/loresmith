@@ -1,0 +1,11 @@
+Generate a compelling title for the main quest in this {theme} story. The title should be 3-8 words, mysterious and engaging.
+
+Story: {story_content}
+
+Examples:
+- Recover the Pathseeker Map
+- Forge the Crystal Alliance
+- Uncover the Forgotten Citadel
+- Defeat the Shadow Prophet
+
+Respond only with the quest title, no quotes or other text.

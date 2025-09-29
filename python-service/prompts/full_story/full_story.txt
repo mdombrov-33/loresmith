@@ -27,5 +27,4 @@ Description: {relic_description}
 Details: {relic_details}
 
 Write a creative story summary connecting all these elements naturally.
-Use vivid language and keep it under 5 sentences.
-Respond only with plain text, no markdown or special characters.
+Ensure the story summary is plain text only: no quotes, no special characters, no markdown, no italics, no bold. Keep it concise, under 5 sentences, and avoid any formatting that could break plain text parsing.

@@ -401,17 +401,18 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 	}
 
 	pieces := map[string]any{
-		"characters": grpcResp.Story.Pieces.Characters,
-		"factions":   grpcResp.Story.Pieces.Factions,
-		"settings":   grpcResp.Story.Pieces.Settings,
-		"events":     grpcResp.Story.Pieces.Events,
-		"relics":     grpcResp.Story.Pieces.Relics,
+		"characters": grpcResp.Story.Pieces.Character,
+		"factions":   grpcResp.Story.Pieces.Faction,
+		"settings":   grpcResp.Story.Pieces.Setting,
+		"events":     grpcResp.Story.Pieces.Event,
+		"relics":     grpcResp.Story.Pieces.Relic,
 	}
 	response := map[string]any{
 		"title":   grpcResp.Story.Title,
 		"content": grpcResp.Story.Content,
 		"theme":   grpcResp.Story.Theme,
 		"pieces":  pieces,
+		"quest":   grpcResp.Story.Quest,
 	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"story": response})
