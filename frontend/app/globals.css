@@ -45,12 +45,12 @@
 .fantasy {
   --radius: 0.625rem;
   --background: oklch(0.14 0.07 305);
-  --foreground: oklch(0.96 0.02 95);
+  --foreground: oklch(98.548% 0.00552 274.897 / 0.814);
   --card: oklch(0.2 0.08 305);
-  --card-foreground: oklch(0.96 0.02 95);
+  --card-foreground: oklch(91.94% 0.01989 77.246 / 0.943);
   --popover: oklch(0.2 0.08 305);
   --popover-foreground: oklch(0.96 0.02 95);
-  --primary: oklch(0.73 0.19 85);
+  --primary: oklch(72% 0.18 85);
   --primary-foreground: oklch(0.1 0.04 305);
   --secondary: oklch(0.55 0.18 310);
   --secondary-foreground: oklch(0.98 0 0);
@@ -68,10 +68,9 @@
 .norse {
   --radius: 0.625rem;
   --background: oklch(0.15 0.06 240);
-  --foreground: oklch(0.95 0.02 250);
+  --foreground: oklch(98.548% 0.00552 274.897 / 0.814);
   --card: oklch(0.22 0.08 240);
-  --card-foreground: oklch(0.95 0.02 250);
-  --popover: oklch(0.22 0.08 240);
+  --card-foreground: oklch(91.94% 0.01989 77.246 / 0.943);
   --popover-foreground: oklch(0.95 0.02 250);
   --primary: oklch(0.63 0.18 235);
   --primary-foreground: oklch(0.98 0 0);
@@ -91,9 +90,9 @@
 .cyberpunk {
   --radius: 0.625rem;
   --background: oklch(0.1 0.05 320);
-  --foreground: oklch(0.96 0.02 320);
+  --foreground: oklch(98.548% 0.00552 274.897 / 0.814);
   --card: oklch(0.18 0.08 320);
-  --card-foreground: oklch(0.96 0.02 320);
+  --card-foreground: oklch(91.94% 0.01989 77.246 / 0.943);
   --popover: oklch(0.18 0.08 320);
   --popover-foreground: oklch(0.96 0.02 320);
   --primary: oklch(0.72 0.25 330);
@@ -114,13 +113,13 @@
 .post-apocalyptic {
   --radius: 0.625rem;
   --background: oklch(0.14 0.05 55);
-  --foreground: oklch(0.92 0.02 80);
+  --foreground: oklch(98.548% 0.00552 274.897 / 0.814);
   --card: oklch(0.22 0.07 55);
-  --card-foreground: oklch(0.92 0.02 80);
+  --card-foreground: oklch(91.94% 0.01989 77.246 / 0.943);
   --popover: oklch(0.22 0.07 55);
   --popover-foreground: oklch(0.92 0.02 80);
   --primary: oklch(0.7 0.18 60);
-  --primary-foreground: oklch(0.98 0 0);
+  --primary-foreground: oklch(97.913% 0.00011 271.152 / 0.826);
   --secondary: oklch(0.48 0.1 40);
   --secondary-foreground: oklch(0.92 0.02 80);
   --muted: oklch(0.26 0.05 55);
@@ -137,9 +136,9 @@
 .steampunk {
   --radius: 0.625rem;
   --background: oklch(0.18 0.05 35);
-  --foreground: oklch(0.92 0.03 40);
+  --foreground: oklch(98.548% 0.00552 274.897 / 0.814);
   --card: oklch(0.24 0.06 35);
-  --card-foreground: oklch(0.92 0.03 40);
+  --card-foreground: oklch(91.94% 0.01989 77.246 / 0.943);
   --popover: oklch(0.24 0.06 35);
   --popover-foreground: oklch(0.92 0.03 40);
   --primary: oklch(0.65 0.14 50);
