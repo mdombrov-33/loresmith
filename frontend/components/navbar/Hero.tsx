@@ -2,12 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 export default function Hero() {
-  const searchParams = useSearchParams();
-  const theme = searchParams.get("theme") || "fantasy";
-
   return (
     <section className="container mx-auto px-4 py-24 md:py-32">
       <div className="flex flex-col items-center justify-center gap-8 text-center">
@@ -40,7 +36,7 @@ export default function Hero() {
           size="lg"
           className="group bg-primary text-primary-foreground mt-4 rounded-lg px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105 hover:shadow-xl"
         >
-          <Link href={`/generate?theme=${theme}`}>
+          <Link href="/generate">
             Begin Your Adventure
             <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
               →
