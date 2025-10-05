@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { THEME_OPTIONS, GameTheme } from "@/constants/game-themes";
+import { THEME_OPTIONS } from "@/constants/game-themes";
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
