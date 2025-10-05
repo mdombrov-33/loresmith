@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
-import { Music, Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 
 export function Navbar() {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -11,13 +11,12 @@ export function Navbar() {
 
   const toggleMusic = () => {
     setIsMusicPlaying(!isMusicPlaying);
-    // TODO: Implement actual audio playback
     console.log("Music toggled:", !isMusicPlaying);
   };
 
   return (
     <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         {/* Logo Section */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 text-xl font-bold">
@@ -28,8 +27,8 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Center - Theme Switcher */}
-        <div className="hidden items-center gap-4 md:flex">
+        {/* Center - Theme Switcher (Desktop) */}
+        <div className="hidden flex-1 items-center justify-center md:flex">
           <ThemeSwitcher />
         </div>
 
