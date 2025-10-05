@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { Volume2, VolumeX } from "lucide-react";
+import { Swords } from "lucide-react";
 
 export function Navbar() {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -20,7 +21,9 @@ export function Navbar() {
         {/* Logo Section */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 text-xl font-bold">
-            <span className="text-primary">⚔️</span>
+            <span className="text-primary">
+              <Swords />
+            </span>
             <span className="from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent">
               LoreSmith
             </span>

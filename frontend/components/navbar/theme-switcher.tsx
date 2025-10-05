@@ -4,13 +4,14 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { Axe, Cpu, Radiation, Cog, Flame } from "lucide-react";
 
 const themes = [
-  { value: "fantasy", label: "Fantasy", icon: "✨" },
-  { value: "norse", label: "Norse", icon: "⚔️" },
-  { value: "cyberpunk", label: "Cyberpunk", icon: "🤖" },
-  { value: "post-apocalyptic", label: "Post-Apoc", icon: "☢️" },
-  { value: "steampunk", label: "Steampunk", icon: "🛠️" },
+  { value: "fantasy", label: "Fantasy", icon: <Flame /> },
+  { value: "norse", label: "Norse", icon: <Axe /> },
+  { value: "cyberpunk", label: "Cyberpunk", icon: <Cpu /> },
+  { value: "post-apocalyptic", label: "Post-Apoc", icon: <Radiation /> },
+  { value: "steampunk", label: "Steampunk", icon: <Cog /> },
 ];
 
 export function ThemeSwitcher() {
