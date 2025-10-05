@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { ThemeProvider } from "./theme-provider";
-import { Navbar } from "@/components/navbar/Navbar";
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/footer/Footer";
 import "./globals.css";
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeWrapper>{children}</ThemeWrapper>
+        <ThemeWrapper>
+          {children}
+          <Footer />
+        </ThemeWrapper>
       </body>
     </html>
   );

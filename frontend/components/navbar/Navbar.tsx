@@ -6,7 +6,7 @@ import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { Volume2, VolumeX } from "lucide-react";
 import { Swords } from "lucide-react";
 
-export function Navbar() {
+export default function Navbar() {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
