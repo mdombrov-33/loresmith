@@ -2,11 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
+import { useAppStage } from "@/contexts/app-stage-context";
 import { Volume2, VolumeX } from "lucide-react";
 import { Swords } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
+  const { appStage } = useAppStage();
+  const showThemeSwitcher = appStage === "home";
+
   return (
     <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
@@ -24,7 +28,7 @@ export default function Navbar() {
 
         {/* Center - Theme Switcher (Desktop) */}
         <div className="hidden flex-1 items-center justify-center md:flex">
-          <ThemeSwitcher />
+          {showThemeSwitcher && <ThemeSwitcher />}
         </div>
 
         {/* Right Section - Music & Auth */}
@@ -38,9 +42,11 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Theme Switcher */}
-      <div className="bg-background/95 border-t px-4 py-3 md:hidden">
-        <ThemeSwitcher />
-      </div>
+      {showThemeSwitcher && (
+        <div className="bg-background/95 border-t px-4 py-3 md:hidden">
+          <ThemeSwitcher />
+        </div>
+      )}
     </nav>
   );
 }

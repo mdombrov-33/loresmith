@@ -7,13 +7,20 @@ import {
   SelectedLore,
   LorePiece,
 } from "@/types/generate-world";
+import { useAppStage } from "@/contexts/app-stage-context";
 import { CharacterCard } from "@/components/generate/CharacterCard";
+import { FactionCard } from "@/components/generate/FactionCard";
+import { SettingCard } from "@/components/generate/SettingCard";
+import { EventCard } from "@/components/generate/EventCard";
+import { RelicCard } from "@/components/generate/RelicCard";
 import { ActionButtons } from "@/components/generate/ActionButtons";
 import { generateLore } from "@/lib/api";
+import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
 export default function GeneratePage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
+  const { setAppStage } = useAppStage();
 
   // State management
   const [stage, setStage] = useState<GenerationStage>("characters");
@@ -24,21 +31,44 @@ export default function GeneratePage() {
   const [hasRegenerated, setHasRegenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Generate on mount
-  useEffect(() => {
-    generateCharacters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const stageConfig = STAGE_CONFIG[stage];
 
-  const generateCharacters = async () => {
+  // Set app stage on mount and cleanup on unmount
+  useEffect(() => {
+    setAppStage("generating");
+    return () => setAppStage("home");
+  }, [setAppStage]);
+
+  // Generate on mount and when stage changes
+  useEffect(() => {
+    generateCurrentStage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
+  const generateCurrentStage = async (regenerate: boolean = false) => {
     setIsLoading(true);
     setError(null);
+    setSelectedIndex(null);
+    setHasRegenerated(regenerate);
+
     try {
-      const data = await generateLore("characters", theme, 3);
+      const data = await generateLore(
+        stageConfig.category as
+          | "characters"
+          | "factions"
+          | "settings"
+          | "events"
+          | "relics",
+        theme,
+        3,
+        regenerate,
+      );
       setGeneratedOptions(data);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to generate characters",
+        err instanceof Error
+          ? err.message
+          : `Failed to generate ${stageConfig.category}`,
       );
       console.error("Generation error:", err);
     } finally {
@@ -51,20 +81,89 @@ export default function GeneratePage() {
   };
 
   const handleRegenerate = async () => {
-    setHasRegenerated(true);
-    setSelectedIndex(null);
-    await generateCharacters();
+    await generateCurrentStage(true);
   };
 
   const handleNext = () => {
-    if (selectedIndex !== null) {
-      // Save selection
-      setSelectedLore({
-        ...selectedLore,
-        [stage]: generatedOptions[selectedIndex],
-      });
-      console.log("Moving to next stage...");
-      // TODO: Move to next stage
+    if (selectedIndex === null) return;
+
+    // Save the selected lore piece
+    const selectedPiece = generatedOptions[selectedIndex];
+    const stageKey = stage as keyof SelectedLore;
+
+    const updatedSelectedLore = {
+      ...selectedLore,
+      [stageKey]: selectedPiece,
+    };
+
+    setSelectedLore(updatedSelectedLore);
+
+    // Move to next stage
+    const nextStage = getNextStage(stage);
+    if (nextStage) {
+      if (nextStage === "full-story") {
+        // Navigate to full story page with all selected lore
+        console.log("Ready for full story generation", updatedSelectedLore);
+        window.location.href = `/story?theme=${theme}`;
+      } else {
+        setStage(nextStage);
+        setHasRegenerated(false);
+      }
+    }
+  };
+
+  const renderCard = (option: LorePiece, index: number) => {
+    const isSelected = selectedIndex === index;
+    const onSelect = () => handleSelectCard(index);
+
+    switch (stage) {
+      case "characters":
+        return (
+          <CharacterCard
+            key={index}
+            character={option}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      case "factions":
+        return (
+          <FactionCard
+            key={index}
+            faction={option}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      case "settings":
+        return (
+          <SettingCard
+            key={index}
+            setting={option}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      case "events":
+        return (
+          <EventCard
+            key={index}
+            event={option}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      case "relics":
+        return (
+          <RelicCard
+            key={index}
+            relic={option}
+            isSelected={isSelected}
+            onSelect={onSelect}
+          />
+        );
+      default:
+        return null;
     }
   };
 
@@ -72,19 +171,17 @@ export default function GeneratePage() {
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold">
-          Choose Your {stage.charAt(0).toUpperCase() + stage.slice(1)}
-        </h1>
-        <p className="text-muted-foreground">
-          Select one of the generated options below
-        </p>
+        <h1 className="mb-2 text-4xl font-bold">{stageConfig.title}</h1>
+        <p className="text-muted-foreground">{stageConfig.description}</p>
       </div>
 
       {/* Loading State */}
       {isLoading && (
         <div className="py-12 text-center">
           <div className="border-primary inline-block h-12 w-12 animate-spin rounded-full border-b-2"></div>
-          <p className="text-muted-foreground mt-4">Generating characters...</p>
+          <p className="text-muted-foreground mt-4">
+            Generating {stageConfig.category}...
+          </p>
         </div>
       )}
 
@@ -94,7 +191,7 @@ export default function GeneratePage() {
           <p className="font-semibold">Error:</p>
           <p>{error}</p>
           <button
-            onClick={generateCharacters}
+            onClick={() => generateCurrentStage()}
             className="mt-2 text-sm underline hover:no-underline"
           >
             Try again
@@ -106,14 +203,7 @@ export default function GeneratePage() {
       {!isLoading && generatedOptions.length > 0 && (
         <>
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {generatedOptions.map((option, index) => (
-              <CharacterCard
-                key={index}
-                character={option}
-                isSelected={selectedIndex === index}
-                onSelect={() => handleSelectCard(index)}
-              />
-            ))}
+            {generatedOptions.map((option, index) => renderCard(option, index))}
           </div>
 
           {/* Action Buttons */}
@@ -121,6 +211,7 @@ export default function GeneratePage() {
             hasSelection={selectedIndex !== null}
             hasRegenerated={hasRegenerated}
             isLoading={isLoading}
+            isLastStage={stage === "relics"}
             onRegenerate={handleRegenerate}
             onNext={handleNext}
           />
@@ -130,7 +221,7 @@ export default function GeneratePage() {
       {/* Empty State */}
       {!isLoading && generatedOptions.length === 0 && (
         <div className="py-12 text-center">
-          <p className="text-muted-foreground">No characters generated yet</p>
+          <p className="text-muted-foreground">No options available.</p>
         </div>
       )}
     </div>

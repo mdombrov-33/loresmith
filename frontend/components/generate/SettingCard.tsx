@@ -1,16 +1,16 @@
 import { LorePiece } from "@/types/generate-world";
 
-interface CharacterCardProps {
-  character: LorePiece;
+interface SettingCardProps {
+  setting: LorePiece;
   isSelected: boolean;
   onSelect: () => void;
 }
 
-export function CharacterCard({
-  character,
+export function SettingCard({
+  setting,
   isSelected,
   onSelect,
-}: CharacterCardProps) {
+}: SettingCardProps) {
   return (
     <div
       onClick={onSelect}
@@ -19,63 +19,37 @@ export function CharacterCard({
       {/* Title + Type Badge */}
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-foreground text-xl font-semibold">
-          {character.name}
+          {setting.name}
         </h3>
         <span className="text-accent bg-accent/10 rounded px-2 py-1 text-xs font-semibold uppercase">
-          Character
+          Setting
         </span>
       </div>
 
-      {/* Description (Backstory) */}
+      {/* Description */}
       <p className="text-muted-foreground mb-4 text-sm">
-        {character.description}
+        {setting.description}
       </p>
 
       {/* Details */}
       <div className="border-border space-y-3 border-t pt-4">
-        {/* Personality */}
+        {/* Landscape */}
         <div>
           <div className="text-accent mb-1 text-xs font-semibold uppercase">
-            Personality
+            Landscape
           </div>
           <div className="text-foreground text-sm">
-            {character.details.personality}
+            {setting.details.landscape}
           </div>
         </div>
 
-        {/* Appearance */}
+        {/* Dangers */}
         <div>
           <div className="text-accent mb-1 text-xs font-semibold uppercase">
-            Appearance
+            Dangers
           </div>
           <div className="text-foreground text-sm">
-            {character.details.appearance}
-          </div>
-        </div>
-
-        {/* Skills */}
-        <div>
-          <div className="text-accent mb-1 text-xs font-semibold uppercase">
-            Skills
-          </div>
-          <div className="text-foreground text-sm">
-            {character.details.skills}
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="flex gap-4 pt-2">
-          <div>
-            <div className="text-muted-foreground text-xs">Health</div>
-            <div className="text-success text-sm font-semibold">
-              {character.details.health}
-            </div>
-          </div>
-          <div>
-            <div className="text-muted-foreground text-xs">Stress</div>
-            <div className="text-warning text-sm font-semibold">
-              {character.details.stress}
-            </div>
+            {setting.details.dangers}
           </div>
         </div>
       </div>

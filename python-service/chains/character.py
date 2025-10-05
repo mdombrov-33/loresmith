@@ -33,7 +33,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             theme=theme,
             name=name,
         )
-        appearance_raw = await ask_openrouter(appearance_prompt, 150)
+        appearance_raw = await ask_openrouter(appearance_prompt, 80)
         appearance = clean_ai_text(appearance_raw)
 
         # Personality prompt

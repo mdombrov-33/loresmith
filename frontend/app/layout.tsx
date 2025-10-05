@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { ThemeProvider } from "./theme-provider";
+import { AppStageProvider } from "@/contexts/app-stage-context";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 import "./globals.css";
@@ -8,8 +9,10 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="bg-background min-h-screen" />}>
       <ThemeProvider>
-        <Navbar />
-        {children}
+        <AppStageProvider>
+          <Navbar />
+          {children}
+        </AppStageProvider>
       </ThemeProvider>
     </Suspense>
   );

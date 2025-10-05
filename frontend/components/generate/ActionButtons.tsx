@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { RotateCw, ArrowRight, Check } from "lucide-react";
+import { RotateCw, ArrowRight, Check, Sparkles } from "lucide-react";
 
 interface ActionButtonsProps {
   hasSelection: boolean;
   hasRegenerated: boolean;
   isLoading: boolean;
+  isLastStage: boolean;
   onRegenerate: () => void;
   onNext: () => void;
 }
@@ -13,6 +14,7 @@ export function ActionButtons({
   hasSelection,
   hasRegenerated,
   isLoading,
+  isLastStage,
   onRegenerate,
   onNext,
 }: ActionButtonsProps) {
@@ -47,8 +49,17 @@ export function ActionButtons({
         disabled={!hasSelection || isLoading}
         className="gap-2"
       >
-        Continue to Next
-        <ArrowRight className="h-4 w-4" />
+        {isLastStage ? (
+          <>
+            <Sparkles className="h-4 w-4" />
+            Generate Full Story
+          </>
+        ) : (
+          <>
+            Continue to Next
+            <ArrowRight className="h-4 w-4" />
+          </>
+        )}
       </Button>
     </div>
   );
