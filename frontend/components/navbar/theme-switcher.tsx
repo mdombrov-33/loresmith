@@ -4,15 +4,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Axe, Cpu, Radiation, Cog, Flame } from "lucide-react";
-
-const themes = [
-  { value: "fantasy", label: "Fantasy", icon: <Flame /> },
-  { value: "norse", label: "Norse", icon: <Axe /> },
-  { value: "cyberpunk", label: "Cyberpunk", icon: <Cpu /> },
-  { value: "post-apocalyptic", label: "Post-Apoc", icon: <Radiation /> },
-  { value: "steampunk", label: "Steampunk", icon: <Cog /> },
-];
+import { THEME_OPTIONS, GameTheme } from "@/constants/game-themes";
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
@@ -49,36 +41,46 @@ export function ThemeSwitcher() {
   if (!mounted) {
     return (
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {themes.map((t) => (
-          <Button
-            key={t.value}
-            variant="outline"
-            size="sm"
-            disabled
-            className="text-sm"
-          >
-            <span className="mr-1.5">{t.icon}</span>
-            {t.label}
-          </Button>
-        ))}
+        {THEME_OPTIONS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <Button
+              key={t.value}
+              variant="outline"
+              size="sm"
+              disabled
+              className="text-sm"
+            >
+              <span className="mr-1.5">
+                <Icon />
+              </span>
+              {t.label}
+            </Button>
+          );
+        })}
       </div>
     );
   }
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
-      {themes.map((t) => (
-        <Button
-          key={t.value}
-          variant={theme === t.value ? "default" : "outline"}
-          size="sm"
-          onClick={() => handleThemeChange(t.value)}
-          className="text-sm"
-        >
-          <span className="mr-1.5">{t.icon}</span>
-          {t.label}
-        </Button>
-      ))}
+      {THEME_OPTIONS.map((t) => {
+        const Icon = t.icon;
+        return (
+          <Button
+            key={t.value}
+            variant={theme === t.value ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleThemeChange(t.value)}
+            className="text-sm"
+          >
+            <span className="mr-1.5">
+              <Icon />
+            </span>
+            {t.label}
+          </Button>
+        );
+      })}
     </div>
   );
 }

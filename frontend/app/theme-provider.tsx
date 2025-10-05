@@ -2,18 +2,19 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { type ThemeProviderProps } from "next-themes";
+import { THEMES } from "@/constants/game-themes";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="fantasy"
+      defaultTheme={THEMES.FANTASY}
       themes={[
-        "fantasy",
-        "norse",
-        "cyberpunk",
-        "post-apocalyptic",
-        "steampunk",
+        THEMES.FANTASY,
+        THEMES.NORSE,
+        THEMES.CYBERPUNK,
+        THEMES.POST_APOCALYPTIC,
+        THEMES.STEAMPUNK,
       ]}
       enableSystem={false}
       disableTransitionOnChange
