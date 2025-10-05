@@ -2,21 +2,36 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/mdombrov-33/loresmith/go-service/internal/app"
 )
 
 func SetupRoutes(app *app.Application) *chi.Mux {
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
+
+	r.Use(middleware.Logger)
+
+	//* Temporarily public for testing
+	r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
+	r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
+	r.Get("/generate/events", app.LoreHandler.HandleGenerateEvents)
+	r.Get("/generate/relics", app.LoreHandler.HandleGenerateRelics)
+	r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
+	r.Get("/generate/all", app.LoreHandler.HandleGenerateAll)
+	r.Post("/generate/full-story", app.LoreHandler.HandleGenerateFullStory)
+
 	r.Group(func(r chi.Router) {
 		r.Use(app.Middleware.Authenticate)
-		r.Get("/generate/characters", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateCharacters))
-		r.Get("/generate/settings", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateSettings))
-		r.Get("/generate/events", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateEvents))
-		r.Get("/generate/relics", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateRelics))
-		r.Get("/generate/factions", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateFactions))
-		r.Get("/generate/all", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateAll))
-		r.Post("/generate/full-story", app.Middleware.RequireAuth(app.LoreHandler.HandleGenerateFullStory))
+		//* Add auth routes here later(generate, etc.)
 	})
 
 	r.Get("/health", app.HealthCheck)
