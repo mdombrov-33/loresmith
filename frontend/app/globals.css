@@ -164,3 +164,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Disable transitions when switching themes to prevent flash */
+html.changing-theme,
+html.changing-theme *,
+html.changing-theme *::before,
+html.changing-theme *::after {
+  transition: none !important;
+}

@@ -36,6 +36,8 @@ export function ThemeSwitcher() {
   }, [mounted, searchParams, theme, setTheme]);
 
   const handleThemeChange = (newTheme: string) => {
+    if (theme === newTheme) return;
+
     setTheme(newTheme);
 
     //* Update query param
