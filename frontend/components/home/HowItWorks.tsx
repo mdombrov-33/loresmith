@@ -29,7 +29,7 @@ export default function HowItWorks() {
           step={3}
           title="Embark on Your Adventure"
           description="Dive into an interactive story where your choices shape the narrative and lead to epic outcomes"
-          colorClass="accent"
+          colorClass="primary"
         />
       </div>
     </section>
