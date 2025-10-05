@@ -1,5 +1,5 @@
 import FeatureCard from "@/components/home/FeatureCard";
-import { Globe, Users, Swords, TrendingUp } from "lucide-react";
+import { Globe, Users, Map, TrendingUp } from "lucide-react";
 
 export default function Features() {
   return (
@@ -23,7 +23,7 @@ export default function Features() {
 
         {/* Interactive Adventure */}
         <FeatureCard
-          icon={<Swords className="h-7 w-7" />}
+          icon={<Map className="h-7 w-7" />}
           title="Interactive Adventure"
           description="Make choices that shape your story with branching narratives"
           colorClass="primary"
