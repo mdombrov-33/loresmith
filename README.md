@@ -58,10 +58,7 @@ LoreSmith is a **dual-purpose platform**:
 
 ### AI Provider Setup
 
-#### Option A: Local AI with Ollama (FREE) 🆓
-
-**Pros:** Free, unlimited usage, no API costs, runs on your machine  
-**Cons:** Slower generation (~10-15s per character), requires decent GPU/CPU
+#### Option A: Local AI with Ollama (FREE)
 
 1. **Install Ollama:**
 
@@ -88,10 +85,7 @@ LoreSmith is a **dual-purpose platform**:
 - `mistral:7b` - Fast, creative (4.1GB)
 - `gemma2:9b` - Good for narrative (5.4GB)
 
-#### Option B: Cloud AI with OpenRouter (PAID) 💳
-
-**Pros:** Faster generation (~5s), higher quality, no local resources needed  
-**Cons:** Costs money per request (~$0.03-0.13 per character depending on model)
+#### Option B: Cloud AI with OpenRouter (PAID)
 
 1. **Get API key:** https://openrouter.ai/
 
