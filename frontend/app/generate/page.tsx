@@ -8,12 +8,12 @@ import {
   LorePiece,
 } from "@/types/generate-world";
 import { useAppStage } from "@/contexts/app-stage-context";
-import { CharacterCard } from "@/components/generate/CharacterCard";
-import { FactionCard } from "@/components/generate/FactionCard";
-import { SettingCard } from "@/components/generate/SettingCard";
-import { EventCard } from "@/components/generate/EventCard";
-import { RelicCard } from "@/components/generate/RelicCard";
-import { ActionButtons } from "@/components/generate/ActionButtons";
+import CharacterCard from "@/components/generate/CharacterCard";
+import FactionCard from "@/components/generate/FactionCard";
+import SettingCard from "@/components/generate/SettingCard";
+import EventCard from "@/components/generate/EventCard";
+import RelicCard from "@/components/generate/RelicCard";
+import ActionButtons from "@/components/generate/ActionButtons";
 import { generateLore } from "@/lib/api";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
@@ -22,7 +22,6 @@ export default function GeneratePage() {
   const theme = searchParams.get("theme") || "fantasy";
   const { setAppStage } = useAppStage();
 
-  // State management
   const [stage, setStage] = useState<GenerationStage>("characters");
   const [selectedLore, setSelectedLore] = useState<SelectedLore>({});
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
@@ -33,13 +32,13 @@ export default function GeneratePage() {
 
   const stageConfig = STAGE_CONFIG[stage];
 
-  // Set app stage on mount and cleanup on unmount
+  //* Set app stage on mount and cleanup on unmount
   useEffect(() => {
     setAppStage("generating");
     return () => setAppStage("home");
   }, [setAppStage]);
 
-  // Generate on mount and when stage changes
+  //* Generate on mount and when stage changes
   useEffect(() => {
     generateCurrentStage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +86,7 @@ export default function GeneratePage() {
   const handleNext = () => {
     if (selectedIndex === null) return;
 
-    // Save the selected lore piece
+    //* Save the selected lore piece
     const selectedPiece = generatedOptions[selectedIndex];
     const stageKey = stage as keyof SelectedLore;
 
@@ -98,11 +97,11 @@ export default function GeneratePage() {
 
     setSelectedLore(updatedSelectedLore);
 
-    // Move to next stage
+    //* Move to next stage
     const nextStage = getNextStage(stage);
     if (nextStage) {
       if (nextStage === "full-story") {
-        // Navigate to full story page with all selected lore
+        //* Navigate to full story page with all selected lore
         console.log("Ready for full story generation", updatedSelectedLore);
         window.location.href = `/story?theme=${theme}`;
       } else {

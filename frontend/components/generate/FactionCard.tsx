@@ -6,7 +6,7 @@ interface FactionCardProps {
   onSelect: () => void;
 }
 
-export function FactionCard({
+export default function FactionCard({
   faction,
   isSelected,
   onSelect,

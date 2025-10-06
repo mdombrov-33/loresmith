@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { useAppStage } from "@/contexts/app-stage-context";
-import { Volume2, VolumeX } from "lucide-react";
 import { Swords } from "lucide-react";
 import Link from "next/link";
 

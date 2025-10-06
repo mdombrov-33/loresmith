@@ -6,7 +6,7 @@ interface CharacterCardProps {
   onSelect: () => void;
 }
 
-export function CharacterCard({
+export default function CharacterCard({
   character,
   isSelected,
   onSelect,

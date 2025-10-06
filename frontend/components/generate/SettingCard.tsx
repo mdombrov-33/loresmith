@@ -6,7 +6,7 @@ interface SettingCardProps {
   onSelect: () => void;
 }
 
-export function SettingCard({
+export default function SettingCard({
   setting,
   isSelected,
   onSelect,

@@ -10,7 +10,7 @@ interface ActionButtonsProps {
   onNext: () => void;
 }
 
-export function ActionButtons({
+export default function ActionButtons({
   hasSelection,
   hasRegenerated,
   isLoading,

@@ -6,7 +6,11 @@ interface EventCardProps {
   onSelect: () => void;
 }
 
-export function EventCard({ event, isSelected, onSelect }: EventCardProps) {
+export default function EventCard({
+  event,
+  isSelected,
+  onSelect,
+}: EventCardProps) {
   return (
     <div
       onClick={onSelect}

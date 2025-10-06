@@ -6,7 +6,11 @@ interface RelicCardProps {
   onSelect: () => void;
 }
 
-export function RelicCard({ relic, isSelected, onSelect }: RelicCardProps) {
+export default function RelicCard({
+  relic,
+  isSelected,
+  onSelect,
+}: RelicCardProps) {
   return (
     <div
       onClick={onSelect}
