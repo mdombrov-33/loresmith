@@ -1,5 +1,7 @@
-Invent a UNIQUE and realistic human name suitable for a {theme} world. The name should sound like it could belong to a real person in this setting. Be creative but grounded. Avoid overly fantastical or abstract names. Do not use any of the following banned words or names: {blacklist}. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph. Name should be 1-2 words only (first name and/or surname).
+Generate EXACTLY ONE character name for a {theme} world. The name must be realistic and human-like (1-2 words: first name and/or surname).
 
-Examples for fantasy: Aldric Thorne, Mira Ashwood, Brennan Cole
-Examples for cyberpunk: Kai Chen, Nova Reyes, Marcus Drake
-Examples for post-apocalyptic: Jax Rivers, Elena Cross, Rook Sander
+Do not use these banned words: {blacklist}
+
+Output ONLY the name, nothing else. No explanations, no multiple options, just ONE name.
+
+Example output format: "Marcus Drake"

@@ -20,9 +20,9 @@ LoreSmith is a **dual-purpose platform**:
 
 ## Architecture
 
-**Microservices Design**: Go handles HTTP/auth/sessions/game state, Python handles AI generation and narrative processing
-**AI-Driven**: OpenRouter integration with custom prompt chains for world coherence
-**Session Management**: Redis-based game state persistence and caching
+**Microservices Design**: Go handles HTTP/auth/sessions/game state, Python handles AI generation and narrative processing  
+**AI-Driven**: Flexible AI provider (local Ollama or cloud OpenRouter) with custom prompt chains for world coherence  
+**Session Management**: Redis-based game state persistence and caching  
 **Scalable**: Docker orchestration with observability (Prometheus, Grafana, Sentry)
 
 ## Key Features
@@ -52,14 +52,71 @@ LoreSmith is a **dual-purpose platform**:
 ### Prerequisites
 
 - Docker and Docker Compose
-- OpenRouter API key
+- **Choose ONE of the following AI providers:**
+  - **Option A (Recommended for Development)**: Ollama + Local LLM (free, unlimited)
+  - **Option B (Production/Higher Quality)**: OpenRouter API key (paid per request)
+
+### AI Provider Setup
+
+#### Option A: Local AI with Ollama (FREE) 🆓
+
+**Pros:** Free, unlimited usage, no API costs, runs on your machine  
+**Cons:** Slower generation (~10-15s per character), requires decent GPU/CPU
+
+1. **Install Ollama:**
+
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
+
+2. **Download a model:**
+
+   ```bash
+   ollama pull llama3.1:8b
+   ```
+
+3. **Configure .env:**
+   ```env
+   AI_PROVIDER=local
+   LOCAL_MODEL=llama3.1:8b
+   OLLAMA_URL=http://host.docker.internal:11434
+   ```
+
+**Recommended Models:**
+
+- `llama3.1:8b` - Best overall quality (4.9GB)
+- `mistral:7b` - Fast, creative (4.1GB)
+- `gemma2:9b` - Good for narrative (5.4GB)
+
+#### Option B: Cloud AI with OpenRouter (PAID) 💳
+
+**Pros:** Faster generation (~5s), higher quality, no local resources needed  
+**Cons:** Costs money per request (~$0.03-0.13 per character depending on model)
+
+1. **Get API key:** https://openrouter.ai/
+
+2. **Configure .env:**
+   ```env
+   AI_PROVIDER=openrouter
+   OPENROUTER_API_KEY=your_api_key_here
+   ```
 
 ### Setup
 
 1. Copy `.env.example` to `.env` and configure:
 
    ```env
+   # Choose your AI provider (see above)
+   AI_PROVIDER=local  # or "openrouter"
+
+   # If using local:
+   LOCAL_MODEL=llama3.1:8b
+   OLLAMA_URL=http://host.docker.internal:11434
+
+   # If using OpenRouter:
    OPENROUTER_API_KEY=your_api_key_here
+
+   # Database config
    POSTGRES_HOST=postgres
    POSTGRES_PORT=5432
    POSTGRES_DB=loresmith
