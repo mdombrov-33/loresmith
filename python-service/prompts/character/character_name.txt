@@ -1,1 +1,5 @@
-Invent a unique name for a character in a {theme} world. Be creative and avoid repetition. Do not use any of the following banned words or names: {blacklist}. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph. Name should be 1-2 words only.
+Invent a UNIQUE and realistic human name suitable for a {theme} world. The name should sound like it could belong to a real person in this setting. Be creative but grounded. Avoid overly fantastical or abstract names. Do not use any of the following banned words or names: {blacklist}. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph. Name should be 1-2 words only (first name and/or surname).
+
+Examples for fantasy: Aldric Thorne, Mira Ashwood, Brennan Cole
+Examples for cyberpunk: Kai Chen, Nova Reyes, Marcus Drake
+Examples for post-apocalyptic: Jax Rivers, Elena Cross, Rook Sander
