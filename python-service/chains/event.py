@@ -1,8 +1,16 @@
+from typing import Union
+
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
 from models.lore_piece import LorePiece
-from services.openrouter_client import ask_openrouter_with_retries as ask_openrouter
+from services.llm_client import (
+    get_llm,
+    increment_success_counter,
+    increment_failure_counter,
+)
 from utils.blacklist import BLACKLIST
 from utils.format_text import clean_ai_text
-from utils.load_prompt import load_prompt
 from utils.logger import logger
 from exceptions.generation import EventGenerationError
 
@@ -16,42 +24,61 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
     Theme controls the genre/world setting.
     """
     try:
-        # Name prompt
-        name_prompt = load_prompt(
-            "event/event_name.txt",
-            theme=theme,
-            blacklist=blacklist_str,
+        # Generate Name
+        with open("prompts/event/event_name.txt", "r") as f:
+            name_prompt_text = f.read()
+
+        name_prompt = PromptTemplate.from_template(name_prompt_text)
+        name_llm = get_llm(max_tokens=50)
+        name_chain = name_prompt | name_llm | StrOutputParser()
+        name_raw = await name_chain.ainvoke(
+            {"theme": theme, "blacklist": blacklist_str}
         )
-        name_raw = await ask_openrouter(name_prompt, max_tokens=50)
         name = clean_ai_text(name_raw)
+        logger.info(f"Generated event name: {name}")
 
-        # Description prompt
-        description_prompt = load_prompt(
-            "event/event_description.txt",
-            theme=theme,
-            name=name,
+        # Generate Description
+        with open("prompts/event/event_description.txt", "r") as f:
+            description_prompt_text = f.read()
+
+        description_prompt = PromptTemplate.from_template(description_prompt_text)
+        description_llm = get_llm(max_tokens=200)
+        description_chain = description_prompt | description_llm | StrOutputParser()
+        description_raw = await description_chain.ainvoke(
+            {"theme": theme, "name": name}
         )
-
-        description_raw = await ask_openrouter(description_prompt, max_tokens=200)
         description = clean_ai_text(description_raw)
+        logger.info(f"Generated description for {name}")
 
-        # Impact prompt
-        impact_prompt = load_prompt(
-            "event/event_impact.txt",
-            theme=theme,
-            name=name,
-            description=description,
+        # Generate Impact
+        with open("prompts/event/event_impact.txt", "r") as f:
+            impact_prompt_text = f.read()
+
+        impact_prompt = PromptTemplate.from_template(impact_prompt_text)
+        impact_llm = get_llm(max_tokens=150)
+        impact_chain = impact_prompt | impact_llm | StrOutputParser()
+        impact_raw = await impact_chain.ainvoke(
+            {
+                "theme": theme,
+                "name": name,
+                "description": description,
+            }
         )
-        impact_raw = await ask_openrouter(impact_prompt, max_tokens=150)
         impact = clean_ai_text(impact_raw)
+        logger.info(f"Generated impact for {name}")
+
+        increment_success_counter()
+        logger.info(f"Successfully generated event: {name}")
 
     except Exception as e:
+        error_type = type(e).__name__
+        increment_failure_counter(error_type=error_type)
         logger.error(f"Failed to generate event: {e}", exc_info=True)
         raise EventGenerationError(
             f"Failed to generate event for theme {theme}: {str(e)}"
         )
 
-    details = {"impact": impact}
+    details: dict[str, Union[str, str]] = {"impact": impact}
 
     return LorePiece(
         name=name,
