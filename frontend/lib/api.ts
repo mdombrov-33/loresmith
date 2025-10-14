@@ -61,7 +61,7 @@ export async function generateFullStory(
   const url = `http://localhost:8080/generate/full-story?theme=${finalTheme}`;
 
   const requestBody = Object.fromEntries(
-    Object.entries(selectedLore).filter(([, value]) => value !== undefined)
+    Object.entries(selectedLore).filter(([, value]) => value !== undefined),
   );
 
   try {
@@ -87,7 +87,7 @@ export async function generateFullStory(
     return data;
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      throw new Error('Request timed out after 60 seconds. Please try again.');
+      throw new Error("Request timed out after 60 seconds. Please try again.");
     }
     throw error;
   }
