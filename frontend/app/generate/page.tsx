@@ -101,6 +101,11 @@ export default function GeneratePage() {
     const nextStage = getNextStage(stage);
     if (nextStage) {
       if (nextStage === "full-story") {
+        //* Store selected lore in sessionStorage for the story page
+        sessionStorage.setItem(
+          "selectedLore",
+          JSON.stringify(updatedSelectedLore),
+        );
         //* Navigate to full story page with all selected lore
         console.log("Ready for full story generation", updatedSelectedLore);
         window.location.href = `/story?theme=${theme}`;
