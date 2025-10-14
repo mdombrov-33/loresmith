@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "@/contexts/auth-context";
+import { loginUser } from "@/lib/api";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -24,14 +26,38 @@ export function LoginModal({
   onClose,
   onSwitchToRegister,
 }: LoginModalProps) {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    // TODO: Implement login logic
-    console.log("Login:", formData);
+  const handleLogin = async () => {
+    if (!formData.username || !formData.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await loginUser({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      login(response.token, response.user);
+
+      onClose();
+      setFormData({ username: "", password: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleAuth = () => {
@@ -41,9 +67,8 @@ export function LoginModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px] p-0 border-0 shadow-2xl">
+      <DialogContent className="border-0 p-0 shadow-2xl sm:max-w-[400px]">
         <div className="relative overflow-hidden rounded-lg">
-
           <div className="p-8">
             <DialogHeader className="pb-2 text-center">
               <DialogTitle className="text-center text-2xl font-semibold">
@@ -91,14 +116,19 @@ export function LoginModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="current-password"
                 />
               </div>
               <div className="pt-2">
+                {error && (
+                  <div className="text-destructive mb-4 text-sm">{error}</div>
+                )}
                 <Button
                   className="h-11 w-full text-base font-medium"
                   onClick={handleLogin}
+                  disabled={isLoading}
                 >
-                  Sign In
+                  {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
               </div>
               <div className="text-muted-foreground text-center text-sm">
@@ -117,9 +147,9 @@ export function LoginModal({
                 <div className="text-muted-foreground mb-4 text-center text-sm">
                   or continue with
                 </div>
-                                <Button
+                <Button
                   variant="outline"
-                  className="w-full h-11"
+                  className="h-11 w-full"
                   onClick={handleGoogleAuth}
                 >
                   <FcGoogle className="mr-2 h-4 w-4" />

@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "@/contexts/auth-context";
+import { registerUser, loginUser } from "@/lib/api";
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -24,15 +26,66 @@ export function RegisterModal({
   onClose,
   onSwitchToLogin,
 }: RegisterModalProps) {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleRegister = () => {
-    // TODO: Implement register logic
-    console.log("Register:", formData);
+  const handleRegister = async () => {
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await registerUser({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const loginResponse = await loginUser({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      login(loginResponse.token, loginResponse.user);
+
+      onClose();
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleAuth = () => {
@@ -112,14 +165,40 @@ export function RegisterModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="new-password"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="reg-confirm-password"
+                  className="text-foreground text-sm font-medium"
+                >
+                  Confirm Password
+                </Label>
+                <Input
+                  id="reg-confirm-password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
+                  className="h-11 px-3"
                 />
               </div>
               <div className="pt-2">
+                {error && (
+                  <div className="text-destructive mb-4 text-sm">{error}</div>
+                )}
                 <Button
                   className="h-11 w-full text-base font-medium"
                   onClick={handleRegister}
+                  disabled={isLoading}
                 >
-                  Create Account
+                  {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
               </div>
               <div className="text-muted-foreground text-center text-sm">

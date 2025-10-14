@@ -6,14 +6,20 @@ import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { LoginModal } from "@/components/navbar/login-modal";
 import { RegisterModal } from "@/components/navbar/register-modal";
 import { useAppStage } from "@/contexts/app-stage-context";
-import { Swords } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { Swords, LogOut } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
   const { appStage } = useAppStage();
+  const { user, isAuthenticated, logout } = useAuth();
   const showThemeSwitcher = appStage === "home";
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <>
@@ -36,18 +42,31 @@ export default function Navbar() {
             {showThemeSwitcher && <ThemeSwitcher />}
           </div>
 
-          {/* Right Section - Music & Auth */}
+          {/* Right Section - Auth */}
           <div className="flex items-center gap-3">
-            {/* Auth Buttons */}
-            <Button
-              variant="ghost"
-              onClick={() => setIsLoginModalOpen(true)}
-            >
-              Login
-            </Button>
-            <Button onClick={() => setIsRegisterModalOpen(true)}>
-              Sign Up
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <span className="text-muted-foreground text-sm">
+                  Welcome, {user?.username}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsLoginModalOpen(true)}
+                >
+                  Login
+                </Button>
+                <Button onClick={() => setIsRegisterModalOpen(true)}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
