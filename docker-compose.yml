@@ -44,5 +44,21 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: unless-stopped
 
+  test-postgres:
+    image: postgres:12.4-alpine
+    container_name: loresmith-test-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=${TEST_POSTGRES_DB}
+      - POSTGRES_USER=${TEST_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${TEST_POSTGRES_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    profiles:
+      - test
+
 volumes:
   postgres_data:
+  test_postgres_data:
