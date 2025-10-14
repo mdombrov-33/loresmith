@@ -1,4 +1,4 @@
-Generate a brief description (1-2 sentences) for the main quest titled {quest_title} in this {theme} story. Make it actionable and tied to the story's conflict.
+Generate a brief description (1-2 sentences) for the main quest titled "{quest_title}" in this {theme} story. Make it actionable and tied to the story's conflict. Do NOT include the quest title in your response - only provide the description.
 
 Story: {story_content}
 
