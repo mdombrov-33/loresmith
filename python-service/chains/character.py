@@ -4,6 +4,8 @@ from typing import Union
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
+from langfuse import observe
+
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
 from models.lore_piece import LorePiece
@@ -18,6 +20,7 @@ from utils.format_text import clean_ai_text
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
+@observe()
 async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     """
     Generate a character by prompting for:

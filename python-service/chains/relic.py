@@ -3,6 +3,8 @@ from typing import Union
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
+from langfuse import observe
+
 from models.lore_piece import LorePiece
 from services.llm_client import (
     get_llm,
@@ -17,6 +19,7 @@ from exceptions.generation import RelicGenerationError
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
+@observe()
 async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
     """
     Generate a relic/artifact by prompting for:

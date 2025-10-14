@@ -1,6 +1,8 @@
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
+from langfuse import observe
+
 from constants.themes import Theme
 from models.full_story import FullStory
 from models.selected_lore_pieces import SelectedLorePieces
@@ -14,6 +16,7 @@ from utils.logger import logger
 from exceptions.generation import FullStoryGenerationError
 
 
+@observe()
 async def generate_full_story(
     selected_pieces: SelectedLorePieces, theme: Theme
 ) -> FullStory:

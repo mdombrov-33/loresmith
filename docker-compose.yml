@@ -21,7 +21,6 @@ services:
     env_file: .env
     depends_on:
       - redis
-    # Allow access to host's Ollama service
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
