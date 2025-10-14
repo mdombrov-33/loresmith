@@ -30,6 +30,12 @@ type loginUserRequest struct {
 	Password string `json:"password"`
 }
 
+type googleAuthRequest struct {
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	ProviderID string `json:"provider_id"`
+}
+
 func NewUserHandler(userStore store.UserStore, logger *log.Logger) *UserHandler {
 	return &UserHandler{
 		userStore: userStore,
@@ -135,6 +141,67 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	if !match {
 		utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid credentials"})
 		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":  user.ID,
+		"username": user.Username,
+		"exp":      time.Now().Add(time.Hour * 72).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		h.logger.Printf("ERROR: signing token: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+		"token": tokenString,
+		"user": map[string]interface{}{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
+}
+
+func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
+	var req googleAuthRequest
+	secret := os.Getenv("JWT_SECRET")
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		h.logger.Printf("ERROR: decoding google auth request: %v", err)
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request payload"})
+		return
+	}
+
+	if req.Email == "" || req.ProviderID == "" {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "email and provider_id are required"})
+		return
+	}
+
+	user, err := h.userStore.GetUserByEmailAndProvider(req.Email, "google")
+	if err != nil {
+		h.logger.Printf("ERROR: fetching user by email and provider: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		return
+	}
+
+	if user == nil {
+		user = &store.User{
+			Username:   req.Name,
+			Email:      req.Email,
+			Provider:   "google",
+			ProviderID: req.ProviderID,
+		}
+		err = h.userStore.CreateUser(user)
+		if err != nil {
+			h.logger.Printf("ERROR: creating google user: %v", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+			return
+		}
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

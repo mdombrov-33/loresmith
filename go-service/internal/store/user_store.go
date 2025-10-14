@@ -13,6 +13,8 @@ type User struct {
 	Username     string    `json:"username"`
 	Email        string    `json:"email"`
 	PasswordHash password  `json:"-"`
+	Provider     string    `json:"provider"`
+	ProviderID   string    `json:"provider_id"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -26,6 +28,7 @@ type UserStore interface {
 	CreateUser(*User) error
 	GetUserByUsername(username string) (*User, error)
 	GetUserByID(id int64) (*User, error)
+	GetUserByEmailAndProvider(email, provider string) (*User, error)
 }
 
 type PostgresUserStore struct {
@@ -61,11 +64,11 @@ func NewPostgresUserStore(db *sql.DB) *PostgresUserStore {
 
 func (s *PostgresUserStore) CreateUser(user *User) error {
 	query := `
-	INSERT INTO users(username, email, password_hash)
-	VALUES($1, $2, $3)
+	INSERT INTO users(username, email, password_hash, provider, provider_id)
+	VALUES($1, $2, $3, $4, $5)
 	RETURNING id, created_at, updated_at
 	`
-	err := s.db.QueryRow(query, user.Username, user.Email, user.PasswordHash.hash).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
+	err := s.db.QueryRow(query, user.Username, user.Email, user.PasswordHash.hash, user.Provider, user.ProviderID).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return err
 	}
@@ -79,7 +82,7 @@ func (s *PostgresUserStore) GetUserByUsername(username string) (*User, error) {
 	}
 
 	query := `
-	SELECT id, username, email, password_hash, created_at, updated_at
+	SELECT id, username, email, password_hash, provider, provider_id, created_at, updated_at
 	FROM users
 	WHERE username = $1
 	`
@@ -89,10 +92,11 @@ func (s *PostgresUserStore) GetUserByUsername(username string) (*User, error) {
 		&user.Username,
 		&user.Email,
 		&user.PasswordHash.hash,
+		&user.Provider,
+		&user.ProviderID,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -119,6 +123,38 @@ func (s *PostgresUserStore) GetUserByID(id int64) (*User, error) {
 		&user.Username,
 		&user.Email,
 		&user.PasswordHash.hash,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (s *PostgresUserStore) GetUserByEmailAndProvider(email, provider string) (*User, error) {
+	user := &User{
+		PasswordHash: password{},
+	}
+
+	query := `
+	SELECT id, username, email, password_hash, provider, provider_id, created_at, updated_at
+	FROM users
+	WHERE email = $1 AND provider = $2
+	`
+
+	err := s.db.QueryRow(query, email, provider).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.PasswordHash.hash,
+		&user.Provider,
+		&user.ProviderID,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)

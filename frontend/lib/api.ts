@@ -1,5 +1,6 @@
 import { LorePiece, SelectedLore } from "@/types/generate-world";
 import { useAppStore } from "@/stores/appStore";
+import { getSession } from "next-auth/react";
 import {
   FullStoryResponse,
   RegisterRequest,
@@ -8,8 +9,9 @@ import {
   AuthResponse,
 } from "@/types/api";
 
-function getAuthHeaders() {
-  const token = useAppStore.getState().token;
+async function getAuthHeaders() {
+  const session = await getSession();
+  const token = session?.token || useAppStore.getState().token;
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -28,7 +30,7 @@ export async function generateLore(
 
   const response = await fetch(url, {
     method: "GET",
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -59,7 +61,7 @@ export async function generateFullStory(
 
     const response = await fetch(url, {
       method: "POST",
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify(requestBody),
       signal: controller.signal,
     });

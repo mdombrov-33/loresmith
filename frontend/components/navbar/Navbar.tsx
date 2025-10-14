@@ -6,18 +6,24 @@ import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { LoginModal } from "@/components/navbar/login-modal";
 import { RegisterModal } from "@/components/navbar/register-modal";
 import { useAppStore } from "@/stores/appStore";
+import { useSession, signOut } from "next-auth/react";
 import { Swords, LogOut } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
   const { user, token, logout, appStage } = useAppStore();
-  const isAuthenticated = !!user && !!token;
+  const { data: session } = useSession();
+  const isAuthenticated = !!session || (!!user && !!token);
   const showThemeSwitcher = appStage === "home";
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    if (session) {
+      signOut();
+    } else {
+      logout();
+    }
   };
 
   return (
@@ -46,7 +52,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <span className="text-muted-foreground text-sm">
-                  Welcome, {user?.username}
+                  Welcome, {session?.backendUser?.username || user?.username}
                 </span>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />

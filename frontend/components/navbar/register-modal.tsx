@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
+import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
 import { registerUser, loginUser } from "@/lib/api";
 
@@ -88,9 +89,16 @@ export function RegisterModal({
     }
   };
 
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google OAuth");
+  const handleGoogleAuth = async () => {
+    console.log("Google auth button clicked");
+    try {
+      console.log("Calling signIn...");
+      const result = await signIn("google", { callbackUrl: "/" });
+      console.log("signIn result:", result);
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+      setError("Google sign-in failed");
+    }
   };
 
   return (
