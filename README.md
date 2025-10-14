@@ -6,7 +6,7 @@
 [![Redis](https://img.shields.io/badge/redis-purple)](https://redis.io/)
 
 <p align="center">
-  <img src="logo.png" alt="LoreSmith Logo" width="400"/>
+  <img src="assets/logo/logo.png" alt="LoreSmith Logo" width="400"/>
 </p>
 
 An AI-powered narrative game engine that transforms generated lore into interactive adventures. Built with Go microservices and Python AI chains, featuring world generation, party management, and session-based gameplay.
@@ -17,6 +17,25 @@ LoreSmith is a **dual-purpose platform**:
 
 1. **World Building API**: Generate cohesive lore (characters, factions, settings, events, relics) for storytelling and tabletop gaming
 2. **Interactive Adventure Engine**: Transform generated worlds into playable text-based adventures with party management, inventory systems, and AI-driven encounters
+
+## Screenshots
+
+### Home Page
+
+![Home Page](assets/screenshots/home.png)
+_Welcome screen with theme selection and navigation_
+
+### Lore Generation Cards
+
+![Generation Cards](assets/screenshots/cards.png)
+_Interactive cards for generating world elements (characters, factions, settings, etc.)_
+
+### Full Story View
+
+![Full Story](assets/screenshots/fullstory.png)
+_Complete generated story with quest details and narrative_
+
+> **Note**: Screenshots show the current development state. UI and features may evolve.
 
 ## Architecture
 

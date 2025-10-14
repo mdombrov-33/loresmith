@@ -1,5 +1,13 @@
 import { LorePiece, SelectedLore } from "@/types/generate-world";
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("auth_token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 export async function generateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
   theme: string,
@@ -10,9 +18,7 @@ export async function generateLore(
 
   const response = await fetch(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -59,9 +65,7 @@ export async function generateFullStory(
 
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(requestBody),
   });
 
