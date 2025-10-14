@@ -150,5 +150,12 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"token": tokenString})
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+		"token": tokenString,
+		"user": map[string]interface{}{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
 }

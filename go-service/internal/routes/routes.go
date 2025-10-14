@@ -20,18 +20,15 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 
 	r.Use(middleware.Logger)
 
-	//* Temporarily public for testing
-	r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
-	r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
-	r.Get("/generate/events", app.LoreHandler.HandleGenerateEvents)
-	r.Get("/generate/relics", app.LoreHandler.HandleGenerateRelics)
-	r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
-	r.Get("/generate/all", app.LoreHandler.HandleGenerateAll)
-	r.Post("/generate/full-story", app.LoreHandler.HandleGenerateFullStory)
-
 	r.Group(func(r chi.Router) {
 		r.Use(app.Middleware.Authenticate)
-		//* Add auth routes here later(generate, etc.)
+		r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
+		r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
+		r.Get("/generate/events", app.LoreHandler.HandleGenerateEvents)
+		r.Get("/generate/relics", app.LoreHandler.HandleGenerateRelics)
+		r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
+		r.Get("/generate/all", app.LoreHandler.HandleGenerateAll)
+		r.Post("/generate/full-story", app.LoreHandler.HandleGenerateFullStory)
 	})
 
 	r.Get("/health", app.HealthCheck)
