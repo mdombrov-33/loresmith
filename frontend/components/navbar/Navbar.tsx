@@ -41,7 +41,6 @@ export default function Navbar() {
             {/* Auth Buttons */}
             <Button
               variant="ghost"
-              className="hidden sm:inline-flex"
               onClick={() => setIsLoginModalOpen(true)}
             >
               Login
