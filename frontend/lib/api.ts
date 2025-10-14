@@ -38,7 +38,6 @@ export async function generateLore(
   }
 
   const data = await response.json();
-  console.log(`[API] ${category} response:`, data);
 
   return data[category] || data;
 }
@@ -73,7 +72,6 @@ export async function generateFullStory(
     }
 
     const data = await response.json();
-    console.log("[API] Full story response:", data);
 
     return data;
   } catch (error) {
@@ -105,7 +103,6 @@ export async function registerUser(
   }
 
   const data = await response.json();
-  console.log("[API] Register response:", data);
 
   return data;
 }
@@ -127,7 +124,6 @@ export async function loginUser(request: LoginRequest): Promise<AuthResponse> {
   }
 
   const data = await response.json();
-  console.log("[API] Login response:", data);
 
   return data;
 }

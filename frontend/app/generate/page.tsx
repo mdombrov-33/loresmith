@@ -20,7 +20,7 @@ import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 export default function GeneratePage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
-  const { setAppStage, selectedLore, updateSelectedLore } = useAppStore();
+  const { setAppStage, updateSelectedLore } = useAppStore();
 
   const [stage, setStage] = useState<GenerationStage>("characters");
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
@@ -96,7 +96,6 @@ export default function GeneratePage() {
     if (nextStage) {
       if (nextStage === "full-story") {
         //* Navigate to full story page with all selected lore
-        console.log("Ready for full story generation", selectedLore);
         window.location.href = `/story?theme=${theme}`;
       } else {
         setStage(nextStage);

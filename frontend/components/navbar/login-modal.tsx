@@ -62,11 +62,8 @@ export function LoginModal({
   };
 
   const handleGoogleAuth = async () => {
-    console.log("Google auth button clicked");
     try {
-      console.log("Calling signIn...");
-      const result = await signIn("google", { callbackUrl: "/" });
-      console.log("signIn result:", result);
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.error("Google sign-in failed:", error);
       setError("Google sign-in failed");

@@ -90,9 +90,7 @@ export function RegisterModal({
   };
 
   const handleGoogleAuth = async () => {
-    console.log("Google auth button clicked");
     try {
-      console.log("Calling signIn...");
       const result = await signIn("google", { callbackUrl: "/" });
       console.log("signIn result:", result);
     } catch (error) {
