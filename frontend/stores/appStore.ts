@@ -82,13 +82,17 @@ useAppStore.subscribe((state) => {
 });
 
 //* Load from storage
-const data = localStorage.getItem("loresmith-store");
-if (data) {
-  try {
-    const partial = JSON.parse(data);
-    useAppStore.setState({ ...partial, isHydrated: true });
-  } catch (e) {
-    console.error("Failed to load from localStorage", e);
+if (typeof window !== "undefined") {
+  const data = localStorage.getItem("loresmith-store");
+  if (data) {
+    try {
+      const partial = JSON.parse(data);
+      useAppStore.setState({ ...partial, isHydrated: true });
+    } catch (e) {
+      console.error("Failed to load from localStorage", e);
+      useAppStore.setState({ isHydrated: true });
+    }
+  } else {
     useAppStore.setState({ isHydrated: true });
   }
 } else {
