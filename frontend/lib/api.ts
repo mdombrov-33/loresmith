@@ -1,5 +1,12 @@
 import { LorePiece, SelectedLore } from "@/types/generate-world";
 import { useAppStore } from "@/stores/appStore";
+import {
+  FullStoryResponse,
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  AuthResponse,
+} from "@/types/api";
 
 function getAuthHeaders() {
   const token = useAppStore.getState().token;
@@ -34,24 +41,6 @@ export async function generateLore(
   return data[category] || data;
 }
 
-export interface FullStoryResponse {
-  story: {
-    title: string;
-    content: string;
-    quest: {
-      title: string;
-      description: string;
-    };
-    pieces: {
-      characters: LorePiece;
-      factions: LorePiece;
-      settings: LorePiece;
-      events: LorePiece;
-      relics: LorePiece;
-    };
-  };
-}
-
 export async function generateFullStory(
   selectedLore: SelectedLore,
   theme?: string,
@@ -66,7 +55,7 @@ export async function generateFullStory(
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     const response = await fetch(url, {
       method: "POST",
@@ -91,36 +80,6 @@ export async function generateFullStory(
     }
     throw error;
   }
-}
-
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-  };
-}
-
-export interface RegisterResponse {
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    created_at: string;
-    updated_at: string;
-  };
 }
 
 export async function registerUser(

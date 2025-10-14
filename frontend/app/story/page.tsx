@@ -16,7 +16,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { generateFullStory, FullStoryResponse } from "@/lib/api";
+import { generateFullStory } from "@/lib/api";
+import { FullStoryResponse } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
 export default function StoryPage() {
