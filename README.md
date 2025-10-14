@@ -43,7 +43,10 @@ LoreSmith is a **dual-purpose platform**:
 ## Tech Stack
 
 - **Go Service**: HTTP server, JWT auth, Chi router, session management, game state logic
-- **Python Service**: gRPC server, AI chains, narrative processing, OpenRouter client
+- **Python Service**: gRPC server with LangChain prompt chains for structured AI generation
+  - **LangChain**: LCEL chains for composable prompt workflows and output parsing
+  - **Langfuse**: Cloud-based observability for LLM tracing, token tracking, and performance monitoring
+- **AI Providers**: Ollama (local models) or OpenRouter (cloud models)
 - **Database**: PostgreSQL (users/world data), Redis (sessions/caching)
 - **Deployment**: Docker Compose with multi-service orchestration
 
