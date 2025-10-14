@@ -1,7 +1,8 @@
 import { LorePiece, SelectedLore } from "@/types/generate-world";
+import { useAppStore } from "@/stores/appStore";
 
 function getAuthHeaders() {
-  const token = localStorage.getItem("auth_token");
+  const token = useAppStore.getState().token;
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -10,11 +11,13 @@ function getAuthHeaders() {
 
 export async function generateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
-  theme: string,
+  theme?: string,
   count: number = 3,
   regenerate: boolean = false,
 ): Promise<LorePiece[]> {
-  const url = `http://localhost:8080/generate/${category}?theme=${theme}&count=${count}${regenerate ? "&regenerate=true" : ""}`;
+  const storeTheme = useAppStore.getState().theme;
+  const finalTheme = theme || storeTheme;
+  const url = `http://localhost:8080/generate/${category}?theme=${finalTheme}&count=${count}${regenerate ? "&regenerate=true" : ""}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -51,32 +54,43 @@ export interface FullStoryResponse {
 
 export async function generateFullStory(
   selectedLore: SelectedLore,
-  theme: string,
+  theme?: string,
 ): Promise<FullStoryResponse> {
-  const url = `http://localhost:8080/generate/full-story?theme=${theme}`;
+  const storeTheme = useAppStore.getState().theme;
+  const finalTheme = theme || storeTheme;
+  const url = `http://localhost:8080/generate/full-story?theme=${finalTheme}`;
 
-  const requestBody = {
-    character: selectedLore.character,
-    faction: selectedLore.faction,
-    setting: selectedLore.setting,
-    event: selectedLore.event,
-    relic: selectedLore.relic,
-  };
+  const requestBody = Object.fromEntries(
+    Object.entries(selectedLore).filter(([, value]) => value !== undefined)
+  );
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(requestBody),
-  });
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
 
-  if (!response.ok) {
-    throw new Error(`Failed to generate full story: ${response.statusText}`);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to generate full story: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("[API] Full story response:", data);
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error('Request timed out after 60 seconds. Please try again.');
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  console.log("[API] Full story response:", data);
-
-  return data;
 }
 
 export interface RegisterRequest {

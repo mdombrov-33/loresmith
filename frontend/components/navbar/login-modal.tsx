@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
-import { useAuth } from "@/contexts/auth-context";
+import { useAppStore } from "@/stores/appStore";
 import { loginUser } from "@/lib/api";
 
 interface LoginModalProps {
@@ -26,7 +26,7 @@ export function LoginModal({
   onClose,
   onSwitchToRegister,
 }: LoginModalProps) {
-  const { login } = useAuth();
+  const { login } = useAppStore();
   const [formData, setFormData] = useState({
     username: "",
     password: "",

@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { THEME_OPTIONS } from "@/constants/game-themes";
+import { useAppStore } from "@/stores/appStore";
 
 export function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme: setNextTheme } = useTheme();
+  const { theme: storeTheme, setTheme: setStoreTheme } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -22,15 +24,17 @@ export function ThemeSwitcher() {
     if (!mounted) return;
 
     const themeFromQuery = searchParams.get("theme");
-    if (themeFromQuery && theme !== themeFromQuery) {
-      setTheme(themeFromQuery);
+    if (themeFromQuery && storeTheme !== themeFromQuery) {
+      setStoreTheme(themeFromQuery);
+      setNextTheme(themeFromQuery);
     }
-  }, [mounted, searchParams, theme, setTheme]);
+  }, [mounted, searchParams, storeTheme, setStoreTheme, setNextTheme]);
 
   const handleThemeChange = (newTheme: string) => {
-    if (theme === newTheme) return;
+    if (storeTheme === newTheme) return;
 
-    setTheme(newTheme);
+    setStoreTheme(newTheme);
+    setNextTheme(newTheme);
 
     //* Update query param
     const params = new URLSearchParams(searchParams.toString());
@@ -69,7 +73,7 @@ export function ThemeSwitcher() {
         return (
           <Button
             key={t.value}
-            variant={theme === t.value ? "default" : "outline"}
+            variant={storeTheme === t.value ? "default" : "outline"}
             size="sm"
             onClick={() => handleThemeChange(t.value)}
             className="text-sm"

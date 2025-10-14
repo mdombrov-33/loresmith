@@ -7,7 +7,7 @@ import {
   SelectedLore,
   LorePiece,
 } from "@/types/generate-world";
-import { useAppStage } from "@/contexts/app-stage-context";
+import { useAppStore } from "@/stores/appStore";
 import CharacterCard from "@/components/generate/CharacterCard";
 import FactionCard from "@/components/generate/FactionCard";
 import SettingCard from "@/components/generate/SettingCard";
@@ -20,10 +20,9 @@ import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 export default function GeneratePage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
-  const { setAppStage } = useAppStage();
+  const { setAppStage, selectedLore, updateSelectedLore } = useAppStore();
 
   const [stage, setStage] = useState<GenerationStage>("characters");
-  const [selectedLore, setSelectedLore] = useState<SelectedLore>({});
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,24 +89,14 @@ export default function GeneratePage() {
     const selectedPiece = generatedOptions[selectedIndex];
     const stageKey = stage as keyof SelectedLore;
 
-    const updatedSelectedLore = {
-      ...selectedLore,
-      [stageKey]: selectedPiece,
-    };
-
-    setSelectedLore(updatedSelectedLore);
+    updateSelectedLore(stageKey, selectedPiece);
 
     //* Move to next stage
     const nextStage = getNextStage(stage);
     if (nextStage) {
       if (nextStage === "full-story") {
-        //* Store selected lore in sessionStorage for the story page
-        sessionStorage.setItem(
-          "selectedLore",
-          JSON.stringify(updatedSelectedLore),
-        );
         //* Navigate to full story page with all selected lore
-        console.log("Ready for full story generation", updatedSelectedLore);
+        console.log("Ready for full story generation", selectedLore);
         window.location.href = `/story?theme=${theme}`;
       } else {
         setStage(nextStage);

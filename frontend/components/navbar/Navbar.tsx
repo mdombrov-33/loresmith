@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { LoginModal } from "@/components/navbar/login-modal";
 import { RegisterModal } from "@/components/navbar/register-modal";
-import { useAppStage } from "@/contexts/app-stage-context";
-import { useAuth } from "@/contexts/auth-context";
+import { useAppStore } from "@/stores/appStore";
 import { Swords, LogOut } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
-  const { appStage } = useAppStage();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, token, logout, appStage } = useAppStore();
+  const isAuthenticated = !!user && !!token;
   const showThemeSwitcher = appStage === "home";
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -26,7 +25,7 @@ export default function Navbar() {
       <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
           {/* Logo Section */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/?theme=fantasy" className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-xl font-bold">
               <span className="text-primary">
                 <Swords />

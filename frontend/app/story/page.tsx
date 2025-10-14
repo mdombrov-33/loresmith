@@ -17,17 +17,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { generateFullStory, FullStoryResponse } from "@/lib/api";
-import { SelectedLore } from "@/types/generate-world";
-import { useAppStage } from "@/contexts/app-stage-context";
+import { useAppStore } from "@/stores/appStore";
 
 export default function StoryPage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
 
-  const { setAppStage } = useAppStage();
+  const { setAppStage, selectedLore, isHydrated } = useAppStore();
 
   const [storyData, setStoryData] = useState<FullStoryResponse | null>(null);
-  const [selectedLore, setSelectedLore] = useState<SelectedLore>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,17 +35,15 @@ export default function StoryPage() {
   }, [setAppStage]);
 
   useEffect(() => {
+    if (!isHydrated) return;
+
     const loadStory = async () => {
       try {
-        const loreData = sessionStorage.getItem("selectedLore");
-        if (!loreData) {
+        if (!selectedLore || Object.keys(selectedLore).length === 0) {
           throw new Error("No selection found. Please create a new story.");
         }
 
-        const lore = JSON.parse(loreData) as SelectedLore;
-        setSelectedLore(lore);
-
-        const response = await generateFullStory(lore, theme);
+        const response = await generateFullStory(selectedLore, theme);
         setStoryData(response);
       } catch (err) {
         setError(
@@ -59,7 +55,7 @@ export default function StoryPage() {
     };
 
     loadStory();
-  }, [theme]);
+  }, [theme, selectedLore, isHydrated]);
 
   if (loading) {
     return (
