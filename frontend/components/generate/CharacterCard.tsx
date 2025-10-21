@@ -5,7 +5,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Heart, Brain, BookOpen, Users, Shield, Lightbulb, Crown, Eye } from "lucide-react";
+import {
+  HelpCircle,
+  Heart,
+  Brain,
+  BookOpen,
+  Users,
+  Shield,
+  Lightbulb,
+  Crown,
+  Eye,
+} from "lucide-react";
 
 interface CharacterCardProps {
   character: LorePiece;
@@ -153,7 +163,7 @@ export default function CharacterCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <BookOpen className="h-3 w-3 text-yellow-500" />
                     <div className="text-muted-foreground text-xs">
                       Lore Mastery
@@ -172,7 +182,7 @@ export default function CharacterCard({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <Users className="h-3 w-3 text-pink-500" />
                     <div className="text-muted-foreground text-xs">Empathy</div>
                     <div className="text-foreground text-sm font-semibold">
@@ -189,7 +199,7 @@ export default function CharacterCard({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <Shield className="h-3 w-3 text-green-500" />
                     <div className="text-muted-foreground text-xs">
                       Resilience
@@ -208,7 +218,7 @@ export default function CharacterCard({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <Lightbulb className="h-3 w-3 text-orange-500" />
                     <div className="text-muted-foreground text-xs">
                       Creativity
@@ -227,7 +237,7 @@ export default function CharacterCard({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <Crown className="h-3 w-3 text-purple-500" />
                     <div className="text-muted-foreground text-xs">
                       Influence
@@ -246,7 +256,7 @@ export default function CharacterCard({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="cursor-help flex items-center gap-1">
+                  <div className="flex cursor-help items-center gap-1">
                     <Eye className="h-3 w-3 text-indigo-500" />
                     <div className="text-muted-foreground text-xs">
                       Perception
