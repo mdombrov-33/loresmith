@@ -1,19 +1,15 @@
-import os
 import redis.asyncio as redis
+from config.settings import get_settings
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_DB = int(os.getenv("REDIS_DB", 0))
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
-REDIS_USERNAME = os.getenv("REDIS_USERNAME", "default")
-REDIS_SSL = os.getenv("REDIS_SSL", "false").lower() == "true"
+settings = get_settings()
+
+REDIS_HOST = settings.REDIS_HOST
+REDIS_PORT = settings.REDIS_PORT
+REDIS_DB = settings.REDIS_DB
 
 redis_client = redis.Redis(
     host=REDIS_HOST,
     port=REDIS_PORT,
     db=REDIS_DB,
-    password=REDIS_PASSWORD,
-    username=REDIS_USERNAME,
-    ssl=REDIS_SSL,
     decode_responses=True,  # returns strings instead of bytes
 )

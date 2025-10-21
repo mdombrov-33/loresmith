@@ -1,5 +1,4 @@
-import os
-from typing import Optional, cast
+from typing import cast
 from dotenv import load_dotenv
 from pydantic import SecretStr
 
@@ -13,41 +12,31 @@ from prometheus_client import Counter
 from langfuse import Langfuse
 from langfuse.langchain import CallbackHandler
 
-
+from config.settings import get_settings
 from utils.logger import logger
 
 load_dotenv()
+settings = get_settings()
 
-AI_PROVIDER = os.getenv("AI_PROVIDER", "local")  # "local" or "openrouter"
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-LOCAL_MODEL = os.getenv("LOCAL_MODEL", "llama3.1:8b")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
-LANGFUSE_ENABLED = os.getenv("LANGFUSE_ENABLED", "true").lower() == "true"
-LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY")
-LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY")
-LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "http://langfuse:3000")
 
-API_KEY: Optional[SecretStr] = (
-    SecretStr(OPENROUTER_API_KEY) if OPENROUTER_API_KEY else None
-)
+langfuse_client: Langfuse | None = None
+langfuse_handler: CallbackHandler | None = None
 
-langfuse_client: Optional[Langfuse] = None
-langfuse_handler: Optional[CallbackHandler] = None
-
-logger.info(f"AI Provider initialized: {AI_PROVIDER}")
-if AI_PROVIDER == "local":
-    logger.info(f"Using local Ollama model: {LOCAL_MODEL} at {OLLAMA_URL}")
+logger.info(f"AI Provider initialized: {settings.AI_PROVIDER}")
+if settings.AI_PROVIDER == "local":
+    logger.info(
+        f"Using local Ollama model: {settings.LOCAL_MODEL} at {settings.OLLAMA_URL}"
+    )
 else:
-    logger.info(f"Using OpenRouter API with model: {OPENROUTER_MODEL}")
+    logger.info(f"Using OpenRouter API with model: {settings.OPENROUTER_MODEL}")
 
 
-if LANGFUSE_ENABLED:
+if settings.LANGFUSE_ENABLED:
     try:
         langfuse_client = Langfuse(
-            public_key=LANGFUSE_PUBLIC_KEY,
-            secret_key=LANGFUSE_SECRET_KEY,
-            host=LANGFUSE_HOST,
+            public_key=settings.LANGFUSE_PUBLIC_KEY,
+            secret_key=settings.LANGFUSE_SECRET_KEY,
+            host=settings.LANGFUSE_HOST,
         )
 
         langfuse_handler = CallbackHandler()
@@ -75,7 +64,7 @@ ai_generation_failure_counter = Counter(
 def get_llm(
     max_tokens: int = 500,
     temperature: float = 0.8,
-    model: Optional[str] = None,
+    model: str | None = None,
 ) -> BaseChatModel:
     """
     Create a LangChain LLM instance based on AI_PROVIDER environment variable.
@@ -91,36 +80,36 @@ def get_llm(
     Raises:
         ValueError: If configuration is invalid or required env vars are missing
     """
-    provider = AI_PROVIDER.lower()
+    provider = settings.AI_PROVIDER.lower()
 
     callbacks: Callbacks = cast(
         Callbacks, [langfuse_handler] if langfuse_handler else []
     )
 
     if provider == "local":
-        model_name = model or LOCAL_MODEL
+        model_name = model or settings.LOCAL_MODEL
 
         logger.debug(
             f"Creating Ollama LLM: model={model_name}, "
-            f"base_url={OLLAMA_URL}, max_tokens={max_tokens}"
+            f"base_url={settings.OLLAMA_URL}, max_tokens={max_tokens}"
         )
 
         return ChatOllama(
             model=model_name,
-            base_url=OLLAMA_URL,
+            base_url=settings.OLLAMA_URL,
             num_predict=max_tokens,
             temperature=temperature,
             callbacks=callbacks,
         )
 
     elif provider == "openrouter":
-        if not OPENROUTER_API_KEY:
+        if not settings.OPENROUTER_API_KEY:
             raise ValueError(
                 "OPENROUTER_API_KEY environment variable is required when "
                 "AI_PROVIDER is set to 'openrouter'"
             )
 
-        model_name = model or OPENROUTER_MODEL
+        model_name = model or settings.OPENROUTER_MODEL
 
         logger.debug(
             f"Creating OpenRouter LLM: model={model_name}, "
@@ -130,7 +119,7 @@ def get_llm(
         return ChatOpenAI(
             model=model_name,
             max_completion_tokens=max_tokens,
-            api_key=API_KEY,
+            api_key=SecretStr(settings.OPENROUTER_API_KEY),
             base_url="https://openrouter.ai/api/v1",
             temperature=temperature,
             max_retries=3,
@@ -151,10 +140,10 @@ def get_model_name() -> str:
     Returns:
         Model identifier string (e.g., "llama3.1:8b" or "openai/gpt-4o-mini")
     """
-    if AI_PROVIDER.lower() == "ollama":
-        return LOCAL_MODEL
+    if settings.AI_PROVIDER.lower() == "ollama":
+        return settings.LOCAL_MODEL
     else:
-        return OPENROUTER_MODEL
+        return settings.OPENROUTER_MODEL
 
 
 def increment_success_counter():
