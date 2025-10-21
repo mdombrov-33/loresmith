@@ -61,6 +61,11 @@ export function LoginModal({
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   const handleGoogleAuth = async () => {
     try {
       await signIn("google", { callbackUrl: "/" });
@@ -81,7 +86,7 @@ export function LoginModal({
               </DialogTitle>
             </DialogHeader>
 
-            <div className="mt-8 space-y-6">
+            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div className="space-y-2">
                 <Label
                   htmlFor="username"
@@ -91,6 +96,7 @@ export function LoginModal({
                 </Label>
                 <Input
                   id="username"
+                  name="username"
                   placeholder="Enter your username"
                   value={formData.username}
                   onChange={(e) =>
@@ -100,6 +106,7 @@ export function LoginModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="username"
                 />
               </div>
               <div className="space-y-2">
@@ -111,6 +118,7 @@ export function LoginModal({
                 </Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Enter your password"
                   value={formData.password}
@@ -129,8 +137,8 @@ export function LoginModal({
                   <div className="text-destructive mb-4 text-sm">{error}</div>
                 )}
                 <Button
+                  type="submit"
                   className="h-11 w-full text-base font-medium"
-                  onClick={handleLogin}
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
@@ -161,7 +169,7 @@ export function LoginModal({
                   Continue with Google
                 </Button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </DialogContent>

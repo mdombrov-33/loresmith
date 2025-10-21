@@ -89,6 +89,11 @@ export function RegisterModal({
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleRegister();
+  };
+
   const handleGoogleAuth = async () => {
     try {
       const result = await signIn("google", { callbackUrl: "/" });
@@ -110,7 +115,7 @@ export function RegisterModal({
               </DialogTitle>
             </DialogHeader>
 
-            <div className="mt-8 space-y-6">
+            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div className="space-y-2">
                 <Label
                   htmlFor="reg-username"
@@ -120,6 +125,7 @@ export function RegisterModal({
                 </Label>
                 <Input
                   id="reg-username"
+                  name="username"
                   placeholder="Choose a username"
                   value={formData.username}
                   onChange={(e) =>
@@ -129,6 +135,7 @@ export function RegisterModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="username"
                 />
               </div>
               <div className="space-y-2">
@@ -140,6 +147,7 @@ export function RegisterModal({
                 </Label>
                 <Input
                   id="reg-email"
+                  name="email"
                   type="email"
                   placeholder="Enter your email"
                   value={formData.email}
@@ -150,6 +158,7 @@ export function RegisterModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="email"
                 />
               </div>
               <div className="space-y-2">
@@ -161,6 +170,7 @@ export function RegisterModal({
                 </Label>
                 <Input
                   id="reg-password"
+                  name="password"
                   type="password"
                   placeholder="Create a password"
                   value={formData.password}
@@ -183,6 +193,7 @@ export function RegisterModal({
                 </Label>
                 <Input
                   id="reg-confirm-password"
+                  name="confirmPassword"
                   type="password"
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
@@ -193,6 +204,7 @@ export function RegisterModal({
                     }))
                   }
                   className="h-11 px-3"
+                  autoComplete="new-password"
                 />
               </div>
               <div className="pt-2">
@@ -200,8 +212,8 @@ export function RegisterModal({
                   <div className="text-destructive mb-4 text-sm">{error}</div>
                 )}
                 <Button
+                  type="submit"
                   className="h-11 w-full text-base font-medium"
-                  onClick={handleRegister}
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
@@ -232,7 +244,7 @@ export function RegisterModal({
                   Continue with Google
                 </Button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </DialogContent>
