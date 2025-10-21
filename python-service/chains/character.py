@@ -136,6 +136,12 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Parse Stats
         health = 100
         stress = 0
+        lore_mastery = 10
+        empathy = 10
+        resilience = 10
+        creativity = 10
+        influence = 10
+        perception = 10
 
         health_match = re.search(r"health[:\s]*(\d+)", stats, re.IGNORECASE)
         if health_match:
@@ -152,6 +158,54 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 stress = max(0, min(50, stress))
             except Exception as e:
                 logger.warning(f"Failed to parse stress: {e}")
+
+        lore_mastery_match = re.search(r"lore_mastery[:\s]*(\d+)", stats, re.IGNORECASE)
+        if lore_mastery_match:
+            try:
+                lore_mastery = int(lore_mastery_match.group(1))
+                lore_mastery = max(8, min(18, lore_mastery))
+            except Exception as e:
+                logger.warning(f"Failed to parse lore_mastery: {e}")
+
+        empathy_match = re.search(r"empathy[:\s]*(\d+)", stats, re.IGNORECASE)
+        if empathy_match:
+            try:
+                empathy = int(empathy_match.group(1))
+                empathy = max(8, min(18, empathy))
+            except Exception as e:
+                logger.warning(f"Failed to parse empathy: {e}")
+
+        resilience_match = re.search(r"resilience[:\s]*(\d+)", stats, re.IGNORECASE)
+        if resilience_match:
+            try:
+                resilience = int(resilience_match.group(1))
+                resilience = max(8, min(18, resilience))
+            except Exception as e:
+                logger.warning(f"Failed to parse resilience: {e}")
+
+        creativity_match = re.search(r"creativity[:\s]*(\d+)", stats, re.IGNORECASE)
+        if creativity_match:
+            try:
+                creativity = int(creativity_match.group(1))
+                creativity = max(8, min(18, creativity))
+            except Exception as e:
+                logger.warning(f"Failed to parse creativity: {e}")
+
+        influence_match = re.search(r"influence[:\s]*(\d+)", stats, re.IGNORECASE)
+        if influence_match:
+            try:
+                influence = int(influence_match.group(1))
+                influence = max(8, min(18, influence))
+            except Exception as e:
+                logger.warning(f"Failed to parse influence: {e}")
+
+        perception_match = re.search(r"perception[:\s]*(\d+)", stats, re.IGNORECASE)
+        if perception_match:
+            try:
+                perception = int(perception_match.group(1))
+                perception = max(8, min(18, perception))
+            except Exception as e:
+                logger.warning(f"Failed to parse perception: {e}")
 
         # Increment Success Counter
         # All 6 steps completed successfully, track metrics
@@ -172,6 +226,12 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "appearance": appearance,
         "health": str(health),
         "stress": str(stress),
+        "lore_mastery": str(lore_mastery),
+        "empathy": str(empathy),
+        "resilience": str(resilience),
+        "creativity": str(creativity),
+        "influence": str(influence),
+        "perception": str(perception),
         "skills": skills,
     }
 
