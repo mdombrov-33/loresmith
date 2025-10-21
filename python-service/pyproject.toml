@@ -19,7 +19,7 @@ dependencies = [
     "langchain-openai (>=0.3.35,<0.4.0)",
     "langchain-ollama (>=0.3.10,<0.4.0)",
     "langfuse (>=3.6.2,<4.0.0)",
-    "langchain-community (>=0.3.31,<0.4.0)"
+    "langchain-community (>=0.3.31,<0.4.0)",
 ]
 
 [tool.poetry.dependencies]
@@ -29,6 +29,7 @@ python = "^3.12"
 pytest = "^8.4.2"
 black = "^25.9.0"
 ruff = "^0.13.1"
+isort = ">=7.0.0,<8.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
