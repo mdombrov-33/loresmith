@@ -30,6 +30,14 @@ export interface RegisterResponse {
   };
 }
 
+export interface SelectedLorePieces {
+  character?: LorePiece;
+  faction?: LorePiece;
+  setting?: LorePiece;
+  event?: LorePiece;
+  relic?: LorePiece;
+}
+
 export interface FullStory {
   title?: string;
   content?: string;
@@ -38,5 +46,5 @@ export interface FullStory {
     title?: string;
     description?: string;
   };
-  pieces?: Partial<Record<string, LorePiece | undefined>>;
+  pieces?: SelectedLorePieces;
 }

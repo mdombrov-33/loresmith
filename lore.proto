@@ -95,7 +95,7 @@ message SelectedLorePieces {
 message FullStory {
   string content = 1;
   string theme = 2;
-  map<string, LorePiece> pieces = 3;
+  SelectedLorePieces pieces = 3;
   map<string, string> quest = 4;
 }
 

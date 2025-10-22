@@ -182,6 +182,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return lore_pb2.AllResponse()  # type: ignore
 
     async def GenerateFullStory(self, request, context):
+        logger.info(f"DEBUG: Received pieces: {request.pieces}")
         try:
             selected_pieces = SelectedLorePieces(
                 character=convert_lore_piece(request.pieces.character)
@@ -204,35 +205,12 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
 
             full_story = await generate_full_story_orchestrator(selected_pieces, theme)
 
-            # Build a dict for the protobuf map field but only include
-            # entries that are present (not None). Protobuf map fields
-            # don't accept None values for message entries.
-            pieces_dict = {}
-            if full_story.pieces.character:
-                pieces_dict["character"] = convert_to_grpc_lore_piece(
-                    full_story.pieces.character
-                )
-            if full_story.pieces.faction:
-                pieces_dict["faction"] = convert_to_grpc_lore_piece(
-                    full_story.pieces.faction
-                )
-            if full_story.pieces.setting:
-                pieces_dict["setting"] = convert_to_grpc_lore_piece(
-                    full_story.pieces.setting
-                )
-            if full_story.pieces.event:
-                pieces_dict["event"] = convert_to_grpc_lore_piece(
-                    full_story.pieces.event
-                )
-            if full_story.pieces.relic:
-                pieces_dict["relic"] = convert_to_grpc_lore_piece(
-                    full_story.pieces.relic
-                )
-
             grpc_story = lore_pb2.FullStory(  # type: ignore
                 content=full_story.content,
                 theme=full_story.theme.value,
-                pieces=pieces_dict,
+                pieces=convert_selected_lore_pieces_to_grpc(
+                    full_story.pieces
+                ),  # <-- Changed from pieces=pieces_dict
                 quest=full_story.quest,
             )
             return lore_pb2.FullStoryResponse(story=grpc_story)  # type: ignore
@@ -258,6 +236,26 @@ def convert_to_grpc_lore_piece(piece):
         description=piece.description,
         details=piece.details,
         type=piece.type,
+    )
+
+
+def convert_selected_lore_pieces_to_grpc(selected_pieces):
+    return lore_pb2.SelectedLorePieces(
+        character=convert_to_grpc_lore_piece(selected_pieces.character)
+        if selected_pieces.character
+        else None,
+        faction=convert_to_grpc_lore_piece(selected_pieces.faction)
+        if selected_pieces.faction
+        else None,
+        setting=convert_to_grpc_lore_piece(selected_pieces.setting)
+        if selected_pieces.setting
+        else None,
+        event=convert_to_grpc_lore_piece(selected_pieces.event)
+        if selected_pieces.event
+        else None,
+        relic=convert_to_grpc_lore_piece(selected_pieces.relic)
+        if selected_pieces.relic
+        else None,
     )
 
 

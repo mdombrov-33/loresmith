@@ -64,17 +64,25 @@ func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb
 		return 0, err
 	}
 
-	for pieceType, piece := range story.Pieces {
-		if piece == nil {
-			continue
-		}
-		detailsJSON, _ := json.Marshal(piece.Details)
-		_, err = tx.Exec(`
-            INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
-            VALUES ($1, $2, $3, $4, $5, NOW())
-        `, worldID, pieceType, piece.Name, piece.Description, string(detailsJSON))
-		if err != nil {
-			return 0, err
+	for _, piece := range []struct {
+		pieceType string
+		piece     *lorepb.LorePiece
+	}{
+		{"character", story.Pieces.Character},
+		{"faction", story.Pieces.Faction},
+		{"setting", story.Pieces.Setting},
+		{"event", story.Pieces.Event},
+		{"relic", story.Pieces.Relic},
+	} {
+		if piece.piece != nil {
+			detailsJSON, _ := json.Marshal(piece.piece.Details)
+			_, err = tx.Exec(`
+                INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
+                VALUES ($1, $2, $3, $4, $5, NOW())
+            `, worldID, piece.pieceType, piece.piece.Name, piece.piece.Description, string(detailsJSON))
+			if err != nil {
+				return 0, err
+			}
 		}
 	}
 

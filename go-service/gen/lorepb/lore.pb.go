@@ -825,7 +825,7 @@ type FullStory struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
 	Theme         string                 `protobuf:"bytes,2,opt,name=theme,proto3" json:"theme,omitempty"`
-	Pieces        map[string]*LorePiece  `protobuf:"bytes,3,rep,name=pieces,proto3" json:"pieces,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Pieces        *SelectedLorePieces    `protobuf:"bytes,3,opt,name=pieces,proto3" json:"pieces,omitempty"`
 	Quest         map[string]string      `protobuf:"bytes,4,rep,name=quest,proto3" json:"quest,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -875,7 +875,7 @@ func (x *FullStory) GetTheme() string {
 	return ""
 }
 
-func (x *FullStory) GetPieces() map[string]*LorePiece {
+func (x *FullStory) GetPieces() *SelectedLorePieces {
 	if x != nil {
 		return x.Pieces
 	}
@@ -1061,15 +1061,12 @@ const file_lore_proto_rawDesc = "" +
 	"\afaction\x18\x02 \x01(\v2\x0f.lore.LorePieceR\afaction\x12)\n" +
 	"\asetting\x18\x03 \x01(\v2\x0f.lore.LorePieceR\asetting\x12%\n" +
 	"\x05event\x18\x04 \x01(\v2\x0f.lore.LorePieceR\x05event\x12%\n" +
-	"\x05relic\x18\x05 \x01(\v2\x0f.lore.LorePieceR\x05relic\"\xa8\x02\n" +
+	"\x05relic\x18\x05 \x01(\v2\x0f.lore.LorePieceR\x05relic\"\xd9\x01\n" +
 	"\tFullStory\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x14\n" +
-	"\x05theme\x18\x02 \x01(\tR\x05theme\x123\n" +
-	"\x06pieces\x18\x03 \x03(\v2\x1b.lore.FullStory.PiecesEntryR\x06pieces\x120\n" +
-	"\x05quest\x18\x04 \x03(\v2\x1a.lore.FullStory.QuestEntryR\x05quest\x1aJ\n" +
-	"\vPiecesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12%\n" +
-	"\x05value\x18\x02 \x01(\v2\x0f.lore.LorePieceR\x05value:\x028\x01\x1a8\n" +
+	"\x05theme\x18\x02 \x01(\tR\x05theme\x120\n" +
+	"\x06pieces\x18\x03 \x01(\v2\x18.lore.SelectedLorePiecesR\x06pieces\x120\n" +
+	"\x05quest\x18\x04 \x03(\v2\x1a.lore.FullStory.QuestEntryR\x05quest\x1a8\n" +
 	"\n" +
 	"QuestEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -1101,7 +1098,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
@@ -1121,8 +1118,7 @@ var file_lore_proto_goTypes = []any{
 	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
 	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
 	nil,                        // 17: lore.LorePiece.DetailsEntry
-	nil,                        // 18: lore.FullStory.PiecesEntry
-	nil,                        // 19: lore.FullStory.QuestEntry
+	nil,                        // 18: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
 	17, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
@@ -1141,30 +1137,29 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 13: lore.SelectedLorePieces.setting:type_name -> lore.LorePiece
 	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
-	18, // 16: lore.FullStory.pieces:type_name -> lore.FullStory.PiecesEntry
-	19, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
+	18, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	5,  // 20: lore.FullStory.PiecesEntry.value:type_name -> lore.LorePiece
-	0,  // 21: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 22: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 23: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 24: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 25: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	11, // 26: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
-	15, // 27: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	6,  // 28: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 29: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 30: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 31: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 32: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 33: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 34: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	28, // [28:35] is the sub-list for method output_type
-	21, // [21:28] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	0,  // 20: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 21: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 22: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 23: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 24: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	11, // 25: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	15, // 26: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	6,  // 27: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 28: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 29: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 30: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 31: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 32: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 33: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	27, // [27:34] is the sub-list for method output_type
+	20, // [20:27] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
@@ -1178,7 +1173,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

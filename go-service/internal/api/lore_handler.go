@@ -393,6 +393,8 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 		Theme:  theme,
 	}
 
+	log.Printf("DEBUG: FullStoryRequest pieces: %+v", grpcReq.Pieces)
+
 	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
@@ -401,11 +403,11 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 	}
 
 	pieces := map[string]any{
-		"characters": grpcResp.Story.Pieces["character"],
-		"factions":   grpcResp.Story.Pieces["faction"],
-		"settings":   grpcResp.Story.Pieces["setting"],
-		"events":     grpcResp.Story.Pieces["event"],
-		"relics":     grpcResp.Story.Pieces["relic"],
+		"characters": grpcResp.Story.Pieces.Character,
+		"factions":   grpcResp.Story.Pieces.Faction,
+		"settings":   grpcResp.Story.Pieces.Setting,
+		"events":     grpcResp.Story.Pieces.Event,
+		"relics":     grpcResp.Story.Pieces.Relic,
 	}
 	response := map[string]any{
 		"content": grpcResp.Story.Content,
