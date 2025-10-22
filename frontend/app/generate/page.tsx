@@ -14,7 +14,7 @@ import SettingCard from "@/components/generate/SettingCard";
 import EventCard from "@/components/generate/EventCard";
 import RelicCard from "@/components/generate/RelicCard";
 import ActionButtons from "@/components/generate/ActionButtons";
-import { generateLore } from "@/lib/api";
+import { generateLore, generateDraft } from "@/lib/api";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
 export default function GeneratePage() {
@@ -82,7 +82,7 @@ export default function GeneratePage() {
     await generateCurrentStage(true);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (selectedIndex === null) return;
 
     //* Save the selected lore piece
@@ -95,8 +95,22 @@ export default function GeneratePage() {
     const nextStage = getNextStage(stage);
     if (nextStage) {
       if (nextStage === "full-story") {
-        //* Navigate to full story page with all selected lore
-        window.location.href = `/story?theme=${theme}`;
+        //* Generate draft world and navigate to story page
+        setIsLoading(true);
+        try {
+          const selectedLore = useAppStore.getState().selectedLore;
+          const response = await generateDraft(selectedLore, theme);
+          window.location.href = `/story?id=${response.world_id}`;
+        } catch (err) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to generate draft world",
+          );
+          console.error("Draft generation error:", err);
+        } finally {
+          setIsLoading(false);
+        }
       } else {
         setStage(nextStage);
         setHasRegenerated(false);

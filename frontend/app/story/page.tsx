@@ -16,13 +16,14 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { generateFullStory } from "@/lib/api";
+import { generateFullStory, getWorld } from "@/lib/api";
 import { FullStoryResponse } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
 export default function StoryPage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
+  const worldId = searchParams.get("id");
 
   const { setAppStage, selectedLore, isHydrated } = useAppStore();
 
@@ -40,12 +41,18 @@ export default function StoryPage() {
 
     const loadStory = async () => {
       try {
-        if (!selectedLore || Object.keys(selectedLore).length === 0) {
-          throw new Error("No selection found. Please create a new story.");
+        if (worldId) {
+          //* Fetch saved world by ID
+          const response = await getWorld(parseInt(worldId));
+          setStoryData(response);
+        } else {
+          //* Fallback: Generate new story (for testing)
+          if (!selectedLore || Object.keys(selectedLore).length === 0) {
+            throw new Error("No selection found. Please create a new story.");
+          }
+          const response = await generateFullStory(selectedLore, theme);
+          setStoryData(response);
         }
-
-        const response = await generateFullStory(selectedLore, theme);
-        setStoryData(response);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to generate story",
@@ -56,7 +63,7 @@ export default function StoryPage() {
     };
 
     loadStory();
-  }, [theme, selectedLore, isHydrated]);
+  }, [theme, selectedLore, isHydrated, worldId]);
 
   if (loading) {
     return (

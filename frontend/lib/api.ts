@@ -82,6 +82,67 @@ export async function generateFullStory(
   }
 }
 
+export async function generateDraft(
+  selectedLore: SelectedLore,
+  theme?: string,
+): Promise<{ world_id: number }> {
+  const storeTheme = useAppStore.getState().theme;
+  const finalTheme = theme || storeTheme;
+  const url = `http://localhost:8080/worlds/draft`;
+
+  const requestBody = {
+    pieces: Object.fromEntries(
+      Object.entries(selectedLore).filter(([, value]) => value !== undefined),
+    ),
+    theme: finalTheme,
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to generate draft: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Request timed out after 60 seconds. Please try again.");
+    }
+    throw error;
+  }
+}
+
+export async function getWorld(worldId: number): Promise<FullStoryResponse> {
+  const url = `http://localhost:8080/worlds/${worldId}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch world: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  const fullStory = JSON.parse(data.world.full_story);
+  return fullStory;
+}
+
 export async function registerUser(
   request: RegisterRequest,
 ): Promise<RegisterResponse> {

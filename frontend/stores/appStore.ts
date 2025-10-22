@@ -72,6 +72,7 @@ export const useAppStore = create<AppState>((set) => ({
 
 //* Manual persistence
 useAppStore.subscribe((state) => {
+  if (typeof window === "undefined") return; //* Skip on server
   const partial = {
     theme: state.theme,
     user: state.user,
