@@ -2,7 +2,7 @@ import { LorePiece, SelectedLore } from "@/types/generate-world";
 import { useAppStore } from "@/stores/appStore";
 import { getSession } from "next-auth/react";
 import {
-  FullStoryResponse,
+  FullStory,
   RegisterRequest,
   RegisterResponse,
   LoginRequest,
@@ -45,7 +45,7 @@ export async function generateLore(
 export async function generateFullStory(
   selectedLore: SelectedLore,
   theme?: string,
-): Promise<FullStoryResponse> {
+): Promise<FullStory> {
   const storeTheme = useAppStore.getState().theme;
   const finalTheme = theme || storeTheme;
   const url = `http://localhost:8080/generate/full-story?theme=${finalTheme}`;
@@ -73,7 +73,9 @@ export async function generateFullStory(
 
     const data = await response.json();
 
-    return data;
+    // Normalize: backend may return either { story: FullStory } or
+    // the FullStory object directly. Return the FullStory object.
+    return data && data.story ? data.story : data;
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new Error("Request timed out after 60 seconds. Please try again.");
@@ -88,6 +90,10 @@ export async function generateDraft(
 ): Promise<{ world_id: number }> {
   const storeTheme = useAppStore.getState().theme;
   const finalTheme = theme || storeTheme;
+  const user = useAppStore.getState().user;
+  if (!user) {
+    throw new Error("User must be logged in to generate a draft world.");
+  }
   const url = `http://localhost:8080/worlds/draft`;
 
   const requestBody = {
@@ -95,6 +101,7 @@ export async function generateDraft(
       Object.entries(selectedLore).filter(([, value]) => value !== undefined),
     ),
     theme: finalTheme,
+    user_id: user.id,
   };
 
   try {
@@ -125,7 +132,7 @@ export async function generateDraft(
   }
 }
 
-export async function getWorld(worldId: number): Promise<FullStoryResponse> {
+export async function getWorld(worldId: number): Promise<FullStory> {
   const url = `http://localhost:8080/worlds/${worldId}`;
 
   const response = await fetch(url, {
@@ -139,7 +146,7 @@ export async function getWorld(worldId: number): Promise<FullStoryResponse> {
 
   const data = await response.json();
 
-  const fullStory = JSON.parse(data.world.full_story);
+  const fullStory = JSON.parse(data.world.full_story) as FullStory;
   return fullStory;
 }
 

@@ -30,20 +30,13 @@ export interface RegisterResponse {
   };
 }
 
-export interface FullStoryResponse {
-  story: {
-    title: string;
-    content: string;
-    quest: {
-      title: string;
-      description: string;
-    };
-    pieces: {
-      characters: LorePiece;
-      factions: LorePiece;
-      settings: LorePiece;
-      events: LorePiece;
-      relics: LorePiece;
-    };
+export interface FullStory {
+  title?: string;
+  content?: string;
+  theme?: string;
+  quest?: {
+    title?: string;
+    description?: string;
   };
+  pieces?: Partial<Record<string, LorePiece | undefined>>;
 }

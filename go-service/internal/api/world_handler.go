@@ -33,9 +33,9 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	}
 
 	var req struct {
-		Pieces lorepb.SelectedLorePieces `json:"pieces"`
-		Theme  string                    `json:"theme"`
-		UserID int                       `json:"user_id"`
+		Pieces map[string]*lorepb.LorePiece `json:"pieces"`
+		Theme  string                       `json:"theme"`
+		UserID int                          `json:"user_id"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
@@ -43,8 +43,14 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	}
 
 	grpcReq := &lorepb.FullStoryRequest{
-		Pieces: &req.Pieces,
-		Theme:  req.Theme,
+		Pieces: &lorepb.SelectedLorePieces{
+			Character: req.Pieces["character"],
+			Faction:   req.Pieces["faction"],
+			Setting:   req.Pieces["setting"],
+			Event:     req.Pieces["event"],
+			Relic:     req.Pieces["relic"],
+		},
+		Theme: req.Theme,
 	}
 	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
 	if err != nil {

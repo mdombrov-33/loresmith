@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 
 class FullStory(BaseModel):
-    title: str
     content: str
     theme: Theme
     pieces: SelectedLorePieces

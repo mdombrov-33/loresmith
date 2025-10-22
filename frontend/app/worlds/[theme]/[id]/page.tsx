@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -16,18 +16,31 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { generateFullStory, getWorld } from "@/lib/api";
-import { FullStoryResponse } from "@/types/api";
+import { getWorld } from "@/lib/api";
+import { FullStory } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
-export default function StoryPage() {
-  const searchParams = useSearchParams();
-  const theme = searchParams.get("theme") || "fantasy";
-  const worldId = searchParams.get("id");
+export default function WorldPage() {
+  const params = useParams();
+  const router = useRouter();
+  const themeParamRaw = params?.theme;
+  const idParamRaw = params?.id;
+  const themeParam = Array.isArray(themeParamRaw)
+    ? themeParamRaw[0]
+    : themeParamRaw || "fantasy";
+  const idParam = Array.isArray(idParamRaw) ? idParamRaw[0] : idParamRaw;
 
-  const { setAppStage, selectedLore, isHydrated } = useAppStore();
+  const { setAppStage, setTheme, isHydrated, selectedLore } = useAppStore();
 
-  const [storyData, setStoryData] = useState<FullStoryResponse | null>(null);
+  const displayNames: Record<string, string> = {
+    characters: "Character",
+    factions: "Faction",
+    settings: "Setting",
+    events: "Event",
+    relics: "Relic",
+  };
+
+  const [storyData, setStoryData] = useState<FullStory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,76 +52,81 @@ export default function StoryPage() {
   useEffect(() => {
     if (!isHydrated) return;
 
-    const loadStory = async () => {
+    const load = async () => {
+      if (!idParam) {
+        router.replace("/");
+        return;
+      }
+
+      const worldId = Number(idParam);
+      if (isNaN(worldId)) {
+        router.replace("/");
+        return;
+      }
+
+      if (typeof themeParam === "string") setTheme(themeParam);
+
       try {
-        if (worldId) {
-          //* Fetch saved world by ID
-          const response = await getWorld(parseInt(worldId));
-          setStoryData(response);
-        } else {
-          //* Fallback: Generate new story (for testing)
-          if (!selectedLore || Object.keys(selectedLore).length === 0) {
-            throw new Error("No selection found. Please create a new story.");
-          }
-          const response = await generateFullStory(selectedLore, theme);
-          setStoryData(response);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to generate story",
-        );
+        const world = await getWorld(worldId);
+        setStoryData(world);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to load world");
       } finally {
         setLoading(false);
       }
     };
 
-    loadStory();
-  }, [theme, selectedLore, isHydrated, worldId]);
+    load();
+  }, [idParam, themeParam, isHydrated, router, setTheme]);
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col items-center justify-center py-24">
-          <div className="bg-primary/10 border-primary mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2">
-            <Loader2 className="text-primary h-10 w-10 animate-spin" />
-          </div>
-          <h2 className="mb-2 text-2xl font-bold">
-            AI is creating your world...
-          </h2>
-          <p className="text-muted-foreground max-w-md text-center">
-            Weaving together your selections into an epic narrative.
-          </p>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
+          <p className="text-muted-foreground">Loading your world...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !storyData) {
+  if (error) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <Card className="border-destructive mx-auto max-w-2xl">
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-destructive">Error</CardTitle>
-            <CardContent className="pt-0">
-              <p>{error || "Failed to load story"}</p>
-              <div className="mt-4 flex gap-4">
-                <Button variant="outline" asChild>
-                  <Link href="/">Return Home</Link>
-                </Button>
-                <Button asChild>
-                  <Link href={`/generate?theme=${theme}`}>
-                    Create New Story
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
           </CardHeader>
+          <CardContent>
+            <p className="mb-4">{error}</p>
+            <Button asChild>
+              <Link href="/">Return Home</Link>
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
   }
 
-  const { story } = storyData;
+  if (!storyData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>World Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">The requested world could not be found.</p>
+            <Button asChild>
+              <Link href="/">Return Home</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const paragraphs = (storyData.content ?? "").split("\n\n").filter(Boolean);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -119,7 +137,7 @@ export default function StoryPage() {
             <Compass className="text-primary h-10 w-10" />
           </div>
         </div>
-        <h1 className="mb-4 text-5xl font-bold">{story.quest.title}</h1>
+        <h1 className="mb-4 text-5xl font-bold">{storyData.quest?.title}</h1>
       </div>
 
       {/* Quest Description */}
@@ -129,7 +147,7 @@ export default function StoryPage() {
             <BookOpen className="text-primary mt-1 h-6 w-6 flex-shrink-0" />
             <div className="flex-1">
               <CardContent className="p-0 text-base">
-                {story.quest.description}
+                {storyData.quest?.description}
               </CardContent>
             </div>
           </div>
@@ -148,11 +166,17 @@ export default function StoryPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 text-base leading-relaxed">
-              {story.content.split("\n\n").map((paragraph, index) => (
-                <p key={index} className="text-foreground">
-                  {paragraph}
+              {paragraphs.length > 0 ? (
+                paragraphs.map((paragraph: string, index: number) => (
+                  <p key={index} className="text-foreground">
+                    {paragraph}
+                  </p>
+                ))
+              ) : (
+                <p className="text-muted-foreground">
+                  No story content available.
                 </p>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -171,7 +195,8 @@ export default function StoryPage() {
                 <Card key={key} className="p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <Badge variant="outline">
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                      {displayNames[key] ||
+                        key.charAt(0).toUpperCase() + key.slice(1)}
                     </Badge>
                     <span className="font-bold">{piece.name}</span>
                   </div>
@@ -193,7 +218,7 @@ export default function StoryPage() {
 
           <div className="flex justify-center gap-4">
             <Button variant="outline" size="lg" className="gap-2" asChild>
-              <Link href={`/generate?theme=${theme}`}>
+              <Link href={`/generate?theme=${themeParam}`}>
                 <Wand2 className="h-4 w-4" />
                 Create New Story
               </Link>

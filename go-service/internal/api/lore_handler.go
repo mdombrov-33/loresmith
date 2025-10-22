@@ -401,14 +401,13 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 	}
 
 	pieces := map[string]any{
-		"characters": grpcResp.Story.Pieces.Character,
-		"factions":   grpcResp.Story.Pieces.Faction,
-		"settings":   grpcResp.Story.Pieces.Setting,
-		"events":     grpcResp.Story.Pieces.Event,
-		"relics":     grpcResp.Story.Pieces.Relic,
+		"characters": grpcResp.Story.Pieces["character"],
+		"factions":   grpcResp.Story.Pieces["faction"],
+		"settings":   grpcResp.Story.Pieces["setting"],
+		"events":     grpcResp.Story.Pieces["event"],
+		"relics":     grpcResp.Story.Pieces["relic"],
 	}
 	response := map[string]any{
-		"title":   grpcResp.Story.Title,
 		"content": grpcResp.Story.Content,
 		"theme":   grpcResp.Story.Theme,
 		"pieces":  pieces,

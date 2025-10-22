@@ -100,7 +100,10 @@ export default function GeneratePage() {
         try {
           const selectedLore = useAppStore.getState().selectedLore;
           const response = await generateDraft(selectedLore, theme);
-          window.location.href = `/story?id=${response.world_id}`;
+          // Redirect to the new world route which includes theme and id
+          window.location.href = `/worlds/${encodeURIComponent(
+            theme,
+          )}/${response.world_id}`;
         } catch (err) {
           setError(
             err instanceof Error

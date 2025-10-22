@@ -117,7 +117,6 @@ async def generate_full_story(
         logger.info("Successfully generated full story with quest")
 
         return FullStory(
-            title="Full Story",
             content=full_story_content,
             theme=theme,
             pieces=selected_pieces,

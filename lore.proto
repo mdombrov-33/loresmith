@@ -93,11 +93,10 @@ message SelectedLorePieces {
 }
 
 message FullStory {
-  string title = 1;
-  string content = 2;
-  string theme = 3;
-  SelectedLorePieces pieces = 4;
-  map<string, string> quest = 5;
+  string content = 1;
+  string theme = 2;
+  map<string, LorePiece> pieces = 3;
+  map<string, string> quest = 4;
 }
 
 message FullStoryRequest {

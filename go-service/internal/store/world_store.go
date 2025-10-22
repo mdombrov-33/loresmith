@@ -19,13 +19,13 @@ type World struct {
 }
 
 type LorePiece struct {
-	ID          int                    `json:"id"`
-	WorldID     int                    `json:"world_id"`
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description"`
-	Details     map[string]interface{} `json:"details"`
-	CreatedAt   time.Time              `json:"created_at"`
+	ID          int               `json:"id"`
+	WorldID     int               `json:"world_id"`
+	Type        string            `json:"type"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Details     map[string]string `json:"details"`
+	CreatedAt   time.Time         `json:"created_at"`
 }
 
 type WorldStore interface {
@@ -64,16 +64,15 @@ func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb
 		return 0, err
 	}
 
-	pieces := []*lorepb.LorePiece{story.Pieces.Character, story.Pieces.Faction, story.Pieces.Setting, story.Pieces.Event, story.Pieces.Relic}
-	for _, piecePtr := range pieces {
-		if piecePtr == nil {
+	for pieceType, piece := range story.Pieces {
+		if piece == nil {
 			continue
 		}
-		detailsJSON, _ := json.Marshal(piecePtr.Details)
+		detailsJSON, _ := json.Marshal(piece.Details)
 		_, err = tx.Exec(`
             INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
             VALUES ($1, $2, $3, $4, $5, NOW())
-        `, worldID, piecePtr.Type, piecePtr.Name, piecePtr.Description, string(detailsJSON))
+        `, worldID, pieceType, piece.Name, piece.Description, string(detailsJSON))
 		if err != nil {
 			return 0, err
 		}
