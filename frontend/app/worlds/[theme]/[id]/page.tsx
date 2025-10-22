@@ -18,7 +18,9 @@ import {
 import Link from "next/link";
 import { getWorld } from "@/lib/api";
 import { FullStory } from "@/types/api";
+import { useTheme } from "next-themes";
 import { useAppStore } from "@/stores/appStore";
+import { THEMES } from "@/constants/game-themes";
 
 export default function WorldPage() {
   const params = useParams();
@@ -30,7 +32,23 @@ export default function WorldPage() {
     : themeParamRaw || "fantasy";
   const idParam = Array.isArray(idParamRaw) ? idParamRaw[0] : idParamRaw;
 
-  const { setAppStage, setTheme, isHydrated, selectedLore } = useAppStore();
+  const urlToThemeMap: Record<string, string> = {
+    fantasy: THEMES.FANTASY,
+    norse: THEMES.NORSE,
+    cyberpunk: THEMES.CYBERPUNK,
+    "post-apoc": THEMES.POST_APOCALYPTIC,
+    steampunk: THEMES.STEAMPUNK,
+  };
+
+  const actualTheme = urlToThemeMap[themeParam] || themeParam;
+
+  const { setTheme: setNextTheme } = useTheme();
+  const {
+    setAppStage,
+    setTheme: setStoreTheme,
+    isHydrated,
+    selectedLore,
+  } = useAppStore();
 
   const displayNames: Record<string, string> = {
     characters: "Character",
@@ -64,12 +82,27 @@ export default function WorldPage() {
         return;
       }
 
-      if (typeof themeParam === "string") setTheme(themeParam);
+      if (typeof actualTheme === "string") {
+        setStoreTheme(actualTheme);
+        setNextTheme(actualTheme);
+      }
 
       try {
         const world = await getWorld(worldId);
+
+        if (world.theme && world.theme !== actualTheme) {
+          setStoreTheme(THEMES.FANTASY);
+          setNextTheme(THEMES.FANTASY);
+          setError(
+            `This world was created with the "${world.theme}" theme, not "${actualTheme}". Please use the correct theme in the URL.`,
+          );
+          return;
+        }
+
         setStoryData(world);
       } catch (e) {
+        setStoreTheme(THEMES.FANTASY);
+        setNextTheme(THEMES.FANTASY);
         setError(e instanceof Error ? e.message : "Failed to load world");
       } finally {
         setLoading(false);
@@ -77,7 +110,7 @@ export default function WorldPage() {
     };
 
     load();
-  }, [idParam, themeParam, isHydrated, router, setTheme]);
+  }, [idParam, actualTheme, isHydrated, router, setStoreTheme, setNextTheme]);
 
   if (loading) {
     return (
@@ -218,7 +251,7 @@ export default function WorldPage() {
 
           <div className="flex justify-center gap-4">
             <Button variant="outline" size="lg" className="gap-2" asChild>
-              <Link href={`/generate?theme=${themeParam}`}>
+              <Link href={`/generate?theme=${actualTheme}`}>
                 <Wand2 className="h-4 w-4" />
                 Create New Story
               </Link>
