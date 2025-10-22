@@ -69,11 +69,6 @@ class LoreServiceStub(object):
                 request_serializer=lore__pb2.FullStoryRequest.SerializeToString,
                 response_deserializer=lore__pb2.FullStoryResponse.FromString,
                 _registered_method=True)
-        self.GetWorld = channel.unary_unary(
-                '/lore.LoreService/GetWorld',
-                request_serializer=lore__pb2.GetWorldRequest.SerializeToString,
-                response_deserializer=lore__pb2.GetWorldResponse.FromString,
-                _registered_method=True)
 
 
 class LoreServiceServicer(object):
@@ -121,12 +116,6 @@ class LoreServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetWorld(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
 
 def add_LoreServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -164,11 +153,6 @@ def add_LoreServiceServicer_to_server(servicer, server):
                     servicer.GenerateFullStory,
                     request_deserializer=lore__pb2.FullStoryRequest.FromString,
                     response_serializer=lore__pb2.FullStoryResponse.SerializeToString,
-            ),
-            'GetWorld': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetWorld,
-                    request_deserializer=lore__pb2.GetWorldRequest.FromString,
-                    response_serializer=lore__pb2.GetWorldResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -360,33 +344,6 @@ class LoreService(object):
             '/lore.LoreService/GenerateFullStory',
             lore__pb2.FullStoryRequest.SerializeToString,
             lore__pb2.FullStoryResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetWorld(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/lore.LoreService/GetWorld',
-            lore__pb2.GetWorldRequest.SerializeToString,
-            lore__pb2.GetWorldResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -993,142 +993,6 @@ func (x *FullStoryResponse) GetStory() *FullStory {
 	return nil
 }
 
-type GetWorldRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorldId       int32                  `protobuf:"varint,1,opt,name=world_id,json=worldId,proto3" json:"world_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetWorldRequest) Reset() {
-	*x = GetWorldRequest{}
-	mi := &file_lore_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetWorldRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetWorldRequest) ProtoMessage() {}
-
-func (x *GetWorldRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetWorldRequest.ProtoReflect.Descriptor instead.
-func (*GetWorldRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *GetWorldRequest) GetWorldId() int32 {
-	if x != nil {
-		return x.WorldId
-	}
-	return 0
-}
-
-type GetWorldResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        int32                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Theme         string                 `protobuf:"bytes,4,opt,name=theme,proto3" json:"theme,omitempty"`
-	Story         *FullStory             `protobuf:"bytes,5,opt,name=story,proto3" json:"story,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetWorldResponse) Reset() {
-	*x = GetWorldResponse{}
-	mi := &file_lore_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetWorldResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetWorldResponse) ProtoMessage() {}
-
-func (x *GetWorldResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetWorldResponse.ProtoReflect.Descriptor instead.
-func (*GetWorldResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *GetWorldResponse) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *GetWorldResponse) GetUserId() int32 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *GetWorldResponse) GetStatus() string {
-	if x != nil {
-		return x.Status
-	}
-	return ""
-}
-
-func (x *GetWorldResponse) GetTheme() string {
-	if x != nil {
-		return x.Theme
-	}
-	return ""
-}
-
-func (x *GetWorldResponse) GetStory() *FullStory {
-	if x != nil {
-		return x.Story
-	}
-	return nil
-}
-
-func (x *GetWorldResponse) GetCreatedAt() string {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return ""
-}
-
-func (x *GetWorldResponse) GetUpdatedAt() string {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return ""
-}
-
 var File_lore_proto protoreflect.FileDescriptor
 
 const file_lore_proto_rawDesc = "" +
@@ -1220,19 +1084,7 @@ const file_lore_proto_rawDesc = "" +
 	"\x06pieces\x18\x01 \x01(\v2\x18.lore.SelectedLorePiecesR\x06pieces\x12\x14\n" +
 	"\x05theme\x18\x02 \x01(\tR\x05theme\":\n" +
 	"\x11FullStoryResponse\x12%\n" +
-	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story\",\n" +
-	"\x0fGetWorldRequest\x12\x19\n" +
-	"\bworld_id\x18\x01 \x01(\x05R\aworldId\"\xce\x01\n" +
-	"\x10GetWorldResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x05R\x06userId\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\tR\x06status\x12\x14\n" +
-	"\x05theme\x18\x04 \x01(\tR\x05theme\x12%\n" +
-	"\x05story\x18\x05 \x01(\v2\x0f.lore.FullStoryR\x05story\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt2\x8b\x04\n" +
+	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story2\xd0\x03\n" +
 	"\vLoreService\x12G\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
@@ -1240,8 +1092,7 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n" +
 	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x122\n" +
 	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
-	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x129\n" +
-	"\bGetWorld\x12\x15.lore.GetWorldRequest\x1a\x16.lore.GetWorldResponseB\fZ\n" +
+	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
 var (
@@ -1256,7 +1107,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
@@ -1275,13 +1126,11 @@ var file_lore_proto_goTypes = []any{
 	(*FullStory)(nil),          // 14: lore.FullStory
 	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
 	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
-	(*GetWorldRequest)(nil),    // 17: lore.GetWorldRequest
-	(*GetWorldResponse)(nil),   // 18: lore.GetWorldResponse
-	nil,                        // 19: lore.LorePiece.DetailsEntry
-	nil,                        // 20: lore.FullStory.QuestEntry
+	nil,                        // 17: lore.LorePiece.DetailsEntry
+	nil,                        // 18: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	19, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	17, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
@@ -1298,31 +1147,28 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
 	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	20, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	18, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	14, // 20: lore.GetWorldResponse.story:type_name -> lore.FullStory
-	0,  // 21: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 22: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 23: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 24: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 25: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	11, // 26: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
-	15, // 27: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	17, // 28: lore.LoreService.GetWorld:input_type -> lore.GetWorldRequest
-	6,  // 29: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 30: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 31: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 32: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 33: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 34: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 35: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	18, // 36: lore.LoreService.GetWorld:output_type -> lore.GetWorldResponse
-	29, // [29:37] is the sub-list for method output_type
-	21, // [21:29] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	0,  // 20: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 21: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 22: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 23: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 24: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	11, // 25: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	15, // 26: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	6,  // 27: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 28: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 29: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 30: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 31: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 32: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 33: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	27, // [27:34] is the sub-list for method output_type
+	20, // [20:27] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
@@ -1336,7 +1182,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
