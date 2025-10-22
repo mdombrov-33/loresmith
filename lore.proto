@@ -12,6 +12,7 @@ service LoreService {
   rpc GenerateRelics (RelicsRequest) returns (RelicsResponse);
   rpc GenerateAll (AllRequest) returns (AllResponse);
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
+  rpc GetWorld(GetWorldRequest) returns (GetWorldResponse);
 }
 
 message CharactersRequest {
@@ -107,4 +108,18 @@ message FullStoryRequest {
 
 message FullStoryResponse {
   FullStory story = 1;
+}
+
+message GetWorldRequest {
+  int32 world_id = 1;
+}
+
+message GetWorldResponse {
+  int32 id = 1;
+  int32 user_id = 2;
+  string status = 3;
+  string theme = 4;
+  FullStory story = 5;
+  string created_at = 6;
+  string updated_at = 7;
 }
