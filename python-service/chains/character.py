@@ -50,7 +50,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             appearance_prompt_text = f.read()
 
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
-        appearance_llm = get_llm(max_tokens=80)
+        appearance_llm = get_llm(max_tokens=150)
         appearance_chain = appearance_prompt | appearance_llm | StrOutputParser()
         appearance_raw = await appearance_chain.ainvoke(
             {
