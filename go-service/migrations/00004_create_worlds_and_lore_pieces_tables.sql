@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS worlds (
     id BIGSERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status VARCHAR(20) NOT NULL DEFAULT 'draft',
+    status VARCHAR(20) NOT NULL DEFAULT 'draft', -- "draft", "adventure"
     theme VARCHAR(100) NOT NULL,
     full_story TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
