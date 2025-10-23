@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
 import {
   GenerationStage,
@@ -20,6 +20,7 @@ import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
 export default function GeneratePage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const theme = searchParams.get("theme") || "fantasy";
   const { setAppStage, updateSelectedLore, setSelectedLore } = useAppStore();
 
@@ -126,9 +127,9 @@ export default function GeneratePage() {
           { selectedLore: useAppStore.getState().selectedLore, theme },
           {
             onSuccess: (response) => {
-              window.location.href = `/worlds/${encodeURIComponent(
-                theme,
-              )}/${response.world_id}`;
+              router.push(
+                `/worlds/${encodeURIComponent(theme)}/${response.world_id}`,
+              );
             },
             onError: (err) => {
               setError(
@@ -136,7 +137,6 @@ export default function GeneratePage() {
                   ? err.message
                   : "Failed to generate draft world",
               );
-              console.error("Draft generation error:", err);
             },
           },
         );
