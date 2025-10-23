@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useWorlds } from "@/lib/queries";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
@@ -30,6 +31,7 @@ const LORE_TYPE_OPTIONS = [
 
 export default function SearchPage() {
   const { setAppStage, setTheme } = useAppStore();
+  const { setTheme: setNextTheme } = useTheme();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
@@ -46,8 +48,9 @@ export default function SearchPage() {
     const themeFromQuery = searchParams.get("theme");
     if (themeFromQuery) {
       setTheme(themeFromQuery);
+      setNextTheme(themeFromQuery);
     }
-  }, [searchParams, setTheme]);
+  }, [searchParams, setTheme, setNextTheme]);
 
   useEffect(() => {
     if (urlTheme !== selectedTheme) {

@@ -9,7 +9,12 @@ import { useAppStore } from "@/stores/appStore";
 
 export function ThemeSwitcher() {
   const { setTheme: setNextTheme } = useTheme();
-  const { theme: storeTheme, setTheme: setStoreTheme } = useAppStore();
+  const {
+    theme: storeTheme,
+    setTheme: setStoreTheme,
+    setAudioTheme,
+    setUserChangedTheme,
+  } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,6 +28,8 @@ export function ThemeSwitcher() {
     if (storeTheme === newTheme) return;
 
     setStoreTheme(newTheme);
+    setAudioTheme(newTheme);
+    setUserChangedTheme(true);
     setNextTheme(newTheme);
 
     //* Update query param

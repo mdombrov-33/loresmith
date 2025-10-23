@@ -12,6 +12,8 @@ export type AppStage = "home" | "generating" | "story" | "adventure" | "search";
 interface AppState {
   //* Theme
   theme: string;
+  audioTheme: string;
+  userChangedTheme: boolean;
 
   //* Auth
   user: User | null;
@@ -32,6 +34,8 @@ interface AppState {
 
   //* Actions
   setTheme: (theme: string) => void;
+  setAudioTheme: (audioTheme: string) => void;
+  setUserChangedTheme: (changed: boolean) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
   setAppStage: (stage: AppStage) => void;
@@ -48,6 +52,8 @@ interface AppState {
 export const useAppStore = create<AppState>((set) => ({
   //* Initial state
   theme: "fantasy", //* Default theme
+  audioTheme: "fantasy", //* Default audio theme
+  userChangedTheme: false,
   user: null,
   token: null,
   appStage: "home",
@@ -58,6 +64,8 @@ export const useAppStore = create<AppState>((set) => ({
 
   //* Actions
   setTheme: (theme: string) => set({ theme }),
+  setAudioTheme: (audioTheme: string) => set({ audioTheme }),
+  setUserChangedTheme: (changed: boolean) => set({ userChangedTheme: changed }),
 
   login: (token: string, user: User) => set({ token, user }),
 
@@ -80,6 +88,7 @@ useAppStore.subscribe((state) => {
   if (typeof window === "undefined") return; //* Skip on server
   const partial = {
     theme: state.theme,
+    audioTheme: state.audioTheme,
     user: state.user,
     token: state.token,
     selectedLore: state.selectedLore,
