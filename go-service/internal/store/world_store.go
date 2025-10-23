@@ -10,14 +10,15 @@ import (
 )
 
 type World struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	UserName  *string   `json:"user_name,omitempty"`
-	Status    string    `json:"status"`
-	Theme     string    `json:"theme"`
-	FullStory string    `json:"full_story"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         int          `json:"id"`
+	UserID     int          `json:"user_id"`
+	UserName   *string      `json:"user_name,omitempty"`
+	Status     string       `json:"status"`
+	Theme      string       `json:"theme"`
+	FullStory  string       `json:"full_story"`
+	LorePieces []*LorePiece `json:"lore_pieces,omitempty"`
+	CreatedAt  time.Time    `json:"created_at"`
+	UpdatedAt  time.Time    `json:"updated_at"`
 }
 
 type LorePiece struct {
@@ -106,6 +107,34 @@ func (s *PostgresWorldStore) GetWorld(worldID int) (*World, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	rows, err := s.db.Query(`
+        SELECT id, world_id, type, name, description, details, created_at
+        FROM lore_pieces WHERE world_id = $1
+    `, worldID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var lorePieces []*LorePiece
+	for rows.Next() {
+		var piece LorePiece
+		var detailsJSON string
+		err := rows.Scan(&piece.ID, &piece.WorldID, &piece.Type, &piece.Name, &piece.Description, &detailsJSON, &piece.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		if detailsJSON != "" {
+			json.Unmarshal([]byte(detailsJSON), &piece.Details)
+		}
+		lorePieces = append(lorePieces, &piece)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	world.LorePieces = lorePieces
 	return &world, nil
 }
 
