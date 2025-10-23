@@ -315,6 +315,12 @@ export default function WorldPage() {
               </Link>
             </Button>
             <Button variant="outline" size="lg" className="gap-2" asChild>
+              <Link href="/search">
+                <Eye className="h-4 w-4" />
+                Check Other Worlds
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" className="gap-2" asChild>
               <Link href="/">
                 <Home className="h-4 w-4" />
                 Return Home
