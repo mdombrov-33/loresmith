@@ -20,6 +20,7 @@ import { useWorld } from "@/lib/queries";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/stores/appStore";
 import { THEMES } from "@/constants/game-themes";
+import { FullStory } from "@/types/api";
 
 export default function WorldPage() {
   const params = useParams();
@@ -42,12 +43,7 @@ export default function WorldPage() {
   const actualTheme = urlToThemeMap[themeParam] || themeParam;
 
   const { setTheme: setNextTheme } = useTheme();
-  const {
-    setAppStage,
-    setTheme: setStoreTheme,
-    isHydrated,
-    selectedLore,
-  } = useAppStore();
+  const { setAppStage, setTheme: setStoreTheme, isHydrated } = useAppStore();
 
   const displayNames: Record<string, string> = {
     characters: "Character",
@@ -59,6 +55,10 @@ export default function WorldPage() {
 
   const worldId = idParam ? Number(idParam) : NaN;
   const { data: storyData, isLoading, error } = useWorld(worldId);
+
+  const parsedStory: FullStory = storyData
+    ? JSON.parse(storyData.full_story)
+    : {};
 
   useEffect(() => {
     setAppStage("story");
@@ -125,7 +125,7 @@ export default function WorldPage() {
     );
   }
 
-  const paragraphs = (storyData.content ?? "").split("\n\n").filter(Boolean);
+  const paragraphs = (parsedStory.content ?? "").split("\n\n").filter(Boolean);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -136,7 +136,7 @@ export default function WorldPage() {
             <Compass className="text-primary h-10 w-10" />
           </div>
         </div>
-        <h1 className="mb-4 text-5xl font-bold">{storyData.quest?.title}</h1>
+        <h1 className="mb-4 text-5xl font-bold">{parsedStory.quest?.title}</h1>
       </div>
 
       {/* Quest Description */}
@@ -146,7 +146,7 @@ export default function WorldPage() {
             <BookOpen className="text-primary mt-1 h-6 w-6 flex-shrink-0" />
             <div className="flex-1">
               <CardContent className="p-0 text-base">
-                {storyData.quest?.description}
+                {parsedStory.quest?.description}
               </CardContent>
             </div>
           </div>
@@ -189,22 +189,20 @@ export default function WorldPage() {
             Your World
           </CardTitle>
           <div className="grid gap-4 md:grid-cols-2">
-            {Object.entries(selectedLore).map(([key, piece]) =>
-              piece ? (
-                <Card key={key} className="p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <Badge variant="outline">
-                      {displayNames[key] ||
-                        key.charAt(0).toUpperCase() + key.slice(1)}
-                    </Badge>
-                    <span className="font-bold">{piece.name}</span>
-                  </div>
-                  <div className="text-muted-foreground line-clamp-3 text-sm">
-                    {piece.description}
-                  </div>
-                </Card>
-              ) : null,
-            )}
+            {storyData?.lore_pieces?.map((piece) => (
+              <Card key={piece.id} className="p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <Badge variant="outline">
+                    {displayNames[piece.type] ||
+                      piece.type.charAt(0).toUpperCase() + piece.type.slice(1)}
+                  </Badge>
+                  <span className="font-bold">{piece.name}</span>
+                </div>
+                <div className="text-muted-foreground line-clamp-3 text-sm">
+                  {piece.description}
+                </div>
+              </Card>
+            ))}
           </div>
         </Card>
 

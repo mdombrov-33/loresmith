@@ -5,11 +5,15 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export default function Hero() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
-  const { user, setIsLoginModalOpen } = useAppStore();
+  const { user, token, setIsLoginModalOpen } = useAppStore();
+  const { data: session } = useSession();
+
+  const isAuthenticated = !!session || (!!user && !!token);
 
   return (
     <section className="container mx-auto px-4 py-24 md:py-32">
@@ -46,7 +50,7 @@ export default function Hero() {
           <Link
             href={`/generate?theme=${theme}`}
             onClick={(e) => {
-              if (!user) {
+              if (!isAuthenticated) {
                 e.preventDefault();
                 toast("Please login to start your adventure", {
                   action: {

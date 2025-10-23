@@ -136,7 +136,7 @@ export async function generateDraft(
   return data;
 }
 
-export async function getWorld(worldId: number): Promise<FullStory> {
+export async function getWorld(worldId: number): Promise<World> {
   const url = `${API_BASE_URL}/worlds/${worldId}`;
 
   const response = await fetchWithTimeout(url, {
@@ -150,8 +150,7 @@ export async function getWorld(worldId: number): Promise<FullStory> {
 
   const data = await response.json();
 
-  const fullStory = JSON.parse(data.world.full_story) as FullStory;
-  return fullStory;
+  return data.world as World;
 }
 
 export async function getWorlds(filters?: {

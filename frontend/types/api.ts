@@ -1,4 +1,12 @@
-import { LorePiece } from "@/types/generate-world";
+export interface LorePiece {
+  id: number;
+  world_id: number;
+  type: string;
+  name: string;
+  description: string;
+  details: Record<string, string>;
+  created_at: string;
+}
 
 export interface RegisterRequest {
   username: string;
@@ -56,6 +64,7 @@ export interface World {
   status: string;
   theme: string;
   full_story: string;
+  lore_pieces?: LorePiece[];
   created_at: string;
   updated_at: string;
 }
