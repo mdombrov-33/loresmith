@@ -8,6 +8,7 @@ import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
 import { Swords, LogOut, Search } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Navbar() {
   const {
@@ -24,6 +25,12 @@ export default function Navbar() {
   const { data: session } = useSession();
   const isAuthenticated = !!session || (!!user && !!token);
   const showThemeSwitcher = appStage === "home";
+
+  useEffect(() => {
+    if (session?.token && session?.backendUser) {
+      useAppStore.getState().login(session.token, session.backendUser);
+    }
+  }, [session]);
 
   const handleLogout = () => {
     if (session) {
