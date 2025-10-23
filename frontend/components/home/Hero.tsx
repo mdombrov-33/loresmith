@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
@@ -7,6 +8,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 export default function Hero() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
   const { user, token, setIsLoginModalOpen } = useAppStore();
@@ -44,7 +46,6 @@ export default function Hero() {
           variant="default"
           size="lg"
           className="group bg-primary text-primary-foreground mt-4 rounded-lg px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-          href={`/generate?theme=${theme}`}
           onClick={(e) => {
             if (!isAuthenticated) {
               e.preventDefault();
@@ -54,6 +55,8 @@ export default function Hero() {
                   onClick: () => setIsLoginModalOpen(true),
                 },
               });
+            } else {
+              router.push(`/generate?theme=${theme}`);
             }
           }}
         >

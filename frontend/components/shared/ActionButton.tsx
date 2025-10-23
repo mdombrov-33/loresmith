@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 interface ActionButtonProps {
   variant?:
@@ -13,7 +12,6 @@ interface ActionButtonProps {
   icon?: React.ReactNode;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  href?: string;
   type?: "button" | "submit" | "reset";
   children?: React.ReactNode;
   className?: string;
@@ -25,7 +23,6 @@ export default function ActionButton({
   icon,
   disabled = false,
   onClick,
-  href,
   type = "button",
   children,
   className,
@@ -36,22 +33,6 @@ export default function ActionButton({
       {children}
     </>
   );
-
-  if (href) {
-    return (
-      <Link href={href}>
-        <Button
-          variant={variant}
-          size={size}
-          disabled={disabled}
-          type={type}
-          className={`gap-2 ${className || ""}`}
-        >
-          {buttonContent}
-        </Button>
-      </Link>
-    );
-  }
 
   return (
     <Button

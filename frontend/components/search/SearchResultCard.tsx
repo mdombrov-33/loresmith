@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +12,16 @@ interface SearchResultCardProps {
 }
 
 export default function SearchResultCard({ world }: SearchResultCardProps) {
+  const router = useRouter();
   const fullStory = JSON.parse(world.full_story);
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
     ? `border-${themeOption.value}`
     : "border-primary";
+
+  const handleViewWorld = () => {
+    router.push(`/worlds/${world.theme}/${world.id}`);
+  };
 
   return (
     <Card
@@ -48,7 +56,7 @@ export default function SearchResultCard({ world }: SearchResultCardProps) {
           <span className="text-muted-foreground text-xs">
             {new Date(world.created_at).toLocaleDateString()}
           </span>
-          <ActionButton size="sm" href={`/worlds/${world.theme}/${world.id}`}>
+          <ActionButton size="sm" onClick={handleViewWorld}>
             View World
           </ActionButton>
         </div>

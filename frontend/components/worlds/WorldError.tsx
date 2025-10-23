@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 
@@ -6,6 +9,12 @@ interface WorldErrorProps {
 }
 
 export default function WorldError({ error }: WorldErrorProps) {
+  const router = useRouter();
+
+  const handleReturnHome = () => {
+    router.push("/");
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center">
       <Card className="w-full max-w-md">
@@ -14,7 +23,7 @@ export default function WorldError({ error }: WorldErrorProps) {
         </CardHeader>
         <CardContent>
           <p className="mb-4">{error}</p>
-          <ActionButton href="/">Return Home</ActionButton>
+          <ActionButton onClick={handleReturnHome}>Return Home</ActionButton>
         </CardContent>
       </Card>
     </main>

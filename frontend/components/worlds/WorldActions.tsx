@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { Compass, Wand2, Eye, Home } from "lucide-react";
 
@@ -6,6 +9,24 @@ interface WorldActionsProps {
 }
 
 export default function WorldActions({ theme }: WorldActionsProps) {
+  const router = useRouter();
+
+  const handleBeginAdventure = () => {
+    router.push(`/generate?theme=${theme}`);
+  };
+
+  const handleCreateNewStory = () => {
+    router.push("/generate");
+  };
+
+  const handleCheckOtherWorlds = () => {
+    router.push("/search");
+  };
+
+  const handleReturnHome = () => {
+    router.push("/");
+  };
+
   return (
     <section className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky bottom-0 mt-8 border-t py-4 backdrop-blur">
       <div className="flex flex-col items-center gap-4 sm:gap-6">
@@ -13,6 +34,7 @@ export default function WorldActions({ theme }: WorldActionsProps) {
           size="lg"
           className="h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg"
           icon={<Compass className="h-4 w-4 sm:h-5 sm:w-5" />}
+          onClick={handleBeginAdventure}
         >
           Begin Adventure
         </ActionButton>
@@ -22,7 +44,7 @@ export default function WorldActions({ theme }: WorldActionsProps) {
             variant="outline"
             size="sm"
             className="sm:size-lg"
-            href={`/generate?theme=${theme}`}
+            onClick={handleCreateNewStory}
             icon={<Wand2 className="h-3 w-3 sm:h-4 sm:w-4" />}
           >
             Create New Story
@@ -31,7 +53,7 @@ export default function WorldActions({ theme }: WorldActionsProps) {
             variant="outline"
             size="sm"
             className="sm:size-lg"
-            href="/search"
+            onClick={handleCheckOtherWorlds}
             icon={<Eye className="h-3 w-3 sm:h-4 sm:w-4" />}
           >
             Check Other Worlds
@@ -40,7 +62,7 @@ export default function WorldActions({ theme }: WorldActionsProps) {
             variant="outline"
             size="sm"
             className="sm:size-lg"
-            href="/"
+            onClick={handleReturnHome}
             icon={<Home className="h-3 w-3 sm:h-4 sm:w-4" />}
           >
             Return Home

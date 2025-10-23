@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { ThemeSwitcher } from "@/components/navbar/ThemeSwitcher";
 import { LoginModal } from "@/components/navbar/LoginModal";
@@ -12,6 +13,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Navbar() {
+  const router = useRouter();
   const {
     user,
     token,
@@ -70,7 +72,7 @@ export default function Navbar() {
                 <ActionButton
                   variant="ghost"
                   size="sm"
-                  href="/search"
+                  onClick={() => router.push("/search")}
                   icon={<Search className="h-4 w-4" />}
                 >
                   Search
