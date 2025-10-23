@@ -7,6 +7,7 @@ import {
   RegisterResponse,
   LoginRequest,
   AuthResponse,
+  World,
 } from "@/types/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
@@ -151,6 +152,31 @@ export async function getWorld(worldId: number): Promise<FullStory> {
 
   const fullStory = JSON.parse(data.world.full_story) as FullStory;
   return fullStory;
+}
+
+export async function getWorlds(filters?: {
+  scope?: "my" | "global";
+  theme?: string;
+  status?: string;
+}): Promise<World[]> {
+  const url = new URL(`${API_BASE_URL}/worlds`);
+  if (filters) {
+    if (filters.scope) url.searchParams.set("scope", filters.scope);
+    if (filters.theme) url.searchParams.set("theme", filters.theme);
+    if (filters.status) url.searchParams.set("status", filters.status);
+  }
+
+  const response = await fetchWithTimeout(url.toString(), {
+    method: "GET",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch worlds: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.worlds || [];
 }
 
 export async function registerUser(

@@ -48,3 +48,14 @@ export interface FullStory {
   };
   pieces?: SelectedLorePieces;
 }
+
+export interface World {
+  id: number;
+  user_id: number;
+  user_name?: string;
+  status: string;
+  theme: string;
+  full_story: string;
+  created_at: string;
+  updated_at: string;
+}

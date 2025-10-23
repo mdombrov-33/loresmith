@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
+	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
 )
@@ -96,4 +97,54 @@ func (h *WorldHandler) HandleGetWorld(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"world": world})
+}
+
+func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		return
+	}
+
+	query := r.URL.Query()
+	var userID *int
+	var theme *string
+	var status *string
+	var scope string
+
+	// Get current user from context
+	currentUser := middleware.GetUser(r)
+	currentUserID := int(currentUser.ID)
+
+	if scopeStr := query.Get("scope"); scopeStr != "" {
+		scope = scopeStr
+	} else {
+		scope = "my" // default to my worlds
+	}
+
+	if scope == "my" {
+		userID = &currentUserID
+	} else if scope == "global" {
+		// userID remains nil for global
+	} else {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid scope"})
+		return
+	}
+
+	if themeStr := query.Get("theme"); themeStr != "" {
+		theme = &themeStr
+	}
+	if statusStr := query.Get("status"); statusStr != "" && statusStr != "all" {
+		status = &statusStr
+	}
+
+	includeUserName := scope == "global"
+
+	worlds, err := h.worldStore.GetWorldsWithFilters(userID, theme, status, includeUserName)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to get worlds: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get worlds"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"worlds": worlds})
 }

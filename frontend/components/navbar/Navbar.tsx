@@ -7,7 +7,7 @@ import { LoginModal } from "@/components/navbar/login-modal";
 import { RegisterModal } from "@/components/navbar/register-modal";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
-import { Swords, LogOut } from "lucide-react";
+import { Swords, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -51,9 +51,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <span className="text-muted-foreground text-sm">
-                  Welcome, {session?.backendUser?.username || user?.username}
-                </span>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/search">
+                    <Search className="mr-2 h-4 w-4" />
+                    Search
+                  </Link>
+                </Button>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout

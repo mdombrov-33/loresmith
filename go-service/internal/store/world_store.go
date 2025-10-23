@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
@@ -11,6 +12,7 @@ import (
 type World struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
+	UserName  *string   `json:"user_name,omitempty"`
 	Status    string    `json:"status"`
 	Theme     string    `json:"theme"`
 	FullStory string    `json:"full_story"`
@@ -32,6 +34,7 @@ type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
 	GetWorld(worldID int) (*World, error)
 	GetWorldsByStatus(status string) ([]*World, error)
+	GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool) ([]*World, error)
 }
 
 type PostgresWorldStore struct {
@@ -120,6 +123,59 @@ func (s *PostgresWorldStore) GetWorldsByStatus(status string) ([]*World, error) 
 	for rows.Next() {
 		var world World
 		err := rows.Scan(&world.ID, &world.UserID, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		worlds = append(worlds, &world)
+	}
+	return worlds, nil
+}
+
+func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool) ([]*World, error) {
+	var query string
+	var args []interface{}
+	argCount := 0
+
+	if includeUserName {
+		query = `
+        SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at
+        FROM worlds w
+        JOIN users u ON w.user_id = u.id
+        WHERE 1=1`
+	} else {
+		query = `
+        SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at
+        FROM worlds WHERE 1=1`
+	}
+
+	if userID != nil {
+		argCount++
+		query += ` AND user_id = $` + strconv.Itoa(argCount)
+		args = append(args, *userID)
+	}
+	if theme != nil {
+		argCount++
+		query += ` AND theme = $` + strconv.Itoa(argCount)
+		args = append(args, *theme)
+	}
+	if status != nil {
+		argCount++
+		query += ` AND status = $` + strconv.Itoa(argCount)
+		args = append(args, *status)
+	}
+
+	query += ` ORDER BY created_at DESC`
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var worlds []*World
+	for rows.Next() {
+		var world World
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}

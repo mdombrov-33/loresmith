@@ -4,6 +4,7 @@ import {
   generateFullStory,
   generateDraft,
   getWorld,
+  getWorlds,
   registerUser,
   loginUser,
 } from "./api";
@@ -13,6 +14,11 @@ import { SelectedLore } from "@/types/generate-world";
 //* Query keys
 export const queryKeys = {
   world: (id: number) => ["world", id],
+  worlds: (filters?: {
+    scope?: "my" | "global";
+    theme?: string;
+    status?: string;
+  }) => ["worlds", filters || {}],
   lore: (
     category: string,
     theme: string,
@@ -33,6 +39,17 @@ export function useWorld(worldId: number) {
     queryFn: () => getWorld(worldId),
     enabled: !!worldId && !isNaN(worldId),
     retry: false, // Don't retry on 404 or auth errors
+  });
+}
+
+export function useWorlds(filters?: {
+  scope?: "my" | "global";
+  theme?: string;
+  status?: string;
+}) {
+  return useQuery({
+    queryKey: queryKeys.worlds(filters),
+    queryFn: () => getWorlds(filters),
   });
 }
 
