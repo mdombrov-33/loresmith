@@ -3,10 +3,7 @@ import ActionButton from "@/components/shared/ActionButton";
 import { Separator } from "@/components/ui/separator";
 import { Filter } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import {
-  STATUS_OPTIONS,
-  LORE_TYPE_OPTIONS,
-} from "@/constants/search-constants";
+import { STATUS_OPTIONS, LORE_TYPE_OPTIONS } from "@/constants/search";
 
 interface SearchFiltersProps {
   selectedTheme: string;
