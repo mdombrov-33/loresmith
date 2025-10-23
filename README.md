@@ -35,6 +35,11 @@ _Interactive cards for generating world elements (characters, factions, settings
 ![Full Story](assets/screenshots/fullstory.png)
 _Complete generated story with quest details and narrative_
 
+### Search Page
+
+![Search Page](assets/screenshots/search.png)
+_Search page with filters_
+
 > **Note**: Screenshots show the current development state. UI and features may evolve.
 
 ## Architecture
