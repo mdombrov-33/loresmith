@@ -42,6 +42,8 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	log.Printf("DEBUG: HandleCreateDraftWorld received req: %+v", req)
+
 	grpcReq := &lorepb.FullStoryRequest{
 		Pieces: &lorepb.SelectedLorePieces{
 			Character: req.Pieces["character"],

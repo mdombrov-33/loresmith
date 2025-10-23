@@ -87,7 +87,15 @@ export default function GeneratePage() {
 
     //* Save the selected lore piece
     const selectedPiece = generatedOptions[selectedIndex];
-    const stageKey = stage as keyof SelectedLore;
+    //* Map plural stage names to singular SelectedLore keys
+    const stageKeyMap: Record<string, keyof SelectedLore> = {
+      characters: "character",
+      factions: "faction",
+      settings: "setting",
+      events: "event",
+      relics: "relic",
+    };
+    const stageKey = stageKeyMap[stage] || (stage as keyof SelectedLore);
 
     updateSelectedLore(stageKey, selectedPiece);
 
@@ -100,7 +108,6 @@ export default function GeneratePage() {
         try {
           const selectedLore = useAppStore.getState().selectedLore;
           const response = await generateDraft(selectedLore, theme);
-          // Redirect to the new world route which includes theme and id
           window.location.href = `/worlds/${encodeURIComponent(
             theme,
           )}/${response.world_id}`;
