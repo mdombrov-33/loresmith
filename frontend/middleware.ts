@@ -4,12 +4,13 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
+  const authCookie = request.cookies.get("auth");
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (token || authCookie?.value === "true") {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  return NextResponse.redirect(new URL("/", request.url));
 }
 
 export const config = {

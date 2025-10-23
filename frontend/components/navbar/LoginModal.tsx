@@ -52,6 +52,8 @@ export function LoginModal({
 
       login(response.token, response.user);
 
+      document.cookie = "auth=true; path=/; max-age=2592000"; //* 30 days
+
       onClose();
       setFormData({ username: "", password: "" });
     } catch (err) {

@@ -40,6 +40,8 @@ export default function Navbar() {
       signOut();
     } else {
       logout();
+      document.cookie = "auth=; path=/; max-age=0";
+      router.push("/");
     }
   };
 
