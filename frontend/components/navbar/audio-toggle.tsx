@@ -39,9 +39,11 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
 };
 
 export function AudioToggle() {
-  const { theme, userChangedTheme, setUserChangedTheme } = useAppStore();
+  const { theme, setTheme, userChangedTheme, setUserChangedTheme } =
+    useAppStore();
   const pathname = usePathname();
-  const [initialTheme, setInitialTheme] = useState(theme);
+  const [initialTheme, setInitialTheme] = useState<string | null>(null);
+  const hasEnteredSearchRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([0.5]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -75,7 +77,7 @@ export function AudioToggle() {
       const pathSegments = pathname.split("/");
       return pathSegments[2] || theme;
     } else if (pathname === "/search") {
-      return initialTheme;
+      return initialTheme || theme;
     } else {
       return theme;
     }
@@ -84,10 +86,20 @@ export function AudioToggle() {
   const prevEffectiveThemeRef = useRef(effectiveTheme);
 
   useEffect(() => {
-    if (pathname === "/search") {
+    if (pathname === "/search" && !hasEnteredSearchRef.current) {
+      hasEnteredSearchRef.current = true;
       setInitialTheme(theme);
+    } else if (pathname !== "/search") {
+      hasEnteredSearchRef.current = false;
+      setInitialTheme(null);
     }
   }, [pathname, theme]);
+
+  useEffect(() => {
+    if (pathname !== "/search") {
+      setTheme(effectiveTheme);
+    }
+  }, [effectiveTheme, pathname, setTheme]);
 
   const playlist = useMemo(
     () => themePlaylists[effectiveTheme] || [],
@@ -113,7 +125,7 @@ export function AudioToggle() {
     const switchAudio = async () => {
       const audio = audioRef.current!;
 
-      if (isPlaying && isThemeChange && userChangedTheme) {
+      if (isPlaying && isThemeChange) {
         await fadeAudio(0, 500);
       }
 
@@ -138,7 +150,7 @@ export function AudioToggle() {
       audio.currentTime = seekTime;
 
       if (isPlaying) {
-        if (isThemeChange && userChangedTheme) {
+        if (isThemeChange) {
           await fadeAudio(volumeRef.current, 500);
           setUserChangedTheme(false);
         }

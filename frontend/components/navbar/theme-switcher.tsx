@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -8,7 +7,6 @@ import { THEME_OPTIONS } from "@/constants/game-themes";
 import { useAppStore } from "@/stores/appStore";
 
 export function ThemeSwitcher() {
-  const { setTheme: setNextTheme } = useTheme();
   const {
     theme: storeTheme,
     setTheme: setStoreTheme,
@@ -30,9 +28,7 @@ export function ThemeSwitcher() {
     setStoreTheme(newTheme);
     setAudioTheme(newTheme);
     setUserChangedTheme(true);
-    setNextTheme(newTheme);
 
-    //* Update query param
     const params = new URLSearchParams(searchParams.toString());
     params.set("theme", newTheme);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });

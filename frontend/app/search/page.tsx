@@ -29,7 +29,7 @@ const LORE_TYPE_OPTIONS = [
 ];
 
 export default function SearchPage() {
-  const { setAppStage, setTheme } = useAppStore();
+  const { setAppStage } = useAppStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
@@ -45,10 +45,9 @@ export default function SearchPage() {
   useEffect(() => {
     const themeFromQuery = searchParams.get("theme");
     if (themeFromQuery) {
-      setTheme(themeFromQuery);
-      // Removed setNextTheme to freeze visual theme during search
+      // Removed setTheme to freeze themes during search
     }
-  }, [searchParams, setTheme]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (urlTheme !== selectedTheme) {
@@ -58,9 +57,6 @@ export default function SearchPage() {
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
-    if (theme) {
-      setTheme(theme);
-    }
     const params = new URLSearchParams(searchParams.toString());
     if (theme) {
       params.set("theme", theme);
