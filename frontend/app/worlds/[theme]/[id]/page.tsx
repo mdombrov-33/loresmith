@@ -197,7 +197,7 @@ export default function WorldPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
-              <CardTitle className="text-2xl">Full Story</CardTitle>
+              <CardTitle className="text-2xl">The Story</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
