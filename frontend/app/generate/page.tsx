@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import {
   GenerationStage,
   SelectedLore,
@@ -49,6 +50,29 @@ export default function GeneratePage() {
   );
 
   const generateDraftMutation = useGenerateDraft();
+
+  //* Loading messages for full story generation
+  const loadingMessages = [
+    "Creating your world...",
+    "Weaving narratives into adventure...",
+    "Forging legendary tales...",
+    "Bending reality into story...",
+    "Crafting your epic journey...",
+  ];
+
+  const [currentLoadingMessage, setCurrentLoadingMessage] = useState(0);
+
+  //* Cycle through loading messages during full story generation
+  useEffect(() => {
+    if (generateDraftMutation.isPending) {
+      const interval = setInterval(() => {
+        setCurrentLoadingMessage((prev) => (prev + 1) % loadingMessages.length);
+      }, 3000); //* change every 3 secs
+      return () => clearInterval(interval);
+    } else {
+      setCurrentLoadingMessage(0);
+    }
+  }, [generateDraftMutation.isPending, loadingMessages.length]);
 
   //* Set app stage on mount and cleanup on unmount
   useEffect(() => {
@@ -222,7 +246,7 @@ export default function GeneratePage() {
           <ActionButtons
             hasSelection={selectedIndex !== null}
             hasRegenerated={hasRegenerated}
-            isLoading={isLoading}
+            isLoading={isLoading || generateDraftMutation.isPending}
             isLastStage={stage === "relics"}
             onRegenerate={handleRegenerate}
             onNext={handleNext}
@@ -234,6 +258,28 @@ export default function GeneratePage() {
       {!isLoading && generatedOptions.length === 0 && (
         <div className="py-12 text-center">
           <p className="text-muted-foreground">No options available.</p>
+        </div>
+      )}
+
+      {/* Full Story Generation Loading Overlay */}
+      {generateDraftMutation.isPending && (
+        <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+          <div className="text-center">
+            <div className="mb-8 flex justify-center">
+              <div className="relative">
+                <div className="border-primary/20 border-t-primary h-24 w-24 animate-spin rounded-full border-4"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="text-primary h-8 w-8" />
+                </div>
+              </div>
+            </div>
+            <h2 className="text-foreground mb-4 text-2xl font-bold">
+              {loadingMessages[currentLoadingMessage]}
+            </h2>
+            <p className="text-muted-foreground">
+              Weaving your chosen elements into an epic adventure...
+            </p>
+          </div>
         </div>
       )}
     </div>
