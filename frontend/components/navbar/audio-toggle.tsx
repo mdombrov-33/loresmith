@@ -18,9 +18,24 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
     { url: "/audio/fantasy/ambient_fantasy01.mp3", duration: 254 },
     { url: "/audio/fantasy/ambient_fantasy02.mp3", duration: 479 },
   ],
-  // cyberpunk: [
-  //   { url: "/audio/cyberpunk/cyber01.mp3", duration: 360 },
-  // ],
+  cyberpunk: [
+    { url: "/audio/cyberpunk/ambient_cyberpunk01.mp3", duration: 244 },
+    { url: "/audio/cyberpunk/ambient_cyberpunk02.mp3", duration: 193 },
+  ],
+  "post-apocalyptic": [
+    {
+      url: "/audio/post-apocalyptic/ambient_post-apocalyptic01.mp3",
+      duration: 214,
+    },
+    {
+      url: "/audio/post-apocalyptic/ambient_post-apocalyptic02.mp3",
+      duration: 263,
+    },
+  ],
+  steampunk: [
+    { url: "/audio/steampunk/ambient_steampunk01.mp3", duration: 219 },
+    { url: "/audio/steampunk/ambient_steampunk02.mp3", duration: 145 },
+  ],
 };
 
 export function AudioToggle() {
@@ -30,6 +45,7 @@ export function AudioToggle() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([0.5]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const volumeRef = useRef(volume[0]);
 
   const fadeAudio = (targetVolume: number, duration: number = 500) => {
     return new Promise<void>((resolve) => {
@@ -67,7 +83,6 @@ export function AudioToggle() {
 
   const prevEffectiveThemeRef = useRef(effectiveTheme);
 
-  // Update initial theme when entering search
   useEffect(() => {
     if (pathname === "/search") {
       setInitialTheme(theme);
@@ -98,12 +113,10 @@ export function AudioToggle() {
     const switchAudio = async () => {
       const audio = audioRef.current!;
 
-      // Fade out if playing and theme changed by user
       if (isPlaying && isThemeChange && userChangedTheme) {
         await fadeAudio(0, 500);
       }
 
-      // Calculate position
       const now = Math.floor(Date.now() / 1000);
       const elapsed = (now - RADIO_START_EPOCH) % totalDuration;
 
@@ -126,7 +139,7 @@ export function AudioToggle() {
 
       if (isPlaying) {
         if (isThemeChange && userChangedTheme) {
-          await fadeAudio(volume[0], 500);
+          await fadeAudio(volumeRef.current, 500);
           setUserChangedTheme(false);
         }
         audio.play().catch(() => {});
@@ -136,7 +149,6 @@ export function AudioToggle() {
     switchAudio();
 
     const handleEnded = () => {
-      // When track ends, recalculate position in synced playlist
       const now = Math.floor(Date.now() / 1000);
       const elapsed = (now - RADIO_START_EPOCH) % totalDuration;
 
@@ -181,6 +193,7 @@ export function AudioToggle() {
     if (audioRef.current) {
       audioRef.current.volume = volume[0];
     }
+    volumeRef.current = volume[0];
   }, [volume]);
 
   const toggleAudio = () => {
