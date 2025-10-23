@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { LoginModal } from "@/components/navbar/login-modal";
 import { RegisterModal } from "@/components/navbar/register-modal";
+import { AudioToggle } from "@/components/navbar/audio-toggle";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
 import { Swords, LogOut, Search } from "lucide-react";
@@ -63,6 +64,7 @@ export default function Navbar() {
 
           {/* Right Section - Auth */}
           <div className="flex items-center gap-3">
+            <AudioToggle />
             {isAuthenticated ? (
               <>
                 <Button variant="ghost" size="sm" asChild>
