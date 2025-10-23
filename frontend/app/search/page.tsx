@@ -14,10 +14,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Filter } from "lucide-react";
 import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
-import { toast } from "sonner";
 
 const STATUS_OPTIONS = [
-  { value: "all", label: "All" },
   { value: "draft", label: "Draft" },
   { value: "adventure", label: "Adventure" },
 ];
@@ -31,7 +29,7 @@ const LORE_TYPE_OPTIONS = [
 ];
 
 export default function SearchPage() {
-  const { setAppStage, setTheme, user, setIsLoginModalOpen } = useAppStore();
+  const { setAppStage, setTheme } = useAppStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
@@ -212,15 +210,6 @@ export default function SearchPage() {
                 <Button
                   variant={selectedScope === "my" ? "default" : "outline"}
                   onClick={() => {
-                    if (!user) {
-                      toast("Please login to view your worlds", {
-                        action: {
-                          label: "Login",
-                          onClick: () => setIsLoginModalOpen(true),
-                        },
-                      });
-                      return;
-                    }
                     setSelectedScope("my");
                   }}
                 >
@@ -296,10 +285,16 @@ export default function SearchPage() {
                           <CardTitle className="line-clamp-2 text-lg">
                             {fullStory.quest?.title || "Untitled World"}
                           </CardTitle>
-                          <Badge variant="secondary">{world.status}</Badge>
+                          <Badge variant="secondary">
+                            {world.status.charAt(0).toUpperCase() +
+                              world.status.slice(1)}
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline">{world.theme}</Badge>
+                          <Badge variant="outline">
+                            {THEME_OPTIONS.find((t) => t.value === world.theme)
+                              ?.label || world.theme}
+                          </Badge>
                           {world.user_name && (
                             <Badge variant="outline" className="text-xs">
                               by {world.user_name}

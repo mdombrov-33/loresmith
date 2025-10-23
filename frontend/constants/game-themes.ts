@@ -13,7 +13,7 @@ export type GameTheme = (typeof THEMES)[keyof typeof THEMES];
 
 export const THEME_OPTIONS = [
   { value: THEMES.FANTASY, label: "Fantasy", icon: Flame },
-  { value: THEMES.NORSE, label: "Norse", icon: Axe },
+  { value: THEMES.NORSE, label: "Norse Mythology", icon: Axe },
   { value: THEMES.CYBERPUNK, label: "Cyberpunk", icon: Cpu },
   {
     value: THEMES.POST_APOCALYPTIC,
