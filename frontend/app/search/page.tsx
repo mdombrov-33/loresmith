@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Filter } from "lucide-react";
 import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
+import { toast } from "sonner";
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All" },
@@ -30,7 +31,7 @@ const LORE_TYPE_OPTIONS = [
 ];
 
 export default function SearchPage() {
-  const { setAppStage, setTheme } = useAppStore();
+  const { setAppStage, setTheme, user, setIsLoginModalOpen } = useAppStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
@@ -210,7 +211,18 @@ export default function SearchPage() {
               <div className="flex gap-2">
                 <Button
                   variant={selectedScope === "my" ? "default" : "outline"}
-                  onClick={() => setSelectedScope("my")}
+                  onClick={() => {
+                    if (!user) {
+                      toast("Please login to view your worlds", {
+                        action: {
+                          label: "Login",
+                          onClick: () => setIsLoginModalOpen(true),
+                        },
+                      });
+                      return;
+                    }
+                    setSelectedScope("my");
+                  }}
                 >
                   My Worlds
                 </Button>

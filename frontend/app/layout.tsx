@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Providers } from "./providers";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
@@ -27,6 +28,7 @@ export default function RootLayout({
           <div className="flex-1">{children}</div>
           <Footer />
         </ThemeWrapper>
+        <Toaster theme="dark" />
       </body>
     </html>
   );

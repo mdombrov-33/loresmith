@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { LoginModal } from "@/components/navbar/login-modal";
@@ -11,12 +10,19 @@ import { Swords, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
-  const { user, token, logout, appStage } = useAppStore();
+  const {
+    user,
+    token,
+    logout,
+    appStage,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
+    isRegisterModalOpen,
+    setIsRegisterModalOpen,
+  } = useAppStore();
   const { data: session } = useSession();
   const isAuthenticated = !!session || (!!user && !!token);
   const showThemeSwitcher = appStage === "home";
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const handleLogout = () => {
     if (session) {

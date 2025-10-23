@@ -23,6 +23,10 @@ interface AppState {
   //* Selected Lore (for generation/story flow)
   selectedLore: SelectedLore;
 
+  //* Modals
+  isLoginModalOpen: boolean;
+  isRegisterModalOpen: boolean;
+
   //* Hydration
   isHydrated: boolean;
 
@@ -36,6 +40,8 @@ interface AppState {
     key: keyof SelectedLore,
     value: LorePiece | undefined,
   ) => void;
+  setIsLoginModalOpen: (open: boolean) => void;
+  setIsRegisterModalOpen: (open: boolean) => void;
 }
 
 //* Create the store
@@ -46,6 +52,8 @@ export const useAppStore = create<AppState>((set) => ({
   token: null,
   appStage: "home",
   selectedLore: {},
+  isLoginModalOpen: false,
+  isRegisterModalOpen: false,
   isHydrated: false,
 
   //* Actions
@@ -63,6 +71,8 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({
       selectedLore: { ...state.selectedLore, [key]: value },
     })),
+  setIsLoginModalOpen: (open: boolean) => set({ isLoginModalOpen: open }),
+  setIsRegisterModalOpen: (open: boolean) => set({ isRegisterModalOpen: open }),
 }));
 
 //* Manual persistence
