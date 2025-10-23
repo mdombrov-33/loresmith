@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useWorlds } from "@/lib/queries";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Filter } from "lucide-react";
 import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
@@ -16,7 +18,7 @@ import { useAppStore } from "@/stores/appStore";
 const STATUS_OPTIONS = [
   { value: "all", label: "All" },
   { value: "draft", label: "Draft" },
-  { value: "initial", label: "Initial" },
+  { value: "adventure", label: "Adventure" },
 ];
 
 const LORE_TYPE_OPTIONS = [
@@ -28,15 +30,45 @@ const LORE_TYPE_OPTIONS = [
 ];
 
 export default function SearchPage() {
-  const { setAppStage } = useAppStore();
+  const { setAppStage, setTheme } = useAppStore();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const urlTheme = searchParams.get("theme");
   const [selectedScope, setSelectedScope] = useState<"my" | "global">("my");
-  const [selectedTheme, setSelectedTheme] = useState<string>("");
+  const [selectedTheme, setSelectedTheme] = useState<string>(urlTheme || "");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     setAppStage("search");
   }, [setAppStage]);
+
+  useEffect(() => {
+    const themeFromQuery = searchParams.get("theme");
+    if (themeFromQuery) {
+      setTheme(themeFromQuery);
+    }
+  }, [searchParams, setTheme]);
+
+  useEffect(() => {
+    if (urlTheme !== selectedTheme) {
+      setSelectedTheme(urlTheme || "");
+    }
+  }, [urlTheme, selectedTheme]);
+
+  const handleThemeChange = (theme: string) => {
+    setSelectedTheme(theme);
+    if (theme) {
+      setTheme(theme);
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    if (theme) {
+      params.set("theme", theme);
+    } else {
+      params.delete("theme");
+    }
+    router.replace(`/search?${params.toString()}`);
+  };
 
   const {
     data: worlds = [],
@@ -87,7 +119,7 @@ export default function SearchPage() {
                       variant={selectedTheme === "" ? "default" : "outline"}
                       size="sm"
                       className="w-full justify-start"
-                      onClick={() => setSelectedTheme("")}
+                      onClick={() => handleThemeChange("")}
                     >
                       All Themes
                     </Button>
@@ -99,7 +131,7 @@ export default function SearchPage() {
                         }
                         size="sm"
                         className={`w-full justify-start ${selectedTheme === theme.value ? theme.value : ""}`}
-                        onClick={() => setSelectedTheme(theme.value)}
+                        onClick={() => handleThemeChange(theme.value)}
                       >
                         <theme.icon className="mr-2 h-4 w-4" />
                         {theme.label}
@@ -207,13 +239,35 @@ export default function SearchPage() {
 
             {/* Results */}
             {isLoading ? (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground">Loading worlds...</p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className="transition-shadow hover:shadow-lg">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-5 w-12" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="mb-2 h-4 w-full" />
+                      <Skeleton className="mb-2 h-4 w-5/6" />
+                      <Skeleton className="mb-4 h-4 w-4/6" />
+                      <div className="flex items-center justify-between">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-8 w-20" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             ) : error ? (
               <div className="py-12 text-center">
                 <p className="text-destructive">
-                  Error loading worlds: {error.message}
+                  Error loading worlds: {error?.message || "Unknown error"}
                 </p>
               </div>
             ) : (
@@ -228,7 +282,7 @@ export default function SearchPage() {
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <CardTitle className="line-clamp-2 text-lg">
-                            {fullStory.title || "Untitled World"}
+                            {fullStory.quest?.title || "Untitled World"}
                           </CardTitle>
                           <Badge variant="secondary">{world.status}</Badge>
                         </div>

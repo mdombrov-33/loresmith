@@ -19,17 +19,6 @@ export function ThemeSwitcher() {
     setMounted(true);
   }, []);
 
-  //* Sync theme from query params on mount
-  useEffect(() => {
-    if (!mounted) return;
-
-    const themeFromQuery = searchParams.get("theme");
-    if (themeFromQuery && storeTheme !== themeFromQuery) {
-      setStoreTheme(themeFromQuery);
-      setNextTheme(themeFromQuery);
-    }
-  }, [mounted, searchParams, storeTheme, setStoreTheme, setNextTheme]);
-
   const handleThemeChange = (newTheme: string) => {
     if (storeTheme === newTheme) return;
 

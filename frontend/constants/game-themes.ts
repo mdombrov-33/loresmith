@@ -15,6 +15,10 @@ export const THEME_OPTIONS = [
   { value: THEMES.FANTASY, label: "Fantasy", icon: Flame },
   { value: THEMES.NORSE, label: "Norse", icon: Axe },
   { value: THEMES.CYBERPUNK, label: "Cyberpunk", icon: Cpu },
-  { value: THEMES.POST_APOCALYPTIC, label: "Post-Apoc", icon: Radiation },
+  {
+    value: THEMES.POST_APOCALYPTIC,
+    label: "Post-Apocalyptic",
+    icon: Radiation,
+  },
   { value: THEMES.STEAMPUNK, label: "Steampunk", icon: Cog },
 ] as const;
