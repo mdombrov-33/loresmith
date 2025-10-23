@@ -19,6 +19,7 @@ export default function Navbar() {
     setIsLoginModalOpen,
     isRegisterModalOpen,
     setIsRegisterModalOpen,
+    theme,
   } = useAppStore();
   const { data: session } = useSession();
   const isAuthenticated = !!session || (!!user && !!token);
@@ -37,7 +38,7 @@ export default function Navbar() {
       <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
           {/* Logo Section */}
-          <Link href="/?theme=fantasy" className="flex items-center gap-2">
+          <Link href={`/?theme=${theme}`} className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-xl font-bold">
               <span className="text-primary">
                 <Swords />
