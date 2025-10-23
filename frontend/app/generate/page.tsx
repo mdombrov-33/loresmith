@@ -14,72 +14,66 @@ import SettingCard from "@/components/generate/SettingCard";
 import EventCard from "@/components/generate/EventCard";
 import RelicCard from "@/components/generate/RelicCard";
 import ActionButtons from "@/components/generate/ActionButtons";
-import { generateLore, generateDraft } from "@/lib/api";
+import { useGenerateLore, useGenerateDraft } from "@/lib/queries";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
 export default function GeneratePage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get("theme") || "fantasy";
-  const { setAppStage, updateSelectedLore } = useAppStore();
+  const { setAppStage, updateSelectedLore, setSelectedLore } = useAppStore();
 
   const [stage, setStage] = useState<GenerationStage>("characters");
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [hasRegenerated, setHasRegenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [regenerateFlag, setRegenerateFlag] = useState(false);
 
   const stageConfig = STAGE_CONFIG[stage];
+
+  const {
+    data: loreData,
+    isLoading,
+    refetch,
+  } = useGenerateLore(
+    stageConfig.category as
+      | "characters"
+      | "factions"
+      | "settings"
+      | "events"
+      | "relics",
+    theme,
+    3,
+    regenerateFlag,
+    true,
+  );
+
+  const generateDraftMutation = useGenerateDraft();
 
   //* Set app stage on mount and cleanup on unmount
   useEffect(() => {
     setAppStage("generating");
+    setSelectedLore({}); //* Clear previous selections for new generation
     return () => setAppStage("home");
-  }, [setAppStage]);
+  }, [setAppStage, setSelectedLore]);
 
-  //* Generate on mount and when stage changes
+  //* Update generated options when data changes
   useEffect(() => {
-    generateCurrentStage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
-
-  const generateCurrentStage = async (regenerate: boolean = false) => {
-    setIsLoading(true);
-    setError(null);
-    setSelectedIndex(null);
-    setHasRegenerated(regenerate);
-
-    try {
-      const data = await generateLore(
-        stageConfig.category as
-          | "characters"
-          | "factions"
-          | "settings"
-          | "events"
-          | "relics",
-        theme,
-        3,
-        regenerate,
-      );
-      setGeneratedOptions(data);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : `Failed to generate ${stageConfig.category}`,
-      );
-      console.error("Generation error:", err);
-    } finally {
-      setIsLoading(false);
+    if (loreData) {
+      setGeneratedOptions(loreData);
+      setSelectedIndex(null);
+      setError(null);
     }
-  };
+  }, [loreData]);
 
   const handleSelectCard = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
   };
 
-  const handleRegenerate = async () => {
-    await generateCurrentStage(true);
+  const handleRegenerate = () => {
+    setRegenerateFlag(true);
+    setHasRegenerated(true);
+    refetch();
   };
 
   const handleNext = async () => {
@@ -104,26 +98,28 @@ export default function GeneratePage() {
     if (nextStage) {
       if (nextStage === "full-story") {
         //* Generate draft world and navigate to story page
-        setIsLoading(true);
-        try {
-          const selectedLore = useAppStore.getState().selectedLore;
-          const response = await generateDraft(selectedLore, theme);
-          window.location.href = `/worlds/${encodeURIComponent(
-            theme,
-          )}/${response.world_id}`;
-        } catch (err) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Failed to generate draft world",
-          );
-          console.error("Draft generation error:", err);
-        } finally {
-          setIsLoading(false);
-        }
+        generateDraftMutation.mutate(
+          { selectedLore: useAppStore.getState().selectedLore, theme },
+          {
+            onSuccess: (response) => {
+              window.location.href = `/worlds/${encodeURIComponent(
+                theme,
+              )}/${response.world_id}`;
+            },
+            onError: (err) => {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to generate draft world",
+              );
+              console.error("Draft generation error:", err);
+            },
+          },
+        );
       } else {
         setStage(nextStage);
         setHasRegenerated(false);
+        setRegenerateFlag(false);
       }
     }
   };
@@ -207,7 +203,7 @@ export default function GeneratePage() {
           <p className="font-semibold">Error:</p>
           <p>{error}</p>
           <button
-            onClick={() => generateCurrentStage()}
+            onClick={() => refetch()}
             className="mt-2 text-sm underline hover:no-underline"
           >
             Try again

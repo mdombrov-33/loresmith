@@ -16,7 +16,6 @@ interface AppState {
   //* Auth
   user: User | null;
   token: string | null;
-  isLoading: boolean;
 
   //* App Stage
   appStage: AppStage;
@@ -31,7 +30,6 @@ interface AppState {
   setTheme: (theme: string) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
-  setIsLoading: (loading: boolean) => void;
   setAppStage: (stage: AppStage) => void;
   setSelectedLore: (selectedLore: SelectedLore) => void;
   updateSelectedLore: (
@@ -46,7 +44,6 @@ export const useAppStore = create<AppState>((set) => ({
   theme: "fantasy", //* Default theme
   user: null,
   token: null,
-  isLoading: false,
   appStage: "home",
   selectedLore: {},
   isHydrated: false,
@@ -54,11 +51,9 @@ export const useAppStore = create<AppState>((set) => ({
   //* Actions
   setTheme: (theme: string) => set({ theme }),
 
-  login: (token: string, user: User) => set({ token, user, isLoading: false }),
+  login: (token: string, user: User) => set({ token, user }),
 
   logout: () => set({ token: null, user: null, selectedLore: {} }),
-
-  setIsLoading: (isLoading: boolean) => set({ isLoading }),
 
   setAppStage: (appStage: AppStage) => set({ appStage }),
 

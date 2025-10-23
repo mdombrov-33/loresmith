@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -16,8 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { getWorld } from "@/lib/api";
-import { FullStory } from "@/types/api";
+import { useWorld } from "@/lib/queries";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/stores/appStore";
 import { THEMES } from "@/constants/game-themes";
@@ -58,9 +57,8 @@ export default function WorldPage() {
     relics: "Relic",
   };
 
-  const [storyData, setStoryData] = useState<FullStory | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const worldId = idParam ? Number(idParam) : NaN;
+  const { data: storyData, isLoading, error } = useWorld(worldId);
 
   useEffect(() => {
     setAppStage("story");
@@ -70,49 +68,33 @@ export default function WorldPage() {
   useEffect(() => {
     if (!isHydrated) return;
 
-    const load = async () => {
-      if (!idParam) {
-        router.replace("/");
-        return;
-      }
+    if (!idParam || isNaN(worldId)) {
+      router.replace("/");
+      return;
+    }
 
-      const worldId = Number(idParam);
-      if (isNaN(worldId)) {
-        router.replace("/");
-        return;
-      }
+    if (typeof actualTheme === "string") {
+      setStoreTheme(actualTheme);
+      setNextTheme(actualTheme);
+    }
+  }, [
+    idParam,
+    actualTheme,
+    isHydrated,
+    router,
+    setStoreTheme,
+    setNextTheme,
+    worldId,
+  ]);
 
-      if (typeof actualTheme === "string") {
-        setStoreTheme(actualTheme);
-        setNextTheme(actualTheme);
-      }
+  const themeMismatch = storyData?.theme && storyData.theme !== actualTheme;
+  const displayError = error
+    ? error.message || "Failed to load world"
+    : themeMismatch
+      ? `This world was created with the "${storyData.theme}" theme, not "${actualTheme}". Please use the correct theme in the URL.`
+      : null;
 
-      try {
-        const world = await getWorld(worldId);
-
-        if (world.theme && world.theme !== actualTheme) {
-          setStoreTheme(THEMES.FANTASY);
-          setNextTheme(THEMES.FANTASY);
-          setError(
-            `This world was created with the "${world.theme}" theme, not "${actualTheme}". Please use the correct theme in the URL.`,
-          );
-          return;
-        }
-
-        setStoryData(world);
-      } catch (e) {
-        setStoreTheme(THEMES.FANTASY);
-        setNextTheme(THEMES.FANTASY);
-        setError(e instanceof Error ? e.message : "Failed to load world");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, [idParam, actualTheme, isHydrated, router, setStoreTheme, setNextTheme]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -123,7 +105,7 @@ export default function WorldPage() {
     );
   }
 
-  if (error) {
+  if (displayError || !storyData) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Card className="w-full max-w-md">
@@ -131,25 +113,9 @@ export default function WorldPage() {
             <CardTitle className="text-destructive">Error</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">{error}</p>
-            <Button asChild>
-              <Link href="/">Return Home</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!storyData) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>World Not Found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4">The requested world could not be found.</p>
+            <p className="mb-4">
+              {displayError || "The requested world could not be found."}
+            </p>
             <Button asChild>
               <Link href="/">Return Home</Link>
             </Button>
