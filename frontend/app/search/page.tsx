@@ -6,13 +6,12 @@ import { useWorlds } from "@/lib/queries";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Filter } from "lucide-react";
-import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
 
 const STATUS_OPTIONS = [
@@ -45,7 +44,6 @@ export default function SearchPage() {
   useEffect(() => {
     const themeFromQuery = searchParams.get("theme");
     if (themeFromQuery) {
-      // Removed setTheme to freeze themes during search
     }
   }, [searchParams]);
 
@@ -111,16 +109,16 @@ export default function SearchPage() {
                 <div>
                   <h3 className="mb-3 font-medium">Theme</h3>
                   <div className="space-y-2">
-                    <Button
+                    <ActionButton
                       variant={selectedTheme === "" ? "default" : "outline"}
                       size="sm"
                       className="w-full justify-start"
                       onClick={() => handleThemeChange("")}
                     >
                       All Themes
-                    </Button>
+                    </ActionButton>
                     {THEME_OPTIONS.map((theme) => (
-                      <Button
+                      <ActionButton
                         key={theme.value}
                         variant={
                           selectedTheme === theme.value ? "default" : "outline"
@@ -128,10 +126,10 @@ export default function SearchPage() {
                         size="sm"
                         className={`w-full justify-start ${selectedTheme === theme.value ? theme.value : ""}`}
                         onClick={() => handleThemeChange(theme.value)}
+                        icon={<theme.icon className="h-4 w-4" />}
                       >
-                        <theme.icon className="mr-2 h-4 w-4" />
                         {theme.label}
-                      </Button>
+                      </ActionButton>
                     ))}
                   </div>
                 </div>
@@ -142,16 +140,16 @@ export default function SearchPage() {
                 <div>
                   <h3 className="mb-3 font-medium">Status</h3>
                   <div className="space-y-2">
-                    <Button
+                    <ActionButton
                       variant={selectedStatus === "" ? "default" : "outline"}
                       size="sm"
                       className="w-full justify-start"
                       onClick={() => setSelectedStatus("")}
                     >
                       All Statuses
-                    </Button>
+                    </ActionButton>
                     {STATUS_OPTIONS.map((status) => (
-                      <Button
+                      <ActionButton
                         key={status.value}
                         variant={
                           selectedStatus === status.value
@@ -163,7 +161,7 @@ export default function SearchPage() {
                         onClick={() => setSelectedStatus(status.value)}
                       >
                         {status.label}
-                      </Button>
+                      </ActionButton>
                     ))}
                   </div>
                 </div>
@@ -174,16 +172,16 @@ export default function SearchPage() {
                 <div>
                   <h3 className="mb-3 font-medium">Lore Type</h3>
                   <div className="space-y-2">
-                    <Button
+                    <ActionButton
                       variant="outline"
                       size="sm"
                       className="w-full justify-start"
                       disabled
                     >
                       Coming Soon
-                    </Button>
+                    </ActionButton>
                     {LORE_TYPE_OPTIONS.map((type) => (
-                      <Button
+                      <ActionButton
                         key={type.value}
                         variant="outline"
                         size="sm"
@@ -191,7 +189,7 @@ export default function SearchPage() {
                         disabled
                       >
                         {type.label}
-                      </Button>
+                      </ActionButton>
                     ))}
                   </div>
                 </div>
@@ -204,20 +202,20 @@ export default function SearchPage() {
             {/* Scope Selector */}
             <div className="mb-6">
               <div className="flex gap-2">
-                <Button
+                <ActionButton
                   variant={selectedScope === "my" ? "default" : "outline"}
                   onClick={() => {
                     setSelectedScope("my");
                   }}
                 >
                   My Worlds
-                </Button>
-                <Button
+                </ActionButton>
+                <ActionButton
                   variant={selectedScope === "global" ? "default" : "outline"}
                   onClick={() => setSelectedScope("global")}
                 >
                   Global Worlds
-                </Button>
+                </ActionButton>
               </div>
             </div>
 
@@ -307,11 +305,12 @@ export default function SearchPage() {
                           <span className="text-muted-foreground text-xs">
                             {new Date(world.created_at).toLocaleDateString()}
                           </span>
-                          <Button asChild size="sm">
-                            <Link href={`/worlds/${world.theme}/${world.id}`}>
-                              View World
-                            </Link>
-                          </Button>
+                          <ActionButton
+                            size="sm"
+                            href={`/worlds/${world.theme}/${world.id}`}
+                          >
+                            View World
+                          </ActionButton>
                         </div>
                       </CardContent>
                     </Card>

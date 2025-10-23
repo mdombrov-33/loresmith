@@ -14,7 +14,8 @@ import FactionCard from "@/components/generate/FactionCard";
 import SettingCard from "@/components/generate/SettingCard";
 import EventCard from "@/components/generate/EventCard";
 import RelicCard from "@/components/generate/RelicCard";
-import ActionButtons from "@/components/generate/ActionButtons";
+import ActionButton from "@/components/generate/ActionButton";
+import SharedActionButton from "@/components/shared/ActionButton";
 import { useGenerateLore, useGenerateDraft } from "@/lib/queries";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 
@@ -226,12 +227,9 @@ export default function GeneratePage() {
         <div className="bg-destructive/10 border-destructive text-destructive mb-8 rounded-lg border p-4">
           <p className="font-semibold">Error:</p>
           <p>{error}</p>
-          <button
-            onClick={() => refetch()}
-            className="mt-2 text-sm underline hover:no-underline"
-          >
+          <SharedActionButton onClick={() => refetch()}>
             Try again
-          </button>
+          </SharedActionButton>
         </div>
       )}
 
@@ -243,14 +241,26 @@ export default function GeneratePage() {
           </div>
 
           {/* Action Buttons */}
-          <ActionButtons
-            hasSelection={selectedIndex !== null}
-            hasRegenerated={hasRegenerated}
-            isLoading={isLoading || generateDraftMutation.isPending}
-            isLastStage={stage === "relics"}
-            onRegenerate={handleRegenerate}
-            onNext={handleNext}
-          />
+          <div className="mt-8 flex items-center justify-between gap-4">
+            <ActionButton
+              type="regenerate"
+              hasSelection={selectedIndex !== null}
+              hasRegenerated={hasRegenerated}
+              isLoading={isLoading || generateDraftMutation.isPending}
+              isLastStage={stage === "relics"}
+              onRegenerate={handleRegenerate}
+              onNext={handleNext}
+            />
+            <ActionButton
+              type="next"
+              hasSelection={selectedIndex !== null}
+              hasRegenerated={hasRegenerated}
+              isLoading={isLoading || generateDraftMutation.isPending}
+              isLastStage={stage === "relics"}
+              onRegenerate={handleRegenerate}
+              onNext={handleNext}
+            />
+          </div>
         </>
       )}
 

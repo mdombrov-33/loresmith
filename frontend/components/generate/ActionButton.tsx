@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { RotateCw, ArrowRight, Check, Sparkles } from "lucide-react";
 
-interface ActionButtonsProps {
+interface ActionButtonProps {
+  type: "regenerate" | "next";
   hasSelection: boolean;
   hasRegenerated: boolean;
   isLoading: boolean;
@@ -10,17 +11,17 @@ interface ActionButtonsProps {
   onNext: () => void;
 }
 
-export default function ActionButtons({
+export default function ActionButton({
+  type,
   hasSelection,
   hasRegenerated,
   isLoading,
   isLastStage,
   onRegenerate,
   onNext,
-}: ActionButtonsProps) {
-  return (
-    <div className="mt-8 flex items-center justify-between gap-4">
-      {/* Regenerate Button */}
+}: ActionButtonProps) {
+  if (type === "regenerate") {
+    return (
       <Button
         variant="outline"
         size="lg"
@@ -40,8 +41,11 @@ export default function ActionButtons({
           </>
         )}
       </Button>
+    );
+  }
 
-      {/* Next Button */}
+  if (type === "next") {
+    return (
       <Button
         variant="default"
         size="lg"
@@ -61,6 +65,8 @@ export default function ActionButtons({
           </>
         )}
       </Button>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }

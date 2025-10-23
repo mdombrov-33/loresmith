@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,6 @@ import {
   Sparkles,
   Eye,
 } from "lucide-react";
-import Link from "next/link";
 import { useWorld } from "@/lib/queries";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/stores/appStore";
@@ -153,9 +152,7 @@ export default function WorldPage() {
             <p className="mb-4">
               {displayError || "The requested world could not be found."}
             </p>
-            <Button asChild>
-              <Link href="/">Return Home</Link>
-            </Button>
+            <ActionButton href="/">Return Home</ActionButton>
           </CardContent>
         </Card>
       </div>
@@ -240,14 +237,14 @@ export default function WorldPage() {
                 </div>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
+                    <ActionButton
                       variant="ghost"
                       size="sm"
                       className="text-primary hover:text-primary/80 h-auto p-0"
+                      icon={<Eye className="h-4 w-4" />}
                     >
-                      <Eye className="mr-1 h-4 w-4" />
                       Read More
-                    </Button>
+                    </ActionButton>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
@@ -302,30 +299,39 @@ export default function WorldPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-col items-center gap-6 pt-8">
-          <Button size="lg" className="h-14 gap-2 px-8 text-lg">
-            <Compass className="h-5 w-5" />
+          <ActionButton
+            size="lg"
+            className="h-14 px-8 text-lg"
+            icon={<Compass className="h-5 w-5" />}
+          >
             Begin Adventure
-          </Button>
+          </ActionButton>
 
           <div className="flex justify-center gap-4">
-            <Button variant="outline" size="lg" className="gap-2" asChild>
-              <Link href={`/generate?theme=${actualTheme}`}>
-                <Wand2 className="h-4 w-4" />
-                Create New Story
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" className="gap-2" asChild>
-              <Link href="/search">
-                <Eye className="h-4 w-4" />
-                Check Other Worlds
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" className="gap-2" asChild>
-              <Link href="/">
-                <Home className="h-4 w-4" />
-                Return Home
-              </Link>
-            </Button>
+            <ActionButton
+              variant="outline"
+              size="lg"
+              href={`/generate?theme=${actualTheme}`}
+              icon={<Wand2 className="h-4 w-4" />}
+            >
+              Create New Story
+            </ActionButton>
+            <ActionButton
+              variant="outline"
+              size="lg"
+              href="/search"
+              icon={<Eye className="h-4 w-4" />}
+            >
+              Check Other Worlds
+            </ActionButton>
+            <ActionButton
+              variant="outline"
+              size="lg"
+              href="/"
+              icon={<Home className="h-4 w-4" />}
+            >
+              Return Home
+            </ActionButton>
           </div>
         </div>
       </div>

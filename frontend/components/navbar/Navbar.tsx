@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
-import { LoginModal } from "@/components/navbar/login-modal";
-import { RegisterModal } from "@/components/navbar/register-modal";
-import { AudioToggle } from "@/components/navbar/audio-toggle";
+import ActionButton from "@/components/shared/ActionButton";
+import { ThemeSwitcher } from "@/components/navbar/ThemeSwitcher";
+import { LoginModal } from "@/components/navbar/LoginModal";
+import { RegisterModal } from "@/components/navbar/RegisterModal";
+import { AudioToggle } from "@/components/navbar/AudioToggle";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
 import { Swords, LogOut, Search } from "lucide-react";
@@ -67,28 +67,34 @@ export default function Navbar() {
             <AudioToggle />
             {isAuthenticated ? (
               <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/search">
-                    <Search className="mr-2 h-4 w-4" />
-                    Search
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                <ActionButton
+                  variant="ghost"
+                  size="sm"
+                  href="/search"
+                  icon={<Search className="h-4 w-4" />}
+                >
+                  Search
+                </ActionButton>
+                <ActionButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  icon={<LogOut className="h-4 w-4" />}
+                >
                   Logout
-                </Button>
+                </ActionButton>
               </>
             ) : (
               <>
-                <Button
+                <ActionButton
                   variant="ghost"
                   onClick={() => setIsLoginModalOpen(true)}
                 >
                   Login
-                </Button>
-                <Button onClick={() => setIsRegisterModalOpen(true)}>
+                </ActionButton>
+                <ActionButton onClick={() => setIsRegisterModalOpen(true)}>
                   Sign Up
-                </Button>
+                </ActionButton>
               </>
             )}
           </div>

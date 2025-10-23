@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { THEME_OPTIONS } from "@/constants/game-themes";
@@ -44,18 +44,16 @@ export function ThemeSwitcher() {
         {THEME_OPTIONS.map((t) => {
           const Icon = t.icon;
           return (
-            <Button
+            <ActionButton
               key={t.value}
               variant="outline"
               size="sm"
               disabled
+              icon={<Icon />}
               className="text-sm"
             >
-              <span className="mr-1.5">
-                <Icon />
-              </span>
               {t.label}
-            </Button>
+            </ActionButton>
           );
         })}
       </div>
@@ -67,18 +65,16 @@ export function ThemeSwitcher() {
       {THEME_OPTIONS.map((t) => {
         const Icon = t.icon;
         return (
-          <Button
+          <ActionButton
             key={t.value}
             variant={storeTheme === t.value ? "default" : "outline"}
             size="sm"
             onClick={() => handleThemeChange(t.value)}
+            icon={<Icon />}
             className="text-sm"
           >
-            <span className="mr-1.5">
-              <Icon />
-            </span>
             {t.label}
-          </Button>
+          </ActionButton>
         );
       })}
     </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import { Slider } from "@/components/ui/slider";
 import { useAppStore } from "@/stores/appStore";
 import { usePathname } from "next/navigation";
@@ -221,13 +221,18 @@ export function AudioToggle() {
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="sm" onClick={toggleAudio}>
-        {isPlaying ? (
-          <Volume2 className="h-4 w-4" />
-        ) : (
-          <VolumeX className="h-4 w-4" />
-        )}
-      </Button>
+      <ActionButton
+        variant="ghost"
+        size="sm"
+        onClick={toggleAudio}
+        icon={
+          isPlaying ? (
+            <Volume2 className="h-4 w-4" />
+          ) : (
+            <VolumeX className="h-4 w-4" />
+          )
+        }
+      ></ActionButton>
       {isPlaying && (
         <Slider
           value={volume}

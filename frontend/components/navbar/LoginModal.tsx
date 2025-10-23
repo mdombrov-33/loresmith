@@ -7,54 +7,37 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
-import { registerUser, loginUser } from "@/lib/api";
+import { loginUser } from "@/lib/api";
 
-interface RegisterModalProps {
+interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSwitchToLogin: () => void;
+  onSwitchToRegister: () => void;
 }
 
-export function RegisterModal({
+export function LoginModal({
   isOpen,
   onClose,
-  onSwitchToLogin,
-}: RegisterModalProps) {
+  onSwitchToRegister,
+}: LoginModalProps) {
   const { login } = useAppStore();
   const [formData, setFormData] = useState({
     username: "",
-    email: "",
     password: "",
-    confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleRegister = async () => {
-    if (
-      !formData.username ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
+  const handleLogin = async () => {
+    if (!formData.username || !formData.password) {
       setError("Please fill in all fields");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
       return;
     }
 
@@ -62,28 +45,17 @@ export function RegisterModal({
     setError("");
 
     try {
-      await registerUser({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      const loginResponse = await loginUser({
+      const response = await loginUser({
         username: formData.username,
         password: formData.password,
       });
 
-      login(loginResponse.token, loginResponse.user);
+      login(response.token, response.user);
 
       onClose();
-      setFormData({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
+      setFormData({ username: "", password: "" });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -91,13 +63,12 @@ export function RegisterModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleRegister();
+    handleLogin();
   };
 
   const handleGoogleAuth = async () => {
     try {
-      const result = await signIn("google", { callbackUrl: "/" });
-      console.log("signIn result:", result);
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.error("Google sign-in failed:", error);
       setError("Google sign-in failed");
@@ -118,15 +89,15 @@ export function RegisterModal({
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div className="space-y-2">
                 <Label
-                  htmlFor="reg-username"
+                  htmlFor="username"
                   className="text-foreground text-sm font-medium"
                 >
                   Username
                 </Label>
                 <Input
-                  id="reg-username"
+                  id="username"
                   name="username"
-                  placeholder="Choose a username"
+                  placeholder="Enter your username"
                   value={formData.username}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -140,39 +111,16 @@ export function RegisterModal({
               </div>
               <div className="space-y-2">
                 <Label
-                  htmlFor="reg-email"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="reg-email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      email: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="email"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-password"
+                  htmlFor="password"
                   className="text-foreground text-sm font-medium"
                 >
                   Password
                 </Label>
                 <Input
-                  id="reg-password"
+                  id="password"
                   name="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -181,51 +129,28 @@ export function RegisterModal({
                     }))
                   }
                   className="h-11 px-3"
-                  autoComplete="new-password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-confirm-password"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Confirm Password
-                </Label>
-                <Input
-                  id="reg-confirm-password"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      confirmPassword: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                 />
               </div>
               <div className="pt-2">
                 {error && (
                   <div className="text-destructive mb-4 text-sm">{error}</div>
                 )}
-                <Button
+                <ActionButton
                   type="submit"
                   className="h-11 w-full text-base font-medium"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </Button>
+                  {isLoading ? "Signing In..." : "Sign In"}
+                </ActionButton>
               </div>
               <div className="text-muted-foreground text-center text-sm">
-                Already have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <button
-                  onClick={onSwitchToLogin}
+                  onClick={onSwitchToRegister}
                   className="text-primary font-medium transition-colors hover:underline"
                 >
-                  Sign In
+                  Create Account
                 </button>
               </div>
 
@@ -235,14 +160,14 @@ export function RegisterModal({
                 <div className="text-muted-foreground mb-4 text-center text-sm">
                   or continue with
                 </div>
-                <Button
+                <ActionButton
                   variant="outline"
                   className="h-11 w-full"
                   onClick={handleGoogleAuth}
+                  icon={<FcGoogle className="h-4 w-4" />}
                 >
-                  <FcGoogle className="mr-2 h-4 w-4" />
                   Continue with Google
-                </Button>
+                </ActionButton>
               </div>
             </form>
           </div>

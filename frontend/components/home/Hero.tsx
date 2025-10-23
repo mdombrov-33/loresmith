@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import ActionButton from "@/components/shared/ActionButton";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
@@ -41,32 +40,28 @@ export default function Hero() {
         </p>
 
         {/* CTA Button */}
-        <Button
-          asChild
+        <ActionButton
           variant="default"
           size="lg"
           className="group bg-primary text-primary-foreground mt-4 rounded-lg px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+          href={`/generate?theme=${theme}`}
+          onClick={(e) => {
+            if (!isAuthenticated) {
+              e.preventDefault();
+              toast("Please login to start your adventure", {
+                action: {
+                  label: "Login",
+                  onClick: () => setIsLoginModalOpen(true),
+                },
+              });
+            }
+          }}
         >
-          <Link
-            href={`/generate?theme=${theme}`}
-            onClick={(e) => {
-              if (!isAuthenticated) {
-                e.preventDefault();
-                toast("Please login to start your adventure", {
-                  action: {
-                    label: "Login",
-                    onClick: () => setIsLoginModalOpen(true),
-                  },
-                });
-              }
-            }}
-          >
-            Begin Your Adventure
-            <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-              →
-            </span>
-          </Link>
-        </Button>
+          Begin Your Adventure
+          <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+            →
+          </span>
+        </ActionButton>
       </div>
     </section>
   );
