@@ -14,7 +14,7 @@ import {
   Trophy,
   CheckCircle,
   Infinity,
-  Cpu,
+  Brain,
 } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
 
@@ -202,7 +202,7 @@ export default function CTA() {
 
             <div className="flex flex-col items-center gap-2 text-center">
               <div className="bg-primary/20 flex h-12 w-12 items-center justify-center rounded-xl">
-                <Cpu className="text-primary h-6 w-6" />
+                <Brain className="text-primary h-6 w-6" />
               </div>
               <div>
                 <div className="text-foreground font-semibold">AI-Powered</div>
