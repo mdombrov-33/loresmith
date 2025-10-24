@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
 
 interface HowItWorksCardProps {
   step: number;
@@ -17,29 +17,11 @@ export default function HowItWorksCard({
   colorClass,
   delay = 0,
 }: HowItWorksCardProps) {
-  const cardRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [delay]);
+  const { elementRef, isVisible } = useIntersectionObserver({}, delay);
 
   return (
     <article
-      ref={cardRef}
+      ref={elementRef}
       className={`flex flex-col items-center text-center transition-all duration-700 ${
         isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       }`}

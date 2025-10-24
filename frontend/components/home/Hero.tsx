@@ -7,7 +7,7 @@ import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { Sparkles, Swords } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useParticleAnimation } from "@/hooks/styling/useParticleAnimation";
 
 export default function Hero() {
   const router = useRouter();
@@ -15,126 +15,9 @@ export default function Hero() {
   const theme = searchParams.get("theme") || "fantasy";
   const { user, token, setIsLoginModalOpen } = useAppStore();
   const { data: session } = useSession();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useParticleAnimation(theme);
 
   const isAuthenticated = !!session || (!!user && !!token);
-
-  // Particle animation based on theme
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles: Array<{
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      opacity: number;
-    }> = [];
-
-    // Theme-specific particle config
-    const particleConfigs: Record<
-      string,
-      { count: number; color: string; speed: number }
-    > = {
-      fantasy: { count: 40, color: "rgba(255, 215, 0, 0.6)", speed: 0.3 },
-      "norse-mythology": {
-        count: 35,
-        color: "rgba(100, 149, 237, 0.6)",
-        speed: 0.4,
-      },
-      cyberpunk: { count: 50, color: "rgba(255, 0, 255, 0.7)", speed: 0.6 },
-      "post-apocalyptic": {
-        count: 30,
-        color: "rgba(255, 140, 0, 0.5)",
-        speed: 0.2,
-      },
-      steampunk: { count: 35, color: "rgba(205, 133, 63, 0.6)", speed: 0.35 },
-    };
-
-    const config = particleConfigs[theme] || particleConfigs.fantasy;
-
-    // Initialize particles
-    for (let i = 0; i < config.count; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 3 + 1,
-        speedX: (Math.random() - 0.5) * config.speed,
-        speedY: (Math.random() - 0.5) * config.speed,
-        opacity: Math.random() * 0.5 + 0.2,
-      });
-    }
-
-    let animationFrameId: number;
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((particle, index) => {
-        // Draw particle
-        ctx.fillStyle = config.color.replace(
-          "0.6",
-          particle.opacity.toString(),
-        );
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-
-        // Wrap around edges
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        if (particle.y > canvas.height) particle.y = 0;
-
-        // Draw connections
-        particles.slice(index + 1).forEach((otherParticle) => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 120) {
-            ctx.strokeStyle = config.color.replace(
-              "0.6",
-              ((1 - distance / 120) * 0.15).toString(),
-            );
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.stroke();
-          }
-        });
-      });
-
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [theme]);
 
   return (
     <header className="relative min-h-[90vh] overflow-hidden">

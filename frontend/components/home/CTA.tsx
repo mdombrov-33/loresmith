@@ -7,7 +7,7 @@ import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
 
 export default function CTA() {
   const router = useRouter();
@@ -15,30 +15,12 @@ export default function CTA() {
   const theme = searchParams.get("theme") || "fantasy";
   const { user, token, setIsLoginModalOpen } = useAppStore();
   const { data: session } = useSession();
-  const sectionRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const { elementRef, isVisible } = useIntersectionObserver();
 
   const isAuthenticated = !!session || (!!user && !!token);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="container mx-auto px-4 py-24">
+    <section ref={elementRef} className="container mx-auto px-4 py-24">
       <div
         className={`border-border bg-card relative overflow-hidden rounded-3xl border shadow-2xl transition-all duration-1000 ${
           isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
