@@ -2,7 +2,6 @@ import SearchResultCard from "./SearchResultCard";
 import SearchEmpty from "./SearchEmpty";
 import { World } from "@/types/api";
 
-//TODO: add pagination later
 interface SearchResultsProps {
   worlds: World[];
 }
