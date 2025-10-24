@@ -26,21 +26,6 @@ services:
     volumes:
       - ./python-service/prompts:/app/prompts
 
-
-   frontend-service:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: loresmith-frontend
-    ports:
-      - "3000:3000"
-    env_file: ./frontend/.env.local
-    environment: 
-      - MODE=prod
-      #TODO - NEXTAUTH_URL=https://domain when ready to deploy(Railway)
-    depends_on:
-      - go-service
-
   redis:
     image: redis:8
     container_name: loresmith-redis

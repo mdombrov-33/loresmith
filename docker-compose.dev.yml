@@ -26,20 +26,6 @@ services:
     volumes:
       - ./python-service/prompts:/app/prompts
 
-  frontend-service:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: loresmith-frontend
-    ports:
-      - "3000:3000"
-    env_file: ./frontend/.env.local
-    depends_on:
-      - go-service
-    volumes: # for dev mode
-      - ./frontend:/app
-      - /app/node_modules
-
   redis:
     image: redis:8
     container_name: loresmith-redis
