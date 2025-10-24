@@ -1,0 +1,22 @@
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build outputs
+bin/
+dist/
+
+# Environment files
+.env*
+
+# Git and logs
+.git
+*.log
+
+# OS/IDE
+.DS_Store
+.vscode
