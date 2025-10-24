@@ -75,6 +75,7 @@ export function RegisterModal({
 
       login(loginResponse.token, loginResponse.user);
 
+      //TODO: nuke this approach later and set httpOnly cookie from backend
       document.cookie = "auth=true; path=/; max-age=2592000"; //* 30 days
 
       onClose();

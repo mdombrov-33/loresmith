@@ -40,6 +40,7 @@ export default function Navbar() {
       signOut();
     } else {
       logout();
+      //TODO: nuke this approach later and set httpOnly cookie from backend
       document.cookie = "auth=; path=/; max-age=0";
       router.push("/");
     }
