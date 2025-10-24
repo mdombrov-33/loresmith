@@ -36,15 +36,18 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user }) {
       try {
-        const response = await fetch("http://localhost:8080/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: user.email,
-            name: user.name,
-            provider_id: user.id,
-          }),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/google`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: user.email,
+              name: user.name,
+              provider_id: user.id,
+            }),
+          },
+        );
         if (!response.ok) {
           console.error("Failed to authenticate with backend");
           return false;
