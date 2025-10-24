@@ -9,12 +9,6 @@ export default function HowItWorks() {
 
   return (
     <section ref={elementRef} className="relative overflow-hidden py-24">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0">
-        <div className="bg-primary/5 absolute -top-40 left-1/4 h-96 w-96 animate-pulse rounded-full blur-3xl" />
-        <div className="bg-secondary/5 absolute right-1/4 -bottom-40 h-96 w-96 animate-pulse rounded-full blur-3xl delay-1000" />
-      </div>
-
       {/* Grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.02]"

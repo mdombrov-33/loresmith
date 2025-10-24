@@ -6,7 +6,16 @@ import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { Sparkles, ArrowRight, Zap, Users, Trophy } from "lucide-react";
+import {
+  Sparkles,
+  ArrowRight,
+  Zap,
+  Users,
+  Trophy,
+  CheckCircle,
+  Infinity,
+  Cpu,
+} from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
 
 export default function CTA() {
@@ -28,9 +37,9 @@ export default function CTA() {
       >
         {/* Animated background orbs */}
         <div className="absolute inset-0">
-          <div className="bg-primary/10 absolute -top-40 -right-40 h-96 w-96 animate-pulse rounded-full blur-3xl" />
-          <div className="bg-secondary/10 absolute -bottom-40 -left-40 h-96 w-96 animate-pulse rounded-full blur-3xl delay-1000" />
-          <div className="bg-accent/10 absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full blur-3xl delay-500" />
+          <div className="bg-primary/10 absolute -top-40 -right-40 h-96 w-96 rounded-full blur-3xl" />
+          <div className="bg-secondary/10 absolute -bottom-40 -left-40 h-96 w-96 rounded-full blur-3xl" />
+          <div className="bg-accent/10 absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
         </div>
 
         {/* Grid pattern overlay */}
@@ -52,7 +61,7 @@ export default function CTA() {
           >
             <div className="bg-primary/10 border-primary relative flex h-24 w-24 items-center justify-center rounded-2xl border-2 backdrop-blur-sm">
               <Sparkles className="text-primary h-12 w-12 animate-pulse" />
-              <div className="bg-primary/20 absolute -inset-6 animate-pulse rounded-3xl blur-2xl" />
+              <div className="bg-primary/20 absolute -inset-4 rounded-3xl blur-xl" />
             </div>
           </div>
 
@@ -165,7 +174,7 @@ export default function CTA() {
           >
             <div className="flex flex-col items-center gap-2 text-center">
               <div className="bg-primary/20 flex h-12 w-12 items-center justify-center rounded-xl">
-                <span className="text-primary text-xl font-bold">✓</span>
+                <CheckCircle className="text-primary h-6 w-6" />
               </div>
               <div>
                 <div className="text-foreground font-semibold">
@@ -179,7 +188,7 @@ export default function CTA() {
 
             <div className="flex flex-col items-center gap-2 text-center">
               <div className="bg-primary/20 flex h-12 w-12 items-center justify-center rounded-xl">
-                <span className="text-primary text-xl font-bold">∞</span>
+                <Infinity className="text-primary h-6 w-6" />
               </div>
               <div>
                 <div className="text-foreground font-semibold">
@@ -193,7 +202,7 @@ export default function CTA() {
 
             <div className="flex flex-col items-center gap-2 text-center">
               <div className="bg-primary/20 flex h-12 w-12 items-center justify-center rounded-xl">
-                <span className="text-primary text-xl font-bold">⚡</span>
+                <Cpu className="text-primary h-6 w-6" />
               </div>
               <div>
                 <div className="text-foreground font-semibold">AI-Powered</div>
