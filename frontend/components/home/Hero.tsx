@@ -15,18 +15,16 @@ export default function Hero() {
   const theme = searchParams.get("theme") || "fantasy";
   const { user, token, setIsLoginModalOpen } = useAppStore();
   const { data: session } = useSession();
-  const canvasRef = useParticleAnimation(theme);
+  const ParticlesComponent = useParticleAnimation({ theme });
 
   const isAuthenticated = !!session || (!!user && !!token);
 
   return (
     <header className="relative min-h-[90vh] overflow-hidden">
-      {/* Animated background canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 opacity-40"
-        style={{ pointerEvents: "none" }}
-      />
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {ParticlesComponent}
+      </div>
 
       {/* Gradient overlays */}
       <div className="via-background/50 to-background absolute inset-0 bg-gradient-to-b from-transparent" />
