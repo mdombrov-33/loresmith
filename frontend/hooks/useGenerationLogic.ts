@@ -24,6 +24,9 @@ export function useGenerationLogic() {
   const [hasRegenerated, setHasRegenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [regenerateFlag, setRegenerateFlag] = useState(false);
+  const [generationMode, setGenerationMode] = useState<
+    "random" | "custom" | null
+  >(null);
 
   const stageConfig = STAGE_CONFIG[stage];
 
@@ -142,6 +145,14 @@ export function useGenerationLogic() {
     }
   };
 
+  const handleSelectRandom = () => {
+    setGenerationMode("random");
+  };
+
+  const handleSelectCustom = () => {
+    setGenerationMode("custom");
+  };
+
   return {
     stageConfig,
     isLoading,
@@ -151,9 +162,12 @@ export function useGenerationLogic() {
     hasRegenerated,
     generateDraftMutation,
     currentLoadingMessage,
+    generationMode,
     handleSelectCard,
     handleRegenerate,
     handleNext,
+    handleSelectRandom,
+    handleSelectCustom,
     refetch,
   };
 }
