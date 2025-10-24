@@ -7,6 +7,7 @@ import { loadStarsPreset } from "tsparticles-preset-stars";
 import { loadSnowPreset } from "tsparticles-preset-snow";
 import { loadFirePreset } from "tsparticles-preset-fire";
 import { loadLinksPreset } from "tsparticles-preset-links";
+import { loadFireflyPreset } from "tsparticles-preset-firefly";
 import type { Engine } from "tsparticles-engine";
 
 interface UseParticleAnimationProps {
@@ -33,6 +34,7 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
     await loadSnowPreset(engine);
     await loadFirePreset(engine);
     await loadLinksPreset(engine);
+    await loadFireflyPreset(engine);
   }, []);
 
   const particlesOptions = useMemo(() => {
@@ -60,10 +62,10 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
         };
       case "steampunk":
         return {
-          preset: "fire",
+          preset: "firefly",
           particles: {
             color: { value: "#ff4500" },
-            number: { value: 25 },
+            number: { value: 5 },
           },
           background: { color: { value: "transparent" } },
           fullScreen: { enable: false },
