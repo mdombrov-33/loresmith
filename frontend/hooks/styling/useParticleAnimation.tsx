@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import Particles from "react-particles";
 import { loadSlim } from "tsparticles-slim";
 import { loadStarsPreset } from "tsparticles-preset-stars";
@@ -14,6 +14,19 @@ interface UseParticleAnimationProps {
 }
 
 export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState(theme);
+
+  useEffect(() => {
+    if (theme !== currentTheme) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setCurrentTheme(theme);
+        setIsTransitioning(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [theme, currentTheme]);
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
     await loadStarsPreset(engine);
@@ -23,7 +36,8 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
   }, []);
 
   const particlesOptions = useMemo(() => {
-    switch (theme) {
+    const t = currentTheme;
+    switch (t) {
       case "fantasy":
         return {
           preset: "stars",
@@ -88,7 +102,7 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
           fullScreen: { enable: false },
         };
     }
-  }, [theme]);
+  }, [currentTheme]);
 
   const ParticlesComponent = useMemo(
     () => (
@@ -96,10 +110,12 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
         id="tsparticles"
         init={particlesInit}
         options={particlesOptions}
-        className="pointer-events-none h-full w-full"
+        className={`pointer-events-none h-full w-full transition-opacity duration-300 ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
       />
     ),
-    [particlesInit, particlesOptions],
+    [particlesInit, particlesOptions, isTransitioning],
   );
 
   return ParticlesComponent;
