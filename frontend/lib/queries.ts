@@ -18,6 +18,8 @@ export const queryKeys = {
     scope?: "my" | "global";
     theme?: string;
     status?: string;
+    limit?: number;
+    offset?: number;
   }) => ["worlds", filters || {}],
   lore: (
     category: string,
@@ -38,7 +40,7 @@ export function useWorld(worldId: number) {
     queryKey: queryKeys.world(worldId),
     queryFn: () => getWorld(worldId),
     enabled: !!worldId && !isNaN(worldId),
-    retry: false, // Don't retry on 404 or auth errors
+    retry: false, //* Don't retry on 404 or auth errors
   });
 }
 
@@ -46,6 +48,8 @@ export function useWorlds(filters?: {
   scope?: "my" | "global";
   theme?: string;
   status?: string;
+  limit?: number;
+  offset?: number;
 }) {
   return useQuery({
     queryKey: queryKeys.worlds(filters),

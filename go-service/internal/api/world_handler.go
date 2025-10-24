@@ -110,22 +110,24 @@ func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
 	var theme *string
 	var status *string
 	var scope string
+	var limit int = 6
+	var offset int = 0
 
-	// Get current user from context
 	currentUser := middleware.GetUser(r)
 	currentUserID := int(currentUser.ID)
 
 	if scopeStr := query.Get("scope"); scopeStr != "" {
 		scope = scopeStr
 	} else {
-		scope = "my" // default to my worlds
+		scope = "my" //* default to my worlds
 	}
 
-	if scope == "my" {
+	switch scope {
+	case "my":
 		userID = &currentUserID
-	} else if scope == "global" {
-		// userID remains nil for global
-	} else {
+	case "global":
+		//* userID remains nil for global
+	default:
 		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid scope"})
 		return
 	}
@@ -137,14 +139,25 @@ func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
 		status = &statusStr
 	}
 
+	if limitStr := query.Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+	if offsetStr := query.Get("offset"); offsetStr != "" {
+		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
+			offset = o
+		}
+	}
+
 	includeUserName := scope == "global"
 
-	worlds, err := h.worldStore.GetWorldsWithFilters(userID, theme, status, includeUserName)
+	worlds, total, err := h.worldStore.GetWorldsWithFilters(userID, theme, status, includeUserName, limit, offset)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get worlds: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get worlds"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"worlds": worlds})
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"worlds": worlds, "total": total})
 }

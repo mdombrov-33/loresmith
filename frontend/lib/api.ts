@@ -96,8 +96,8 @@ export async function generateFullStory(
 
   const data = await response.json();
 
-  // Normalize: backend may return either { story: FullStory } or
-  // the FullStory object directly. Return the FullStory object.
+  //* Normalize: backend may return either { story: FullStory } or
+  //* the FullStory object directly. Return the FullStory object.
   return data && data.story ? data.story : data;
 }
 
@@ -157,12 +157,17 @@ export async function getWorlds(filters?: {
   scope?: "my" | "global";
   theme?: string;
   status?: string;
-}): Promise<World[]> {
+  limit?: number;
+  offset?: number;
+}): Promise<{ worlds: World[]; total: number }> {
   const url = new URL(`${API_BASE_URL}/worlds`);
   if (filters) {
     if (filters.scope) url.searchParams.set("scope", filters.scope);
     if (filters.theme) url.searchParams.set("theme", filters.theme);
     if (filters.status) url.searchParams.set("status", filters.status);
+    if (filters.limit) url.searchParams.set("limit", filters.limit.toString());
+    if (filters.offset)
+      url.searchParams.set("offset", filters.offset.toString());
   }
 
   const response = await fetchWithTimeout(url.toString(), {
@@ -175,7 +180,7 @@ export async function getWorlds(filters?: {
   }
 
   const data = await response.json();
-  return data.worlds || [];
+  return { worlds: data.worlds || [], total: data.total || 0 };
 }
 
 export async function registerUser(

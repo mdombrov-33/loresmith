@@ -14,6 +14,8 @@ export function useSearchLogic() {
   const [selectedTheme, setSelectedTheme] = useState<string>(urlTheme || "");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
 
   useEffect(() => {
     setAppStage("search");
@@ -24,6 +26,10 @@ export function useSearchLogic() {
       setSelectedTheme(urlTheme || "");
     }
   }, [urlTheme, selectedTheme]);
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [selectedScope, selectedTheme, selectedStatus]);
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
@@ -37,14 +43,18 @@ export function useSearchLogic() {
   };
 
   const {
-    data: worlds = [],
+    data: { worlds = [], total = 0 } = {},
     isLoading,
     error,
   } = useWorlds({
     scope: selectedScope,
     theme: selectedTheme || undefined,
     status: selectedStatus || undefined,
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
   });
+
+  const totalPages = Math.ceil(total / pageSize);
 
   const filteredWorlds = worlds.filter((world: World) => {
     if (searchQuery) {
@@ -75,5 +85,8 @@ export function useSearchLogic() {
     worlds: filteredWorlds,
     isLoading,
     error,
+    currentPage,
+    setCurrentPage,
+    totalPages,
   };
 }

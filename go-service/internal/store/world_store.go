@@ -35,7 +35,7 @@ type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
 	GetWorld(worldID int) (*World, error)
 	GetWorldsByStatus(status string) ([]*World, error)
-	GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool) ([]*World, error)
+	GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
 }
 
 type PostgresWorldStore struct {
@@ -160,10 +160,13 @@ func (s *PostgresWorldStore) GetWorldsByStatus(status string) ([]*World, error) 
 	return worlds, nil
 }
 
-func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool) ([]*World, error) {
+func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error) {
 	var query string
-	var args []interface{}
+	var countQuery string
+	args := []interface{}{}
+	countArgs := []interface{}{}
 	argCount := 0
+	countArgCount := 0
 
 	if includeUserName {
 		query = `
@@ -171,33 +174,51 @@ func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, st
         FROM worlds w
         JOIN users u ON w.user_id = u.id
         WHERE 1=1`
+		countQuery = `
+        SELECT COUNT(*)
+        FROM worlds w
+        JOIN users u ON w.user_id = u.id
+        WHERE 1=1`
 	} else {
 		query = `
         SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at
+        FROM worlds WHERE 1=1`
+		countQuery = `
+        SELECT COUNT(*)
         FROM worlds WHERE 1=1`
 	}
 
 	if userID != nil {
 		argCount++
+		countArgCount++
 		query += ` AND user_id = $` + strconv.Itoa(argCount)
+		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
 		args = append(args, *userID)
+		countArgs = append(countArgs, *userID)
 	}
 	if theme != nil {
 		argCount++
+		countArgCount++
 		query += ` AND theme = $` + strconv.Itoa(argCount)
+		countQuery += ` AND theme = $` + strconv.Itoa(countArgCount)
 		args = append(args, *theme)
+		countArgs = append(countArgs, *theme)
 	}
 	if status != nil {
 		argCount++
+		countArgCount++
 		query += ` AND status = $` + strconv.Itoa(argCount)
+		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
 		args = append(args, *status)
+		countArgs = append(countArgs, *status)
 	}
 
-	query += ` ORDER BY created_at DESC`
+	query += ` ORDER BY created_at DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
+	args = append(args, limit, offset)
 
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -206,9 +227,16 @@ func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, st
 		var world World
 		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		worlds = append(worlds, &world)
 	}
-	return worlds, nil
+
+	var total int
+	err = s.db.QueryRow(countQuery, countArgs...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return worlds, total, nil
 }
