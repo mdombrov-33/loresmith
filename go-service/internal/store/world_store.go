@@ -34,7 +34,6 @@ type LorePiece struct {
 type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
 	GetWorld(worldID int) (*World, error)
-	GetWorldsByStatus(status string) ([]*World, error)
 	GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
 }
 
@@ -136,28 +135,6 @@ func (s *PostgresWorldStore) GetWorld(worldID int) (*World, error) {
 
 	world.LorePieces = lorePieces
 	return &world, nil
-}
-
-func (s *PostgresWorldStore) GetWorldsByStatus(status string) ([]*World, error) {
-	rows, err := s.db.Query(`
-        SELECT id, user_id, status, theme, full_story, created_at, updated_at
-        FROM worlds WHERE status = $1
-    `, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var worlds []*World
-	for rows.Next() {
-		var world World
-		err := rows.Scan(&world.ID, &world.UserID, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-		worlds = append(worlds, &world)
-	}
-	return worlds, nil
 }
 
 func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error) {
