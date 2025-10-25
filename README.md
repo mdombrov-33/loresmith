@@ -1,5 +1,8 @@
 [![Go](https://img.shields.io/badge/go-purple)](https://golang.org/)
 [![Python](https://img.shields.io/badge/python-purple)](https://www.python.org/)
+[![Next.js](https://img.shields.io/badge/next.js-purple)](https://nextjs.org/)
+[![LangChain](https://img.shields.io/badge/langchain-purple)](https://www.langchain.com/)
+[![Langfuse](https://img.shields.io/badge/langfuse-purple)](https://langfuse.com/)
 [![gRPC](https://img.shields.io/badge/grpc-purple)](https://grpc.io/)
 [![Docker](https://img.shields.io/badge/docker-purple)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-purple)](https://www.postgresql.org/)
@@ -9,14 +12,9 @@
   <img src="assets/logo/logo.png" alt="LoreSmith Logo" width="400"/>
 </p>
 
-An AI-powered narrative game engine that transforms generated lore into interactive adventures. Built with Go microservices and Python AI chains, featuring world generation, party management, and session-based gameplay.
-
 ## What is LoreSmith?
 
-LoreSmith is a **dual-purpose platform**:
-
-1. **World Building API**: Generate cohesive lore (characters, factions, settings, events, relics) for storytelling and tabletop gaming
-2. **Interactive Adventure Engine**: Transform generated worlds into playable text-based adventures with party management, inventory systems, and AI-driven encounters
+LoreSmith is an **interactive adventure platform** where AI generates rich, thematic worlds and transforms them into playable text-based games. Create characters, explore dynamic settings, and embark on AI-driven adventures with party management, inventory systems, and branching narratives—all powered by advanced language models.
 
 ## Screenshots
 
@@ -47,26 +45,26 @@ _Search page with filters_
 **Microservices Design**: Go handles HTTP/auth/sessions/game state, Python handles AI generation and narrative processing  
 **AI-Driven**: Flexible AI provider (local Ollama or cloud OpenRouter) with custom prompt chains for world coherence  
 **Session Management**: Redis-based game state persistence and caching  
-**Scalable**: Docker orchestration with observability (Prometheus, Grafana, Sentry)
+**Scalable**: Docker orchestration with observability (Prometheus, Langfuse)
 
 ## Key Features
 
-### World Building (API Mode)
+### AI-Powered World Creation
 
 - **Thematic Generation**: Create lore for multiple genres (post-apocalyptic, fantasy, cyberpunk, etc.)
 - **Narrative Coherence**: Full story generation weaves disconnected pieces into coherent worlds
-- **Flexible Output**: Individual components or complete world bundles
+- **Dynamic Content**: AI generates contextual encounters and branching storylines
 
-### Adventure Gaming (Interactive Mode)
+### Interactive Adventures
 
-- **World Initialization**: Generated lore becomes playable adventure setting
 - **Party Management**: Character selection, health/stress tracking, inventory systems
 - **Dynamic Encounters**: AI generates contextual encounters based on established world lore
 - **Session Persistence**: Save/resume adventures with full game state management
 
 ## Tech Stack
 
-- **Go Service**: HTTP server, JWT auth, Chi router, session management, game state logic
+- **Frontend**: Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query
+- **Go Service**: HTTP server, JWT auth, Chi router
 - **Python Service**: gRPC server with LangChain prompt chains for structured AI generation
   - **LangChain**: LCEL chains for composable prompt workflows and output parsing
   - **Langfuse**: Cloud-based observability for LLM tracing, token tracking, and performance monitoring
@@ -124,29 +122,9 @@ _Search page with filters_
 
 ### Setup
 
-1. Copy `.env.example` to `.env` and configure:
+1. Copy `.env.example` to `.env` and configure your values:
 
-   ```env
-   # Choose your AI provider (see above)
-   AI_PROVIDER=local  # or "openrouter"
-
-   # If using local:
-   LOCAL_MODEL=llama3.1:8b
-   OLLAMA_URL=http://host.docker.internal:11434
-
-   # If using OpenRouter:
-   OPENROUTER_API_KEY=your_api_key_here
-
-   # Database config
-   POSTGRES_HOST=postgres
-   POSTGRES_PORT=5432
-   POSTGRES_DB=loresmith
-   POSTGRES_USER=loresmithuser
-   POSTGRES_PASSWORD=your_password
-   REDIS_HOST=redis
-   REDIS_PORT=6379
-   JWT_SECRET=your_secret
-   ```
+   See `.env.example` for all required environment variables including database config, AI provider settings, Langfuse observability, and frontend authentication.
 
 2. Run:
 
@@ -154,87 +132,38 @@ _Search page with filters_
    docker-compose up --build
    ```
 
+   > **Alternative**: Use the provided Makefile for convenience:
+   >
+   > ```bash
+   > make docker-dev
+   > ```
+   >
+   > Check `Makefile` for additional commands like `make test`, `make lint`, etc.
+
 3. Access:
    - API: http://localhost:8080
    - Health: http://localhost:8080/health
 
-## API Usage
+## API Reference
 
-### World Building Endpoints
+The platform uses a REST API for user authentication and internal operations. Key endpoints include:
 
-All generation endpoints require JWT auth (except `/health`, `/register`, `/login`).
+- `POST /register` - User registration
+- `POST /login` - User authentication
+- `GET /generate/*` - AI-powered content generation
+- `GET/POST /worlds/*` - Worlds management
 
-**Authentication:**
-
-- `POST /register` - Register user
-- `POST /login` - Login and receive JWT token
-
-**Lore Generation:**
-
-- `GET /generate/characters` - Generate character profiles
-- `GET /generate/factions` - Generate faction descriptions
-- `GET /generate/settings` - Generate location details
-- `GET /generate/events` - Generate historical events
-- `GET /generate/relics` - Generate artifact descriptions
-- `GET /generate/all` - Generate complete world bundle
-- `POST /generate/full-story` - Create narrative from selected lore pieces
-
-**Query Parameters:**
-
-- `count`: Number of items (1-10)
-- `theme`: World theme (post-apocalyptic, fantasy, cyberpunk, etc.)
-- `regenerate`: Skip cache for fresh generation
-
-### Adventure Gaming Endpoints
-
-**Adventure Management:**
-
-- `POST /adventure/initialize` - Create new adventure world
-- `POST /adventure/start` - Begin adventure with selected party
-- `GET /adventure/encounter` - Get current encounter and choices
-- `POST /adventure/choice` - Process player decision
-- `GET /adventure/status` - Get current game state
-
-**Example World Generation Response:**
-
-```json
-{
-  "characters": [
-    {
-      "name": "Echo",
-      "description": "A skilled scavenger navigating ruins...",
-      "details": {
-        "personality": "Cautious, intelligent, burdened by past",
-        "appearance": "Dust-covered cloak, reflective goggles",
-        "health": 100,
-        "stress": 20,
-        "skills": ["scavenging", "stealth", "tech-savvy"]
-      }
-    }
-  ],
-  "full_story": {
-    "title": "The Last Signal",
-    "content": "In Ashfall City, Echo discovers the Pathseeker Map while avoiding the militant Steel Reclaimers..."
-  }
-}
-```
+For development details, see the Go service source code.
 
 ## How It Works
 
-### World Building Flow
+### Adventure Creation Flow
 
-1. **Generation**: AI creates thematic lore pieces using custom prompt chains
-2. **Coherence**: Full story generation weaves pieces into narrative
-3. **Caching**: Redis stores results for performance
-4. **Export**: JSON API or adventure initialization
-
-### Adventure Gaming Flow
-
-1. **Initialization**: Generate world bundle → create full story → establish context
-2. **Party Selection**: Choose characters from generated cast
-3. **Session Creation**: Store world context and party state in Redis
-4. **Adventure Loop**: Generate encounters → present choices → update state → repeat
-5. **State Management**: Track health, stress, inventory, relationships, world progress
+1. **World Generation**: AI creates thematic lore pieces using custom prompt chains
+2. **Story Weaving**: Full story generation connects pieces into coherent narratives
+3. **Party Assembly**: Choose characters from generated cast with unique attributes
+4. **Adventure Launch**: Enter the world with dynamic encounters and player choices
+5. **State Management**: Track health, stress, inventory, and story progress across sessions
 
 ## Development Roadmap
 
@@ -243,15 +172,19 @@ All generation endpoints require JWT auth (except `/health`, `/register`, `/logi
 - ✅ Core lore generation system
 - ✅ Full story narrative weaving
 - ✅ Microservices architecture
-- 🔄 Adventure game engine (in development)
+- ✅ Web interface with search and generation
+- 🔄 AI evaluation and output polishing
+- 🔄 Interactive adventure engine (core implementation)
+- 🔄 Party management and character systems
 
 ### Planned Features
 
-- **Enhanced UI**: Multi-panel adventure interface with visual components
-- **Inventory System**: Item management, crafting, trading
-- **Faction Dynamics**: Reputation tracking, political consequences
+- **Enhanced Adventure UI**: Multi-panel interface with visual components and maps
+- **Advanced AI Encounters**: More sophisticated contextual storytelling and choices
+- **Inventory & Crafting**: Item management, equipment, and crafting systems
+- **Faction Dynamics**: Reputation tracking, political consequences, alliances
 - **Environmental Systems**: Weather, hazards, resource management
-- **Multiplayer Support**: Shared adventures, party cooperation
+- **Multiplayer Support**: Shared adventures, cooperative gameplay
 
 ## CI/CD
 
