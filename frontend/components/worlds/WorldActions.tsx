@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { Compass, Wand2, Eye, Home, ChevronRight } from "lucide-react";
+import { useAppStore } from "@/stores/appStore";
 
 interface WorldActionsProps {
   theme: string;
@@ -10,6 +11,7 @@ interface WorldActionsProps {
 
 export default function WorldActions({ theme }: WorldActionsProps) {
   const router = useRouter();
+  const { theme: currentTheme } = useAppStore();
 
   const handleCreateNewStory = () => {
     router.push(`/generate?theme=${theme}`);
@@ -20,7 +22,8 @@ export default function WorldActions({ theme }: WorldActionsProps) {
   };
 
   const handleReturnHome = () => {
-    router.push("/");
+    const themeToUse = currentTheme || theme || "fantasy";
+    router.push(`/?theme=${themeToUse}`);
   };
 
   return (

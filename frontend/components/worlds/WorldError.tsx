@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
+import { useAppStore } from "@/stores/appStore";
 
 interface WorldErrorProps {
   error: string;
@@ -10,9 +11,10 @@ interface WorldErrorProps {
 
 export default function WorldError({ error }: WorldErrorProps) {
   const router = useRouter();
+  const { theme } = useAppStore();
 
   const handleReturnHome = () => {
-    router.push("/");
+    router.push(`/?theme=${theme || "fantasy"}`);
   };
 
   return (

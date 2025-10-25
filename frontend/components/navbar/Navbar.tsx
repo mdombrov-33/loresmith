@@ -42,7 +42,7 @@ export default function Navbar() {
       logout();
       //TODO: nuke this approach later and set httpOnly cookie from backend
       document.cookie = "auth=; path=/; max-age=0";
-      router.push("/");
+      router.push(`/?theme=${theme}`);
     }
   };
 
