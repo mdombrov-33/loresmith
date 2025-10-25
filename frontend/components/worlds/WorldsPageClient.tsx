@@ -17,7 +17,6 @@ export default function WorldsPageClient() {
     paragraphs,
     lorePieces,
     displayNames,
-    truncateText,
     sortDetails,
     actualTheme,
   } = useWorldsLogic();
@@ -31,16 +30,17 @@ export default function WorldsPageClient() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-6">
-      <WorldHeader parsedStory={parsedStory} />
-      <WorldQuestDescription parsedStory={parsedStory} />
-      <WorldStoryContent paragraphs={paragraphs} />
-      <WorldLorePieces
-        lorePieces={lorePieces}
-        displayNames={displayNames}
-        truncateText={truncateText}
-        sortDetails={sortDetails}
-      />
+    <main className="bg-background min-h-screen pb-20">
+      <div className="container mx-auto px-4 py-8">
+        <WorldHeader parsedStory={parsedStory} theme={actualTheme} />
+        <WorldQuestDescription parsedStory={parsedStory} />
+        <WorldStoryContent paragraphs={paragraphs} />
+        <WorldLorePieces
+          lorePieces={lorePieces}
+          displayNames={displayNames}
+          sortDetails={sortDetails}
+        />
+      </div>
       <WorldActions theme={actualTheme} />
     </main>
   );

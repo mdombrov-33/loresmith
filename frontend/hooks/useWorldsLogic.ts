@@ -30,11 +30,11 @@ export function useWorldsLogic() {
   const { setAppStage, setTheme: setStoreTheme, isHydrated } = useAppStore();
 
   const displayNames: Record<string, string> = {
-    characters: "Character",
-    factions: "Faction",
-    settings: "Setting",
-    events: "Event",
-    relics: "Relic",
+    character: "Character",
+    faction: "Faction",
+    setting: "Setting",
+    event: "Event",
+    relic: "Relic",
   };
 
   const truncateText = (text: string, maxLength: number = 150) => {

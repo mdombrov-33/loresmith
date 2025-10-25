@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
 import { FullStory } from "@/types/api";
 
@@ -10,17 +10,22 @@ export default function WorldQuestDescription({
   parsedStory,
 }: WorldQuestDescriptionProps) {
   return (
-    <Card className="border-primary/50 mx-auto mb-8 max-w-4xl shadow-lg">
-      <CardHeader className="bg-primary/5">
-        <div className="flex items-start gap-3">
-          <BookOpen className="text-primary mt-1 h-6 w-6 flex-shrink-0" />
-          <div className="flex-1">
-            <CardContent className="p-0 text-base">
-              {parsedStory.quest?.description}
-            </CardContent>
+    <section className="mb-8">
+      <Card className="shadow-xl">
+        <CardHeader className="border-border/50 border-b">
+          <div className="flex items-center gap-3">
+            <figure className="border-primary/30 bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg border">
+              <BookOpen className="text-primary h-5 w-5" />
+            </figure>
+            <CardTitle className="text-2xl">Your Quest</CardTitle>
           </div>
-        </div>
-      </CardHeader>
-    </Card>
+        </CardHeader>
+        <CardContent className="p-6">
+          <p className="text-foreground/90 text-base leading-relaxed">
+            {parsedStory.quest?.description}
+          </p>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
