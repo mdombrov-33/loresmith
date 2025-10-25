@@ -61,24 +61,24 @@ export default function SearchResultCard({
     >
       {themeOption && (
         <div className="absolute top-3 right-3">
-          <themeOption.icon className="text-muted-foreground h-6 w-6" />
+          <themeOption.icon className="text-muted-foreground h-8 w-8" />
         </div>
       )}
-      <CardHeader className="pt-6">
-        <CardTitle className="line-clamp-2 text-lg">
-          {fullStory.quest?.title || "Untitled World"}
-        </CardTitle>
-        <div className="mt-2 flex items-center gap-2">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
           <Badge variant="secondary">
             {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
           </Badge>
-          <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
-          {world.user_name && (
-            <Badge variant="outline" className="text-xs">
-              by {world.user_name}
-            </Badge>
-          )}
         </div>
+        <CardTitle className="line-clamp-2 text-lg">
+          {fullStory.quest?.title || "Untitled World"}
+        </CardTitle>
+        {world.user_name && (
+          <Badge variant="outline" className="mt-2 w-fit text-xs">
+            by {world.user_name}
+          </Badge>
+        )}
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
