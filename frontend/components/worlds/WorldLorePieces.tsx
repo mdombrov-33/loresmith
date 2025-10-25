@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -11,24 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Scroll,
-  Users,
-  MapPin,
-  Calendar,
-  Gem,
-  Shield,
-  Eye,
-  ChevronRight,
-  Sparkles,
-  BookOpen,
-  Zap,
-  Heart,
-  Brain,
-  Lightbulb,
-  Crown,
-} from "lucide-react";
+import { Scroll, Eye, ChevronRight, BookOpen } from "lucide-react";
 import { LorePiece } from "@/types/api";
+import { loreIcons, getAttributeIcon } from "@/constants/lore";
 
 interface WorldLorePiecesProps {
   lorePieces: LorePiece[];
@@ -36,45 +20,11 @@ interface WorldLorePiecesProps {
   sortDetails: (details: Record<string, unknown>) => [string, unknown][];
 }
 
-const loreIcons: Record<string, React.ElementType> = {
-  characters: Users,
-  factions: Shield,
-  settings: MapPin,
-  events: Calendar,
-  relics: Gem,
-};
-
-const getAttributeIcon = (key: string) => {
-  const iconMap: Record<string, { icon: React.ElementType; color: string }> = {
-    health: { icon: Heart, color: "text-red-500" },
-    stress: { icon: Brain, color: "text-blue-500" },
-    "lore mastery": { icon: BookOpen, color: "text-yellow-500" },
-    empathy: { icon: Users, color: "text-pink-500" },
-    resilience: { icon: Shield, color: "text-green-500" },
-    creativity: { icon: Lightbulb, color: "text-orange-500" },
-    influence: { icon: Crown, color: "text-purple-500" },
-  };
-
-  const normalizedKey = key.toLowerCase().replace(/_/g, " ");
-  return iconMap[normalizedKey] || { icon: Zap, color: "text-primary" };
-};
-
 export default function WorldLorePieces({
   lorePieces,
   displayNames,
   sortDetails,
 }: WorldLorePiecesProps) {
-  const groupedPieces = lorePieces.reduce(
-    (acc, piece) => {
-      if (!acc[piece.type]) acc[piece.type] = [];
-      acc[piece.type].push(piece);
-      return acc;
-    },
-    {} as Record<string, LorePiece[]>,
-  );
-
-  const allTypes = Object.keys(groupedPieces);
-
   return (
     <section className="mb-8">
       <Card className="shadow-xl">
@@ -86,52 +36,17 @@ export default function WorldLorePieces({
             <CardTitle className="text-2xl">World Encyclopedia</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6 flex w-full flex-wrap justify-start gap-2">
-              <TabsTrigger value="all" className="gap-2">
-                <Sparkles className="h-4 w-4" />
-                All
-              </TabsTrigger>
-              {allTypes.map((type) => {
-                const Icon = loreIcons[type] || Scroll;
-                return (
-                  <TabsTrigger key={type} value={type} className="gap-2">
-                    <Icon className="h-4 w-4" />
-                    {displayNames[type] || type}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-
-            <TabsContent value="all" className="space-y-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                {lorePieces.map((piece) => (
-                  <LorePieceCard
-                    key={piece.id}
-                    piece={piece}
-                    displayNames={displayNames}
-                    sortDetails={sortDetails}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-
-            {allTypes.map((type) => (
-              <TabsContent key={type} value={type} className="space-y-4">
-                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-                  {groupedPieces[type].map((piece) => (
-                    <LorePieceCard
-                      key={piece.id}
-                      piece={piece}
-                      displayNames={displayNames}
-                      sortDetails={sortDetails}
-                    />
-                  ))}
-                </div>
-              </TabsContent>
+        <CardContent className="p-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {lorePieces?.map((piece) => (
+              <LorePieceCard
+                key={piece.id}
+                piece={piece}
+                displayNames={displayNames}
+                sortDetails={sortDetails}
+              />
             ))}
-          </Tabs>
+          </div>
         </CardContent>
       </Card>
     </section>

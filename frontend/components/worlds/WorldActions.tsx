@@ -8,14 +8,14 @@ interface WorldActionsProps {
   theme: string;
 }
 
-export default function WorldActions({}: WorldActionsProps) {
+export default function WorldActions({ theme }: WorldActionsProps) {
   const router = useRouter();
 
   const handleCreateNewStory = () => {
-    router.push("/generate");
+    router.push(`/generate?theme=${theme}`);
   };
 
-  const handleCheckOtherWorlds = () => {
+  const handleExploreWorlds = () => {
     router.push("/search");
   };
 
@@ -42,8 +42,8 @@ export default function WorldActions({}: WorldActionsProps) {
             <ActionButton
               variant="outline"
               size="sm"
+              onClick={() => handleCreateNewStory()}
               className="gap-2 transition-all hover:scale-105"
-              onClick={handleCreateNewStory}
             >
               <Wand2 className="h-4 w-4" />
               Create New Story
@@ -51,8 +51,8 @@ export default function WorldActions({}: WorldActionsProps) {
             <ActionButton
               variant="outline"
               size="sm"
+              onClick={() => handleExploreWorlds()}
               className="gap-2 transition-all hover:scale-105"
-              onClick={handleCheckOtherWorlds}
             >
               <Eye className="h-4 w-4" />
               Explore Worlds
@@ -60,8 +60,8 @@ export default function WorldActions({}: WorldActionsProps) {
             <ActionButton
               variant="outline"
               size="sm"
+              onClick={() => handleReturnHome()}
               className="gap-2 transition-all hover:scale-105"
-              onClick={handleReturnHome}
             >
               <Home className="h-4 w-4" />
               Return Home

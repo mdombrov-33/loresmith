@@ -21,8 +21,8 @@ export default function WorldStoryContent({
             <CardTitle className="text-2xl">The Chronicle</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4 text-base leading-relaxed">
+        <CardContent className="p-8">
+          <div className="space-y-6 text-base leading-relaxed">
             {paragraphs.length > 0 ? (
               paragraphs.map((paragraph, index) => (
                 <div
