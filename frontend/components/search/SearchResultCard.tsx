@@ -89,9 +89,6 @@ export default function SearchResultCard({
             {new Date(world.created_at).toLocaleDateString()}
           </span>
           <div className="flex gap-2">
-            <ActionButton size="sm" onClick={handleViewWorld}>
-              View World
-            </ActionButton>
             {scope === "my" && (
               <ActionButton
                 size="sm"
@@ -102,6 +99,9 @@ export default function SearchResultCard({
                 {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
               </ActionButton>
             )}
+            <ActionButton size="sm" onClick={handleViewWorld}>
+              View World
+            </ActionButton>
           </div>
         </div>
       </CardContent>
