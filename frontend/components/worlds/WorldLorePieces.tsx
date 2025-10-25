@@ -101,7 +101,7 @@ function LorePieceCard({
             >
               <span className="flex items-center gap-2">
                 <Eye className="h-4 w-4" />
-                View Details
+                Read More
               </span>
               <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
             </Button>
