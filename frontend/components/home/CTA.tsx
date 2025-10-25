@@ -28,6 +28,29 @@ export default function CTA() {
 
   const isAuthenticated = !!session || (!!user && !!token);
 
+  const handleExploreWorlds = () => {
+    const { searchTheme, searchStatus } = useAppStore.getState();
+    const params = new URLSearchParams();
+    if (searchTheme) params.set("theme", searchTheme);
+    if (searchStatus) params.set("status", searchStatus);
+    const query = params.toString();
+    router.push(query ? `/search?${query}` : "/search");
+  };
+
+  const handleStartCreating = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast("Please login to start your adventure", {
+        action: {
+          label: "Login",
+          onClick: () => setIsLoginModalOpen(true),
+        },
+      });
+    } else {
+      router.push(`/generate?theme=${theme}`);
+    }
+  };
+
   return (
     <section ref={elementRef} className="container mx-auto px-4 py-24">
       <div
@@ -101,19 +124,7 @@ export default function CTA() {
               variant="default"
               size="lg"
               className="group bg-primary text-primary-foreground hover:shadow-primary/50 relative overflow-hidden rounded-lg px-8 py-4 text-lg font-semibold shadow-2xl transition-all hover:scale-105"
-              onClick={(e) => {
-                if (!isAuthenticated) {
-                  e.preventDefault();
-                  toast("Please login to start your adventure", {
-                    action: {
-                      label: "Login",
-                      onClick: () => setIsLoginModalOpen(true),
-                    },
-                  });
-                } else {
-                  router.push(`/generate?theme=${theme}`);
-                }
-              }}
+              onClick={handleStartCreating}
             >
               <span className="relative z-10 flex items-center gap-2">
                 <Zap className="h-5 w-5" />
@@ -127,7 +138,7 @@ export default function CTA() {
               variant="outline"
               size="lg"
               className="group rounded-lg px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-              onClick={() => router.push("/search")}
+              onClick={handleExploreWorlds}
             >
               <span className="flex items-center gap-2">
                 Explore Worlds

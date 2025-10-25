@@ -5,14 +5,27 @@ import { World } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
 export function useSearchLogic() {
-  const { setAppStage, searchScope, setSearchScope } = useAppStore();
+  const {
+    setAppStage,
+    searchScope,
+    setSearchScope,
+    searchTheme,
+    setSearchTheme,
+    searchStatus,
+    setSearchStatus,
+  } = useAppStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
   const urlScope = searchParams.get("scope") as "my" | "global" | null;
+  const urlStatus = searchParams.get("status");
 
-  const [selectedTheme, setSelectedTheme] = useState<string>(urlTheme || "");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedTheme, setSelectedTheme] = useState<string>(
+    urlTheme || searchTheme || "",
+  );
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    urlStatus || searchStatus || "",
+  );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
@@ -45,16 +58,35 @@ export function useSearchLogic() {
   }, [urlTheme, selectedTheme]);
 
   useEffect(() => {
+    if (urlStatus !== selectedStatus) {
+      setSelectedStatus(urlStatus || "");
+    }
+  }, [urlStatus, selectedStatus]);
+
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchScope, selectedTheme, selectedStatus]);
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
+    setSearchTheme(theme);
     const params = new URLSearchParams(searchParams.toString());
     if (theme) {
       params.set("theme", theme);
     } else {
       params.delete("theme");
+    }
+    router.replace(`/search?${params.toString()}`);
+  };
+
+  const handleStatusChange = (status: string) => {
+    setSelectedStatus(status);
+    setSearchStatus(status);
+    const params = new URLSearchParams(searchParams.toString());
+    if (status) {
+      params.set("status", status);
+    } else {
+      params.delete("status");
     }
     router.replace(`/search?${params.toString()}`);
   };
@@ -99,7 +131,7 @@ export function useSearchLogic() {
     setSelectedScope: handleScopeChange,
     selectedTheme,
     selectedStatus,
-    setSelectedStatus,
+    setSelectedStatus: handleStatusChange,
     searchQuery,
     setSearchQuery,
     handleThemeChange,

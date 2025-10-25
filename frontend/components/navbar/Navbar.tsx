@@ -46,6 +46,15 @@ export default function Navbar() {
     }
   };
 
+  const handleSearchNavigation = () => {
+    const { searchTheme, searchStatus } = useAppStore.getState();
+    const params = new URLSearchParams();
+    if (searchTheme) params.set("theme", searchTheme);
+    if (searchStatus) params.set("status", searchStatus);
+    const query = params.toString();
+    router.push(query ? `/search?${query}` : "/search");
+  };
+
   return (
     <>
       <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
@@ -75,7 +84,7 @@ export default function Navbar() {
                 <ActionButton
                   variant="ghost"
                   size="sm"
-                  onClick={() => router.push("/search")}
+                  onClick={handleSearchNavigation}
                   icon={<Search className="h-4 w-4" />}
                 >
                   Search

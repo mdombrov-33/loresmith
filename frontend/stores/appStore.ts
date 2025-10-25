@@ -27,6 +27,8 @@ interface AppState {
 
   //* Search
   searchScope: "my" | "global";
+  searchTheme: string;
+  searchStatus: string;
 
   //* Modals
   isLoginModalOpen: boolean;
@@ -48,6 +50,8 @@ interface AppState {
     value: LorePiece | undefined,
   ) => void;
   setSearchScope: (scope: "my" | "global") => void;
+  setSearchTheme: (theme: string) => void;
+  setSearchStatus: (status: string) => void;
   setIsLoginModalOpen: (open: boolean) => void;
   setIsRegisterModalOpen: (open: boolean) => void;
 }
@@ -63,6 +67,8 @@ export const useAppStore = create<AppState>((set) => ({
   appStage: "home",
   selectedLore: {},
   searchScope: "my",
+  searchTheme: "",
+  searchStatus: "",
   isLoginModalOpen: false,
   isRegisterModalOpen: false,
   isHydrated: false,
@@ -85,6 +91,8 @@ export const useAppStore = create<AppState>((set) => ({
       selectedLore: { ...state.selectedLore, [key]: value },
     })),
   setSearchScope: (searchScope: "my" | "global") => set({ searchScope }),
+  setSearchTheme: (searchTheme: string) => set({ searchTheme }),
+  setSearchStatus: (searchStatus: string) => set({ searchStatus }),
   setIsLoginModalOpen: (open: boolean) => set({ isLoginModalOpen: open }),
   setIsRegisterModalOpen: (open: boolean) => set({ isRegisterModalOpen: open }),
 }));
@@ -99,6 +107,8 @@ useAppStore.subscribe((state) => {
     token: state.token,
     selectedLore: state.selectedLore,
     searchScope: state.searchScope,
+    searchTheme: state.searchTheme,
+    searchStatus: state.searchStatus,
   };
   localStorage.setItem("loresmith-store", JSON.stringify(partial));
 });

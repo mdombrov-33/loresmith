@@ -19,6 +19,25 @@ export default function Hero() {
 
   const isAuthenticated = !!session || (!!user && !!token);
 
+  const handleBeginAdventure = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast("Please login to start your adventure", {
+        action: {
+          label: "Login",
+          onClick: () => setIsLoginModalOpen(true),
+        },
+      });
+    } else {
+      router.push(`/generate?theme=${theme}`);
+    }
+  };
+
+  const handleLearnMore = () => {
+    const featuresSection = document.getElementById("features");
+    featuresSection?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <header className="relative min-h-[90vh] overflow-hidden">
       {/* Animated background particles */}
@@ -70,19 +89,7 @@ export default function Hero() {
               variant="default"
               size="lg"
               className="group bg-primary text-primary-foreground hover:shadow-primary/25 relative overflow-hidden rounded-lg px-8 py-4 text-lg font-semibold shadow-2xl transition-all hover:scale-105"
-              onClick={(e) => {
-                if (!isAuthenticated) {
-                  e.preventDefault();
-                  toast("Please login to start your adventure", {
-                    action: {
-                      label: "Login",
-                      onClick: () => setIsLoginModalOpen(true),
-                    },
-                  });
-                } else {
-                  router.push(`/generate?theme=${theme}`);
-                }
-              }}
+              onClick={handleBeginAdventure}
             >
               <span className="relative z-10 flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
@@ -98,10 +105,7 @@ export default function Hero() {
               variant="outline"
               size="lg"
               className="group rounded-lg px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-              onClick={() => {
-                const featuresSection = document.getElementById("features");
-                featuresSection?.scrollIntoView({ behavior: "smooth" });
-              }}
+              onClick={handleLearnMore}
             >
               <span className="flex items-center gap-2">
                 Learn More

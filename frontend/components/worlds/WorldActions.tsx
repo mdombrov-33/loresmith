@@ -18,7 +18,12 @@ export default function WorldActions({ theme }: WorldActionsProps) {
   };
 
   const handleExploreWorlds = () => {
-    router.push("/search");
+    const { searchTheme, searchStatus } = useAppStore.getState();
+    const params = new URLSearchParams();
+    if (searchTheme) params.set("theme", searchTheme);
+    if (searchStatus) params.set("status", searchStatus);
+    const query = params.toString();
+    router.push(query ? `/search?${query}` : "/search");
   };
 
   const handleReturnHome = () => {
