@@ -72,7 +72,7 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"world_id": worldID})
 }
 
-func (h *WorldHandler) HandleGetWorld(w http.ResponseWriter, r *http.Request) {
+func (h *WorldHandler) HandleGetWorldById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
 		return
@@ -85,7 +85,7 @@ func (h *WorldHandler) HandleGetWorld(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	world, err := h.worldStore.GetWorld(worldID)
+	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get world: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get world"})
@@ -99,7 +99,7 @@ func (h *WorldHandler) HandleGetWorld(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"world": world})
 }
 
-func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
+func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
 		return
@@ -152,7 +152,7 @@ func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
 
 	includeUserName := scope == "global"
 
-	worlds, total, err := h.worldStore.GetWorldsWithFilters(userID, theme, status, includeUserName, limit, offset)
+	worlds, total, err := h.worldStore.GetWorldsByFilters(userID, theme, status, includeUserName, limit, offset)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get worlds: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get worlds"})
@@ -160,4 +160,27 @@ func (h *WorldHandler) HandleGetWorlds(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"worlds": worlds, "total": total})
+}
+
+func (h *WorldHandler) HandleDeleteWorldById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		return
+	}
+
+	worldIDStr := chi.URLParam(r, "id")
+	worldID, err := strconv.Atoi(worldIDStr)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		return
+	}
+
+	err = h.worldStore.DeleteWorldById(worldID)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to delete world: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to delete world"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"message": "world deleted successfully"})
 }

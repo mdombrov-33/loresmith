@@ -25,6 +25,9 @@ interface AppState {
   //* Selected Lore (for generation/story flow)
   selectedLore: SelectedLore;
 
+  //* Search
+  searchScope: "my" | "global";
+
   //* Modals
   isLoginModalOpen: boolean;
   isRegisterModalOpen: boolean;
@@ -44,6 +47,7 @@ interface AppState {
     key: keyof SelectedLore,
     value: LorePiece | undefined,
   ) => void;
+  setSearchScope: (scope: "my" | "global") => void;
   setIsLoginModalOpen: (open: boolean) => void;
   setIsRegisterModalOpen: (open: boolean) => void;
 }
@@ -58,6 +62,7 @@ export const useAppStore = create<AppState>((set) => ({
   token: null,
   appStage: "home",
   selectedLore: {},
+  searchScope: "my",
   isLoginModalOpen: false,
   isRegisterModalOpen: false,
   isHydrated: false,
@@ -79,6 +84,7 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({
       selectedLore: { ...state.selectedLore, [key]: value },
     })),
+  setSearchScope: (searchScope: "my" | "global") => set({ searchScope }),
   setIsLoginModalOpen: (open: boolean) => set({ isLoginModalOpen: open }),
   setIsRegisterModalOpen: (open: boolean) => set({ isRegisterModalOpen: open }),
 }));
@@ -92,6 +98,7 @@ useAppStore.subscribe((state) => {
     user: state.user,
     token: state.token,
     selectedLore: state.selectedLore,
+    searchScope: state.searchScope,
   };
   localStorage.setItem("loresmith-store", JSON.stringify(partial));
 });

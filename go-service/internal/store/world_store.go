@@ -33,8 +33,9 @@ type LorePiece struct {
 
 type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
-	GetWorld(worldID int) (*World, error)
-	GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
+	GetWorldById(worldID int) (*World, error)
+	GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
+	DeleteWorldById(worldID int) error
 }
 
 type PostgresWorldStore struct {
@@ -97,7 +98,7 @@ func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb
 	return worldID, nil
 }
 
-func (s *PostgresWorldStore) GetWorld(worldID int) (*World, error) {
+func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 	var world World
 	err := s.db.QueryRow(`
         SELECT id, user_id, status, theme, full_story, created_at, updated_at
@@ -137,7 +138,7 @@ func (s *PostgresWorldStore) GetWorld(worldID int) (*World, error) {
 	return &world, nil
 }
 
-func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error) {
+func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error) {
 	var query string
 	var countQuery string
 	args := []interface{}{}
@@ -216,4 +217,9 @@ func (s *PostgresWorldStore) GetWorldsWithFilters(userID *int, theme *string, st
 	}
 
 	return worlds, total, nil
+}
+
+func (s *PostgresWorldStore) DeleteWorldById(worldID int) error {
+	_, err := s.db.Exec(`DELETE FROM worlds WHERE id = $1`, worldID)
+	return err
 }

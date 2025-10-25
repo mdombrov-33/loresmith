@@ -5,6 +5,7 @@ import {
   generateDraft,
   getWorld,
   getWorlds,
+  deleteWorld,
   registerUser,
   loginUser,
 } from "./api";
@@ -83,7 +84,6 @@ export function useGenerateFullStory() {
       theme: string;
     }) => generateFullStory(selectedLore, theme),
     onSuccess: () => {
-      //* Optionally invalidate related queries
       queryClient.invalidateQueries({ queryKey: ["world"] });
     },
   });
@@ -102,6 +102,16 @@ export function useGenerateDraft() {
     }) => generateDraft(selectedLore, theme),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["world"] });
+    },
+  });
+}
+
+export function useDeleteWorld() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (worldId: number) => deleteWorld(worldId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
     },
   });
 }

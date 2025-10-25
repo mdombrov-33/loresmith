@@ -5,12 +5,12 @@ import { World } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
 export function useSearchLogic() {
-  const { setAppStage } = useAppStore();
+  const { setAppStage, searchScope, setSearchScope } = useAppStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const urlTheme = searchParams.get("theme");
+  const urlScope = searchParams.get("scope") as "my" | "global" | null;
 
-  const [selectedScope, setSelectedScope] = useState<"my" | "global">("my");
   const [selectedTheme, setSelectedTheme] = useState<string>(urlTheme || "");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -22,14 +22,31 @@ export function useSearchLogic() {
   }, [setAppStage]);
 
   useEffect(() => {
+    if (urlScope && urlScope !== "my") {
+      setSearchScope(urlScope);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchScope) {
+      params.set("scope", searchScope);
+    } else {
+      params.delete("scope");
+    }
+    router.replace(`/search?${params.toString()}`);
+  }, [searchScope, searchParams, router]);
+
+  useEffect(() => {
     if (urlTheme !== selectedTheme) {
       setSelectedTheme(urlTheme || "");
     }
   }, [urlTheme, selectedTheme]);
 
   useEffect(() => {
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [selectedScope, selectedTheme, selectedStatus]);
+    setCurrentPage(1);
+  }, [searchScope, selectedTheme, selectedStatus]);
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
@@ -42,12 +59,16 @@ export function useSearchLogic() {
     router.replace(`/search?${params.toString()}`);
   };
 
+  const handleScopeChange = (scope: "my" | "global") => {
+    setSearchScope(scope);
+  };
+
   const {
     data: { worlds = [], total = 0 } = {},
     isLoading,
     error,
   } = useWorlds({
-    scope: selectedScope,
+    scope: searchScope,
     theme: selectedTheme || undefined,
     status: selectedStatus || undefined,
     limit: pageSize,
@@ -74,8 +95,8 @@ export function useSearchLogic() {
   });
 
   return {
-    selectedScope,
-    setSelectedScope,
+    selectedScope: searchScope,
+    setSelectedScope: handleScopeChange,
     selectedTheme,
     selectedStatus,
     setSelectedStatus,

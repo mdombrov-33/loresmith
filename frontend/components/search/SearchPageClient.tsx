@@ -61,7 +61,7 @@ export default function SearchPageClient() {
               <SearchError error={error} />
             ) : (
               <>
-                <SearchResults worlds={worlds} />
+                <SearchResults worlds={worlds} scope={selectedScope} />
                 {totalPages > 1 && (
                   <Pagination className="mt-6">
                     <PaginationContent>

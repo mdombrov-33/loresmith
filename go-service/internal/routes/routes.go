@@ -29,9 +29,10 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
 		r.Get("/generate/all", app.LoreHandler.HandleGenerateAll)
 		r.Post("/generate/full-story", app.LoreHandler.HandleGenerateFullStory)
-		r.Get("/worlds", app.WorldHandler.HandleGetWorlds)
-		r.Get("/worlds/{id}", app.WorldHandler.HandleGetWorld)
+		r.Get("/worlds", app.WorldHandler.HandleGetWorldsByFilters)
+		r.Get("/worlds/{id}", app.WorldHandler.HandleGetWorldById)
 		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld)
+		r.Delete("/worlds/{id}", app.WorldHandler.HandleDeleteWorldById)
 	})
 
 	r.Get("/health", app.HealthCheck)

@@ -11,7 +11,7 @@ import {
 } from "@/types/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-const REQUEST_TIMEOUT = 60000; // 60 seconds
+const REQUEST_TIMEOUT = 60000; //* 60 seconds
 
 async function getAuthHeaders() {
   const session = await getSession();
@@ -181,6 +181,19 @@ export async function getWorlds(filters?: {
 
   const data = await response.json();
   return { worlds: data.worlds || [], total: data.total || 0 };
+}
+
+export async function deleteWorld(worldId: number): Promise<void> {
+  const url = `${API_BASE_URL}/worlds/${worldId}`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "DELETE",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete world: ${response.statusText}`);
+  }
 }
 
 export async function registerUser(

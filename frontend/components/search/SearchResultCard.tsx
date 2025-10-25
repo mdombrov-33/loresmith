@@ -1,18 +1,35 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
+import { useDeleteWorld } from "@/lib/queries";
 
 interface SearchResultCardProps {
   world: World;
+  scope: "my" | "global";
 }
 
-export default function SearchResultCard({ world }: SearchResultCardProps) {
+export default function SearchResultCard({
+  world,
+  scope,
+}: SearchResultCardProps) {
   const router = useRouter();
+  const deleteWorldMutation = useDeleteWorld();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const fullStory = JSON.parse(world.full_story);
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
@@ -21,6 +38,21 @@ export default function SearchResultCard({ world }: SearchResultCardProps) {
 
   const handleViewWorld = () => {
     router.push(`/worlds/${world.theme}/${world.id}`);
+  };
+
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteWorldMutation.mutate(world.id, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+      },
+      onError: () => {
+        setIsDeleteDialogOpen(false);
+      },
+    });
   };
 
   return (
@@ -56,11 +88,52 @@ export default function SearchResultCard({ world }: SearchResultCardProps) {
           <span className="text-muted-foreground text-xs">
             {new Date(world.created_at).toLocaleDateString()}
           </span>
-          <ActionButton size="sm" onClick={handleViewWorld}>
-            View World
-          </ActionButton>
+          <div className="flex gap-2">
+            <ActionButton size="sm" onClick={handleViewWorld}>
+              View World
+            </ActionButton>
+            {scope === "my" && (
+              <ActionButton
+                size="sm"
+                variant="destructive"
+                onClick={handleDeleteClick}
+                disabled={deleteWorldMutation.isPending}
+              >
+                {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+              </ActionButton>
+            )}
+          </div>
         </div>
       </CardContent>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete World</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete &quot;
+              {fullStory.quest?.title || "this world"}&quot;? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={deleteWorldMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteWorldMutation.isPending}
+            >
+              {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
