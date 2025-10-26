@@ -69,6 +69,11 @@ class LoreServiceStub(object):
                 request_serializer=lore__pb2.FullStoryRequest.SerializeToString,
                 response_deserializer=lore__pb2.FullStoryResponse.FromString,
                 _registered_method=True)
+        self.GenerateEmbedding = channel.unary_unary(
+                '/lore.LoreService/GenerateEmbedding',
+                request_serializer=lore__pb2.EmbeddingRequest.SerializeToString,
+                response_deserializer=lore__pb2.EmbeddingResponse.FromString,
+                _registered_method=True)
 
 
 class LoreServiceServicer(object):
@@ -116,6 +121,12 @@ class LoreServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GenerateEmbedding(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_LoreServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -153,6 +164,11 @@ def add_LoreServiceServicer_to_server(servicer, server):
                     servicer.GenerateFullStory,
                     request_deserializer=lore__pb2.FullStoryRequest.FromString,
                     response_serializer=lore__pb2.FullStoryResponse.SerializeToString,
+            ),
+            'GenerateEmbedding': grpc.unary_unary_rpc_method_handler(
+                    servicer.GenerateEmbedding,
+                    request_deserializer=lore__pb2.EmbeddingRequest.FromString,
+                    response_serializer=lore__pb2.EmbeddingResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -344,6 +360,33 @@ class LoreService(object):
             '/lore.LoreService/GenerateFullStory',
             lore__pb2.FullStoryRequest.SerializeToString,
             lore__pb2.FullStoryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GenerateEmbedding(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/lore.LoreService/GenerateEmbedding',
+            lore__pb2.EmbeddingRequest.SerializeToString,
+            lore__pb2.EmbeddingResponse.FromString,
             options,
             channel_credentials,
             insecure,

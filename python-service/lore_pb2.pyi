@@ -175,3 +175,15 @@ class FullStoryResponse(_message.Message):
     STORY_FIELD_NUMBER: _ClassVar[int]
     story: FullStory
     def __init__(self, story: _Optional[_Union[FullStory, _Mapping]] = ...) -> None: ...
+
+class EmbeddingRequest(_message.Message):
+    __slots__ = ("text",)
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    text: str
+    def __init__(self, text: _Optional[str] = ...) -> None: ...
+
+class EmbeddingResponse(_message.Message):
+    __slots__ = ("embedding",)
+    EMBEDDING_FIELD_NUMBER: _ClassVar[int]
+    embedding: _containers.RepeatedScalarFieldContainer[float]
+    def __init__(self, embedding: _Optional[_Iterable[float]] = ...) -> None: ...
