@@ -14,6 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
 import { useDeleteWorld } from "@/lib/queries";
@@ -35,6 +42,14 @@ export default function SearchResultCard({
   const themeBorderColor = themeOption
     ? `border-${themeOption.value}`
     : "border-primary";
+
+  const getMatchLabel = (relevance: number) => {
+    if (relevance >= 0.8)
+      return { label: "High Match", color: "text-green-600" };
+    if (relevance >= 0.5)
+      return { label: "Medium Match", color: "text-orange-600" };
+    return { label: "Low Match", color: "text-red-600" };
+  };
 
   const handleViewWorld = () => {
     router.push(`/worlds/${world.theme}/${world.id}`);
@@ -90,9 +105,26 @@ export default function SearchResultCard({
               {new Date(world.created_at).toLocaleDateString()}
             </span>
             {world.relevance && (
-              <span className="text-xs font-medium text-green-600">
-                {(world.relevance * 100).toFixed(1)}% relevant
-              </span>
+              <div className="mt-2 flex items-center gap-1">
+                <span
+                  className={`text-xs font-medium ${getMatchLabel(world.relevance).color}`}
+                >
+                  {getMatchLabel(world.relevance).label}
+                </span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="text-muted-foreground h-3 w-3 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Results ranked by AI for thematic relevance. Score
+                        reflects semantic match.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             )}
           </div>
           <div className="flex gap-2">

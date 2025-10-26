@@ -6,12 +6,19 @@ Reference: https://github.com/NirDiamant/RAG_TECHNIQUES/blob/main/all_rag_techni
 We use LLM-based reranking to better differentiate search results after initial vector similarity search.
 """
 
-import json
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import PromptTemplate
+from pydantic import BaseModel, Field
 
 from services.llm_client import get_llm
 from utils.logger import logger
+
+
+class RelevanceScore(BaseModel):
+    relevance_score: float = Field(
+        ...,
+        description="The relevance score of a world to the query, on a scale of 1-10.",
+    )
 
 
 class ResultReranker:
@@ -19,11 +26,11 @@ class ResultReranker:
 
     def __init__(self, llm: BaseChatModel | None = None):
         """Initialize with optional LLM instance."""
-        self.llm = llm or get_llm(max_tokens=300, temperature=0.1)
+        self.llm = llm or get_llm(max_tokens=1000, temperature=0.1)
 
     def rerank_results(self, query: str, worlds: list[dict]) -> list[dict]:
         """
-        Rerank search results using LLM to score relevance.
+        Rerank search results using LLM to score relevance individually.
 
         Args:
             query: Original search query
@@ -45,101 +52,55 @@ class ResultReranker:
         logger.info(f"Starting reranking for query '{query}' with {len(worlds)} worlds")
 
         try:
-            world_summaries = self._create_world_summaries(worlds)
+            scored_worlds = []
+            for world in worlds:
+                initial_relevance = world.get("relevance", 0)
+                full_story = world.get("full_story", "")
+                theme = world.get("theme", "Unknown")
 
-            ranking_indices = self._get_llm_ranking(query, world_summaries, len(worlds))
+                prompt = PromptTemplate.from_template("""
+                On a scale of 1-10, rate the relevance of the following world description to the query. 
+                Give high scores (8-10) for strong matches, medium (5-7) for partial matches, and low (1-4) for weak matches.
+                Consider the initial similarity {initial_relevance:.1%} but prioritize semantic fit over keywords.
+                Query: {query}
+                World ({theme}): {full_story}
+                Relevance Score (1-10):
+                """)
 
-            reranked_worlds = [worlds[i] for i in ranking_indices]
+                chain = prompt | self.llm.with_structured_output(RelevanceScore)
+                score_response = chain.invoke(
+                    {
+                        "query": query,
+                        "initial_relevance": initial_relevance,
+                        "theme": theme,
+                        "full_story": full_story[:500],  # Truncate for token limits
+                    }
+                )
+                if isinstance(score_response, RelevanceScore):
+                    new_score = score_response.relevance_score
+                else:
+                    logger.warning(
+                        f"Unexpected response type: {type(score_response)}, using default score"
+                    )
+                    new_score = 5.0  # Default medium score
 
-            logger.info(
-                f"Reranking complete: original order {list(range(len(worlds)))} -> {ranking_indices}"
-            )
+                # Update the world dict with new score (as decimal for display, e.g., 0.8 for 80%)
+                world["relevance"] = new_score / 10.0
+                logger.info(
+                    f"World '{theme}': initial {initial_relevance:.1%} -> new {new_score}/10 = {world['relevance']:.1%}"
+                )
+                scored_worlds.append((world, new_score))
+
+            reranked_worlds = [
+                w for w, _ in sorted(scored_worlds, key=lambda x: x[1], reverse=True)
+            ]
+
+            logger.info("Reranking complete with new scores")
             return reranked_worlds
 
         except Exception as e:
             logger.warning(f"Reranking failed: {e}, returning original order")
             return worlds
-
-    def _create_world_summaries(self, worlds: list[dict]) -> str:
-        """Create truncated summaries of worlds for LLM input."""
-        summaries = []
-        for i, world in enumerate(worlds):
-            theme = world.get("theme", "Unknown")
-            full_story = world.get("full_story", "")
-
-            summary = f"World {i + 1} ({theme}): {full_story[:200]}..."
-            summaries.append(summary)
-
-        return "\n\n".join(summaries)
-
-    def _get_llm_ranking(
-        self, query: str, world_summaries: str, num_worlds: int
-    ) -> list[int]:
-        """Get ranking from LLM."""
-        prompt = ChatPromptTemplate.from_template("""
-        Given the search query: "{query}"
-
-        Rank these world descriptions by how well they match the query.
-        Consider themes, characters, settings, events, relics, and overall relevance.
-
-        {world_summaries}
-
-        Return ONLY a JSON array of indices in ranked order (best match first).
-        Example: [0, 2, 1, 3] means World 0 is best, World 2 is second, etc.
-
-        JSON array:
-        """)
-
-        chain = prompt | self.llm
-        response = chain.invoke({"query": query, "world_summaries": world_summaries})
-
-        content = response.content
-        if isinstance(content, list):
-            # If it's a list, join the elements
-            content = " ".join(str(item) for item in content)
-        elif isinstance(content, dict):
-            # If it's a dict, try to extract text content
-            content = str(content.get("text", content))
-
-        content = content.strip()
-
-        # Try to extract JSON array from response
-        try:
-            # Look for JSON array in the response
-            start_idx = content.find("[")
-            end_idx = content.rfind("]") + 1
-            if start_idx != -1 and end_idx > start_idx:
-                json_str = content[start_idx:end_idx]
-                ranking = json.loads(json_str)
-
-                # Validate ranking
-                if (
-                    isinstance(ranking, list)
-                    and len(ranking) == num_worlds
-                    and set(ranking) == set(range(num_worlds))
-                ):
-                    return ranking
-                else:
-                    raise ValueError("Invalid ranking format")
-
-            else:
-                # Try parsing the whole response as JSON
-                ranking = json.loads(content)
-                if (
-                    isinstance(ranking, list)
-                    and len(ranking) == num_worlds
-                    and set(ranking) == set(range(num_worlds))
-                ):
-                    return ranking
-                else:
-                    raise ValueError("Invalid ranking format")
-
-        except (json.JSONDecodeError, ValueError) as e:
-            logger.warning(
-                f"Failed to parse LLM ranking response: {e}, content: {content}"
-            )
-            # Fallback: return original order
-            return list(range(num_worlds))
 
 
 def rerank_search_results(query: str, worlds: list[dict]) -> list[dict]:

@@ -58,13 +58,13 @@ class QueryPreprocessor:
             Rewritten query optimized for semantic search
         """
         prompt = ChatPromptTemplate.from_template("""
-        You are a helpful AI assistant. Given the following query, rewrite it to be more effective for semantic search
-        by making it more descriptive and specific. Include relevant keywords that would likely appear in
-        detailed world descriptions.
+        You are a helpful AI assistant. Given the following query, rewrite it as a descriptive phrase for semantic search,
+        making it more specific and including relevant keywords that would appear in detailed world descriptions.
+        Do not make it a question.
 
         Original query: {query}
 
-        Return ONLY the rewritten query as a single sentence, no explanations or additional text:
+        Return ONLY the rewritten phrase as a single sentence, no explanations or additional text:
         """)
 
         chain = prompt | self.llm

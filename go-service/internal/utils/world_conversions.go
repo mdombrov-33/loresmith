@@ -35,11 +35,13 @@ func ConvertFromWorldResults(reranked []*lorepb.WorldResult, originals []*store.
 		originalMap[world.ID] = world
 	}
 
-	//* Reorder based on reranked results
+	//* Reorder based on reranked results and update relevance
 	for i, rerankedResult := range reranked {
 		if id, err := strconv.Atoi(rerankedResult.Title); err == nil {
 			if original, exists := originalMap[id]; exists {
 				results[i] = original
+				updatedRelevance := float64(rerankedResult.Relevance)
+				results[i].Relevance = &updatedRelevance
 			}
 		}
 	}
