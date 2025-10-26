@@ -25,6 +25,7 @@ export default function SearchPageClient() {
     setSelectedStatus,
     searchQuery,
     setSearchQuery,
+    handleSearch,
     handleThemeChange,
     worlds,
     isLoading,
@@ -54,6 +55,8 @@ export default function SearchPageClient() {
             <SearchBar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              onSearch={handleSearch}
+              isLoading={isLoading}
             />
             {isLoading ? (
               <SearchLoading />

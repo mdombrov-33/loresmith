@@ -3,10 +3,13 @@ package store
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
+	"github.com/pgvector/pgvector-go"
 )
 
 type World struct {
@@ -19,6 +22,7 @@ type World struct {
 	LorePieces []*LorePiece `json:"lore_pieces,omitempty"`
 	CreatedAt  time.Time    `json:"created_at"`
 	UpdatedAt  time.Time    `json:"updated_at"`
+	Relevance  *float64     `json:"relevance,omitempty"`
 }
 
 type LorePiece struct {
@@ -33,8 +37,10 @@ type LorePiece struct {
 
 type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
+	CreateWorldWithEmbedding(userID int, theme string, story *lorepb.FullStory, status string, embedding []float32) (int, error)
 	GetWorldById(worldID int) (*World, error)
 	GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
+	SearchWorldsByEmbedding(embedding []float32, userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
 	DeleteWorldById(worldID int) error
 }
 
@@ -47,6 +53,10 @@ func NewPostgresWorldStore(db *sql.DB) *PostgresWorldStore {
 }
 
 func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error) {
+	return s.CreateWorldWithEmbedding(userID, theme, story, status, nil)
+}
+
+func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, story *lorepb.FullStory, status string, embedding []float32) (int, error) {
 	tx, err := s.db.Begin()
 	if err != nil {
 		return 0, err
@@ -59,11 +69,34 @@ func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb
 	}
 
 	var worldID int
-	err = tx.QueryRow(`
-        INSERT INTO worlds (user_id, status, theme, full_story, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, NOW(), NOW())
-        RETURNING id
-    `, userID, status, theme, string(storyJSON)).Scan(&worldID)
+	var query string
+	var args []interface{}
+
+	if len(embedding) > 0 {
+		vec := pgvector.NewVector(embedding)
+		provider := os.Getenv("AI_PROVIDER")
+		var column string
+		if provider == "local" {
+			column = "embedding_local"
+		} else {
+			column = "embedding_prod"
+		}
+		query = fmt.Sprintf(`
+			INSERT INTO worlds (user_id, status, theme, full_story, %s, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+			RETURNING id
+		`, column)
+		args = []interface{}{userID, status, theme, string(storyJSON), vec}
+	} else {
+		query = `
+			INSERT INTO worlds (user_id, status, theme, full_story, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, NOW(), NOW())
+			RETURNING id
+		`
+		args = []interface{}{userID, status, theme, string(storyJSON)}
+	}
+
+	err = tx.QueryRow(query, args...).Scan(&worldID)
 	if err != nil {
 		return 0, err
 	}
@@ -81,9 +114,9 @@ func (s *PostgresWorldStore) CreateWorld(userID int, theme string, story *lorepb
 		if piece.piece != nil {
 			detailsJSON, _ := json.Marshal(piece.piece.Details)
 			_, err = tx.Exec(`
-                INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
-                VALUES ($1, $2, $3, $4, $5, NOW())
-            `, worldID, piece.pieceType, piece.piece.Name, piece.piece.Description, string(detailsJSON))
+				INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
+				VALUES ($1, $2, $3, $4, $5, NOW())
+			`, worldID, piece.pieceType, piece.piece.Name, piece.piece.Description, string(detailsJSON))
 			if err != nil {
 				return 0, err
 			}
@@ -208,6 +241,118 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 			return nil, 0, err
 		}
 		worlds = append(worlds, &world)
+	}
+
+	var total int
+	err = s.db.QueryRow(countQuery, countArgs...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return worlds, total, nil
+}
+
+func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error) {
+	if len(embedding) == 0 {
+		return nil, 0, fmt.Errorf("embedding cannot be empty")
+	}
+
+	vec := pgvector.NewVector(embedding)
+	provider := os.Getenv("AI_PROVIDER")
+	var column string
+	if provider == "local" {
+		column = "embedding_local"
+	} else {
+		column = "embedding_prod"
+	}
+
+	var query string
+	var countQuery string
+	args := []interface{}{}
+	countArgs := []interface{}{}
+	argCount := 0
+	countArgCount := 0
+
+	//* Append vec first
+	args = append(args, vec)
+	argCount = 1 //* vec is $1
+
+	if includeUserName {
+		query = fmt.Sprintf(`
+		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance
+		FROM worlds w
+		JOIN users u ON w.user_id = u.id
+		WHERE w.%s IS NOT NULL`, column, column)
+		countQuery = fmt.Sprintf(`
+		SELECT COUNT(*)
+		FROM worlds w
+		JOIN users u ON w.user_id = u.id
+		WHERE w.%s IS NOT NULL`, column)
+	} else {
+		query = fmt.Sprintf(`
+		SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at, (1 - (%s <=> $1))::float8 as relevance
+		FROM worlds WHERE %s IS NOT NULL`, column, column)
+		countQuery = fmt.Sprintf(`
+		SELECT COUNT(*)
+		FROM worlds WHERE %s IS NOT NULL`, column)
+	}
+
+	if userID != nil {
+		argCount++
+		countArgCount++
+		query += ` AND user_id = $` + strconv.Itoa(argCount)
+		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
+		args = append(args, *userID)
+		countArgs = append(countArgs, *userID)
+	}
+	if theme != nil {
+		argCount++
+		countArgCount++
+		query += ` AND theme = $` + strconv.Itoa(argCount)
+		countQuery += ` AND theme = $` + strconv.Itoa(countArgCount)
+		args = append(args, *theme)
+		countArgs = append(countArgs, *theme)
+	}
+	if status != nil {
+		argCount++
+		countArgCount++
+		query += ` AND status = $` + strconv.Itoa(argCount)
+		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
+		args = append(args, *status)
+		countArgs = append(countArgs, *status)
+	}
+
+	query += ` ORDER BY relevance DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
+	args = append(args, limit, offset)
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, 0, fmt.Errorf("search query failed: %w", err)
+	}
+	defer rows.Close()
+
+	var worlds []*World
+	for rows.Next() {
+		var world World
+		err := rows.Scan(
+			&world.ID,
+			&world.UserID,
+			&world.UserName,
+			&world.Status,
+			&world.Theme,
+			&world.FullStory,
+			&world.CreatedAt,
+			&world.UpdatedAt,
+			&world.Relevance,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+		worlds = append(worlds, &world)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
 	}
 
 	var total int

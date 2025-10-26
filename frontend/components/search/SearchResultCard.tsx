@@ -85,9 +85,16 @@ export default function SearchResultCard({
           {fullStory.content || "No description available"}
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-xs">
-            {new Date(world.created_at).toLocaleDateString()}
-          </span>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground text-xs">
+              {new Date(world.created_at).toLocaleDateString()}
+            </span>
+            {world.relevance && (
+              <span className="text-xs font-medium text-green-600">
+                {(world.relevance * 100).toFixed(1)}% relevant
+              </span>
+            )}
+          </div>
           <div className="flex gap-2">
             {scope === "my" && (
               <ActionButton

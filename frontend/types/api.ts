@@ -67,4 +67,5 @@ export interface World {
   lore_pieces?: LorePiece[];
   created_at: string;
   updated_at: string;
+  relevance?: number;
 }

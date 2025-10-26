@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorlds } from "@/lib/queries";
-import { World } from "@/types/api";
 import { useAppStore } from "@/stores/appStore";
 
 export function useSearchLogic() {
@@ -27,6 +26,7 @@ export function useSearchLogic() {
     urlStatus || searchStatus || "",
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
@@ -95,6 +95,17 @@ export function useSearchLogic() {
     setSearchScope(scope);
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setActiveSearchQuery(searchQuery.trim());
+      setCurrentPage(1);
+    }
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
   const {
     data: { worlds = [], total = 0 } = {},
     isLoading,
@@ -105,26 +116,10 @@ export function useSearchLogic() {
     status: selectedStatus || undefined,
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
+    search: activeSearchQuery || undefined,
   });
 
   const totalPages = Math.ceil(total / pageSize);
-
-  const filteredWorlds = worlds.filter((world: World) => {
-    if (searchQuery) {
-      const fullStory = JSON.parse(world.full_story);
-      const searchableText = [
-        fullStory.title,
-        fullStory.content,
-        fullStory.theme,
-        fullStory.quest?.title,
-        fullStory.quest?.description,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return searchableText.includes(searchQuery.toLowerCase());
-    }
-    return true;
-  });
 
   return {
     selectedScope: searchScope,
@@ -133,9 +128,10 @@ export function useSearchLogic() {
     selectedStatus,
     setSelectedStatus: handleStatusChange,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: handleSearchChange,
+    handleSearch,
     handleThemeChange,
-    worlds: filteredWorlds,
+    worlds,
     isLoading,
     error,
     currentPage,

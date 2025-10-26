@@ -21,6 +21,7 @@ export const queryKeys = {
     status?: string;
     limit?: number;
     offset?: number;
+    search?: string;
   }) => ["worlds", filters || {}],
   lore: (
     category: string,
@@ -51,6 +52,7 @@ export function useWorlds(filters?: {
   status?: string;
   limit?: number;
   offset?: number;
+  search?: string;
 }) {
   return useQuery({
     queryKey: queryKeys.worlds(filters),

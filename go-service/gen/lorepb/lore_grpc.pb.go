@@ -26,6 +26,7 @@ const (
 	LoreService_GenerateRelics_FullMethodName     = "/lore.LoreService/GenerateRelics"
 	LoreService_GenerateAll_FullMethodName        = "/lore.LoreService/GenerateAll"
 	LoreService_GenerateFullStory_FullMethodName  = "/lore.LoreService/GenerateFullStory"
+	LoreService_GenerateEmbedding_FullMethodName  = "/lore.LoreService/GenerateEmbedding"
 )
 
 // LoreServiceClient is the client API for LoreService service.
@@ -39,6 +40,7 @@ type LoreServiceClient interface {
 	GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (*RelicsResponse, error)
 	GenerateAll(ctx context.Context, in *AllRequest, opts ...grpc.CallOption) (*AllResponse, error)
 	GenerateFullStory(ctx context.Context, in *FullStoryRequest, opts ...grpc.CallOption) (*FullStoryResponse, error)
+	GenerateEmbedding(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error)
 }
 
 type loreServiceClient struct {
@@ -119,6 +121,16 @@ func (c *loreServiceClient) GenerateFullStory(ctx context.Context, in *FullStory
 	return out, nil
 }
 
+func (c *loreServiceClient) GenerateEmbedding(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EmbeddingResponse)
+	err := c.cc.Invoke(ctx, LoreService_GenerateEmbedding_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LoreServiceServer is the server API for LoreService service.
 // All implementations must embed UnimplementedLoreServiceServer
 // for forward compatibility.
@@ -130,6 +142,7 @@ type LoreServiceServer interface {
 	GenerateRelics(context.Context, *RelicsRequest) (*RelicsResponse, error)
 	GenerateAll(context.Context, *AllRequest) (*AllResponse, error)
 	GenerateFullStory(context.Context, *FullStoryRequest) (*FullStoryResponse, error)
+	GenerateEmbedding(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error)
 	mustEmbedUnimplementedLoreServiceServer()
 }
 
@@ -160,6 +173,9 @@ func (UnimplementedLoreServiceServer) GenerateAll(context.Context, *AllRequest) 
 }
 func (UnimplementedLoreServiceServer) GenerateFullStory(context.Context, *FullStoryRequest) (*FullStoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateFullStory not implemented")
+}
+func (UnimplementedLoreServiceServer) GenerateEmbedding(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateEmbedding not implemented")
 }
 func (UnimplementedLoreServiceServer) mustEmbedUnimplementedLoreServiceServer() {}
 func (UnimplementedLoreServiceServer) testEmbeddedByValue()                     {}
@@ -308,6 +324,24 @@ func _LoreService_GenerateFullStory_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LoreService_GenerateEmbedding_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmbeddingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LoreServiceServer).GenerateEmbedding(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LoreService_GenerateEmbedding_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LoreServiceServer).GenerateEmbedding(ctx, req.(*EmbeddingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LoreService_ServiceDesc is the grpc.ServiceDesc for LoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,6 +376,10 @@ var LoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateFullStory",
 			Handler:    _LoreService_GenerateFullStory_Handler,
+		},
+		{
+			MethodName: "GenerateEmbedding",
+			Handler:    _LoreService_GenerateEmbedding_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

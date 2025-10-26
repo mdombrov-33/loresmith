@@ -985,6 +985,94 @@ func (x *FullStoryResponse) GetStory() *FullStory {
 	return nil
 }
 
+type EmbeddingRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EmbeddingRequest) Reset() {
+	*x = EmbeddingRequest{}
+	mi := &file_lore_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EmbeddingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EmbeddingRequest) ProtoMessage() {}
+
+func (x *EmbeddingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EmbeddingRequest.ProtoReflect.Descriptor instead.
+func (*EmbeddingRequest) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *EmbeddingRequest) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+type EmbeddingResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Embedding     []float32              `protobuf:"fixed32,1,rep,packed,name=embedding,proto3" json:"embedding,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EmbeddingResponse) Reset() {
+	*x = EmbeddingResponse{}
+	mi := &file_lore_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EmbeddingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EmbeddingResponse) ProtoMessage() {}
+
+func (x *EmbeddingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EmbeddingResponse.ProtoReflect.Descriptor instead.
+func (*EmbeddingResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *EmbeddingResponse) GetEmbedding() []float32 {
+	if x != nil {
+		return x.Embedding
+	}
+	return nil
+}
+
 var File_lore_proto protoreflect.FileDescriptor
 
 const file_lore_proto_rawDesc = "" +
@@ -1075,7 +1163,11 @@ const file_lore_proto_rawDesc = "" +
 	"\x06pieces\x18\x01 \x01(\v2\x18.lore.SelectedLorePiecesR\x06pieces\x12\x14\n" +
 	"\x05theme\x18\x02 \x01(\tR\x05theme\":\n" +
 	"\x11FullStoryResponse\x12%\n" +
-	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story2\xd0\x03\n" +
+	"\x05story\x18\x01 \x01(\v2\x0f.lore.FullStoryR\x05story\"&\n" +
+	"\x10EmbeddingRequest\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\"1\n" +
+	"\x11EmbeddingResponse\x12\x1c\n" +
+	"\tembedding\x18\x01 \x03(\x02R\tembedding2\x96\x04\n" +
 	"\vLoreService\x12G\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
@@ -1083,7 +1175,8 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n" +
 	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x122\n" +
 	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
-	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponseB\fZ\n" +
+	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x12D\n" +
+	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
 var (
@@ -1098,7 +1191,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
@@ -1117,11 +1210,13 @@ var file_lore_proto_goTypes = []any{
 	(*FullStory)(nil),          // 14: lore.FullStory
 	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
 	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
-	nil,                        // 17: lore.LorePiece.DetailsEntry
-	nil,                        // 18: lore.FullStory.QuestEntry
+	(*EmbeddingRequest)(nil),   // 17: lore.EmbeddingRequest
+	(*EmbeddingResponse)(nil),  // 18: lore.EmbeddingResponse
+	nil,                        // 19: lore.LorePiece.DetailsEntry
+	nil,                        // 20: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	17, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	19, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
@@ -1138,7 +1233,7 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
 	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	18, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	20, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
 	0,  // 20: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
@@ -1148,15 +1243,17 @@ var file_lore_proto_depIdxs = []int32{
 	4,  // 24: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
 	11, // 25: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
 	15, // 26: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	6,  // 27: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 28: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 29: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 30: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 31: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 32: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 33: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	27, // [27:34] is the sub-list for method output_type
-	20, // [20:27] is the sub-list for method input_type
+	17, // 27: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
+	6,  // 28: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 29: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 30: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 31: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 32: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 33: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 34: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	18, // 35: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	28, // [28:36] is the sub-list for method output_type
+	20, // [20:28] is the sub-list for method input_type
 	20, // [20:20] is the sub-list for extension type_name
 	20, // [20:20] is the sub-list for extension extendee
 	0,  // [0:20] is the sub-list for field type_name
@@ -1173,7 +1270,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

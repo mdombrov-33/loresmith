@@ -159,15 +159,29 @@ export async function getWorlds(filters?: {
   status?: string;
   limit?: number;
   offset?: number;
+  search?: string;
 }): Promise<{ worlds: World[]; total: number }> {
-  const url = new URL(`${API_BASE_URL}/worlds`);
-  if (filters) {
+  let url: URL;
+  if (filters?.search) {
+    url = new URL(`${API_BASE_URL}/worlds/search`);
+    url.searchParams.set("q", filters.search);
     if (filters.scope) url.searchParams.set("scope", filters.scope);
     if (filters.theme) url.searchParams.set("theme", filters.theme);
     if (filters.status) url.searchParams.set("status", filters.status);
     if (filters.limit) url.searchParams.set("limit", filters.limit.toString());
     if (filters.offset)
       url.searchParams.set("offset", filters.offset.toString());
+  } else {
+    url = new URL(`${API_BASE_URL}/worlds`);
+    if (filters) {
+      if (filters.scope) url.searchParams.set("scope", filters.scope);
+      if (filters.theme) url.searchParams.set("theme", filters.theme);
+      if (filters.status) url.searchParams.set("status", filters.status);
+      if (filters.limit)
+        url.searchParams.set("limit", filters.limit.toString());
+      if (filters.offset)
+        url.searchParams.set("offset", filters.offset.toString());
+    }
   }
 
   const response = await fetchWithTimeout(url.toString(), {
