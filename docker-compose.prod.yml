@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:12.4-alpine
+    image: pgvector/pgvector:pg12
     container_name: loresmith-postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -47,7 +47,7 @@ services:
     restart: unless-stopped
 
   test-postgres:
-    image: postgres:12.4-alpine
+    image: pgvector/pgvector:pg16
     container_name: loresmith-test-postgres
     ports:
       - "5433:5432"
