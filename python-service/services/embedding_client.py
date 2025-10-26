@@ -3,6 +3,7 @@ from langchain_openai import OpenAIEmbeddings
 from pydantic import SecretStr
 
 from config.settings import get_settings
+from search.query_preprocessor import preprocess_search_query
 from utils.logger import logger
 
 settings = get_settings()
@@ -35,8 +36,11 @@ def get_embedding_model():
 async def generate_embedding(text: str) -> list[float]:
     """Generate embedding vector for given text."""
     try:
+        preprocessed_text = preprocess_search_query(text)
+        logger.debug(f"Original text: '{text}' -> Preprocessed: '{preprocessed_text}'")
+
         model = get_embedding_model()
-        embedding = await model.aembed_query(text)
+        embedding = await model.aembed_query(preprocessed_text)
         logger.info(f"Generated embedding with {len(embedding)} dimensions")
         return embedding
     except Exception as e:
