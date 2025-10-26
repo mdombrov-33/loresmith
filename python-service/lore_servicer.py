@@ -15,6 +15,7 @@ from models.selected_lore_pieces import SelectedLorePieces
 from models.lore_piece import LorePiece
 from constants.themes import Theme
 from utils.logger import logger
+from services.embedding_client import generate_embedding
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -219,6 +220,21 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Full story generation failed: {str(e)}")
             return lore_pb2.FullStoryResponse()  # type: ignore
+
+    async def GenerateEmbedding(self, request, context):
+        try:
+            if not request.text:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("Text cannot be empty")
+                return lore_pb2.EmbeddingResponse()
+
+            embedding = await generate_embedding(request.text)
+            return lore_pb2.EmbeddingResponse(embedding=embedding)
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Embedding generation failed: {str(e)}")
+            return lore_pb2.EmbeddingResponse()
 
 
 def convert_lore_piece(grpc_piece):
