@@ -12,6 +12,7 @@ service LoreService {
   rpc GenerateRelics (RelicsRequest) returns (RelicsResponse);
   rpc GenerateAll (AllRequest) returns (AllResponse);
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
+  rpc GenerateEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
 }
 
 message CharactersRequest {
@@ -106,4 +107,12 @@ message FullStoryRequest {
 
 message FullStoryResponse {
   FullStory story = 1;
+}
+
+message EmbeddingRequest {
+  string text = 1;
+}
+
+message EmbeddingResponse {
+  repeated float embedding = 1;
 }
