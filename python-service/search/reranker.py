@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from services.llm_client import get_llm
 from utils.logger import logger
+from search.query_preprocessor import preprocess_search_query
 
 
 class RelevanceScore(BaseModel):
@@ -49,6 +50,11 @@ class ResultReranker:
             )
             worlds = worlds[:10]
 
+        preprocessed_query = preprocess_search_query(query)
+        logger.info(
+            f"Using preprocessed query for reranking: '{query}' -> '{preprocessed_query}'"
+        )
+
         logger.info(f"Starting reranking for query '{query}' with {len(worlds)} worlds")
 
         try:
@@ -60,8 +66,10 @@ class ResultReranker:
 
                 prompt = PromptTemplate.from_template("""
                 On a scale of 1-10, rate the relevance of the following world description to the query. 
-                Give high scores (8-10) for strong matches, medium (5-7) for partial matches, and low (1-4) for weak matches.
-                Consider the initial similarity {initial_relevance:.1%} but prioritize semantic fit over keywords.
+                Be strict: Give high scores (8-10) only for strong, direct matches to the query's core elements.
+                Give medium scores (5-7) for worlds with some related themes but not the full story.
+                Give low scores (1-4) for weak or tangential matches.
+                Consider the initial similarity {initial_relevance:.1%} but prioritize exact semantic and thematic fit.
                 Query: {query}
                 World ({theme}): {full_story}
                 Relevance Score (1-10):
@@ -70,7 +78,7 @@ class ResultReranker:
                 chain = prompt | self.llm.with_structured_output(RelevanceScore)
                 score_response = chain.invoke(
                     {
-                        "query": query,
+                        "query": preprocessed_query,  # Use preprocessed for reranking
                         "initial_relevance": initial_relevance,
                         "theme": theme,
                         "full_story": full_story[:500],  # Truncate for token limits
