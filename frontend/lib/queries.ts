@@ -22,7 +22,21 @@ export const queryKeys = {
     limit?: number;
     offset?: number;
     search?: string;
-  }) => ["worlds", filters || {}],
+  }) => {
+    if (filters?.search && filters.search.trim()) {
+      //* For search queries, exclude pagination params from key since we fetch all and paginate locally
+      return [
+        "worlds",
+        {
+          scope: filters.scope,
+          theme: filters.theme,
+          status: filters.status,
+          search: filters.search,
+        },
+      ];
+    }
+    return ["worlds", filters || {}];
+  },
   lore: (
     category: string,
     theme: string,
@@ -36,7 +50,7 @@ export const queryKeys = {
   ],
 };
 
-// Hooks
+//* Hooks
 export function useWorld(worldId: number) {
   return useQuery({
     queryKey: queryKeys.world(worldId),
@@ -54,9 +68,30 @@ export function useWorlds(filters?: {
   offset?: number;
   search?: string;
 }) {
+  //* For search queries, fetch all results and paginate locally to avoid re-running search
+  const isSearchQuery = filters?.search && filters.search.trim();
+
   return useQuery({
     queryKey: queryKeys.worlds(filters),
-    queryFn: () => getWorlds(filters),
+    queryFn: async () => {
+      if (isSearchQuery) {
+        //* For search queries, fetch all results once
+        const allResults = await getWorlds({
+          ...filters,
+          limit: 100, //* Fetch all
+          offset: 0,
+        });
+
+        //* Return all worlds for local pagination in component
+        return {
+          worlds: allResults.worlds,
+          total: allResults.worlds.length,
+        };
+      } else {
+        //* Normal server-side pagination for non-search queries
+        return getWorlds(filters);
+      }
+    },
   });
 }
 

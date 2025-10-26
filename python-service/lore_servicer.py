@@ -16,6 +16,7 @@ from models.lore_piece import LorePiece
 from constants.themes import Theme
 from utils.logger import logger
 from services.embedding_client import generate_embedding
+from search.reranker import rerank_search_results
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -235,6 +236,50 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Embedding generation failed: {str(e)}")
             return lore_pb2.EmbeddingResponse()
+
+    async def RerankResults(self, request, context):
+        try:
+            if not request.query:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("Query cannot be empty")
+                return lore_pb2.RerankSearchResponse()
+
+            if not request.worlds:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("Worlds list cannot be empty")
+                return lore_pb2.RerankSearchResponse()
+
+            # Convert gRPC worlds to dict format for reranker
+            worlds = []
+            for grpc_world in request.worlds:
+                world = {
+                    "title": grpc_world.title,
+                    "theme": grpc_world.theme,
+                    "full_story": grpc_world.full_story,
+                    "relevance": grpc_world.relevance,
+                }
+                worlds.append(world)
+
+            reranked_worlds = rerank_search_results(request.query, worlds)
+
+            # Convert back to gRPC format
+            grpc_reranked_worlds = []
+            for world in reranked_worlds:
+                grpc_world = lore_pb2.WorldResult(  # type: ignore
+                    title=world["title"],
+                    theme=world["theme"],
+                    full_story=world["full_story"],
+                    relevance=world["relevance"],
+                )
+                grpc_reranked_worlds.append(grpc_world)
+
+            return lore_pb2.RerankSearchResponse(reranked_worlds=grpc_reranked_worlds)  # type: ignore
+
+        except Exception as e:
+            logger.error(f"Reranking failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Reranking failed: {str(e)}")
+            return lore_pb2.RerankSearchResponse()
 
 
 def convert_lore_piece(grpc_piece):

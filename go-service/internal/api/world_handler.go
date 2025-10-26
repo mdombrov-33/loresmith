@@ -191,15 +191,51 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	worlds, total, err := h.worldStore.SearchWorldsByEmbedding(embeddingResp.Embedding, userID, theme, status, includeUserName, limit, offset)
-	if err != nil {
-		h.logger.Printf("ERROR: failed to search worlds: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to search worlds"})
-		return
+	//* Handle search vs browsing
+	var finalWorlds []*store.World
+	var total int
+
+	if searchQuery != "" {
+		//* Search: get all worlds, rerank all, return all (frontend paginates)
+		allWorlds, _, err := h.worldStore.SearchWorldsByEmbedding(embeddingResp.Embedding, userID, theme, status, includeUserName, 100, 0)
+		if err != nil {
+			h.logger.Printf("ERROR: failed to search all worlds: %v", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to search worlds"})
+			return
+		}
+
+		rerankedWorlds := allWorlds
+		if len(allWorlds) > 1 {
+			rerankReq := &lorepb.RerankSearchRequest{
+				Query:  searchQuery,
+				Worlds: utils.ConvertToWorldResults(allWorlds),
+			}
+
+			rerankResp, err := h.loreClient.RerankResults(r.Context(), rerankReq)
+			if err != nil {
+				h.logger.Printf("WARNING: reranking failed, using original results: %v", err)
+			} else {
+				rerankedWorlds = utils.ConvertFromWorldResults(rerankResp.RerankedWorlds, allWorlds)
+			}
+		}
+
+		finalWorlds = rerankedWorlds
+		total = len(rerankedWorlds)
+	} else {
+		//* Browsing: normal server-side pagination
+		initialWorlds, totalCount, err := h.worldStore.SearchWorldsByEmbedding(embeddingResp.Embedding, userID, theme, status, includeUserName, limit, offset)
+		if err != nil {
+			h.logger.Printf("ERROR: failed to search worlds: %v", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to search worlds"})
+			return
+		}
+
+		finalWorlds = initialWorlds
+		total = totalCount
 	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
-		"worlds": worlds,
+		"worlds": finalWorlds,
 		"total":  total,
 		"query":  searchQuery,
 	})

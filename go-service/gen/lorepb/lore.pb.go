@@ -1073,6 +1073,170 @@ func (x *EmbeddingResponse) GetEmbedding() []float32 {
 	return nil
 }
 
+type WorldResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Theme         string                 `protobuf:"bytes,2,opt,name=theme,proto3" json:"theme,omitempty"`
+	FullStory     string                 `protobuf:"bytes,3,opt,name=full_story,json=fullStory,proto3" json:"full_story,omitempty"`
+	Relevance     float32                `protobuf:"fixed32,4,opt,name=relevance,proto3" json:"relevance,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorldResult) Reset() {
+	*x = WorldResult{}
+	mi := &file_lore_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorldResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorldResult) ProtoMessage() {}
+
+func (x *WorldResult) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorldResult.ProtoReflect.Descriptor instead.
+func (*WorldResult) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *WorldResult) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *WorldResult) GetTheme() string {
+	if x != nil {
+		return x.Theme
+	}
+	return ""
+}
+
+func (x *WorldResult) GetFullStory() string {
+	if x != nil {
+		return x.FullStory
+	}
+	return ""
+}
+
+func (x *WorldResult) GetRelevance() float32 {
+	if x != nil {
+		return x.Relevance
+	}
+	return 0
+}
+
+type RerankSearchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Worlds        []*WorldResult         `protobuf:"bytes,2,rep,name=worlds,proto3" json:"worlds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RerankSearchRequest) Reset() {
+	*x = RerankSearchRequest{}
+	mi := &file_lore_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RerankSearchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RerankSearchRequest) ProtoMessage() {}
+
+func (x *RerankSearchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RerankSearchRequest.ProtoReflect.Descriptor instead.
+func (*RerankSearchRequest) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *RerankSearchRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *RerankSearchRequest) GetWorlds() []*WorldResult {
+	if x != nil {
+		return x.Worlds
+	}
+	return nil
+}
+
+type RerankSearchResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	RerankedWorlds []*WorldResult         `protobuf:"bytes,1,rep,name=reranked_worlds,json=rerankedWorlds,proto3" json:"reranked_worlds,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RerankSearchResponse) Reset() {
+	*x = RerankSearchResponse{}
+	mi := &file_lore_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RerankSearchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RerankSearchResponse) ProtoMessage() {}
+
+func (x *RerankSearchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RerankSearchResponse.ProtoReflect.Descriptor instead.
+func (*RerankSearchResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *RerankSearchResponse) GetRerankedWorlds() []*WorldResult {
+	if x != nil {
+		return x.RerankedWorlds
+	}
+	return nil
+}
+
 var File_lore_proto protoreflect.FileDescriptor
 
 const file_lore_proto_rawDesc = "" +
@@ -1167,7 +1331,18 @@ const file_lore_proto_rawDesc = "" +
 	"\x10EmbeddingRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"1\n" +
 	"\x11EmbeddingResponse\x12\x1c\n" +
-	"\tembedding\x18\x01 \x03(\x02R\tembedding2\x96\x04\n" +
+	"\tembedding\x18\x01 \x03(\x02R\tembedding\"v\n" +
+	"\vWorldResult\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12\x14\n" +
+	"\x05theme\x18\x02 \x01(\tR\x05theme\x12\x1d\n" +
+	"\n" +
+	"full_story\x18\x03 \x01(\tR\tfullStory\x12\x1c\n" +
+	"\trelevance\x18\x04 \x01(\x02R\trelevance\"V\n" +
+	"\x13RerankSearchRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12)\n" +
+	"\x06worlds\x18\x02 \x03(\v2\x11.lore.WorldResultR\x06worlds\"R\n" +
+	"\x14RerankSearchResponse\x12:\n" +
+	"\x0freranked_worlds\x18\x01 \x03(\v2\x11.lore.WorldResultR\x0ererankedWorlds2\xde\x04\n" +
 	"\vLoreService\x12G\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
@@ -1176,7 +1351,8 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x122\n" +
 	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
 	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x12D\n" +
-	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponseB\fZ\n" +
+	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponse\x12F\n" +
+	"\rRerankResults\x12\x19.lore.RerankSearchRequest\x1a\x1a.lore.RerankSearchResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
 var (
@@ -1191,32 +1367,35 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_lore_proto_goTypes = []any{
-	(*CharactersRequest)(nil),  // 0: lore.CharactersRequest
-	(*FactionsRequest)(nil),    // 1: lore.FactionsRequest
-	(*SettingsRequest)(nil),    // 2: lore.SettingsRequest
-	(*EventsRequest)(nil),      // 3: lore.EventsRequest
-	(*RelicsRequest)(nil),      // 4: lore.RelicsRequest
-	(*LorePiece)(nil),          // 5: lore.LorePiece
-	(*CharactersResponse)(nil), // 6: lore.CharactersResponse
-	(*FactionsResponse)(nil),   // 7: lore.FactionsResponse
-	(*SettingsResponse)(nil),   // 8: lore.SettingsResponse
-	(*EventsResponse)(nil),     // 9: lore.EventsResponse
-	(*RelicsResponse)(nil),     // 10: lore.RelicsResponse
-	(*AllRequest)(nil),         // 11: lore.AllRequest
-	(*AllResponse)(nil),        // 12: lore.AllResponse
-	(*SelectedLorePieces)(nil), // 13: lore.SelectedLorePieces
-	(*FullStory)(nil),          // 14: lore.FullStory
-	(*FullStoryRequest)(nil),   // 15: lore.FullStoryRequest
-	(*FullStoryResponse)(nil),  // 16: lore.FullStoryResponse
-	(*EmbeddingRequest)(nil),   // 17: lore.EmbeddingRequest
-	(*EmbeddingResponse)(nil),  // 18: lore.EmbeddingResponse
-	nil,                        // 19: lore.LorePiece.DetailsEntry
-	nil,                        // 20: lore.FullStory.QuestEntry
+	(*CharactersRequest)(nil),    // 0: lore.CharactersRequest
+	(*FactionsRequest)(nil),      // 1: lore.FactionsRequest
+	(*SettingsRequest)(nil),      // 2: lore.SettingsRequest
+	(*EventsRequest)(nil),        // 3: lore.EventsRequest
+	(*RelicsRequest)(nil),        // 4: lore.RelicsRequest
+	(*LorePiece)(nil),            // 5: lore.LorePiece
+	(*CharactersResponse)(nil),   // 6: lore.CharactersResponse
+	(*FactionsResponse)(nil),     // 7: lore.FactionsResponse
+	(*SettingsResponse)(nil),     // 8: lore.SettingsResponse
+	(*EventsResponse)(nil),       // 9: lore.EventsResponse
+	(*RelicsResponse)(nil),       // 10: lore.RelicsResponse
+	(*AllRequest)(nil),           // 11: lore.AllRequest
+	(*AllResponse)(nil),          // 12: lore.AllResponse
+	(*SelectedLorePieces)(nil),   // 13: lore.SelectedLorePieces
+	(*FullStory)(nil),            // 14: lore.FullStory
+	(*FullStoryRequest)(nil),     // 15: lore.FullStoryRequest
+	(*FullStoryResponse)(nil),    // 16: lore.FullStoryResponse
+	(*EmbeddingRequest)(nil),     // 17: lore.EmbeddingRequest
+	(*EmbeddingResponse)(nil),    // 18: lore.EmbeddingResponse
+	(*WorldResult)(nil),          // 19: lore.WorldResult
+	(*RerankSearchRequest)(nil),  // 20: lore.RerankSearchRequest
+	(*RerankSearchResponse)(nil), // 21: lore.RerankSearchResponse
+	nil,                          // 22: lore.LorePiece.DetailsEntry
+	nil,                          // 23: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	19, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	22, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
@@ -1233,30 +1412,34 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
 	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	20, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	23, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	0,  // 20: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 21: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 22: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 23: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 24: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	11, // 25: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
-	15, // 26: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	17, // 27: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
-	6,  // 28: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 29: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 30: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 31: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 32: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 33: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 34: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	18, // 35: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
-	28, // [28:36] is the sub-list for method output_type
-	20, // [20:28] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	19, // 20: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
+	19, // 21: lore.RerankSearchResponse.reranked_worlds:type_name -> lore.WorldResult
+	0,  // 22: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 23: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 24: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 25: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 26: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	11, // 27: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	15, // 28: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	17, // 29: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
+	20, // 30: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
+	6,  // 31: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 32: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 33: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 34: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 35: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 36: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 37: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	18, // 38: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	21, // 39: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
+	31, // [31:40] is the sub-list for method output_type
+	22, // [22:31] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
@@ -1270,7 +1453,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

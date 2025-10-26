@@ -65,6 +65,7 @@ export function useSearchLogic() {
 
   useEffect(() => {
     setCurrentPage(1);
+    setActiveSearchQuery("");
   }, [searchScope, selectedTheme, selectedStatus]);
 
   const handleThemeChange = (theme: string) => {
@@ -107,7 +108,7 @@ export function useSearchLogic() {
   };
 
   const {
-    data: { worlds = [], total = 0 } = {},
+    data: { worlds: allWorlds = [], total = 0 } = {},
     isLoading,
     error,
   } = useWorlds({
@@ -118,6 +119,11 @@ export function useSearchLogic() {
     offset: (currentPage - 1) * pageSize,
     search: activeSearchQuery || undefined,
   });
+
+  //* For search queries, paginate locally from all worlds
+  const worlds = activeSearchQuery
+    ? allWorlds.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : allWorlds;
 
   const totalPages = Math.ceil(total / pageSize);
 

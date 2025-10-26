@@ -13,6 +13,7 @@ service LoreService {
   rpc GenerateAll (AllRequest) returns (AllResponse);
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
   rpc GenerateEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
+  rpc RerankResults (RerankSearchRequest) returns (RerankSearchResponse);
 }
 
 message CharactersRequest {
@@ -115,4 +116,20 @@ message EmbeddingRequest {
 
 message EmbeddingResponse {
   repeated float embedding = 1;
+}
+
+message WorldResult {
+  string title = 1;
+  string theme = 2;
+  string full_story = 3;
+  float relevance = 4;
+}
+
+message RerankSearchRequest {
+  string query = 1;
+  repeated WorldResult worlds = 2;
+}
+
+message RerankSearchResponse {
+  repeated WorldResult reranked_worlds = 1;
 }

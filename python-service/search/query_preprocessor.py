@@ -1,5 +1,5 @@
 """
-Query preprocessing module for enhancing semantic search relevance.
+Query preprocessing for enhancing semantic search relevance.
 
 Reference: https://github.com/NirDiamant/RAG_TECHNIQUES/blob/main/all_rag_techniques/query_transformations.ipynb
 
