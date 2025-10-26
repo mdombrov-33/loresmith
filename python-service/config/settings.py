@@ -14,7 +14,10 @@ class Settings(BaseSettings):
     AI_PROVIDER: str = "local"  # Options: 'local', 'openrouter'
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "gpt-5"
+    OPENROUTER_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    OPENROUTER_EMBEDDING_BASE_URL: str = "https://openrouter.ai/api/v1"
     LOCAL_MODEL: str = "llama3.1:8b"
+    LOCAL_EMBEDDING_MODEL: str = "nomic-embed-text"
     OLLAMA_URL: str = "http://host.docker.internal:11434"
 
     REDIS_HOST: str = "redis"
