@@ -55,8 +55,6 @@ class ResultReranker:
             f"Using preprocessed query for reranking: '{query}' -> '{preprocessed_query}'"
         )
 
-        logger.info(f"Starting reranking for query '{query}' with {len(worlds)} worlds")
-
         try:
             scored_worlds = []
             for world in worlds:
