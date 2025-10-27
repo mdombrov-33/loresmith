@@ -263,6 +263,13 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
                 }
                 worlds.append(world)
 
+            logger.info(
+                f"Reranking {len(worlds)} worlds, query_embedding length: {len(request.query_embedding) if request.query_embedding else 0}"
+            )
+            logger.info(
+                f"Worlds with embeddings: {sum(1 for w in worlds if w['embedding'])}/{len(worlds)}"
+            )
+
             reranked_worlds = rerank_with_fusion_dartboard(
                 request.query, worlds, query_embedding=list(request.query_embedding)
             )

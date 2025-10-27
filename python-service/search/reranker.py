@@ -149,9 +149,21 @@ def rerank_with_fusion_dartboard(
 
     fused_worlds = fuse_search_results(worlds, query, alpha)
 
+    # Check if Dartboard can run
+    has_query_embedding = query_embedding is not None
+    worlds_with_embeddings = sum(
+        1 for w in fused_worlds if "embedding" in w and w["embedding"]
+    )
+    total_worlds = len(fused_worlds)
+
+    logger.info(
+        f"Dartboard check: query_embedding={has_query_embedding}, worlds_with_embeddings={worlds_with_embeddings}/{total_worlds}"
+    )
+
     if query_embedding and all(
         "embedding" in w and w["embedding"] for w in fused_worlds
     ):
+        logger.info("Running Dartboard reranking")
         reranker = ResultReranker()
         try:
             # Add query embedding to worlds for Dartboard
@@ -160,9 +172,11 @@ def rerank_with_fusion_dartboard(
             final_worlds = reranker.rerank_with_dartboard(
                 query, fused_worlds, diversity_weight, relevance_weight
             )
+            logger.info("Dartboard completed successfully")
             return final_worlds
         except Exception as e:
             logger.warning(f"Dartboard failed, using fused results: {e}")
             return fused_worlds
     else:
+        logger.info("Dartboard skipped, using fusion results only")
         return fused_worlds

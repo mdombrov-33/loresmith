@@ -21,7 +21,7 @@ export default function SearchBar({
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
           <Input
-            placeholder="Search worlds... e.g., 'desert oasis with ancient pyramids' or 'hero fighting dragons in medieval kingdom'"
+            placeholder="Search worlds... e.g., 'Desert oasis with ancient pyramids' or 'Erik Magnusson'"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"

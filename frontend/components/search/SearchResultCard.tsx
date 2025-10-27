@@ -44,7 +44,7 @@ export default function SearchResultCard({
     : "border-primary";
 
   const getMatchLabel = (relevance: number) => {
-    if (relevance >= 0.8)
+    if (relevance >= 0.7)
       return { label: "High Match", color: "text-green-600" };
     if (relevance >= 0.5)
       return { label: "Medium Match", color: "text-orange-600" };
@@ -118,8 +118,8 @@ export default function SearchResultCard({
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
-                        Results ranked by AI for thematic relevance. Score
-                        reflects semantic match.
+                        Results ranked by AI for relevance and variety. Score
+                        reflects how well it matches your search.
                       </p>
                     </TooltipContent>
                   </Tooltip>
