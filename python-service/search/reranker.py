@@ -38,10 +38,8 @@ class ResultReranker:
         if len(worlds) <= 1:
             return worlds
 
-        # Extract embeddings and scores
         embeddings: list[np.ndarray] = []
         for world in worlds:
-            # Assume embeddings are stored in world dict (need to add from vector search)
             emb = world.get("embedding", [])
             if emb:
                 embeddings.append(np.array(emb))
@@ -53,22 +51,16 @@ class ResultReranker:
             return worlds
 
         embeddings_array = np.array(embeddings)
-        query_embedding = worlds[0].get(
-            "query_embedding", []
-        )  # Assume added during search
+        query_embedding = worlds[0].get("query_embedding", [])
         if not query_embedding:
             logger.warning("Missing query embedding, skipping Dartboard")
             return worlds
 
         query_emb = np.array(query_embedding)
 
-        # Calculate distances
         query_distances = 1 - np.dot(embeddings_array, query_emb)  # Cosine distance
-        doc_distances = 1 - np.dot(
-            embeddings_array, embeddings_array.T
-        )  # Pairwise distances
+        doc_distances = 1 - np.dot(embeddings_array, embeddings_array.T)
 
-        # Apply Dartboard selection
         selected_indices, scores = self._greedy_dartsearch(
             query_distances,
             doc_distances,
@@ -92,19 +84,15 @@ class ResultReranker:
         relevance_weight=1.0,
         sigma=0.1,
     ):
-        """Greedy Dartboard search implementation."""
         sigma = max(sigma, 1e-5)
 
-        # Convert to log probabilities
         query_probs = self._lognorm(query_distances, sigma)
         doc_probs = self._lognorm(doc_distances, sigma)
 
-        # Initialize with most relevant
         most_relevant_idx = np.argmax(query_probs)
         selected_indices = np.array([most_relevant_idx])
         max_distances = doc_probs[most_relevant_idx]
 
-        # Select remaining
         while len(selected_indices) < min(num_results, len(documents)):
             updated_distances = np.maximum(max_distances, doc_probs)
             combined_scores = (
@@ -119,7 +107,6 @@ class ResultReranker:
         return selected_indices, [1.0] * len(selected_indices)  # Dummy scores
 
     def _lognorm(self, dist, sigma):
-        """Log normal probability."""
         if sigma < 1e-9:
             return -np.inf * dist
         return -np.log(sigma) - 0.5 * np.log(2 * np.pi) - dist**2 / (2 * sigma**2)
@@ -151,7 +138,6 @@ def rerank_with_fusion_dartboard(
 
     fused_worlds = fuse_search_results(worlds, query, alpha)
 
-    # Check if Dartboard can run
     has_query_embedding = query_embedding is not None
     worlds_with_embeddings = sum(
         1 for w in fused_worlds if "embedding" in w and w["embedding"]
@@ -168,7 +154,6 @@ def rerank_with_fusion_dartboard(
         logger.info("Running Dartboard reranking")
         reranker = ResultReranker()
         try:
-            # Add query embedding to worlds for Dartboard
             for world in fused_worlds:
                 world["query_embedding"] = query_embedding
             final_worlds = reranker.rerank_with_dartboard(

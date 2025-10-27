@@ -7,19 +7,10 @@ Combines semantic vector search with keyword-based BM25 retrieval for improved r
 """
 
 import numpy as np
-from rank_bm25 import BM25Okapi  # type: ignore
 from typing import Any
 from utils.logger import logger
-import spacy  # type: ignore
-from spacy import Language  # type: ignore
-
-nlp: Language | None = None
-
-try:
-    nlp = spacy.load("en_core_web_sm")
-except ImportError:
-    logger.warning("spaCy not installed, falling back to basic tokenization")
-    nlp = None
+from search.tokenizer import tokenize
+from search.bm25_indexer import BM25Indexer
 
 
 class FusionRetriever:
@@ -33,18 +24,8 @@ class FusionRetriever:
             alpha: Weight for vector scores (1-alpha for BM25). 0.7 = favor vector more.
         """
         self.alpha = alpha
-        self.bm25_index = None
+        self.bm25_indexer = BM25Indexer()
         self.documents: list[dict] = []
-
-    def _tokenize(self, text: str) -> list[str]:
-        """Tokenize text using spaCy or fallback to split."""
-        if nlp:
-            doc = nlp(text.lower())
-            return [
-                token.lemma_ for token in doc if not token.is_stop and token.is_alpha
-            ]
-        else:
-            return text.lower().split()
 
     def build_bm25_index(self, documents: list[dict[str, Any]]):
         """
@@ -54,13 +35,7 @@ class FusionRetriever:
             documents: List of world dicts with 'full_story', 'title', 'theme'
         """
         self.documents = documents
-        texts = []
-        for doc in documents:
-            text = f"{doc.get('title', '')} {doc.get('theme', '')} {doc.get('full_story', '')}"
-            texts.append(self._tokenize(text))
-
-        self.bm25_index = BM25Okapi(texts)
-        logger.info(f"Built BM25 index for {len(documents)} documents")
+        self.bm25_indexer.build_index(documents)
 
     def fuse_scores(
         self, vector_results: list[dict[str, Any]], query: str
@@ -75,15 +50,15 @@ class FusionRetriever:
         Returns:
             Fused results with updated relevance scores
         """
-        if not self.bm25_index or not self.documents:
+        if not self.bm25_indexer.index or not self.documents:
             logger.warning("BM25 index not built, returning vector results")
             return vector_results
 
         if not vector_results:
             return []
 
-        query_tokens = self._tokenize(query)
-        bm25_scores = self.bm25_index.get_scores(query_tokens)
+        query_tokens = tokenize(query)
+        bm25_scores = self.bm25_indexer.get_scores(query)
 
         logger.info(f"Query tokens: {query_tokens}")
         logger.info(
