@@ -27,32 +27,12 @@ class FusionRetriever:
         self.bm25_indexer = BM25Indexer()
         self.documents: list[dict] = []
 
-    def build_bm25_index(self, documents: list[dict[str, Any]]):
-        """
-        Build BM25 index from document texts.
-
-        Args:
-            documents: List of world dicts with 'full_story', 'title', 'theme'
-        """
-        self.documents = documents
-        self.bm25_indexer.build_index(documents)
-
     def fuse_scores(
         self, vector_results: list[dict[str, Any]], query: str
     ) -> list[dict[str, Any]]:
-        """
-        Fuse vector and BM25 scores.
-
-        Args:
-            vector_results: List of worlds from vector search with 'relevance' scores
-            query: Search query
-
-        Returns:
-            Fused results with updated relevance scores
-        """
-        if not self.bm25_indexer.index or not self.documents:
-            logger.warning("BM25 index not built, returning vector results")
-            return vector_results
+        if not self.bm25_indexer.index:
+            self.bm25_indexer.build_index(vector_results)
+            self.documents = vector_results
 
         if not vector_results:
             return []
@@ -99,19 +79,18 @@ class FusionRetriever:
 
 
 def fuse_search_results(
-    vector_results: list[dict[str, Any]], query: str, alpha: float = 0.7
+    vector_results: list[dict[str, Any]], query: str, alpha: float = 0.5
 ) -> list[dict[str, Any]]:
     """
-    Convenience function for fusion retrieval.
+    Convenience function to fuse vector and BM25 search results.
 
     Args:
-        vector_results: Worlds from vector search
+        vector_results: List of worlds from vector search with 'relevance' scores
         query: Search query
-        alpha: Fusion weight
+        alpha: Weight for BM25 scores (0.0 = pure vector, 1.0 = pure BM25)
 
     Returns:
-        Fused and sorted results
+        Fused results sorted by relevance
     """
     retriever = FusionRetriever(alpha=alpha)
-    retriever.build_bm25_index(vector_results)
     return retriever.fuse_scores(vector_results, query)
