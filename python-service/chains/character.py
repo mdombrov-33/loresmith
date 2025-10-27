@@ -113,6 +113,24 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         skills = clean_ai_text(skills_raw)
         logger.info(f"Generated skills for {name}")
 
+        # Generate Flaw
+        with open("prompts/character/character_flaw.txt", "r") as f:
+            flaw_prompt_text = f.read()
+
+        flaw_prompt = PromptTemplate.from_template(flaw_prompt_text)
+        flaw_llm = get_llm(max_tokens=50)
+        flaw_chain = flaw_prompt | flaw_llm | StrOutputParser()
+        flaw_raw = await flaw_chain.ainvoke(
+            {
+                "theme": theme,
+                "name": name,
+                "personality": personality,
+                "description": backstory,
+            }
+        )
+        flaw = clean_ai_text(flaw_raw)
+        logger.info(f"Generated flaw for {name}")
+
         # Generate Stats
         with open("prompts/character/character_stats.txt", "r") as f:
             stats_prompt_text = f.read()
@@ -224,6 +242,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     details: dict[str, Union[str, str]] = {
         "personality": personality,
         "appearance": appearance,
+        "flaw": flaw,
         "health": str(health),
         "stress": str(stress),
         "lore_mastery": str(lore_mastery),

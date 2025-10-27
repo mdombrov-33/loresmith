@@ -33,16 +33,46 @@ def get_embedding_model():
         )
 
 
-async def generate_embedding(text: str) -> list[float]:
-    """Generate embedding vector for given text."""
+async def generate_search_embedding(query: str) -> list[float]:
+    """
+    Generate embedding for a search query (with preprocessing/expansion).
+    Used when user searches for worlds.
+    """
     try:
-        preprocessed_text = preprocess_search_query(text)
-        logger.debug(f"Original text: '{text}' -> Preprocessed: '{preprocessed_text}'")
+        preprocessed_query = preprocess_search_query(query)
+        logger.debug(f"Search query: '{query[:100]}...' -> Preprocessed: '{preprocessed_query[:100]}...'")
 
         model = get_embedding_model()
-        embedding = await model.aembed_query(preprocessed_text)
-        logger.info(f"Generated embedding with {len(embedding)} dimensions")
+        embedding = await model.aembed_query(preprocessed_query)
+        logger.info(f"Generated search embedding with {len(embedding)} dimensions")
         return embedding
     except Exception as e:
-        logger.error(f"Failed to generate embedding: {e}", exc_info=True)
+        logger.error(f"Failed to generate search embedding: {e}", exc_info=True)
         raise
+
+
+async def generate_content_embedding(text: str) -> list[float]:
+    """
+    Generate embedding for content to be indexed (no preprocessing).
+    Used when storing world stories in the database for search.
+    """
+    try:
+        logger.debug(f"Generating content embedding for text: '{text[:100]}...'")
+
+        model = get_embedding_model()
+        embedding = await model.aembed_query(text)
+        logger.info(f"Generated content embedding with {len(embedding)} dimensions")
+        return embedding
+    except Exception as e:
+        logger.error(f"Failed to generate content embedding: {e}", exc_info=True)
+        raise
+
+
+# Legacy function for backward compatibility - delegates to search embedding
+async def generate_embedding(text: str) -> list[float]:
+    """
+    Legacy function. Use generate_search_embedding or generate_content_embedding instead.
+    Defaults to search embedding for backward compatibility.
+    """
+    logger.warning("generate_embedding() is deprecated. Use generate_search_embedding() or generate_content_embedding()")
+    return await generate_search_embedding(text)

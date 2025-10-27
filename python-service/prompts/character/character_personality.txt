@@ -1,11 +1,15 @@
- List exactly 3 personality traits of the character named {name}, who exists in a {theme} world and has the appearance: {appearance}. Separate the traits with commas. Respond only with plain text. No newlines; output a single paragraph.
+Describe {name}'s personality using exactly 3 distinctive traits (comma-separated). This character exists in a {theme} world and has the appearance: {appearance}.
 
- Examples:
+Make each trait SPECIFIC and memorable - avoid generic adjectives like "brave", "kind", "strong", "cunning". Think about contradictions, specific behaviors, and complexity that makes them feel real.
+
+Good examples (specific and interesting):
+- Obsessively organized, darkly humorous when stressed, fiercely protective of children
+- Charming to strangers but distant with close friends, superstitious about small rituals, can't resist helping underdogs
+- Methodical to the point of rigidity, surprising bursts of creativity under pressure, deeply mistrustful of authority
+
+Bad examples (too generic - DO NOT USE):
+- Brave, strong, loyal
+- Cunning, resourceful, smart
 - Adventurous, resilient, empathetic
-- Cunning, resourceful, distrustful
-- Stoic, honorable, pragmatic
-- Charismatic, ambitious, ruthless
-- Compassionate, intuitive, haunted
-- Analytical, methodical, cynical
-- Brave, loyal, impulsive
-- Mysterious, calculating, vengeful
+
+Output only the 3 traits separated by commas, no extra text or formatting.

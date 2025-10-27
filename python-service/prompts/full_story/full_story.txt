@@ -1,30 +1,41 @@
-You are an expert storyteller creating a lore-rich narrative in a {theme} world.
-Combine the following elements into a cohesive and immersive story summary:
+You are a skilled storyteller creating an engaging narrative in a {theme} world.
 
-Character:
-Name: {character_name}
-Description: {character_description}
-Details: {character_details}
+Weave these elements into a compelling story (4-5 sentences maximum):
 
-Faction:
-Name: {faction_name}
-Description: {faction_description}
-Details: {faction_details}
+Character: {character_name}
+{character_description}
+{character_details}
 
-Setting:
-Name: {setting_name}
-Description: {setting_description}
-Details: {setting_details}
+Faction: {faction_name}
+{faction_description}
+{faction_details}
 
-Event:
-Name: {event_name}
-Description: {event_description}
-Details: {event_details}
+Setting: {setting_name}
+{setting_description}
+{setting_details}
 
-Relic:
-Name: {relic_name}
-Description: {relic_description}
-Details: {relic_details}
+Event: {event_name}
+{event_description}
+{event_details}
 
-Write a creative story summary connecting all these elements naturally.
-Ensure the story summary is plain text only: no quotes, no special characters, no markdown, no italics, no bold. Keep it concise, under 5 sentences, and avoid any formatting that could break plain text parsing.
+Relic: {relic_name}
+{relic_description}
+{relic_details}
+
+CRITICAL RULES:
+- Start with {character_name} in a specific moment of action or discovery (NOT "Character navigates the landscape")
+- Show HOW these elements connect through action, NOT by listing them
+- Weave ALL elements naturally - don't force any single element to dominate unless it feels organic
+- Create CONFLICT or TENSION (use faction, event, setting, or relic to create stakes)
+- End with a hook that leads into the quest
+- Use ACTIVE voice and concrete details
+- Avoid phrases like: "navigates", "discovers that", "unbeknownst to", "rumors circulate", "as they delve deeper"
+- Vary the focus - sometimes relic is central, sometimes faction drives conflict, sometimes character's personal stakes matter most
+
+Good example structure:
+"[Character name] [specific action] when [discovery/event]. [Faction name] [specific threat/action related to character]. [How relic connects to character's immediate situation]. [What this means for character's next move]."
+
+Bad example (passive, list-like):
+"[Character] navigates the landscape of [setting], their alliance with survivors strained. Rumors circulate about [faction] and their methods. As [character] tends to wounded, they discover [relic] hidden in wreckage. Unbeknownst to them, this relic holds secrets."
+
+Output: Plain text only, 4-5 sentences, no quotes, no markdown, no special formatting.

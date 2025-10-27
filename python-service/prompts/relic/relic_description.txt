@@ -1,1 +1,21 @@
-Describe the appearance and notable features of the relic named {name} in a {theme} setting. Respond only with plain text, no markdown. No newlines; output a single paragraph. Respond in exactly 2 sentences.
+Describe the relic named {name} in a {theme} setting using EXACTLY 2 sentences.
+
+RULES:
+- First sentence: Physical appearance (specific materials, size/scale, ONE striking visual detail)
+- Second sentence: What makes it mysterious, eerie, or intriguing (NOT just "it glows" or "covered in runes")
+- Be SPECIFIC with materials (not "ancient metal" but "tarnished brass", "rusted iron", "carved obsidian", etc.)
+- AVOID overused words: glowing, pulsing, shimmering, ancient, mysterious, otherworldly (unless subverting the cliche)
+- Focus on what makes it FEEL strange, not just look strange
+
+Good examples:
+"The Oracle is a cracked stone tablet the size of a dinner plate, its surface covered in handprints burned into the rock. When you stare at it too long, you start seeing your own hand among them."
+
+"The Compass is a brass navigator's tool with a cracked glass face, the needle replaced by a sliver of bone. It doesn't point north - it points toward whoever's thinking about you."
+
+"The Crown is a circlet of blackened silver, three of its seven gemstones missing. Everyone who's worn it has heard the same voice whispering coordinates to a place that doesn't exist on any map."
+
+Bad examples (too purple, too vague):
+"An ancient glowing orb covered in mystical runes that pulse with otherworldly energy."
+"A mysterious artifact that shimmers with iridescent light and seems to hold secrets from forgotten times."
+
+Output plain text only, exactly 2 sentences, no formatting.

@@ -1,1 +1,16 @@
-Write a brief backstory for the character named {name}, a human living in a {theme} world with the following personality traits: {personality}. Focus on their human experiences, struggles, and motivations rather than supernatural origins or fantastical powers. Use 1-2 sentences max. Keep it concise and lore-friendly. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph.
+Write a 3-4 sentence backstory for {name}, a character in a {theme} world with the following personality traits: {personality}.
+
+IMPORTANT RULES:
+- Start with a specific moment, image, or action - NOT "X grew up in Y" or "X was born in Z"
+- Include ONE concrete detail that reveals character (what they carry, what they fear, a specific habit, a scar)
+- Show their personality through their actions and choices, not by describing it
+- End with what drives them NOW in the present, not just summarizing their past
+- Use active, vivid language - avoid passive voice and generic phrases
+
+Good example (post-apocalyptic):
+"Rina keeps her daughter's baby shoe in a ziplock bag, the rubber sole still caked with pre-war mud. She trades medical supplies in the ruins of Detroit, known for setting broken bones with steady hands and zero bedside manner. Most survivors think she's cold, but really she just can't afford to care about anyone new. The only thing that gets her out of bed is the faint hope that somewhere, someone might know what happened to her daughter."
+
+Bad example (too generic and passive):
+"Rina grew up in Detroit after the apocalypse. Her parents died when she was young, so she learned medicine to survive on her own. She lost her daughter during a raid and now helps people in the wasteland while searching for answers."
+
+Output only plain text backstory (3-4 sentences), no extra formatting or markdown.

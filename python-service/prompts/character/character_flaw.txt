@@ -1,0 +1,24 @@
+Generate ONE distinctive character flaw or negative quirk for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
+
+This flaw should be:
+- Specific and behavioral (not just "arrogant" but "interrupts people mid-sentence, assuming they know what others will say")
+- A potential liability in dangerous or social situations
+- Memorable and slightly unusual
+- Related to their personality or backstory if possible
+- Something that could create interesting complications in gameplay
+
+Good examples:
+- "Refuses to use pre-war technology, convinced it's cursed by the old world"
+- "Compulsively hoards batteries and power cells, even completely drained ones"
+- "Goes completely silent and unresponsive when stressed - just stares into space"
+- "Trusts anyone who shares food, even obvious enemies or manipulators"
+- "Cannot sleep indoors - panics in enclosed spaces after being buried alive"
+- "Lies reflexively to anyone in authority, even when the truth would help"
+- "Counts everything obsessively - bullets, steps, heartbeats - loses track of surroundings"
+
+Bad examples (too vague):
+- "Has trust issues"
+- "Sometimes makes bad decisions"
+- "Can be reckless"
+
+Output: Plain text, one sentence describing the flaw, no explanation or extra formatting.
