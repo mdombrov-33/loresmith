@@ -1079,6 +1079,7 @@ type WorldResult struct {
 	Theme         string                 `protobuf:"bytes,2,opt,name=theme,proto3" json:"theme,omitempty"`
 	FullStory     string                 `protobuf:"bytes,3,opt,name=full_story,json=fullStory,proto3" json:"full_story,omitempty"`
 	Relevance     float32                `protobuf:"fixed32,4,opt,name=relevance,proto3" json:"relevance,omitempty"`
+	Embedding     []float32              `protobuf:"fixed32,5,rep,packed,name=embedding,proto3" json:"embedding,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1141,12 +1142,20 @@ func (x *WorldResult) GetRelevance() float32 {
 	return 0
 }
 
+func (x *WorldResult) GetEmbedding() []float32 {
+	if x != nil {
+		return x.Embedding
+	}
+	return nil
+}
+
 type RerankSearchRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Worlds        []*WorldResult         `protobuf:"bytes,2,rep,name=worlds,proto3" json:"worlds,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Query          string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Worlds         []*WorldResult         `protobuf:"bytes,2,rep,name=worlds,proto3" json:"worlds,omitempty"`
+	QueryEmbedding []float32              `protobuf:"fixed32,3,rep,packed,name=query_embedding,json=queryEmbedding,proto3" json:"query_embedding,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RerankSearchRequest) Reset() {
@@ -1189,6 +1198,13 @@ func (x *RerankSearchRequest) GetQuery() string {
 func (x *RerankSearchRequest) GetWorlds() []*WorldResult {
 	if x != nil {
 		return x.Worlds
+	}
+	return nil
+}
+
+func (x *RerankSearchRequest) GetQueryEmbedding() []float32 {
+	if x != nil {
+		return x.QueryEmbedding
 	}
 	return nil
 }
@@ -1331,16 +1347,18 @@ const file_lore_proto_rawDesc = "" +
 	"\x10EmbeddingRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"1\n" +
 	"\x11EmbeddingResponse\x12\x1c\n" +
-	"\tembedding\x18\x01 \x03(\x02R\tembedding\"v\n" +
+	"\tembedding\x18\x01 \x03(\x02R\tembedding\"\x94\x01\n" +
 	"\vWorldResult\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x14\n" +
 	"\x05theme\x18\x02 \x01(\tR\x05theme\x12\x1d\n" +
 	"\n" +
 	"full_story\x18\x03 \x01(\tR\tfullStory\x12\x1c\n" +
-	"\trelevance\x18\x04 \x01(\x02R\trelevance\"V\n" +
+	"\trelevance\x18\x04 \x01(\x02R\trelevance\x12\x1c\n" +
+	"\tembedding\x18\x05 \x03(\x02R\tembedding\"\x7f\n" +
 	"\x13RerankSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12)\n" +
-	"\x06worlds\x18\x02 \x03(\v2\x11.lore.WorldResultR\x06worlds\"R\n" +
+	"\x06worlds\x18\x02 \x03(\v2\x11.lore.WorldResultR\x06worlds\x12'\n" +
+	"\x0fquery_embedding\x18\x03 \x03(\x02R\x0equeryEmbedding\"R\n" +
 	"\x14RerankSearchResponse\x12:\n" +
 	"\x0freranked_worlds\x18\x01 \x03(\v2\x11.lore.WorldResultR\x0ererankedWorlds2\xde\x04\n" +
 	"\vLoreService\x12G\n" +

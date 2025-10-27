@@ -16,7 +16,7 @@ from models.lore_piece import LorePiece
 from constants.themes import Theme
 from utils.logger import logger
 from services.embedding_client import generate_embedding
-from search.reranker import rerank_search_results
+from search.reranker import rerank_with_fusion_dartboard
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -257,10 +257,15 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
                     "theme": grpc_world.theme,
                     "full_story": grpc_world.full_story,
                     "relevance": grpc_world.relevance,
+                    "embedding": list(grpc_world.embedding)
+                    if grpc_world.embedding
+                    else [],
                 }
                 worlds.append(world)
 
-            reranked_worlds = rerank_search_results(request.query, worlds)
+            reranked_worlds = rerank_with_fusion_dartboard(
+                request.query, worlds, query_embedding=list(request.query_embedding)
+            )
 
             # Convert back to gRPC format
             grpc_reranked_worlds = []

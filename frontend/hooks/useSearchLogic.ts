@@ -122,7 +122,9 @@ export function useSearchLogic() {
 
   //* For search queries, paginate locally from all worlds
   const worlds = activeSearchQuery
-    ? allWorlds.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    ? allWorlds
+        .sort((a, b) => (b.relevance ?? 0) - (a.relevance ?? 0))
+        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : allWorlds;
 
   const totalPages = Math.ceil(total / pageSize);

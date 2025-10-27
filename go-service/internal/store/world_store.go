@@ -23,6 +23,7 @@ type World struct {
 	CreatedAt  time.Time    `json:"created_at"`
 	UpdatedAt  time.Time    `json:"updated_at"`
 	Relevance  *float64     `json:"relevance,omitempty"`
+	Embedding  []float32    `json:"embedding,omitempty"`
 }
 
 type LorePiece struct {
@@ -279,10 +280,10 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 
 	if includeUserName {
 		query = fmt.Sprintf(`
-		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance
+		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
 		FROM worlds w
 		JOIN users u ON w.user_id = u.id
-		WHERE w.%s IS NOT NULL`, column, column)
+		WHERE w.%s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM worlds w
@@ -290,8 +291,8 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		WHERE w.%s IS NOT NULL`, column)
 	} else {
 		query = fmt.Sprintf(`
-		SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at, (1 - (%s <=> $1))::float8 as relevance
-		FROM worlds WHERE %s IS NOT NULL`, column, column)
+		SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at, (1 - (%s <=> $1))::float8 as relevance, %s as embedding
+		FROM worlds WHERE %s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM worlds WHERE %s IS NOT NULL`, column)
@@ -334,6 +335,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	var worlds []*World
 	for rows.Next() {
 		var world World
+		var embedding pgvector.Vector
 		err := rows.Scan(
 			&world.ID,
 			&world.UserID,
@@ -344,9 +346,13 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 			&world.CreatedAt,
 			&world.UpdatedAt,
 			&world.Relevance,
+			&embedding,
 		)
 		if err != nil {
 			return nil, 0, err
+		}
+		if embedding.Slice() != nil {
+			world.Embedding = embedding.Slice()
 		}
 		worlds = append(worlds, &world)
 	}

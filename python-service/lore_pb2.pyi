@@ -189,24 +189,28 @@ class EmbeddingResponse(_message.Message):
     def __init__(self, embedding: _Optional[_Iterable[float]] = ...) -> None: ...
 
 class WorldResult(_message.Message):
-    __slots__ = ("title", "theme", "full_story", "relevance")
+    __slots__ = ("title", "theme", "full_story", "relevance", "embedding")
     TITLE_FIELD_NUMBER: _ClassVar[int]
     THEME_FIELD_NUMBER: _ClassVar[int]
     FULL_STORY_FIELD_NUMBER: _ClassVar[int]
     RELEVANCE_FIELD_NUMBER: _ClassVar[int]
+    EMBEDDING_FIELD_NUMBER: _ClassVar[int]
     title: str
     theme: str
     full_story: str
     relevance: float
-    def __init__(self, title: _Optional[str] = ..., theme: _Optional[str] = ..., full_story: _Optional[str] = ..., relevance: _Optional[float] = ...) -> None: ...
+    embedding: _containers.RepeatedScalarFieldContainer[float]
+    def __init__(self, title: _Optional[str] = ..., theme: _Optional[str] = ..., full_story: _Optional[str] = ..., relevance: _Optional[float] = ..., embedding: _Optional[_Iterable[float]] = ...) -> None: ...
 
 class RerankSearchRequest(_message.Message):
-    __slots__ = ("query", "worlds")
+    __slots__ = ("query", "worlds", "query_embedding")
     QUERY_FIELD_NUMBER: _ClassVar[int]
     WORLDS_FIELD_NUMBER: _ClassVar[int]
+    QUERY_EMBEDDING_FIELD_NUMBER: _ClassVar[int]
     query: str
     worlds: _containers.RepeatedCompositeFieldContainer[WorldResult]
-    def __init__(self, query: _Optional[str] = ..., worlds: _Optional[_Iterable[_Union[WorldResult, _Mapping]]] = ...) -> None: ...
+    query_embedding: _containers.RepeatedScalarFieldContainer[float]
+    def __init__(self, query: _Optional[str] = ..., worlds: _Optional[_Iterable[_Union[WorldResult, _Mapping]]] = ..., query_embedding: _Optional[_Iterable[float]] = ...) -> None: ...
 
 class RerankSearchResponse(_message.Message):
     __slots__ = ("reranked_worlds",)

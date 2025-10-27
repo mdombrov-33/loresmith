@@ -20,6 +20,7 @@ func ConvertToWorldResults(worlds []*store.World) []*lorepb.WorldResult {
 			Theme:     world.Theme,
 			FullStory: world.FullStory,
 			Relevance: relevance,
+			Embedding: world.Embedding,
 		}
 	}
 	return results

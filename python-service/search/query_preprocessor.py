@@ -32,10 +32,13 @@ class QueryPreprocessor:
         Returns:
             Preprocessed query optimized for semantic search
         """
+        # Skip preprocessing for short queries to avoid hallucination
+        if len(query.split()) <= 2:
+            return query
+
         logger.info(f"Starting query preprocessing for: '{query}'")
 
         try:
-            # Directly rewrite the query for better semantic matching
             rewritten_query = self._rewrite_query(query)
 
             logger.info(

@@ -10,6 +10,8 @@ RUN poetry config virtualenvs.create false
 
 RUN poetry install --only main --no-root --no-interaction --no-ansi
 
+RUN python -m spacy download en_core_web_sm
+
 COPY . .
 
 EXPOSE 50051

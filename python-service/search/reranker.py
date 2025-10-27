@@ -1,124 +1,168 @@
 """
 Result reranking for improving semantic search relevance.
 
-Reference: https://github.com/NirDiamant/RAG_TECHNIQUES/blob/main/all_rag_techniques/reranking.ipynb
-
-We use LLM-based reranking to better differentiate search results after initial vector similarity search.
+Uses Fusion Retrieval (vector + BM25) and Dartboard RAG for diversity.
 """
 
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.prompts import PromptTemplate
-from pydantic import BaseModel, Field
-
-from services.llm_client import get_llm
+from scipy.special import logsumexp  # type: ignore
+import numpy as np
 from utils.logger import logger
-from search.query_preprocessor import preprocess_search_query
-
-
-class RelevanceScore(BaseModel):
-    relevance_score: float = Field(
-        ...,
-        description="The relevance score of a world to the query, on a scale of 1-10.",
-    )
 
 
 class ResultReranker:
-    """Handles reranking of semantic search results using LLM."""
+    """Handles reranking of semantic search results using fusion and diversity."""
 
-    def __init__(self, llm: BaseChatModel | None = None):
-        """Initialize with optional LLM instance."""
-        self.llm = llm or get_llm(max_tokens=1000, temperature=0.1)
-
-    def rerank_results(self, query: str, worlds: list[dict]) -> list[dict]:
+    def rerank_with_dartboard(
+        self,
+        query: str,
+        worlds: list[dict],
+        diversity_weight: float = 1.0,
+        relevance_weight: float = 1.0,
+        sigma: float = 0.1,
+    ) -> list[dict]:
         """
-        Rerank search results using LLM to score relevance individually.
+        Rerank using Dartboard algorithm for relevance-diversity balance.
 
         Args:
-            query: Original search query
-            worlds: List of world dicts with 'full_story', 'relevance', etc.
+            query: Search query
+            worlds: List of world dicts with embeddings and relevance scores
+            diversity_weight: Weight for diversity
+            relevance_weight: Weight for relevance
+            sigma: Smoothing parameter
 
         Returns:
-            Reranked worlds by LLM relevance scores
+            Reranked worlds balancing relevance and diversity
         """
         if len(worlds) <= 1:
-            logger.debug("Only one world to rank, skipping reranking")
             return worlds
 
-        if len(worlds) > 10:
-            logger.warning(
-                f"Too many worlds for reranking ({len(worlds)}), limiting to top 10"
-            )
-            worlds = worlds[:10]
+        # Extract embeddings and scores
+        embeddings: list[np.ndarray] = []
+        for world in worlds:
+            # Assume embeddings are stored in world dict (need to add from vector search)
+            emb = world.get("embedding", [])
+            if emb:
+                embeddings.append(np.array(emb))
+            else:
+                logger.warning("Missing embedding for world, skipping Dartboard")
+                return worlds
 
-        preprocessed_query = preprocess_search_query(query)
-        logger.info(
-            f"Using preprocessed query for reranking: '{query}' -> '{preprocessed_query}'"
+        if not embeddings:
+            return worlds
+
+        embeddings_array = np.array(embeddings)
+        query_embedding = worlds[0].get(
+            "query_embedding", []
+        )  # Assume added during search
+        if not query_embedding:
+            logger.warning("Missing query embedding, skipping Dartboard")
+            return worlds
+
+        query_emb = np.array(query_embedding)
+
+        # Calculate distances
+        query_distances = 1 - np.dot(embeddings_array, query_emb)  # Cosine distance
+        doc_distances = 1 - np.dot(
+            embeddings_array, embeddings_array.T
+        )  # Pairwise distances
+
+        # Apply Dartboard selection
+        selected_indices, scores = self._greedy_dartsearch(
+            query_distances,
+            doc_distances,
+            worlds,
+            len(worlds),
+            diversity_weight,
+            relevance_weight,
+            sigma,
         )
 
-        try:
-            scored_worlds = []
-            for world in worlds:
-                initial_relevance = world.get("relevance", 0)
-                full_story = world.get("full_story", "")
-                theme = world.get("theme", "Unknown")
+        selected_worlds = [worlds[i] for i in selected_indices]
+        return selected_worlds
 
-                prompt = PromptTemplate.from_template("""
-                On a scale of 1-10, rate the relevance of the following world description to the query. 
-                Be strict: Give high scores (8-10) only for strong, direct matches to the query's core elements.
-                Give medium scores (5-7) for worlds with some related themes but not the full story.
-                Give low scores (1-4) for weak or tangential matches.
-                Consider the initial similarity {initial_relevance:.1%} but prioritize exact semantic and thematic fit.
-                Query: {query}
-                World ({theme}): {full_story}
-                Relevance Score (1-10):
-                """)
+    def _greedy_dartsearch(
+        self,
+        query_distances,
+        doc_distances,
+        documents,
+        num_results,
+        diversity_weight=1.0,
+        relevance_weight=1.0,
+        sigma=0.1,
+    ):
+        """Greedy Dartboard search implementation."""
+        sigma = max(sigma, 1e-5)
 
-                chain = prompt | self.llm.with_structured_output(RelevanceScore)
-                score_response = chain.invoke(
-                    {
-                        "query": preprocessed_query,  # Use preprocessed for reranking
-                        "initial_relevance": initial_relevance,
-                        "theme": theme,
-                        "full_story": full_story[:500],  # Truncate for token limits
-                    }
-                )
-                if isinstance(score_response, RelevanceScore):
-                    new_score = score_response.relevance_score
-                else:
-                    logger.warning(
-                        f"Unexpected response type: {type(score_response)}, using default score"
-                    )
-                    new_score = 5.0  # Default medium score
+        # Convert to log probabilities
+        query_probs = self._lognorm(query_distances, sigma)
+        doc_probs = self._lognorm(doc_distances, sigma)
 
-                # Update the world dict with new score (as decimal for display, e.g., 0.8 for 80%)
-                world["relevance"] = new_score / 10.0
-                logger.info(
-                    f"World '{theme}': initial {initial_relevance:.1%} -> new {new_score}/10 = {world['relevance']:.1%}"
-                )
-                scored_worlds.append((world, new_score))
+        # Initialize with most relevant
+        most_relevant_idx = np.argmax(query_probs)
+        selected_indices = np.array([most_relevant_idx])
+        max_distances = doc_probs[most_relevant_idx]
 
-            reranked_worlds = [
-                w for w, _ in sorted(scored_worlds, key=lambda x: x[1], reverse=True)
-            ]
+        # Select remaining
+        while len(selected_indices) < min(num_results, len(documents)):
+            updated_distances = np.maximum(max_distances, doc_probs)
+            combined_scores = (
+                updated_distances * diversity_weight + query_probs * relevance_weight
+            )
+            normalized_scores = np.array(logsumexp(combined_scores, axis=1))
+            normalized_scores[selected_indices] = -np.inf
+            best_idx = np.argmax(normalized_scores)
+            max_distances = updated_distances[best_idx]
+            selected_indices = np.append(selected_indices, best_idx)
 
-            logger.info("Reranking complete with new scores")
-            return reranked_worlds
+        return selected_indices, [1.0] * len(selected_indices)  # Dummy scores
 
-        except Exception as e:
-            logger.warning(f"Reranking failed: {e}, returning original order")
-            return worlds
+    def _lognorm(self, dist, sigma):
+        """Log normal probability."""
+        if sigma < 1e-9:
+            return -np.inf * dist
+        return -np.log(sigma) - 0.5 * np.log(2 * np.pi) - dist**2 / (2 * sigma**2)
 
 
-def rerank_search_results(query: str, worlds: list[dict]) -> list[dict]:
+def rerank_with_fusion_dartboard(
+    query: str,
+    worlds: list[dict],
+    alpha: float = 0.5,
+    diversity_weight: float = 1.0,
+    relevance_weight: float = 1.0,
+    query_embedding: list | None = None,
+) -> list[dict]:
     """
-    Convenience function to rerank search results.
+    Combined fusion + Dartboard reranking.
 
     Args:
-        query: Original search query
-        worlds: List of world dicts from vector search
+        query: Search query
+        worlds: Worlds from vector search
+        alpha: Fusion weight
+        diversity_weight: Dartboard diversity weight
+        relevance_weight: Dartboard relevance weight
+        query_embedding: Query embedding for Dartboard
 
     Returns:
-        Reranked worlds by LLM relevance
+        Reranked worlds
     """
-    reranker = ResultReranker()
-    return reranker.rerank_results(query, worlds)
+    from search.fusion_retriever import fuse_search_results
+
+    fused_worlds = fuse_search_results(worlds, query, alpha)
+
+    if query_embedding and all(
+        "embedding" in w and w["embedding"] for w in fused_worlds
+    ):
+        reranker = ResultReranker()
+        try:
+            # Add query embedding to worlds for Dartboard
+            for world in fused_worlds:
+                world["query_embedding"] = query_embedding
+            final_worlds = reranker.rerank_with_dartboard(
+                query, fused_worlds, diversity_weight, relevance_weight
+            )
+            return final_worlds
+        except Exception as e:
+            logger.warning(f"Dartboard failed, using fused results: {e}")
+            return fused_worlds
+    else:
+        return fused_worlds

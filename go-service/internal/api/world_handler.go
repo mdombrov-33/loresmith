@@ -207,8 +207,9 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 		rerankedWorlds := allWorlds
 		if len(allWorlds) > 1 {
 			rerankReq := &lorepb.RerankSearchRequest{
-				Query:  searchQuery,
-				Worlds: utils.ConvertToWorldResults(allWorlds),
+				Query:          searchQuery,
+				Worlds:         utils.ConvertToWorldResults(allWorlds),
+				QueryEmbedding: embeddingResp.Embedding,
 			}
 
 			rerankResp, err := h.loreClient.RerankResults(r.Context(), rerankReq)

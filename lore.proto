@@ -123,11 +123,13 @@ message WorldResult {
   string theme = 2;
   string full_story = 3;
   float relevance = 4;
+  repeated float embedding = 5;
 }
 
 message RerankSearchRequest {
   string query = 1;
   repeated WorldResult worlds = 2;
+  repeated float query_embedding = 3;
 }
 
 message RerankSearchResponse {
