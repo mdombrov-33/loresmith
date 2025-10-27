@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Scroll, Eye, ChevronRight, BookOpen } from "lucide-react";
+import { Scroll, Eye, ChevronRight, BookOpen, AlertTriangle } from "lucide-react";
 import { LorePiece } from "@/types/api";
 import { loreIcons, getAttributeIcon } from "@/constants/lore";
 
@@ -138,20 +138,31 @@ function LorePieceCard({
                   </h4>
                   <div className="grid gap-3">
                     {sortDetails(piece.details).map(([key, value]) => {
-                      const { icon: AttributeIcon, color } =
-                        getAttributeIcon(key);
+                      const isFlaw = key === "flaw";
+                      const { icon: AttributeIcon, color } = isFlaw
+                        ? { icon: AlertTriangle, color: "text-red-500" }
+                        : getAttributeIcon(key);
+
                       return (
                         <div
                           key={key}
-                          className="border-border/50 bg-muted/30 hover:border-primary/30 hover:bg-muted/50 flex flex-col gap-2 rounded-lg border p-4 transition-all"
+                          className={`flex flex-col gap-2 rounded-lg border p-4 transition-all ${
+                            isFlaw
+                              ? "border-red-500/20 bg-red-500/5 hover:border-red-500/30 hover:bg-red-500/10"
+                              : "border-border/50 bg-muted/30 hover:border-primary/30 hover:bg-muted/50"
+                          }`}
                         >
-                          <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
+                          <div className={`flex items-center gap-2 text-sm font-medium ${
+                            isFlaw ? "text-red-500" : "text-muted-foreground"
+                          }`}>
                             <AttributeIcon className={`h-3 w-3 ${color}`} />
                             {key
                               .replace(/_/g, " ")
                               .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </div>
-                          <p className="text-foreground text-sm leading-relaxed">
+                          <p className={`text-sm leading-relaxed ${
+                            isFlaw ? "text-red-400" : "text-foreground"
+                          }`}>
                             {String(value)}
                           </p>
                         </div>

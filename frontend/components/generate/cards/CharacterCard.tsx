@@ -15,6 +15,7 @@ import {
   Lightbulb,
   Crown,
   Eye,
+  AlertTriangle,
 } from "lucide-react";
 
 interface CharacterCardProps {
@@ -69,6 +70,21 @@ export default function CharacterCard({
             {character.details.appearance}
           </div>
         </div>
+
+        {/* Flaw */}
+        {character.details.flaw && (
+          <div className="border-red-500/20 bg-red-500/5 rounded-lg border p-3">
+            <div className="mb-1 flex items-center gap-1.5">
+              <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
+              <div className="text-xs font-semibold uppercase text-red-500">
+                Flaw
+              </div>
+            </div>
+            <div className="text-sm text-red-400">
+              {character.details.flaw}
+            </div>
+          </div>
+        )}
 
         {/* Skills */}
         <div>
