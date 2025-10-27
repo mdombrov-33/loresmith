@@ -47,6 +47,19 @@ _Search page with filters_
 **Session Management**: Redis-based game state persistence and caching  
 **Scalable**: Docker orchestration with observability (Prometheus, Langfuse)
 
+## Search System
+
+LoreSmith features advanced AI-powered search combining semantic and keyword matching:
+
+1. **Query Processing**: User queries are preprocessed (LLM expansion for thematic searches, skipped for exact terms)
+2. **Vector Search**: PostgreSQL with pgvector finds semantically similar worlds via embeddings
+3. **Fusion Retrieval**: Combines vector similarity with BM25 keyword scoring for robust relevance
+4. **Diversity Reranking**: Dartboard algorithm ensures varied results, preventing similar worlds from dominating
+
+This hybrid approach enables both thematic exploration ("desert oasis with pyramids") and precise lookups ("Eira Flynn").
+
+## Tech Stack
+
 ## Key Features
 
 ### AI-Powered World Creation
@@ -69,7 +82,7 @@ _Search page with filters_
   - **LangChain**: LCEL chains for composable prompt workflows and output parsing
   - **Langfuse**: Cloud-based observability for LLM tracing, token tracking, and performance monitoring
 - **AI Providers**: Ollama (local models) or OpenRouter (cloud models)
-- **Database**: PostgreSQL (users/world data), Redis (sessions/caching)
+- **Database**: PostgreSQL (users/world data) with pgvector (vector embeddings), Redis (sessions/caching)
 - **Deployment**: Docker Compose with multi-service orchestration
 
 ## Getting Started
