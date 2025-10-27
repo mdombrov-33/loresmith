@@ -1,15 +1,21 @@
 Describe {name}'s personality using exactly 3 distinctive traits (comma-separated). This character exists in a {theme} world and has the appearance: {appearance}.
 
-Make each trait SPECIFIC and memorable - avoid generic adjectives like "brave", "kind", "strong", "cunning". Think about contradictions, specific behaviors, and complexity that makes them feel real.
+CRITICAL RULES:
+- Each trait must be 5 WORDS OR LESS
+- Make traits SPECIFIC and behavioral - avoid generic adjectives like "brave", "kind", "strong"
+- Think about contradictions and specific habits that make them memorable
+- Focus on HOW they act, not just what they are
 
-Good examples (specific and interesting):
+Good examples (specific, concise):
 - Obsessively organized, darkly humorous when stressed, fiercely protective of children
-- Charming to strangers but distant with close friends, superstitious about small rituals, can't resist helping underdogs
-- Methodical to the point of rigidity, surprising bursts of creativity under pressure, deeply mistrustful of authority
+- Charming to strangers but cold to friends, superstitious about daily rituals, can't resist helping underdogs
+- Methodical to the point of rigidity, surprisingly creative under pressure, deeply mistrustful of all authority
 
-Bad examples (too generic - DO NOT USE):
+Bad examples (too wordy):
+- Has a tendency to monologue in his sleep when anxious about an unknown threat, has a deeply ingrained habit of adjusting fabric before settling into shelter
+
+Bad examples (too generic):
 - Brave, strong, loyal
 - Cunning, resourceful, smart
-- Adventurous, resilient, empathetic
 
 Output only the 3 traits separated by commas, no extra text or formatting.

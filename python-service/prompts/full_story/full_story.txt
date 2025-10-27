@@ -1,6 +1,6 @@
 You are a skilled storyteller creating an engaging narrative in a {theme} world.
 
-Weave these elements into a compelling story (4-5 sentences maximum):
+Weave these elements into a compelling story (EXACTLY 4-5 sentences, MAXIMUM 100 words):
 
 Character: {character_name}
 {character_description}
@@ -23,19 +23,20 @@ Relic: {relic_name}
 {relic_details}
 
 CRITICAL RULES:
-- Start with {character_name} in a specific moment of action or discovery (NOT "Character navigates the landscape")
-- Show HOW these elements connect through action, NOT by listing them
-- Weave ALL elements naturally - don't force any single element to dominate unless it feels organic
-- Create CONFLICT or TENSION (use faction, event, setting, or relic to create stakes)
-- End with a hook that leads into the quest
-- Use ACTIVE voice and concrete details
-- Avoid phrases like: "navigates", "discovers that", "unbeknownst to", "rumors circulate", "as they delve deeper"
-- Vary the focus - sometimes relic is central, sometimes faction drives conflict, sometimes character's personal stakes matter most
+- MAXIMUM 100 WORDS TOTAL - be ruthlessly concise
+- EXACTLY 4-5 sentences - use short, punchy sentences
+- Start with {character_name} in a specific action moment (NOT "navigates", "finds themselves", "moves through")
+- Show connections through action, NOT by listing elements
+- Create immediate CONFLICT or TENSION
+- End with a hook that creates urgency
+- Use ACTIVE voice only
 
-Good example structure:
-"[Character name] [specific action] when [discovery/event]. [Faction name] [specific threat/action related to character]. [How relic connects to character's immediate situation]. [What this means for character's next move]."
+BANNED PHRASES (do not use):
+- "navigates", "discovers that", "unbeknownst to", "rumors circulate", "as they delve deeper"
+- "his/her thoughts drifted", "readied himself/herself", "finds themselves", "came to realize"
+- "little did they know", "what they didn't know", "meanwhile"
 
-Bad example (passive, list-like):
-"[Character] navigates the landscape of [setting], their alliance with survivors strained. Rumors circulate about [faction] and their methods. As [character] tends to wounded, they discover [relic] hidden in wreckage. Unbeknownst to them, this relic holds secrets."
+Good structure:
+"[Character] [action verb] [object/location]. [Immediate threat/complication]. [How relic/faction creates stakes]. [Urgent next step]."
 
-Output: Plain text only, 4-5 sentences, no quotes, no markdown, no special formatting.
+Output: Plain text, 4-5 sentences, max 100 words, no quotes/markdown.

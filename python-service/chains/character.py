@@ -118,7 +118,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             flaw_prompt_text = f.read()
 
         flaw_prompt = PromptTemplate.from_template(flaw_prompt_text)
-        flaw_llm = get_llm(max_tokens=50)
+        flaw_llm = get_llm(max_tokens=70)
         flaw_chain = flaw_prompt | flaw_llm | StrOutputParser()
         flaw_raw = await flaw_chain.ainvoke(
             {

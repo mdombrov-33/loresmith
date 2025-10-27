@@ -1,1 +1,18 @@
-Describe the realistic physical appearance of {name}, a human character from a {theme} world, in exactly 2 sentences. Focus on practical clothing appropriate to the setting, natural human features (hair color, build, facial features), and one memorable but realistic detail (scar, tattoo, distinctive style). Avoid supernatural traits like glowing skin, color-changing features, or magical effects. They should look like a real person you could meet. Respond only with plain text. No newlines; output a single paragraph.
+Describe {name}'s appearance in EXACTLY 2 sentences (maximum 40 words total). This is a {theme} world.
+
+RULES:
+- First sentence: Height/build, hair, eye color, one facial feature
+- Second sentence: Practical clothing + ONE memorable detail (scar, tattoo, distinctive item)
+- Be concise - no flowery language or long clauses
+- Avoid: "often", "usually", "typically", "seems to", "appears to"
+- Natural human features only - no glowing/magical effects
+
+Good examples (concise):
+"Rina stands 5'8" with a lean build, short dark hair, and tired brown eyes. She wears a worn leather jacket over scavenged fatigues, a thin scar above her left eyebrow."
+
+"Marcus is a stocky 6'2" with buzz-cut gray hair and sharp green eyes. He wears patched military gear and keeps a faded dog tag around his neck."
+
+Bad examples (too wordy):
+"Kael Jensen stands at about 5'9" with a lean yet athletic build, his dark brown hair often tied back in a practical ponytail to keep it out of his face as he navigates the harsh environment, and his bright blue eyes are framed by sharp cheekbones."
+
+Output: Exactly 2 sentences, plain text, max 40 words total, no newlines.

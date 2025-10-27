@@ -1,21 +1,24 @@
-Describe the relic named {name} in a {theme} setting using EXACTLY 2 sentences.
+Describe the relic named {name} in a {theme} setting using EXACTLY 2 sentences (maximum 40 words total).
 
-RULES:
-- First sentence: Physical appearance (specific materials, size/scale, ONE striking visual detail)
-- Second sentence: What makes it mysterious, eerie, or intriguing (NOT just "it glows" or "covered in runes")
-- Be SPECIFIC with materials (not "ancient metal" but "tarnished brass", "rusted iron", "carved obsidian", etc.)
-- AVOID overused words: glowing, pulsing, shimmering, ancient, mysterious, otherworldly (unless subverting the cliche)
-- Focus on what makes it FEEL strange, not just look strange
+CRITICAL RULES:
+- First sentence: Physical appearance (specific materials, size, ONE striking detail)
+- Second sentence: What makes it strange/eerie/intriguing
+- Be SPECIFIC with materials: "tarnished brass", "rusted iron", "carved obsidian" (NOT "ancient metal")
+- AVOID: glowing, pulsing, shimmering, ancient, mysterious, otherworldly
+- VARY THE STRUCTURE - do NOT always use "When you..." or "Whenever..." or "The more you..."
 
-Good examples:
-"The Oracle is a cracked stone tablet the size of a dinner plate, its surface covered in handprints burned into the rock. When you stare at it too long, you start seeing your own hand among them."
+Good examples (VARIED structures):
+"The Oracle is a cracked stone tablet the size of a dinner plate, covered in burned handprints. Stare too long and you'll see your own hand among them."
 
-"The Compass is a brass navigator's tool with a cracked glass face, the needle replaced by a sliver of bone. It doesn't point north - it points toward whoever's thinking about you."
+"A brass compass with cracked glass, its needle replaced by bone. It points toward whoever's thinking about you, not north."
 
-"The Crown is a circlet of blackened silver, three of its seven gemstones missing. Everyone who's worn it has heard the same voice whispering coordinates to a place that doesn't exist on any map."
+"The Crown is blackened silver with three missing gemstones. Everyone who wears it hears coordinates whispered for a place that doesn't exist."
 
-Bad examples (too purple, too vague):
-"An ancient glowing orb covered in mystical runes that pulse with otherworldly energy."
-"A mysterious artifact that shimmers with iridescent light and seems to hold secrets from forgotten times."
+"Three glass orbs suspended in tarnished iron, one cracked to reveal dark liquid inside. You hear whispers from them, but never quite catch the words."
 
-Output plain text only, exactly 2 sentences, no formatting.
+Bad examples (formulaic pattern):
+"When you bring your ear close, you hear whispering."
+"Whenever someone touches it, they recall forgotten arguments."
+"The more time you spend around it, the more you notice strange effects."
+
+Output: Exactly 2 sentences, plain text, max 40 words, no formatting.

@@ -1,1 +1,17 @@
-List the main dangers and threats in the setting {name} in a {theme} world, considering the landscape described as {landscape}. Include environmental hazards, creatures, or other challenges. Respond only with plain text, no markdown. No newlines; output a single paragraph. Respond in exactly 1 sentence. Describe 2-3 dangers or threats.
+List 2-3 main dangers in {name} (a {theme} world with this landscape: {landscape}) in ONE sentence (maximum 40 words).
+
+RULES:
+- Be specific - "acid rain that melts exposed skin" not "harsh weather"
+- Mix danger types: environmental hazard + creature/faction + resource scarcity
+- Use active, concrete language
+- AVOID: "dangerous", "deadly", "treacherous", "lurking", "prowling"
+
+Good examples (specific, varied):
+"Acid rain melts exposed skin within minutes, radiation-twisted coyotes hunt in packs of twenty, and clean water only exists in Syndicate-controlled wells."
+
+"Sandstorms strip flesh from bone, biomechanical scorpions nest in every shadow, and the sun causes hallucinations after two hours of exposure."
+
+Bad examples (too generic):
+"The area is extremely dangerous with deadly creatures, harsh weather, and limited resources for survivors."
+
+Output: Exactly 1 sentence, plain text, max 40 words, no formatting.

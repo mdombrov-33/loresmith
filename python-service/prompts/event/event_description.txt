@@ -1,1 +1,19 @@
-Describe the event named {name} in 2-3 sentences in a {theme} setting. Include what happened and key details. Respond only with plain text, no markdown. No newlines; output a single paragraph.
+Describe the event {name} in EXACTLY 2-3 sentences (maximum 75 words total) in a {theme} world.
+
+RULES:
+- First sentence: What happened (specific action, not "an event occurred")
+- Second sentence: Immediate visible consequence
+- Optional third sentence: One lasting effect on the world/people
+- Use active voice and concrete details
+- AVOID: "changed everything", "the world would never be the same", "marked a turning point"
+- DO NOT mention specific faction names or character names unless they're legendary/mythological
+
+Good examples (concise, specific):
+"The Shattering cracked the moon in half, sending fragments raining down for three days. Coastal cities drowned under tidal waves, and the sky turned permanently red from ash. Now the tides are unpredictable and navigation by stars is impossible."
+
+"Someone detonated an EMP over the Eastern Seaboard, frying every circuit from Boston to Miami. Planes fell from the sky mid-flight, hospitals went dark, and two million people died in the first week. Thirty years later, the dead zone still has no working electronics."
+
+Bad examples (too vague, too dramatic):
+"The Cataclysm was a devastating event that changed the world forever. Everything people knew was destroyed, and society had to rebuild from scratch. The survivors would never forget what happened that day."
+
+Output: 2-3 sentences, plain text, max 75 words total, no formatting.
