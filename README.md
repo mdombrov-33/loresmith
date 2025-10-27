@@ -58,8 +58,6 @@ LoreSmith features advanced AI-powered search combining semantic and keyword mat
 
 This hybrid approach enables both thematic exploration ("desert oasis with pyramids") and precise lookups ("Eira Flynn").
 
-## Tech Stack
-
 ## Key Features
 
 ### AI-Powered World Creation
