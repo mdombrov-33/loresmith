@@ -13,7 +13,7 @@ export default function SearchLoading() {
         </div>
       </div>
       <p className="text-muted-foreground animate-pulse text-sm">
-        Searching the realms...
+        Loading the realms...
       </p>
     </section>
   );
