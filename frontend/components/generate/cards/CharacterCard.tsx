@@ -112,7 +112,7 @@ export default function CharacterCard({
                   <HelpCircle className="text-muted-foreground h-3 w-3" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Hover over attribute to see details</p>
+                  <p>Hover over attribute to see details.</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
