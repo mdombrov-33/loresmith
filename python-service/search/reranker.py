@@ -1,6 +1,8 @@
 """
 Result reranking for improving semantic search relevance.
 
+Reference: https://github.com/NirDiamant/RAG_TECHNIQUES/blob/main/all_rag_techniques/reranking.ipynb
+
 Uses Fusion Retrieval (vector + BM25) and Dartboard RAG for diversity.
 """
 
