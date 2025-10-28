@@ -113,6 +113,13 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 		{"relic", story.Pieces.Relic},
 	} {
 		if piece.piece != nil {
+			if piece.pieceType == "character" {
+				if piece.piece.Details == nil {
+					piece.piece.Details = make(map[string]string)
+				}
+				piece.piece.Details["is_protagonist"] = "true"
+			}
+
 			detailsJSON, _ := json.Marshal(piece.piece.Details)
 			_, err = tx.Exec(`
 				INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
