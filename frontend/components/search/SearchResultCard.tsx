@@ -23,7 +23,7 @@ import {
 import { HelpCircle } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
-import { useDeleteWorld, useDeleteAdventureSession } from "@/lib/queries";
+import { useDeleteWorld, useDeleteAdventureSession, useUpdateWorldVisibility } from "@/lib/queries";
 
 interface SearchResultCardProps {
   world: World;
@@ -37,9 +37,20 @@ export default function SearchResultCard({
   const router = useRouter();
   const deleteWorldMutation = useDeleteWorld();
   const deleteSessionMutation = useDeleteAdventureSession();
+  const updateVisibilityMutation = useUpdateWorldVisibility();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState<"world" | "session">("world");
   const fullStory = JSON.parse(world.full_story);
+
+  // Debug logging
+  if (world.status === "active") {
+    console.log("Active world:", {
+      id: world.id,
+      status: world.status,
+      session_id: world.session_id,
+      hasSession: !!world.session_id
+    });
+  }
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
     ? `border-${themeOption.value}`
@@ -71,6 +82,14 @@ export default function SearchResultCard({
   const handleDeleteSessionClick = () => {
     setDeleteType("session");
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleToggleVisibility = () => {
+    const newVisibility = world.visibility === "private" ? "published" : "private";
+    updateVisibilityMutation.mutate({
+      worldId: world.id,
+      visibility: newVisibility,
+    });
   };
 
   const handleConfirmDelete = () => {
@@ -105,11 +124,28 @@ export default function SearchResultCard({
         </div>
       )}
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
-          <Badge variant="secondary">
-            {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
-          </Badge>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
+            <Badge variant="secondary">
+              {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
+            </Badge>
+          </div>
+          {scope === "my" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToggleVisibility}
+              disabled={updateVisibilityMutation.isPending}
+              className="h-8 px-2 text-xs"
+            >
+              {updateVisibilityMutation.isPending
+                ? "..."
+                : world.visibility === "published"
+                  ? "Published"
+                  : "Private"}
+            </Button>
+          )}
         </div>
         <CardTitle className="line-clamp-2 text-lg">
           {fullStory.quest?.title || "Untitled World"}

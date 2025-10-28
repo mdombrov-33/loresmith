@@ -295,3 +295,24 @@ export async function deleteAdventureSession(
     );
   }
 }
+
+export async function updateWorldVisibility(
+  worldId: number,
+  visibility: "private" | "published",
+): Promise<void> {
+  const url = `${API_BASE_URL}/worlds/${worldId}/visibility`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "PATCH",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify({ visibility }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error ||
+        `Failed to update world visibility: ${response.statusText}`,
+    );
+  }
+}

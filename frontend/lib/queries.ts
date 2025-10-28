@@ -10,6 +10,7 @@ import {
   loginUser,
   startAdventure,
   deleteAdventureSession,
+  updateWorldVisibility,
 } from "./api";
 import { RegisterRequest, LoginRequest } from "@/types/api";
 import { SelectedLore } from "@/types/generate-world";
@@ -185,6 +186,19 @@ export function useDeleteAdventureSession() {
     mutationFn: (sessionId: number) => deleteAdventureSession(sessionId),
     onSuccess: () => {
       //* Invalidate worlds query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
+    },
+  });
+}
+
+export function useUpdateWorldVisibility() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ worldId, visibility }: { worldId: number; visibility: "private" | "published" }) =>
+      updateWorldVisibility(worldId, visibility),
+    onSuccess: (_, { worldId }) => {
+      //* Invalidate world and worlds queries to refresh
+      queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
       queryClient.invalidateQueries({ queryKey: ["worlds"] });
     },
   });

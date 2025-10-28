@@ -40,6 +40,7 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Get("/worlds/{id}", app.WorldHandler.HandleGetWorldById)
 		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld) //TODO: nuke /draft part? change to just /worlds?
 		r.Delete("/worlds/{id}", app.WorldHandler.HandleDeleteWorldById)
+		r.Patch("/worlds/{id}/visibility", app.WorldHandler.HandleUpdateWorldVisibility)
 
 		//* Adventure routes
 		r.Post("/worlds/{id}/adventure/start", app.AdventureHandler.HandleStartAdventure)

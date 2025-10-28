@@ -330,3 +330,51 @@ func (h *WorldHandler) HandleDeleteWorldById(w http.ResponseWriter, r *http.Requ
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"message": "world deleted successfully"})
 }
+
+func (h *WorldHandler) HandleUpdateWorldVisibility(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch {
+		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		return
+	}
+
+	worldIDStr := chi.URLParam(r, "id")
+	worldID, err := strconv.Atoi(worldIDStr)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		return
+	}
+
+	var req struct {
+		Visibility string `json:"visibility"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		return
+	}
+
+	if req.Visibility != "private" && req.Visibility != "published" {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "visibility must be 'private' or 'published'"})
+		return
+	}
+
+	currentUser := middleware.GetUser(r)
+	world, err := h.worldStore.GetWorldById(worldID)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "world not found"})
+		return
+	}
+
+	if world.UserID != int(currentUser.ID) {
+		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized to update this world"})
+		return
+	}
+
+	err = h.worldStore.UpdateWorldVisibility(worldID, req.Visibility)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to update world visibility: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to update visibility"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"success": true, "visibility": req.Visibility})
+}

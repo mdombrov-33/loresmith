@@ -21,6 +21,7 @@ type World struct {
 	FullStory  string       `json:"full_story"`
 	LorePieces []*LorePiece `json:"lore_pieces,omitempty"`
 	SessionID  *int         `json:"session_id,omitempty"`
+	Visibility string       `json:"visibility"`
 	CreatedAt  time.Time    `json:"created_at"`
 	UpdatedAt  time.Time    `json:"updated_at"`
 	Relevance  *float64     `json:"relevance,omitempty"`
@@ -46,6 +47,7 @@ type WorldStore interface {
 	DeleteWorldById(worldID int) error
 	GetProtagonistForWorld(worldID int) (*LorePiece, error)
 	UpdateWorldStatus(worldID int, status string) error
+	UpdateWorldVisibility(worldID int, visibility string) error
 }
 
 type PostgresWorldStore struct {
@@ -192,10 +194,13 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 
 	if includeUserName {
 		query = `
-        SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at
+        SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story,
+               (SELECT id FROM adventure_sessions
+                WHERE world_id = w.id AND status IN ('initializing', 'active')
+                ORDER BY created_at DESC LIMIT 1) as session_id,
+               w.visibility, w.created_at, w.updated_at
         FROM worlds w
         JOIN users u ON w.user_id = u.id
-        LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
         WHERE 1=1`
 		countQuery = `
         SELECT COUNT(*)
@@ -204,9 +209,12 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
         WHERE 1=1`
 	} else {
 		query = `
-        SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at
+        SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story,
+               (SELECT id FROM adventure_sessions
+                WHERE world_id = w.id AND status IN ('initializing', 'active')
+                ORDER BY created_at DESC LIMIT 1) as session_id,
+               w.visibility, w.created_at, w.updated_at
         FROM worlds w
-        LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
         WHERE 1=1`
 		countQuery = `
         SELECT COUNT(*)
@@ -251,7 +259,7 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	for rows.Next() {
 		var world World
 		var sessionID sql.NullInt64
-		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.CreatedAt, &world.UpdatedAt)
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -298,10 +306,13 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 
 	if includeUserName {
 		query = fmt.Sprintf(`
-		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story,
+		       (SELECT id FROM adventure_sessions
+		        WHERE world_id = w.id AND status IN ('initializing', 'active')
+		        ORDER BY created_at DESC LIMIT 1) as session_id,
+		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
 		FROM worlds w
 		JOIN users u ON w.user_id = u.id
-		LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
 		WHERE w.%s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
@@ -310,9 +321,12 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		WHERE w.%s IS NOT NULL`, column)
 	} else {
 		query = fmt.Sprintf(`
-		SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story,
+		       (SELECT id FROM adventure_sessions
+		        WHERE world_id = w.id AND status IN ('initializing', 'active')
+		        ORDER BY created_at DESC LIMIT 1) as session_id,
+		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
 		FROM worlds w
-		LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
 		WHERE w.%s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
@@ -366,6 +380,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 			&world.Theme,
 			&world.FullStory,
 			&sessionID,
+			&world.Visibility,
 			&world.CreatedAt,
 			&world.UpdatedAt,
 			&world.Relevance,
@@ -432,5 +447,15 @@ func (s *PostgresWorldStore) UpdateWorldStatus(worldID int, status string) error
 	WHERE id = $2
 	`
 	_, err := s.db.Exec(query, status, worldID)
+	return err
+}
+
+func (s *PostgresWorldStore) UpdateWorldVisibility(worldID int, visibility string) error {
+	query := `
+	UPDATE worlds
+	SET visibility = $1, updated_at = NOW()
+	WHERE id = $2
+	`
+	_, err := s.db.Exec(query, visibility, worldID)
 	return err
 }
