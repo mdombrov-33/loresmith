@@ -23,7 +23,11 @@ import {
 import { HelpCircle } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
-import { useDeleteWorld, useDeleteAdventureSession, useUpdateWorldVisibility } from "@/lib/queries";
+import {
+  useDeleteWorld,
+  useDeleteAdventureSession,
+  useUpdateWorldVisibility,
+} from "@/lib/queries";
 
 interface SearchResultCardProps {
   world: World;
@@ -40,17 +44,8 @@ export default function SearchResultCard({
   const updateVisibilityMutation = useUpdateWorldVisibility();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState<"world" | "session">("world");
-  const fullStory = JSON.parse(world.full_story);
 
-  // Debug logging
-  if (world.status === "active") {
-    console.log("Active world:", {
-      id: world.id,
-      status: world.status,
-      session_id: world.session_id,
-      hasSession: !!world.session_id
-    });
-  }
+  const fullStory = JSON.parse(world.full_story);
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
     ? `border-${themeOption.value}`
@@ -85,7 +80,8 @@ export default function SearchResultCard({
   };
 
   const handleToggleVisibility = () => {
-    const newVisibility = world.visibility === "private" ? "published" : "private";
+    const newVisibility =
+      world.visibility === "private" ? "published" : "private";
     updateVisibilityMutation.mutate({
       worldId: world.id,
       visibility: newVisibility,
@@ -198,7 +194,9 @@ export default function SearchResultCard({
                     onClick={handleDeleteWorldClick}
                     disabled={deleteWorldMutation.isPending}
                   >
-                    {deleteWorldMutation.isPending ? "Deleting..." : "Delete World"}
+                    {deleteWorldMutation.isPending
+                      ? "Deleting..."
+                      : "Delete World"}
                   </ActionButton>
                 ) : world.status === "active" && world.session_id ? (
                   <ActionButton
@@ -207,7 +205,9 @@ export default function SearchResultCard({
                     onClick={handleDeleteSessionClick}
                     disabled={deleteSessionMutation.isPending}
                   >
-                    {deleteSessionMutation.isPending ? "Deleting..." : "Delete Session"}
+                    {deleteSessionMutation.isPending
+                      ? "Deleting..."
+                      : "Delete Session"}
                   </ActionButton>
                 ) : world.status === "completed" && world.session_id ? (
                   <ActionButton
@@ -216,7 +216,9 @@ export default function SearchResultCard({
                     onClick={handleDeleteSessionClick}
                     disabled={deleteSessionMutation.isPending}
                   >
-                    {deleteSessionMutation.isPending ? "Deleting..." : "Delete Session"}
+                    {deleteSessionMutation.isPending
+                      ? "Deleting..."
+                      : "Delete Session"}
                   </ActionButton>
                 ) : null}
               </>
@@ -238,7 +240,9 @@ export default function SearchResultCard({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {deleteType === "world" ? "Delete World" : "Delete Adventure Session"}
+              {deleteType === "world"
+                ? "Delete World"
+                : "Delete Adventure Session"}
             </DialogTitle>
             <DialogDescription>
               {deleteType === "world" ? (

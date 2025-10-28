@@ -99,8 +99,7 @@ export function RegisterModal({
 
   const handleGoogleAuth = async () => {
     try {
-      const result = await signIn("google", { callbackUrl: "/" });
-      console.log("signIn result:", result);
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.error("Google sign-in failed:", error);
       setError("Google sign-in failed");

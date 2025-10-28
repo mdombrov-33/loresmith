@@ -147,9 +147,9 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 	var world World
 	err := s.db.QueryRow(`
-        SELECT id, user_id, status, theme, full_story, created_at, updated_at
+        SELECT id, user_id, status, theme, full_story, visibility, created_at, updated_at
         FROM worlds WHERE id = $1
-    `, worldID).Scan(&world.ID, &world.UserID, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
+    `, worldID).Scan(&world.ID, &world.UserID, &world.Status, &world.Theme, &world.FullStory, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -244,6 +244,12 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
 		args = append(args, *status)
 		countArgs = append(countArgs, *status)
+	}
+
+	//* For global scope (userID == nil), only show published worlds
+	if userID == nil {
+		query += ` AND w.visibility = 'published'`
+		countQuery += ` AND visibility = 'published'`
 	}
 
 	query += ` ORDER BY w.created_at DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
@@ -356,6 +362,12 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
 		args = append(args, *status)
 		countArgs = append(countArgs, *status)
+	}
+
+	//* For global scope (userID == nil), only show published worlds
+	if userID == nil {
+		query += ` AND w.visibility = 'published'`
+		countQuery += ` AND visibility = 'published'`
 	}
 
 	query += ` ORDER BY relevance DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
