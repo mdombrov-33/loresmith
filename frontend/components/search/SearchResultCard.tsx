@@ -23,7 +23,7 @@ import {
 import { HelpCircle } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
-import { useDeleteWorld } from "@/lib/queries";
+import { useDeleteWorld, useDeleteAdventureSession } from "@/lib/queries";
 
 interface SearchResultCardProps {
   world: World;
@@ -36,7 +36,9 @@ export default function SearchResultCard({
 }: SearchResultCardProps) {
   const router = useRouter();
   const deleteWorldMutation = useDeleteWorld();
+  const deleteSessionMutation = useDeleteAdventureSession();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteType, setDeleteType] = useState<"world" | "session">("world");
   const fullStory = JSON.parse(world.full_story);
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
@@ -55,19 +57,42 @@ export default function SearchResultCard({
     router.push(`/worlds/${world.theme}/${world.id}`);
   };
 
-  const handleDeleteClick = () => {
+  const handleResumeAdventure = () => {
+    if (world.session_id) {
+      router.push(`/adventure/${world.session_id}`);
+    }
+  };
+
+  const handleDeleteWorldClick = () => {
+    setDeleteType("world");
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSessionClick = () => {
+    setDeleteType("session");
     setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    deleteWorldMutation.mutate(world.id, {
-      onSuccess: () => {
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        setIsDeleteDialogOpen(false);
-      },
-    });
+    if (deleteType === "world") {
+      deleteWorldMutation.mutate(world.id, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+        },
+        onError: () => {
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    } else if (deleteType === "session" && world.session_id) {
+      deleteSessionMutation.mutate(world.session_id, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+        },
+        onError: () => {
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    }
   };
 
   return (
@@ -129,18 +154,46 @@ export default function SearchResultCard({
           </div>
           <div className="flex gap-2">
             {scope === "my" && (
-              <ActionButton
-                size="sm"
-                variant="destructive"
-                onClick={handleDeleteClick}
-                disabled={deleteWorldMutation.isPending}
-              >
-                {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+              <>
+                {world.status === "draft" ? (
+                  <ActionButton
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleDeleteWorldClick}
+                    disabled={deleteWorldMutation.isPending}
+                  >
+                    {deleteWorldMutation.isPending ? "Deleting..." : "Delete World"}
+                  </ActionButton>
+                ) : world.status === "active" && world.session_id ? (
+                  <ActionButton
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleDeleteSessionClick}
+                    disabled={deleteSessionMutation.isPending}
+                  >
+                    {deleteSessionMutation.isPending ? "Deleting..." : "Delete Session"}
+                  </ActionButton>
+                ) : world.status === "completed" && world.session_id ? (
+                  <ActionButton
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleDeleteSessionClick}
+                    disabled={deleteSessionMutation.isPending}
+                  >
+                    {deleteSessionMutation.isPending ? "Deleting..." : "Delete Session"}
+                  </ActionButton>
+                ) : null}
+              </>
+            )}
+            {world.status === "active" && world.session_id ? (
+              <ActionButton size="sm" onClick={handleResumeAdventure}>
+                Resume Adventure
+              </ActionButton>
+            ) : (
+              <ActionButton size="sm" onClick={handleViewWorld}>
+                View World
               </ActionButton>
             )}
-            <ActionButton size="sm" onClick={handleViewWorld}>
-              View World
-            </ActionButton>
           </div>
         </div>
       </CardContent>
@@ -148,27 +201,46 @@ export default function SearchResultCard({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete World</DialogTitle>
+            <DialogTitle>
+              {deleteType === "world" ? "Delete World" : "Delete Adventure Session"}
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;
-              {fullStory.quest?.title || "this world"}&quot;? This action cannot
-              be undone.
+              {deleteType === "world" ? (
+                <>
+                  Are you sure you want to delete &quot;
+                  {fullStory.quest?.title || "this world"}&quot;? This action
+                  cannot be undone.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete the adventure session for
+                  &quot;{fullStory.quest?.title || "this world"}&quot;? Your
+                  progress will be lost and the world will return to draft
+                  status.
+                </>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              disabled={deleteWorldMutation.isPending}
+              disabled={
+                deleteWorldMutation.isPending || deleteSessionMutation.isPending
+              }
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              disabled={deleteWorldMutation.isPending}
+              disabled={
+                deleteWorldMutation.isPending || deleteSessionMutation.isPending
+              }
             >
-              {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteWorldMutation.isPending || deleteSessionMutation.isPending
+                ? "Deleting..."
+                : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

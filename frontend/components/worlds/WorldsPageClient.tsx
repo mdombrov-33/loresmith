@@ -19,6 +19,7 @@ export default function WorldsPageClient() {
     displayNames,
     sortDetails,
     actualTheme,
+    worldId,
   } = useWorldsLogic();
 
   if (isLoading) {
@@ -41,7 +42,7 @@ export default function WorldsPageClient() {
           sortDetails={sortDetails}
         />
       </div>
-      <WorldActions theme={actualTheme} />
+      <WorldActions theme={actualTheme} worldId={worldId} />
     </main>
   );
 }

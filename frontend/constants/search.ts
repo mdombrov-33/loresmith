@@ -1,6 +1,7 @@
 export const STATUS_OPTIONS = [
   { value: "draft", label: "Draft" },
-  { value: "adventure", label: "Adventure" },
+  { value: "active", label: "Active" },
+  { value: "completed", label: "Completed" },
 ];
 
 export const LORE_TYPE_OPTIONS = [

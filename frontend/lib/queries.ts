@@ -8,6 +8,8 @@ import {
   deleteWorld,
   registerUser,
   loginUser,
+  startAdventure,
+  deleteAdventureSession,
 } from "./api";
 import { RegisterRequest, LoginRequest } from "@/types/api";
 import { SelectedLore } from "@/types/generate-world";
@@ -162,5 +164,28 @@ export function useRegister() {
 export function useLogin() {
   return useMutation({
     mutationFn: (request: LoginRequest) => loginUser(request),
+  });
+}
+
+export function useStartAdventure() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (worldId: number) => startAdventure(worldId),
+    onSuccess: (data, worldId) => {
+      //* Invalidate world query to refresh status
+      queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
+    },
+  });
+}
+
+export function useDeleteAdventureSession() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: number) => deleteAdventureSession(sessionId),
+    onSuccess: () => {
+      //* Invalidate worlds query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
+    },
   });
 }

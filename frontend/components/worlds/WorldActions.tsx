@@ -2,16 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { Compass, Wand2, Eye, Home, ChevronRight } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
+import { useStartAdventure } from "@/lib/queries";
 
 interface WorldActionsProps {
   theme: string;
+  worldId: number;
 }
 
-export default function WorldActions({ theme }: WorldActionsProps) {
+export default function WorldActions({ theme, worldId }: WorldActionsProps) {
   const router = useRouter();
   const { theme: currentTheme } = useAppStore();
+  const startAdventureMutation = useStartAdventure();
 
   const handleCreateNewStory = () => {
     router.push(`/generate?theme=${theme}`);
@@ -31,19 +35,37 @@ export default function WorldActions({ theme }: WorldActionsProps) {
     router.push(`/?theme=${themeToUse}`);
   };
 
+  const handleBeginAdventure = async () => {
+    try {
+      const result = await startAdventureMutation.mutateAsync(worldId);
+      router.push(`/adventure/${result.session_id}`);
+    } catch (error) {
+      console.error("Failed to start adventure:", error);
+    }
+  };
+
   return (
-    <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-border/50 sticky bottom-0 z-20 border-t py-6 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col items-center gap-6">
-          {/* Primary CTA */}
-          <ActionButton
-            size="lg"
-            className="group hover:shadow-primary/25 h-14 gap-3 px-8 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-          >
-            <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
-            Begin Your Adventure
-            <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </ActionButton>
+    <>
+      {startAdventureMutation.isPending && (
+        <LoadingSpinner
+          title="Initializing Adventure"
+          description="Preparing your journey..."
+        />
+      )}
+      <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-border/50 sticky bottom-0 z-20 border-t py-6 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center gap-6">
+            {/* Primary CTA */}
+            <ActionButton
+              size="lg"
+              onClick={handleBeginAdventure}
+              disabled={startAdventureMutation.isPending}
+              className="group hover:shadow-primary/25 h-14 gap-3 px-8 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            >
+              <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
+              {startAdventureMutation.isPending ? "Starting..." : "Begin Your Adventure"}
+              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </ActionButton>
 
           {/* Secondary Actions */}
           <div className="flex flex-wrap justify-center gap-3">
@@ -78,5 +100,6 @@ export default function WorldActions({ theme }: WorldActionsProps) {
         </div>
       </div>
     </nav>
+    </>
   );
 }

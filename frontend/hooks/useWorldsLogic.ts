@@ -122,5 +122,6 @@ export function useWorldsLogic() {
     truncateText,
     sortDetails,
     actualTheme,
+    worldId,
   };
 }

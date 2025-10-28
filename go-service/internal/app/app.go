@@ -17,13 +17,14 @@ import (
 )
 
 type Application struct {
-	Logger       *log.Logger
-	UserHandler  *api.UserHandler
-	LoreHandler  *api.LoreHandler
-	WorldHandler *api.WorldHandler
-	LoreClient   lorepb.LoreServiceClient
-	Middleware   middleware.UserMiddleware
-	DB           *sql.DB
+	Logger           *log.Logger
+	UserHandler      *api.UserHandler
+	LoreHandler      *api.LoreHandler
+	WorldHandler     *api.WorldHandler
+	AdventureHandler *api.AdventureHandler
+	LoreClient       lorepb.LoreServiceClient
+	Middleware       middleware.UserMiddleware
+	DB               *sql.DB
 }
 
 func NewApplication() (*Application, error) {
@@ -48,21 +49,25 @@ func NewApplication() (*Application, error) {
 	//* Stores
 	userStore := store.NewPostgresUserStore(pgDB)
 	worldStore := store.NewPostgresWorldStore(pgDB)
+	adventureStore := store.NewPostgresAdventureStore(pgDB)
+	partyStore := store.NewPostgresPartyStore(pgDB)
 
 	//* Handlers
 	userHandler := api.NewUserHandler(userStore, logger)
 	worldHandler := api.NewWorldHandler(loreClient, worldStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
+	adventureHandler := api.NewAdventureHandler(adventureStore, partyStore, worldStore, logger)
 	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
 
 	app := &Application{
-		Logger:       logger,
-		LoreClient:   loreClient,
-		LoreHandler:  loreHandler,
-		WorldHandler: worldHandler,
-		UserHandler:  userHandler,
-		Middleware:   middlewareHandler,
-		DB:           pgDB,
+		Logger:           logger,
+		LoreClient:       loreClient,
+		LoreHandler:      loreHandler,
+		WorldHandler:     worldHandler,
+		AdventureHandler: adventureHandler,
+		UserHandler:      userHandler,
+		Middleware:       middlewareHandler,
+		DB:               pgDB,
 	}
 
 	return app, nil

@@ -20,8 +20,12 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 
 	r.Use(middleware.Logger)
 
+	//TODO: add /api prefix to routes?
+	//* Authenticated routes
 	r.Group(func(r chi.Router) {
 		r.Use(app.Middleware.Authenticate)
+
+		//* Lore generation routes
 		r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
 		r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
 		r.Get("/generate/events", app.LoreHandler.HandleGenerateEvents)
@@ -29,13 +33,24 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Get("/generate/factions", app.LoreHandler.HandleGenerateFactions)
 		r.Get("/generate/all", app.LoreHandler.HandleGenerateAll)
 		r.Post("/generate/full-story", app.LoreHandler.HandleGenerateFullStory)
+
+		//* World routes
 		r.Get("/worlds", app.WorldHandler.HandleGetWorldsByFilters)
 		r.Get("/worlds/search", app.WorldHandler.HandleSearchWorlds)
 		r.Get("/worlds/{id}", app.WorldHandler.HandleGetWorldById)
-		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld)
+		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld) //TODO: nuke /draft part? change to just /worlds?
 		r.Delete("/worlds/{id}", app.WorldHandler.HandleDeleteWorldById)
+
+		//* Adventure routes
+		r.Post("/worlds/{id}/adventure/start", app.AdventureHandler.HandleStartAdventure)
+		r.Get("/adventure/{session_id}/state", app.AdventureHandler.HandleGetAdventureState)
+		r.Get("/adventure/{session_id}/party", app.AdventureHandler.HandleGetParty)
+		r.Post("/adventure/{session_id}/progress", app.AdventureHandler.HandleUpdateSessionProgress)
+		r.Post("/adventure/{session_id}/party/update", app.AdventureHandler.HandleUpdatePartyStats)
+		r.Delete("/adventure/{session_id}", app.AdventureHandler.HandleDeleteSession)
 	})
 
+	//* Public routes
 	r.Get("/health", app.HealthCheck)
 	r.Post("/register", app.UserHandler.HandleRegisterUser)
 	r.Post("/login", app.UserHandler.HandleLoginUser)

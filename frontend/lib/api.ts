@@ -255,3 +255,43 @@ export async function loginUser(request: LoginRequest): Promise<AuthResponse> {
 
   return data;
 }
+
+export async function startAdventure(
+  worldId: number,
+): Promise<{ session_id: number; protagonist: any }> {
+  const url = `${API_BASE_URL}/worlds/${worldId}/adventure/start`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "POST",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error || `Failed to start adventure: ${response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function deleteAdventureSession(
+  sessionId: number,
+): Promise<void> {
+  const url = `${API_BASE_URL}/adventure/${sessionId}`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "DELETE",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error ||
+        `Failed to delete adventure session: ${response.statusText}`,
+    );
+  }
+}

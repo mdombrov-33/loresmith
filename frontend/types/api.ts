@@ -65,6 +65,7 @@ export interface World {
   theme: string;
   full_story: string;
   lore_pieces?: LorePiece[];
+  session_id?: number;
   created_at: string;
   updated_at: string;
   relevance?: number;

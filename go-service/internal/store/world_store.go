@@ -20,6 +20,7 @@ type World struct {
 	Theme      string       `json:"theme"`
 	FullStory  string       `json:"full_story"`
 	LorePieces []*LorePiece `json:"lore_pieces,omitempty"`
+	SessionID  *int         `json:"session_id,omitempty"`
 	CreatedAt  time.Time    `json:"created_at"`
 	UpdatedAt  time.Time    `json:"updated_at"`
 	Relevance  *float64     `json:"relevance,omitempty"`
@@ -43,6 +44,8 @@ type WorldStore interface {
 	GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
 	SearchWorldsByEmbedding(embedding []float32, userID *int, theme *string, status *string, includeUserName bool, limit int, offset int) ([]*World, int, error)
 	DeleteWorldById(worldID int) error
+	GetProtagonistForWorld(worldID int) (*LorePiece, error)
+	UpdateWorldStatus(worldID int, status string) error
 }
 
 type PostgresWorldStore struct {
@@ -75,7 +78,7 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 
 	if len(embedding) > 0 {
 		vec := pgvector.NewVector(embedding)
-		provider := os.Getenv("AI_PROVIDER")
+		provider := os.Getenv("AI_PROVIDER") //TODO: I don't think i see ai provider column filled in when we create world
 		var column string
 		if provider == "local" {
 			column = "embedding_local"
@@ -189,9 +192,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 
 	if includeUserName {
 		query = `
-        SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at
+        SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at
         FROM worlds w
         JOIN users u ON w.user_id = u.id
+        LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
         WHERE 1=1`
 		countQuery = `
         SELECT COUNT(*)
@@ -200,8 +204,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
         WHERE 1=1`
 	} else {
 		query = `
-        SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at
-        FROM worlds WHERE 1=1`
+        SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at
+        FROM worlds w
+        LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
+        WHERE 1=1`
 		countQuery = `
         SELECT COUNT(*)
         FROM worlds WHERE 1=1`
@@ -210,7 +216,7 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	if userID != nil {
 		argCount++
 		countArgCount++
-		query += ` AND user_id = $` + strconv.Itoa(argCount)
+		query += ` AND w.user_id = $` + strconv.Itoa(argCount)
 		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
 		args = append(args, *userID)
 		countArgs = append(countArgs, *userID)
@@ -218,7 +224,7 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	if theme != nil {
 		argCount++
 		countArgCount++
-		query += ` AND theme = $` + strconv.Itoa(argCount)
+		query += ` AND w.theme = $` + strconv.Itoa(argCount)
 		countQuery += ` AND theme = $` + strconv.Itoa(countArgCount)
 		args = append(args, *theme)
 		countArgs = append(countArgs, *theme)
@@ -226,13 +232,13 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	if status != nil {
 		argCount++
 		countArgCount++
-		query += ` AND status = $` + strconv.Itoa(argCount)
+		query += ` AND w.status = $` + strconv.Itoa(argCount)
 		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
 		args = append(args, *status)
 		countArgs = append(countArgs, *status)
 	}
 
-	query += ` ORDER BY created_at DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
+	query += ` ORDER BY w.created_at DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
 	args = append(args, limit, offset)
 
 	rows, err := s.db.Query(query, args...)
@@ -244,9 +250,14 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	var worlds []*World
 	for rows.Next() {
 		var world World
-		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.CreatedAt, &world.UpdatedAt)
+		var sessionID sql.NullInt64
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.CreatedAt, &world.UpdatedAt)
 		if err != nil {
 			return nil, 0, err
+		}
+		if sessionID.Valid {
+			sessionIDInt := int(sessionID.Int64)
+			world.SessionID = &sessionIDInt
 		}
 		worlds = append(worlds, &world)
 	}
@@ -287,9 +298,10 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 
 	if includeUserName {
 		query = fmt.Sprintf(`
-		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		SELECT w.id, w.user_id, u.username as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
 		FROM worlds w
 		JOIN users u ON w.user_id = u.id
+		LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
 		WHERE w.%s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
@@ -298,8 +310,10 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		WHERE w.%s IS NOT NULL`, column)
 	} else {
 		query = fmt.Sprintf(`
-		SELECT id, user_id, NULL as user_name, status, theme, full_story, created_at, updated_at, (1 - (%s <=> $1))::float8 as relevance, %s as embedding
-		FROM worlds WHERE %s IS NOT NULL`, column, column, column)
+		SELECT w.id, w.user_id, NULL as user_name, w.status, w.theme, w.full_story, adv.id as session_id, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		FROM worlds w
+		LEFT JOIN adventure_sessions adv ON w.id = adv.world_id AND adv.status IN ('initializing', 'active')
+		WHERE w.%s IS NOT NULL`, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM worlds WHERE %s IS NOT NULL`, column)
@@ -308,7 +322,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	if userID != nil {
 		argCount++
 		countArgCount++
-		query += ` AND user_id = $` + strconv.Itoa(argCount)
+		query += ` AND w.user_id = $` + strconv.Itoa(argCount)
 		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
 		args = append(args, *userID)
 		countArgs = append(countArgs, *userID)
@@ -316,7 +330,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	if theme != nil {
 		argCount++
 		countArgCount++
-		query += ` AND theme = $` + strconv.Itoa(argCount)
+		query += ` AND w.theme = $` + strconv.Itoa(argCount)
 		countQuery += ` AND theme = $` + strconv.Itoa(countArgCount)
 		args = append(args, *theme)
 		countArgs = append(countArgs, *theme)
@@ -324,7 +338,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	if status != nil {
 		argCount++
 		countArgCount++
-		query += ` AND status = $` + strconv.Itoa(argCount)
+		query += ` AND w.status = $` + strconv.Itoa(argCount)
 		countQuery += ` AND status = $` + strconv.Itoa(countArgCount)
 		args = append(args, *status)
 		countArgs = append(countArgs, *status)
@@ -342,6 +356,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	var worlds []*World
 	for rows.Next() {
 		var world World
+		var sessionID sql.NullInt64
 		var embedding pgvector.Vector
 		err := rows.Scan(
 			&world.ID,
@@ -350,6 +365,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 			&world.Status,
 			&world.Theme,
 			&world.FullStory,
+			&sessionID,
 			&world.CreatedAt,
 			&world.UpdatedAt,
 			&world.Relevance,
@@ -357,6 +373,10 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		)
 		if err != nil {
 			return nil, 0, err
+		}
+		if sessionID.Valid {
+			sessionIDInt := int(sessionID.Int64)
+			world.SessionID = &sessionIDInt
 		}
 		if embedding.Slice() != nil {
 			world.Embedding = embedding.Slice()
@@ -379,5 +399,38 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 
 func (s *PostgresWorldStore) DeleteWorldById(worldID int) error {
 	_, err := s.db.Exec(`DELETE FROM worlds WHERE id = $1`, worldID)
+	return err
+}
+
+func (s *PostgresWorldStore) GetProtagonistForWorld(worldID int) (*LorePiece, error) {
+	query := `
+	SELECT id, world_id, type, name, description, details, created_at
+	FROM lore_pieces
+	WHERE world_id = $1 AND type = 'character' AND details->>'is_protagonist' = 'true'
+	`
+	var piece LorePiece
+	var detailsJSON string
+	err := s.db.QueryRow(query, worldID).Scan(&piece.ID, &piece.WorldID, &piece.Type, &piece.Name, &piece.Description, &detailsJSON, &piece.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	if detailsJSON != "" {
+		if err := json.Unmarshal([]byte(detailsJSON), &piece.Details); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal details: %w", err)
+		}
+	}
+
+	return &piece, nil
+
+}
+
+func (s *PostgresWorldStore) UpdateWorldStatus(worldID int, status string) error {
+	query := `
+	UPDATE worlds
+	SET status = $1, updated_at = NOW()
+	WHERE id = $2
+	`
+	_, err := s.db.Exec(query, status, worldID)
 	return err
 }
