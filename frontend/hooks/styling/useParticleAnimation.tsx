@@ -89,10 +89,24 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
         };
       case "post-apocalyptic":
         return {
-          preset: "fire",
+          preset: "snow",
           particles: {
-            color: { value: "#8b0000" },
-            number: { value: 20 },
+            color: { value: "#8b3a3a" },
+            number: { value: 120 },
+            opacity: {
+              value: 0.6,
+              random: true,
+            },
+            size: {
+              value: 4,
+              random: true,
+            },
+            move: {
+              direction: "bottom-right",
+              speed: 1.2,
+              straight: false,
+              random: true,
+            },
           },
           background: { color: { value: "transparent" } },
           fullScreen: { enable: false },

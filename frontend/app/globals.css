@@ -113,25 +113,25 @@
 
 .post-apocalyptic {
   --radius: 0.625rem;
-  --background: oklch(0.15 0.04 110);
-  --foreground: oklch(0.92 0.01 120);
-  --card: oklch(0.21 0.05 110);
-  --card-foreground: oklch(0.9 0.015 120);
-  --popover: oklch(0.21 0.05 110);
-  --popover-foreground: oklch(0.92 0.01 120);
-  --primary: oklch(0.55 0.12 100);
-  --primary-foreground: oklch(0.95 0.01 120);
-  --secondary: oklch(0.48 0.1 25);
-  --secondary-foreground: oklch(0.92 0.01 120);
-  --muted: oklch(0.27 0.04 110);
-  --muted-foreground: oklch(0.62 0.06 110);
-  --accent: oklch(0.5 0.11 80);
-  --accent-foreground: oklch(0.95 0.01 120);
-  --destructive: oklch(0.52 0.18 30);
+  --background: oklch(0.14 0.03 270);
+  --foreground: oklch(0.9 0.01 0);
+  --card: oklch(0.2 0.04 270);
+  --card-foreground: oklch(0.88 0.015 0);
+  --popover: oklch(0.2 0.04 270);
+  --popover-foreground: oklch(0.9 0.01 0);
+  --primary: oklch(0.52 0.16 15);
+  --primary-foreground: oklch(0.95 0.01 0);
+  --secondary: oklch(0.42 0.08 265);
+  --secondary-foreground: oklch(0.92 0.01 0);
+  --muted: oklch(0.26 0.03 270);
+  --muted-foreground: oklch(0.62 0.04 270);
+  --accent: oklch(0.48 0.12 10);
+  --accent-foreground: oklch(0.95 0.01 0);
+  --destructive: oklch(0.48 0.18 5);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.3 0.05 110);
-  --input: oklch(0.27 0.04 110);
-  --ring: oklch(0.55 0.12 100);
+  --border: oklch(0.3 0.04 270);
+  --input: oklch(0.26 0.03 270);
+  --ring: oklch(0.52 0.16 15);
 }
 
 .steampunk {
