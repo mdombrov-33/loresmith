@@ -43,6 +43,7 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Patch("/worlds/{id}/visibility", app.WorldHandler.HandleUpdateWorldVisibility)
 
 		//* Adventure routes
+		r.Get("/worlds/{id}/adventure/check", app.AdventureHandler.HandleCheckActiveSession)
 		r.Post("/worlds/{id}/adventure/start", app.AdventureHandler.HandleStartAdventure)
 		r.Get("/adventure/{session_id}/state", app.AdventureHandler.HandleGetAdventureState)
 		r.Get("/adventure/{session_id}/party", app.AdventureHandler.HandleGetParty)

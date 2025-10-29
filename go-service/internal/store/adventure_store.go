@@ -24,6 +24,7 @@ type AdventureStore interface {
 	GetSessionByID(sessionID int) (*AdventureSession, error)
 	GetSessionsByUserID(userID int, status *string) ([]*AdventureSession, error)
 	GetSessionsByWorldID(worldID int, status *string) ([]*AdventureSession, error)
+	GetActiveSessionForWorld(worldID int, userID int) (*AdventureSession, error)
 	UpdateSessionStatus(sessionID int, status string) error
 	UpdateSessionProgress(sessionID int, sceneIndex int, act int) error
 	UpdateSessionState(sessionID int, state map[string]interface{}) error
@@ -213,6 +214,51 @@ func (s *PostgresAdventureStore) GetSessionsByWorldID(worldID int, status *strin
 	}
 
 	return sessions, nil
+}
+
+func (s *PostgresAdventureStore) GetActiveSessionForWorld(worldID int, userID int) (*AdventureSession, error) {
+	query := `
+	SELECT id, world_id, user_id, status, current_scene_index, current_act,
+	       session_state, created_at, updated_at, completed_at
+	FROM adventure_sessions
+	WHERE world_id = $1 AND user_id = $2 AND status IN ('initializing', 'active')
+	ORDER BY updated_at DESC
+	LIMIT 1
+	`
+	var session AdventureSession
+	var sessionStateJSON sql.NullString
+
+	err := s.db.QueryRow(query, worldID, userID).Scan(
+		&session.ID,
+		&session.WorldID,
+		&session.UserID,
+		&session.Status,
+		&session.CurrentSceneIndex,
+		&session.CurrentAct,
+		&sessionStateJSON,
+		&session.CreatedAt,
+		&session.UpdatedAt,
+		&session.CompletedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil //* No active session found
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	//* Handle nullable session_state
+	if sessionStateJSON.Valid {
+		var state map[string]interface{}
+		if err := json.Unmarshal([]byte(sessionStateJSON.String), &state); err != nil {
+			return nil, err
+		}
+		session.SessionState = state
+	}
+
+	return &session, nil
 }
 
 func (s *PostgresAdventureStore) UpdateSessionStatus(sessionID int, status string) error {

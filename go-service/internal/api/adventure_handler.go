@@ -33,6 +33,41 @@ func NewAdventureHandler(
 	}
 }
 
+func (h *AdventureHandler) HandleCheckActiveSession(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		return
+	}
+
+	currentUser := middleware.GetUser(r)
+
+	worldIDStr := chi.URLParam(r, "id")
+	worldID, err := strconv.Atoi(worldIDStr)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		return
+	}
+
+	activeSession, err := h.adventureStore.GetActiveSessionForWorld(worldID, int(currentUser.ID))
+	if err != nil {
+		h.logger.Printf("ERROR: failed to check active session: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to check session"})
+		return
+	}
+
+	if activeSession == nil {
+		utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+			"has_active_session": false,
+			"session":            nil,
+		})
+	} else {
+		utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+			"has_active_session": true,
+			"session":            activeSession,
+		})
+	}
+}
+
 func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
