@@ -20,7 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Eye, EyeOff } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/types/api";
 import {
@@ -120,32 +120,16 @@ export default function SearchResultCard({
         </div>
       )}
       <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
-            <Badge variant="secondary">
-              {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
+          <Badge variant="secondary">
+            {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
+          </Badge>
+          {world.status === "active" && world.active_sessions !== undefined && (
+            <Badge variant="default" className="bg-green-600">
+              {world.active_sessions}{" "}
+              {world.active_sessions === 1 ? "player" : "players"}
             </Badge>
-            {world.status === "active" && world.active_sessions !== undefined && (
-              <Badge variant="default" className="bg-green-600">
-                {world.active_sessions} {world.active_sessions === 1 ? "player" : "players"}
-              </Badge>
-            )}
-          </div>
-          {scope === "my" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleToggleVisibility}
-              disabled={updateVisibilityMutation.isPending}
-              className="h-8 px-2 text-xs"
-            >
-              {updateVisibilityMutation.isPending
-                ? "..."
-                : world.visibility === "published"
-                  ? "Published"
-                  : "Private"}
-            </Button>
           )}
         </div>
         <CardTitle className="line-clamp-2 text-lg">
@@ -190,52 +174,100 @@ export default function SearchResultCard({
             )}
           </div>
           <div className="flex gap-2">
-            {scope === "my" && (
+            {scope === "my" ? (
               <>
                 {world.status === "draft" ? (
-                  <ActionButton
-                    size="sm"
-                    variant="destructive"
-                    onClick={handleDeleteWorldClick}
-                    disabled={deleteWorldMutation.isPending}
-                  >
-                    {deleteWorldMutation.isPending
-                      ? "Deleting..."
-                      : "Delete World"}
-                  </ActionButton>
+                  <>
+                    <ActionButton
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleDeleteWorldClick}
+                      disabled={deleteWorldMutation.isPending}
+                    >
+                      {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+                    </ActionButton>
+                    <ActionButton size="sm" onClick={handleViewWorld}>
+                      View
+                    </ActionButton>
+                  </>
                 ) : world.status === "active" && world.session_id ? (
-                  <ActionButton
-                    size="sm"
-                    variant="destructive"
-                    onClick={handleDeleteSessionClick}
-                    disabled={deleteSessionMutation.isPending}
-                  >
-                    {deleteSessionMutation.isPending
-                      ? "Deleting..."
-                      : "Delete Session"}
-                  </ActionButton>
+                  <>
+                    <ActionButton
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleDeleteSessionClick}
+                      disabled={deleteSessionMutation.isPending}
+                    >
+                      {deleteSessionMutation.isPending
+                        ? "Deleting..."
+                        : "Delete"}
+                    </ActionButton>
+                    <ActionButton size="sm" onClick={handleResumeAdventure}>
+                      Resume
+                    </ActionButton>
+                  </>
                 ) : world.status === "completed" && world.session_id ? (
-                  <ActionButton
-                    size="sm"
-                    variant="destructive"
-                    onClick={handleDeleteSessionClick}
-                    disabled={deleteSessionMutation.isPending}
-                  >
-                    {deleteSessionMutation.isPending
-                      ? "Deleting..."
-                      : "Delete Session"}
+                  <>
+                    <ActionButton
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleDeleteSessionClick}
+                      disabled={deleteSessionMutation.isPending}
+                    >
+                      {deleteSessionMutation.isPending
+                        ? "Deleting..."
+                        : "Delete"}
+                    </ActionButton>
+                    <ActionButton size="sm" onClick={handleViewWorld}>
+                      View
+                    </ActionButton>
+                  </>
+                ) : (
+                  <ActionButton size="sm" onClick={handleViewWorld}>
+                    View
                   </ActionButton>
-                ) : null}
+                )}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleToggleVisibility}
+                        disabled={updateVisibilityMutation.isPending}
+                        className="hover:bg-primary hover:text-primary-foreground px-2 transition-colors"
+                      >
+                        {updateVisibilityMutation.isPending ? (
+                          <span className="h-4 w-4">...</span>
+                        ) : world.visibility === "published" ? (
+                          <Eye className="h-4 w-4" />
+                        ) : (
+                          <EyeOff className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        {world.visibility === "published"
+                          ? "Published - Click to make private."
+                          : "Private - Click to publish."}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </>
-            )}
-            {world.status === "active" && world.session_id ? (
-              <ActionButton size="sm" onClick={handleResumeAdventure}>
-                Resume Adventure
-              </ActionButton>
             ) : (
-              <ActionButton size="sm" onClick={handleViewWorld}>
-                View World
-              </ActionButton>
+              <>
+                {world.status === "active" && world.session_id ? (
+                  <ActionButton size="sm" onClick={handleResumeAdventure}>
+                    Resume
+                  </ActionButton>
+                ) : (
+                  <ActionButton size="sm" onClick={handleViewWorld}>
+                    View
+                  </ActionButton>
+                )}
+              </>
             )}
           </div>
         </div>
