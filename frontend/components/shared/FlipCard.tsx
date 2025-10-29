@@ -22,11 +22,7 @@ export default function FlipCard({
       className={`group perspective-1000 h-full w-full cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <div
-        className={`relative h-full w-full transform-style-3d transition-transform duration-700 group-hover:rotate-y-180 ${
-          isSelected ? "ring-primary ring-2 ring-offset-2" : ""
-        }`}
-      >
+      <div className="relative h-full w-full transform-style-3d transition-transform duration-700 group-hover:rotate-y-180">
         {/* Front Face */}
         <div className="backface-hidden absolute inset-0 h-full w-full">
           {frontContent}

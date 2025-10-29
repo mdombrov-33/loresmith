@@ -35,7 +35,7 @@ export default function CharacterCard({
   // Front side: Basic info
   const frontContent = (
     <div
-      className={`bg-card flex h-full flex-col rounded-xl border p-6 ${isSelected ? "border-primary from-primary/10 to-accent/10 bg-gradient-to-br shadow-lg" : "border-border"}`}
+      className={`bg-card flex h-full flex-col rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-border"}`}
     >
       {/* Title + Type Badge */}
       <div className="mb-3 flex items-center justify-between">
@@ -65,7 +65,7 @@ export default function CharacterCard({
   //* Back side: Detailed info
   const backContent = (
     <div
-      className={`bg-card h-full overflow-y-auto rounded-xl border p-6 ${isSelected ? "border-primary from-primary/10 to-accent/10 bg-gradient-to-br shadow-lg" : "border-border"}`}
+      className={`bg-card h-full overflow-y-auto rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-border"}`}
     >
       {/* Title */}
       <div className="mb-3">
