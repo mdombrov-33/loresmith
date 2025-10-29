@@ -28,7 +28,7 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Generate Name
-        with open("prompts/relic/relic_name.txt", "r") as f:
+        with open("generate/prompts/relic/relic_name.txt", "r") as f:
             name_prompt_text = f.read()
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
@@ -41,7 +41,7 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated relic name: {name}")
 
         # Generate Description
-        with open("prompts/relic/relic_description.txt", "r") as f:
+        with open("generate/prompts/relic/relic_description.txt", "r") as f:
             description_prompt_text = f.read()
 
         description_prompt = PromptTemplate.from_template(description_prompt_text)
@@ -54,7 +54,7 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated description for {name}")
 
         # Generate History
-        with open("prompts/relic/relic_history.txt", "r") as f:
+        with open("generate/prompts/relic/relic_history.txt", "r") as f:
             history_prompt_text = f.read()
 
         history_prompt = PromptTemplate.from_template(history_prompt_text)

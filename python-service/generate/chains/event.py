@@ -28,7 +28,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Generate Name
-        with open("prompts/event/event_name.txt", "r") as f:
+        with open("generate/prompts/event/event_name.txt", "r") as f:
             name_prompt_text = f.read()
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
@@ -41,7 +41,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated event name: {name}")
 
         # Generate Description
-        with open("prompts/event/event_description.txt", "r") as f:
+        with open("generate/prompts/event/event_description.txt", "r") as f:
             description_prompt_text = f.read()
 
         description_prompt = PromptTemplate.from_template(description_prompt_text)
@@ -54,7 +54,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated description for {name}")
 
         # Generate Impact
-        with open("prompts/event/event_impact.txt", "r") as f:
+        with open("generate/prompts/event/event_impact.txt", "r") as f:
             impact_prompt_text = f.read()
 
         impact_prompt = PromptTemplate.from_template(impact_prompt_text)

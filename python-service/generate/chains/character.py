@@ -30,7 +30,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
 
     try:
         # Generate Name
-        with open("prompts/character/character_name.txt", "r") as f:
+        with open("generate/prompts/character/character_name.txt", "r") as f:
             name_prompt_text = f.read()
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
@@ -46,7 +46,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated character name: {name}")
 
         # Generate Appearance
-        with open("prompts/character/character_appearance.txt", "r") as f:
+        with open("generate/prompts/character/character_appearance.txt", "r") as f:
             appearance_prompt_text = f.read()
 
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
@@ -62,7 +62,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated appearance for {name}")
 
         # Generate Personality
-        with open("prompts/character/character_personality.txt", "r") as f:
+        with open("generate/prompts/character/character_personality.txt", "r") as f:
             personality_prompt_text = f.read()
 
         personality_prompt = PromptTemplate.from_template(personality_prompt_text)
@@ -79,7 +79,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated personality for {name}")
 
         # Generate Backstory
-        with open("prompts/character/character_backstory.txt", "r") as f:
+        with open("generate/prompts/character/character_backstory.txt", "r") as f:
             backstory_prompt_text = f.read()
 
         backstory_prompt = PromptTemplate.from_template(backstory_prompt_text)
@@ -96,7 +96,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated backstory for {name}")
 
         # Generate Skills
-        with open("prompts/character/character_skills.txt", "r") as f:
+        with open("generate/prompts/character/character_skills.txt", "r") as f:
             skills_prompt_text = f.read()
 
         skills_prompt = PromptTemplate.from_template(skills_prompt_text)
@@ -114,7 +114,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated skills for {name}")
 
         # Generate Flaw
-        with open("prompts/character/character_flaw.txt", "r") as f:
+        with open("generate/prompts/character/character_flaw.txt", "r") as f:
             flaw_prompt_text = f.read()
 
         flaw_prompt = PromptTemplate.from_template(flaw_prompt_text)
@@ -132,7 +132,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated flaw for {name}")
 
         # Generate Stats
-        with open("prompts/character/character_stats.txt", "r") as f:
+        with open("generate/prompts/character/character_stats.txt", "r") as f:
             stats_prompt_text = f.read()
 
         stats_prompt = PromptTemplate.from_template(stats_prompt_text)

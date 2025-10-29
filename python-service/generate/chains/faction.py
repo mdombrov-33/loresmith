@@ -28,7 +28,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Generate Name
-        with open("prompts/faction/faction_name.txt", "r") as f:
+        with open("generate/prompts/faction/faction_name.txt", "r") as f:
             name_prompt_text = f.read()
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
@@ -41,7 +41,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated faction name: {name}")
 
         # Generate Ideology
-        with open("prompts/faction/faction_ideology.txt", "r") as f:
+        with open("generate/prompts/faction/faction_ideology.txt", "r") as f:
             ideology_prompt_text = f.read()
 
         ideology_prompt = PromptTemplate.from_template(ideology_prompt_text)
@@ -52,7 +52,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated ideology for {name}")
 
         # Generate Appearance
-        with open("prompts/faction/faction_appearance.txt", "r") as f:
+        with open("generate/prompts/faction/faction_appearance.txt", "r") as f:
             appearance_prompt_text = f.read()
 
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
@@ -69,7 +69,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated appearance for {name}")
 
         # Generate Summary
-        with open("prompts/faction/faction_summary.txt", "r") as f:
+        with open("generate/prompts/faction/faction_summary.txt", "r") as f:
             summary_prompt_text = f.read()
 
         summary_prompt = PromptTemplate.from_template(summary_prompt_text)

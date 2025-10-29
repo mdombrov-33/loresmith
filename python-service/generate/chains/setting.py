@@ -28,7 +28,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
     """
     try:
         # Generate Name
-        with open("prompts/setting/setting_name.txt", "r") as f:
+        with open("generate/prompts/setting/setting_name.txt", "r") as f:
             name_prompt_text = f.read()
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
@@ -41,7 +41,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated setting name: {name}")
 
         # Generate Landscape
-        with open("prompts/setting/setting_landscape.txt", "r") as f:
+        with open("generate/prompts/setting/setting_landscape.txt", "r") as f:
             landscape_prompt_text = f.read()
 
         landscape_prompt = PromptTemplate.from_template(landscape_prompt_text)
@@ -52,7 +52,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated landscape for {name}")
 
         # Generate Dangers
-        with open("prompts/setting/setting_dangers.txt", "r") as f:
+        with open("generate/prompts/setting/setting_dangers.txt", "r") as f:
             dangers_prompt_text = f.read()
 
         dangers_prompt = PromptTemplate.from_template(dangers_prompt_text)
@@ -69,7 +69,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         logger.info(f"Generated dangers for {name}")
 
         # Generate Summary
-        with open("prompts/setting/setting_summary.txt", "r") as f:
+        with open("generate/prompts/setting/setting_summary.txt", "r") as f:
             summary_prompt_text = f.read()
 
         summary_prompt = PromptTemplate.from_template(summary_prompt_text)

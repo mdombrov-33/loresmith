@@ -38,7 +38,7 @@ async def generate_full_story(
         relic = selected_pieces.relic
 
         # Generate Full Story
-        with open("prompts/full_story/full_story.txt", "r") as f:
+        with open("generate/prompts/full_story/full_story.txt", "r") as f:
             full_story_prompt_text = f.read()
 
         full_story_prompt = PromptTemplate.from_template(full_story_prompt_text)
@@ -75,7 +75,7 @@ async def generate_full_story(
         logger.info("Generated full story content")
 
         # Generate Quest Title
-        with open("prompts/full_story/quest_title.txt", "r") as f:
+        with open("generate/prompts/full_story/quest_title.txt", "r") as f:
             quest_title_prompt_text = f.read()
 
         quest_title_prompt = PromptTemplate.from_template(quest_title_prompt_text)
@@ -92,7 +92,7 @@ async def generate_full_story(
         logger.info(f"Generated quest title: {quest_title}")
 
         # Generate Quest Description
-        with open("prompts/full_story/quest_description.txt", "r") as f:
+        with open("generate/prompts/full_story/quest_description.txt", "r") as f:
             quest_description_prompt_text = f.read()
 
         quest_description_prompt = PromptTemplate.from_template(
