@@ -256,6 +256,27 @@ export async function loginUser(request: LoginRequest): Promise<AuthResponse> {
   return data;
 }
 
+export async function checkActiveSession(
+  worldId: number,
+): Promise<{ has_active_session: boolean; session: any | null }> {
+  const url = `${API_BASE_URL}/worlds/${worldId}/adventure/check`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "GET",
+    headers: await getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error || `Failed to check active session: ${response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  return data;
+}
+
 export async function startAdventure(
   worldId: number,
 ): Promise<{ session_id: number; protagonist: any }> {

@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import { Compass, Wand2, Eye, Home, ChevronRight } from "lucide-react";
+import { Compass, Wand2, Eye, Home, ChevronRight, Play } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
-import { useStartAdventure } from "@/lib/queries";
+import { useStartAdventure, useCheckActiveSession } from "@/lib/queries";
 
 interface WorldActionsProps {
   theme: string;
@@ -16,6 +16,7 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
   const router = useRouter();
   const { theme: currentTheme } = useAppStore();
   const startAdventureMutation = useStartAdventure();
+  const { data: sessionCheck, isLoading: isCheckingSession } = useCheckActiveSession(worldId);
 
   const handleCreateNewStory = () => {
     router.push(`/generate?theme=${theme}`);
@@ -37,19 +38,27 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
 
   const handleBeginAdventure = async () => {
     try {
-      const result = await startAdventureMutation.mutateAsync(worldId);
-      router.push(`/adventure/${result.session_id}`);
+      //* If active session exists, resume it
+      if (sessionCheck?.has_active_session && sessionCheck?.session) {
+        router.push(`/adventure/${sessionCheck.session.id}`);
+      } else {
+        //* Otherwise start a new session
+        const result = await startAdventureMutation.mutateAsync(worldId);
+        router.push(`/adventure/${result.session_id}`);
+      }
     } catch (error) {
       console.error("Failed to start adventure:", error);
     }
   };
 
+  const hasActiveSession = sessionCheck?.has_active_session ?? false;
+
   return (
     <>
       {startAdventureMutation.isPending && (
         <LoadingSpinner
-          title="Initializing Adventure"
-          description="Preparing your journey..."
+          title={hasActiveSession ? "Resuming Adventure" : "Initializing Adventure"}
+          description={hasActiveSession ? "Loading your journey..." : "Preparing your journey..."}
         />
       )}
       <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-border/50 sticky bottom-0 z-20 border-t py-6 backdrop-blur-sm">
@@ -59,12 +68,22 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
             <ActionButton
               size="lg"
               onClick={handleBeginAdventure}
-              disabled={startAdventureMutation.isPending}
+              disabled={startAdventureMutation.isPending || isCheckingSession}
               className="group hover:shadow-primary/25 h-14 gap-3 px-8 text-lg shadow-lg transition-all hover:scale-105 hover:shadow-xl"
             >
-              <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
-              {startAdventureMutation.isPending ? "Starting..." : "Begin Your Adventure"}
-              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              {hasActiveSession ? (
+                <>
+                  <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
+                  {startAdventureMutation.isPending ? "Resuming..." : "Resume Your Adventure"}
+                  <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </>
+              ) : (
+                <>
+                  <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                  {startAdventureMutation.isPending ? "Starting..." : "Begin Your Adventure"}
+                  <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </ActionButton>
 
           {/* Secondary Actions */}

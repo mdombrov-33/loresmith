@@ -8,6 +8,7 @@ import {
   deleteWorld,
   registerUser,
   loginUser,
+  checkActiveSession,
   startAdventure,
   deleteAdventureSession,
   updateWorldVisibility,
@@ -165,6 +166,14 @@ export function useRegister() {
 export function useLogin() {
   return useMutation({
     mutationFn: (request: LoginRequest) => loginUser(request),
+  });
+}
+
+export function useCheckActiveSession(worldId: number) {
+  return useQuery({
+    queryKey: ["activeSession", worldId],
+    queryFn: () => checkActiveSession(worldId),
+    staleTime: 0, //* Always fetch fresh data
   });
 }
 
