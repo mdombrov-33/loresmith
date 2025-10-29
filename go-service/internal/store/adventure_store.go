@@ -264,7 +264,7 @@ func (s *PostgresAdventureStore) DeleteSession(sessionID int) error {
 
 func (s *PostgresAdventureStore) CountActiveSessions(worldID int) (int, error) {
 	query := `
-	SELECT COUNT(*) FROM adventure_sessions
+	SELECT COUNT(DISTINCT user_id) FROM adventure_sessions
 	WHERE world_id = $1 AND status IN ('initializing', 'active')
 	`
 	var count int

@@ -22,6 +22,17 @@ export default function QuickActions({ myWorlds }: QuickActionsProps) {
       return bDate.getTime() - aDate.getTime();
     })[0];
 
+  const lastActiveWorldTitle = lastActiveWorld
+    ? (() => {
+        try {
+          const fullStory = JSON.parse(lastActiveWorld.full_story);
+          return fullStory?.quest?.title || "Your Adventure";
+        } catch {
+          return "Your Adventure";
+        }
+      })()
+    : null;
+
   const handleCreateNew = () => {
     router.push(`/generate?theme=${theme || "fantasy"}`);
   };
@@ -52,10 +63,15 @@ export default function QuickActions({ myWorlds }: QuickActionsProps) {
           size="lg"
           variant="secondary"
           onClick={handleContinueAdventure}
-          icon={<Play className="h-5 w-5" />}
+          icon={<Play className="h-5 w-5 shrink-0" />}
           className="min-w-[200px] flex-1"
         >
-          Continue Adventure
+          <div className="flex flex-col items-center gap-0">
+            <span className="text-xs font-medium leading-tight">Continue</span>
+            <span className="max-w-[180px] truncate text-base font-semibold leading-tight">
+              {lastActiveWorldTitle}
+            </span>
+          </div>
         </ActionButton>
       )}
 

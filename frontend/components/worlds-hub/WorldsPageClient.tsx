@@ -118,7 +118,61 @@ export default function WorldsPageClient() {
                 ) : error ? (
                   <SearchError error={error} />
                 ) : (
-                  <WorldsTable worlds={worlds} isLoading={isLoading} />
+                  <>
+                    <WorldsTable worlds={worlds} isLoading={isLoading} />
+                    {totalPages > 1 && (
+                      <Pagination className="mt-8">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() =>
+                                setCurrentPage(Math.max(1, currentPage - 1))
+                              }
+                              className={
+                                currentPage === 1
+                                  ? "pointer-events-none opacity-50"
+                                  : "cursor-pointer"
+                              }
+                            />
+                          </PaginationItem>
+                          {Array.from(
+                            { length: Math.min(totalPages, 5) },
+                            (_, i) => {
+                              if (totalPages <= 5) return i + 1;
+                              if (currentPage <= 3) return i + 1;
+                              if (currentPage >= totalPages - 2)
+                                return totalPages - 4 + i;
+                              return currentPage - 2 + i;
+                            },
+                          ).map((page) => (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setCurrentPage(page)}
+                                isActive={currentPage === page}
+                                className="cursor-pointer"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() =>
+                                setCurrentPage(
+                                  Math.min(totalPages, currentPage + 1),
+                                )
+                              }
+                              className={
+                                currentPage === totalPages
+                                  ? "pointer-events-none opacity-50"
+                                  : "cursor-pointer"
+                              }
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    )}
+                  </>
                 )}
               </div>
               <div className="lg:col-span-1">

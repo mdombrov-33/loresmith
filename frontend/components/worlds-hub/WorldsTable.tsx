@@ -14,7 +14,11 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { useDeleteWorld, useDeleteAdventureSession } from "@/lib/queries";
+import {
+  useDeleteWorld,
+  useDeleteAdventureSession,
+  useUpdateWorldVisibility,
+} from "@/lib/queries";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -36,6 +40,7 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
   const router = useRouter();
   const deleteWorldMutation = useDeleteWorld();
   const deleteSessionMutation = useDeleteAdventureSession();
+  const updateVisibilityMutation = useUpdateWorldVisibility();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [worldToDelete, setWorldToDelete] = useState<{
     id: number;
@@ -100,6 +105,18 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
     setWorldToDelete(null);
   };
 
+  const handleToggleVisibility = async (
+    worldId: number,
+    currentVisibility: string,
+  ) => {
+    const newVisibility =
+      currentVisibility === "published" ? "private" : "published";
+    await updateVisibilityMutation.mutateAsync({
+      worldId,
+      visibility: newVisibility as "private" | "published",
+    });
+  };
+
   const getThemeLabel = (theme: string) => {
     return THEME_OPTIONS.find((t) => t.value === theme)?.label || theme;
   };
@@ -158,7 +175,13 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                           world.status.slice(1)}
                       </Badge>
                       {world.visibility && (
-                        <Badge variant="outline" className="gap-1 text-xs">
+                        <Badge
+                          variant="outline"
+                          className="hover:bg-accent cursor-pointer gap-1 text-xs transition-colors"
+                          onClick={() =>
+                            handleToggleVisibility(world.id, world.visibility)
+                          }
+                        >
                           {world.visibility === "published" ? (
                             <>
                               <Eye className="h-3 w-3" />

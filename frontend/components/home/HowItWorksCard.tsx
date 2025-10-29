@@ -87,7 +87,7 @@ export default function HowItWorksCard({
 
       {/* Content Card */}
       <div
-        className={`bg-card/50 border-border group relative w-full rounded-2xl border backdrop-blur-sm transition-all duration-300 ${
+        className={`bg-card/50 border-border group relative flex h-full min-h-[180px] w-full flex-col rounded-2xl border backdrop-blur-sm transition-all duration-300 ${
           isHovered ? "-translate-y-2 shadow-2xl" : "translate-y-0 shadow-lg"
         }`}
       >
@@ -98,7 +98,7 @@ export default function HowItWorksCard({
           }`}
         />
 
-        <div className="relative z-10 p-6">
+        <div className="relative z-10 flex flex-1 flex-col p-6">
           <h3
             className={`text-foreground mb-4 text-2xl font-bold transition-colors ${
               isHovered ? "text-primary" : ""
@@ -106,7 +106,9 @@ export default function HowItWorksCard({
           >
             {title}
           </h3>
-          <p className="text-muted-foreground leading-relaxed">{description}</p>
+          <p className="text-muted-foreground flex-1 leading-relaxed">
+            {description}
+          </p>
         </div>
 
         {/* Bottom accent line */}
