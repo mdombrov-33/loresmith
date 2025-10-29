@@ -121,11 +121,16 @@ export default function SearchResultCard({
       )}
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline">{themeOption?.label || world.theme}</Badge>
             <Badge variant="secondary">
               {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
             </Badge>
+            {world.status === "active" && world.active_sessions !== undefined && (
+              <Badge variant="default" className="bg-green-600">
+                {world.active_sessions} {world.active_sessions === 1 ? "player" : "players"}
+              </Badge>
+            )}
           </div>
           {scope === "my" && (
             <Button

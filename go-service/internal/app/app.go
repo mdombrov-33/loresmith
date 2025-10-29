@@ -54,7 +54,7 @@ func NewApplication() (*Application, error) {
 
 	//* Handlers
 	userHandler := api.NewUserHandler(userStore, logger)
-	worldHandler := api.NewWorldHandler(loreClient, worldStore, logger)
+	worldHandler := api.NewWorldHandler(loreClient, worldStore, adventureStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
 	adventureHandler := api.NewAdventureHandler(adventureStore, partyStore, worldStore, logger)
 	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}

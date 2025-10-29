@@ -20,8 +20,9 @@ type World struct {
 	Theme      string       `json:"theme"`
 	FullStory  string       `json:"full_story"`
 	LorePieces []*LorePiece `json:"lore_pieces,omitempty"`
-	SessionID  *int         `json:"session_id,omitempty"`
-	Visibility string       `json:"visibility"`
+	SessionID      *int    `json:"session_id,omitempty"`
+	ActiveSessions *int    `json:"active_sessions,omitempty"`
+	Visibility     string  `json:"visibility"`
 	CreatedAt  time.Time    `json:"created_at"`
 	UpdatedAt  time.Time    `json:"updated_at"`
 	Relevance  *float64     `json:"relevance,omitempty"`
