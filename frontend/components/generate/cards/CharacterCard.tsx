@@ -16,7 +16,10 @@ import {
   Crown,
   Eye,
   AlertTriangle,
+  RotateCw,
 } from "lucide-react";
+import FlipCard from "@/components/shared/FlipCard";
+import SelectionEffect from "@/components/shared/SelectionEffect";
 
 interface CharacterCardProps {
   character: LorePiece;
@@ -29,10 +32,10 @@ export default function CharacterCard({
   isSelected,
   onSelect,
 }: CharacterCardProps) {
-  return (
+  // Front side: Basic info
+  const frontContent = (
     <div
-      onClick={onSelect}
-      className={`bg-card hover:border-primary cursor-pointer rounded-xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg ${isSelected ? "border-primary from-primary/10 to-accent/10 bg-gradient-to-br shadow-lg" : "border-border"} `}
+      className={`bg-card flex h-full flex-col rounded-xl border p-6 ${isSelected ? "border-primary from-primary/10 to-accent/10 bg-gradient-to-br shadow-lg" : "border-border"}`}
     >
       {/* Title + Type Badge */}
       <div className="mb-3 flex items-center justify-between">
@@ -45,12 +48,34 @@ export default function CharacterCard({
       </div>
 
       {/* Description (Backstory) */}
-      <p className="text-muted-foreground mb-4 text-sm">
+      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
         {character.description}
       </p>
 
+      {/* Hover hint - pushed to bottom */}
+      <div className="bg-primary/5 border-primary/20 mt-auto flex items-center justify-center gap-2 rounded-lg border p-3">
+        <RotateCw className="text-primary h-4 w-4" />
+        <span className="text-muted-foreground text-xs">
+          Hover to see full details
+        </span>
+      </div>
+    </div>
+  );
+
+  //* Back side: Detailed info
+  const backContent = (
+    <div
+      className={`bg-card h-full overflow-y-auto rounded-xl border p-6 ${isSelected ? "border-primary from-primary/10 to-accent/10 bg-gradient-to-br shadow-lg" : "border-border"}`}
+    >
+      {/* Title */}
+      <div className="mb-3">
+        <h3 className="text-foreground text-xl font-semibold">
+          {character.name}
+        </h3>
+      </div>
+
       {/* Details */}
-      <div className="border-border space-y-3 border-t pt-4">
+      <div className="space-y-3">
         {/* Personality */}
         <div>
           <div className="text-accent mb-1 text-xs font-semibold uppercase">
@@ -73,16 +98,14 @@ export default function CharacterCard({
 
         {/* Flaw */}
         {character.details.flaw && (
-          <div className="border-red-500/20 bg-red-500/5 rounded-lg border p-3">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
             <div className="mb-1 flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
-              <div className="text-xs font-semibold uppercase text-red-500">
+              <div className="text-xs font-semibold text-red-500 uppercase">
                 Flaw
               </div>
             </div>
-            <div className="text-sm text-red-400">
-              {character.details.flaw}
-            </div>
+            <div className="text-sm text-red-400">{character.details.flaw}</div>
           </div>
         )}
 
@@ -293,6 +316,18 @@ export default function CharacterCard({
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="relative h-full">
+      <FlipCard
+        frontContent={frontContent}
+        backContent={backContent}
+        isSelected={isSelected}
+        onClick={onSelect}
+      />
+      <SelectionEffect isActive={isSelected} />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import CardSkeleton from "@/components/shared/CardSkeleton";
+
 interface GenerateLoadingProps {
   isLoading: boolean;
   category: string;
@@ -10,9 +12,15 @@ export default function GenerateLoading({
   if (!isLoading) return null;
 
   return (
-    <section className="py-12 text-center">
-      <div className="border-primary inline-block h-12 w-12 animate-spin rounded-full border-b-2"></div>
-      <p className="text-muted-foreground mt-4">Generating {category}...</p>
-    </section>
+    <div>
+      <p className="text-muted-foreground mb-6 text-center">
+        Generating {category}...
+      </p>
+      <section className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <CardSkeleton />
+        <CardSkeleton />
+        <CardSkeleton />
+      </section>
+    </div>
   );
 }

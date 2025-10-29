@@ -10,7 +10,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Scroll, Eye, ChevronRight, BookOpen, AlertTriangle } from "lucide-react";
+import {
+  Scroll,
+  Eye,
+  ChevronRight,
+  BookOpen,
+  AlertTriangle,
+} from "lucide-react";
 import { LorePiece } from "@/types/api";
 import { loreIcons, getAttributeIcon } from "@/constants/lore";
 
@@ -138,6 +144,8 @@ function LorePieceCard({
                   </h4>
                   <div className="grid gap-3">
                     {sortDetails(piece.details).map(([key, value]) => {
+                      if (key === "is_protagonist") return null;
+
                       const isFlaw = key === "flaw";
                       const { icon: AttributeIcon, color } = isFlaw
                         ? { icon: AlertTriangle, color: "text-red-500" }
@@ -152,17 +160,21 @@ function LorePieceCard({
                               : "border-border/50 bg-muted/30 hover:border-primary/30 hover:bg-muted/50"
                           }`}
                         >
-                          <div className={`flex items-center gap-2 text-sm font-medium ${
-                            isFlaw ? "text-red-500" : "text-muted-foreground"
-                          }`}>
+                          <div
+                            className={`flex items-center gap-2 text-sm font-medium ${
+                              isFlaw ? "text-red-500" : "text-muted-foreground"
+                            }`}
+                          >
                             <AttributeIcon className={`h-3 w-3 ${color}`} />
                             {key
                               .replace(/_/g, " ")
                               .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </div>
-                          <p className={`text-sm leading-relaxed ${
-                            isFlaw ? "text-red-400" : "text-foreground"
-                          }`}>
+                          <p
+                            className={`text-sm leading-relaxed ${
+                              isFlaw ? "text-red-400" : "text-foreground"
+                            }`}
+                          >
                             {String(value)}
                           </p>
                         </div>

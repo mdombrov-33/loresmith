@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useGenerationLogic } from "@/hooks/useGenerationLogic";
 import GenerateHeader from "@/components/generate/GenerateHeader";
 import GenerateLoading from "@/components/generate/GenerateLoading";
@@ -9,8 +10,15 @@ import GenerateActions from "@/components/generate/GenerateActions";
 import GenerateEmpty from "@/components/generate/GenerateEmpty";
 import GenerateOverlay from "@/components/generate/GenerateOverlay";
 import ActionButton from "@/components/shared/ActionButton";
+import StageProgress from "@/components/generate/StageProgress";
+import StageTransition from "@/components/shared/StageTransition";
+import { getThemeFont } from "@/constants/game-themes";
 
 export default function GeneratePageClient() {
+  const searchParams = useSearchParams();
+  const theme = searchParams.get("theme") || "fantasy";
+  const themeFont = getThemeFont(theme);
+
   const {
     stageConfig,
     isLoading,
@@ -30,7 +38,7 @@ export default function GeneratePageClient() {
   } = useGenerationLogic();
 
   return (
-    <main className="container mx-auto px-4 py-12">
+    <main className={`container mx-auto px-4 py-12 ${themeFont}`}>
       {generationMode === null ? (
         <>
           <GenerateHeader
@@ -61,17 +69,20 @@ export default function GeneratePageClient() {
             title={stageConfig.title}
             description={stageConfig.description}
           />
+          <StageProgress currentStage={stageConfig.category} />
           <GenerateLoading
             isLoading={isLoading}
             category={stageConfig.category}
           />
           <GenerateError error={error} onRefetch={refetch} />
-          <GenerateGrid
-            generatedOptions={generatedOptions}
-            selectedIndex={selectedIndex}
-            stage={stageConfig.category}
-            onSelectCard={handleSelectCard}
-          />
+          <StageTransition stageKey={stageConfig.category}>
+            <GenerateGrid
+              generatedOptions={generatedOptions}
+              selectedIndex={selectedIndex}
+              stage={stageConfig.category}
+              onSelectCard={handleSelectCard}
+            />
+          </StageTransition>
           <GenerateActions
             hasSelection={selectedIndex !== null}
             hasRegenerated={hasRegenerated}

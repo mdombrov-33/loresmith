@@ -112,11 +112,11 @@ export default function SearchResultCard({
 
   return (
     <Card
-      className={`relative border-2 transition-all hover:scale-[1.02] hover:shadow-lg ${themeBorderColor}`}
+      className={`group relative border-2 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl ${themeBorderColor}`}
     >
       {themeOption && (
-        <div className="absolute top-3 right-3">
-          <themeOption.icon className="text-muted-foreground h-8 w-8" />
+        <div className="absolute top-3 right-3 transition-all duration-300 group-hover:scale-110">
+          <themeOption.icon className="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors duration-300" />
         </div>
       )}
       <CardHeader>
@@ -132,7 +132,7 @@ export default function SearchResultCard({
             </Badge>
           )}
         </div>
-        <CardTitle className="line-clamp-2 text-lg">
+        <CardTitle className="line-clamp-2 text-lg transition-colors duration-200 group-hover:text-primary">
           {fullStory.quest?.title || "Untitled World"}
         </CardTitle>
         {world.user_name && (

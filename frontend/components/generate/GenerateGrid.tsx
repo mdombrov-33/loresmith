@@ -4,6 +4,7 @@ import FactionCard from "@/components/generate/cards/FactionCard";
 import SettingCard from "@/components/generate/cards/SettingCard";
 import EventCard from "@/components/generate/cards/EventCard";
 import RelicCard from "@/components/generate/cards/RelicCard";
+import StaggeredReveal from "@/components/shared/StaggeredReveal";
 
 interface GenerateGridProps {
   generatedOptions: LorePiece[];
@@ -76,8 +77,12 @@ export default function GenerateGrid({
   };
 
   return (
-    <section className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {generatedOptions.map((option, index) => renderCard(option, index))}
+    <section className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {generatedOptions.map((option, index) => (
+        <StaggeredReveal key={index} index={index} className="min-h-[550px]">
+          {renderCard(option, index)}
+        </StaggeredReveal>
+      ))}
     </section>
   );
 }
