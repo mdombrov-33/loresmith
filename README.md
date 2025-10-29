@@ -23,15 +23,25 @@ LoreSmith is an **interactive adventure platform** where AI generates rich, them
 ![Home Page](assets/screenshots/home.png)
 _Welcome screen with theme selection and navigation_
 
-### Lore Generation Cards
+### Lore Generation Cards(Front)
 
-![Generation Cards](assets/screenshots/cards.png)
+![Generation Cards](assets/screenshots/cards-front.png)
+_Interactive cards for generating world elements (characters, factions, settings, etc.)_
+
+### Lore Generation Cards(Back)
+
+![Generation Cards](assets/screenshots/cards-back.png)
 _Interactive cards for generating world elements (characters, factions, settings, etc.)_
 
 ### Full Story View
 
 ![Full Story](assets/screenshots/fullstory.png)
 _Complete generated story with quest details and narrative_
+
+### My Hub
+
+![My Hub](assets/screenshots/my-hub.png)
+_Personal hub of created worlds_
 
 ### Search Page
 
