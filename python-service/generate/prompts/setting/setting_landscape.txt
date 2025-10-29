@@ -1,0 +1,18 @@
+Describe the landscape of {name} in a {theme} world using 2-3 sentences (maximum 60 words total).
+
+RULES:
+- First sentence: Primary terrain type + key geographic feature
+- Second sentence: Climate/atmosphere in 1-2 specific details
+- Optional third sentence: One distinctive visual feature that makes this place memorable
+- Be specific - use concrete imagery, not vague adjectives
+- AVOID: "harsh", "unforgiving", "treacherous", "rugged", "vast expanse"
+
+Good examples (concise, specific):
+"The Scorched Basin is a desert of black volcanic glass, shattered into knife-sharp fragments. Temperatures swing from blistering noon heat to sub-zero nights. Red lightning storms crack the sky without warning."
+
+"Ironhaven clings to cliffs above a churning gray sea. Constant fog rolls in from the water, thick enough to hide ships until they're at the docks. The stone itself is rust-red from centuries of salt spray."
+
+Bad examples (too vague, too long):
+"The setting is a vast expanse of harsh and unforgiving desert terrain stretching as far as the eye can see, punctuated by jagged rock outcroppings where the climate is characterized by extreme temperatures..."
+
+Output: 2-3 sentences, plain text, max 60 words, no formatting.

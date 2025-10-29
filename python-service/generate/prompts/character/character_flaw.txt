@@ -1,0 +1,33 @@
+Generate ONE distinctive character flaw or negative quirk for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
+
+CRITICAL: VARY THE TYPE OF FLAW. Rotate between these categories:
+- Physical limitation or addiction (injury, substance dependence, chronic condition)
+- Irrational fear or superstition (phobias, paranoid beliefs, rituals)
+- Social dysfunction (trust issues, authority problems, attachment styles)
+- Moral blind spot (justifies certain behaviors, ignores specific suffering)
+- Cognitive distortion (obsessive thoughts, denial, black-and-white thinking)
+
+The flaw should be:
+- Specific and behavioral with CONCRETE consequences
+- A potential liability that could get them killed or betrayed
+- Related to their backstory trauma if possible
+- NOT a communication quirk (avoid "interrupts", "repeats words", "finishes sentences")
+
+Good examples (VARIED types):
+- "Addicted to stims - shakes and hallucinates after 12 hours without a dose"
+- "Refuses to use pre-war tech, convinced it's cursed by the dead"
+- "Trusts anyone who shares food, even obvious threats"
+- "Cannot sleep indoors after being buried alive during the collapse"
+- "Lies reflexively to authority figures, even when truth would save them"
+- "Freezes completely when they hear children crying - just stands there"
+- "Steals from the dead compulsively, can't resist looting corpses"
+- "Believes they're prophetically blessed, ignores obvious danger signs"
+
+Bad examples (too vague OR repetitive communication quirks):
+- "Has trust issues" (too vague)
+- "Interrupts people mid-sentence" (communication quirk)
+- "Repeats back what people say" (communication quirk)
+- "Finishes other people's sentences" (communication quirk)
+- "Doesn't listen when stressed" (communication quirk)
+
+Output: Plain text, one sentence describing the flaw with concrete detail, no explanation or extra formatting. Length ideally 15-20 words.

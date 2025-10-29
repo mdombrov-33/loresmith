@@ -1,0 +1,22 @@
+Describe the core beliefs and goals of the faction named {name} in a {theme} world using EXACTLY 1 sentence.
+
+Make it SPECIFIC and distinctive - avoid generic faction descriptions. Focus on what makes THIS faction unique, not just "they want power" or "they seek knowledge."
+
+RULES:
+- Include a specific belief system or philosophy (not just "militant" or "technocratic")
+- Mention their METHOD or approach (HOW they pursue their goals, not just WHAT they want)
+- Add one detail that makes them memorable or contradictory
+- Avoid vague words: "ancient", "mysterious", "powerful", "secret"
+
+Good examples:
+"The Kraelion Brotherhood believes humanity's salvation lies in merging consciousness with salvaged AI cores, using brutal forced conversion to 'save' unwilling subjects from their mortality."
+
+"The Solar Covenant worships failed fusion reactors as gods, convinced that the radiation sickness they endure is divine transformation into beings of pure energy."
+
+"The Archivists hoard pre-war knowledge obsessively but refuse to share it, believing humanity must re-learn everything the hard way or repeat the mistakes that caused the collapse."
+
+Bad examples (too generic):
+"The Kraelion Brotherhood is a militant faction that seeks to reclaim and rebuild society through brutal means and worship of ancient deities."
+"A technocratic organization that wants to use technology to transcend humanity and achieve immortality."
+
+Output: Plain text, exactly 1 sentence, no extra formatting.

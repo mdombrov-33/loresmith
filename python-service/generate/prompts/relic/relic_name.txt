@@ -1,0 +1,1 @@
+Invent a unique name for a mysterious {theme} relic or artifact that does NOT contain or match any of the following words or names: {blacklist}. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph. Name should be 2-4 words only.

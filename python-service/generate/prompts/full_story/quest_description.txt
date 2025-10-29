@@ -1,0 +1,11 @@
+Generate a brief description (1-2 sentences) for the main quest titled "{quest_title}" in this {theme} story. Make it actionable and tied to the story's conflict. Do NOT include the quest title in your response - only provide the description.
+
+Story: {story_content}
+
+Examples:
+- An ancient map could unite the warring factions, but the Steel Reclaimers want it destroyed.
+- A powerful artifact holds the key to defeating the invading army, but corrupting whispers threaten to consume its guardian.
+- The lost heir must reclaim their throne from a usurper, but ancient curses and political intrigue stand in their way.
+- A mysterious plague ravages the land, and only the sacred spring can provide the cure before it's too late.
+
+Respond only with the quest description, no other text.

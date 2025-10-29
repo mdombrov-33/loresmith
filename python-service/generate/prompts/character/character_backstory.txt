@@ -1,0 +1,18 @@
+Write a 3-4 sentence backstory for {name}, a character in a {theme} world with the following personality traits: {personality}.
+
+CRITICAL RULES:
+- MAXIMUM 75 WORDS TOTAL - be ruthlessly concise
+- Start with a specific moment, image, or action - NOT "X grew up in Y" or "X was born in Z"
+- VARY YOUR OPENING - don't always start with "{name}'s fingers..." or "{name} rummages..." - use different verbs and structures
+- Include ONE concrete detail that reveals character (what they carry, what they fear, a habit, a scar)
+- Show their personality through actions, NOT by describing it
+- End with what drives them NOW in the present
+- Use short, punchy sentences - avoid long clauses
+
+Good example (post-apocalyptic, 68 words):
+"Rina keeps her daughter's baby shoe in a ziplock bag, rubber sole still caked with pre-war mud. She trades medical supplies in Detroit's ruins, known for setting bones with steady hands and zero bedside manner. Most think she's cold. She just can't afford to care about anyone new. The only thing that gets her out of bed is finding out what happened to her daughter."
+
+Bad example (too long, too passive, too generic):
+"Rina grew up in Detroit after the apocalypse. Her parents died when she was young, so she learned medicine to survive on her own and help others. She lost her daughter during a raid years ago and now helps people in the wasteland while searching for answers about what happened, though the memories haunt her and she struggles to trust anyone."
+
+Output only plain text backstory (3-4 sentences, max 75 words), no formatting.

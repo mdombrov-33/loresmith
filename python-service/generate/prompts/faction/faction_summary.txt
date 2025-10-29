@@ -1,0 +1,1 @@
+Write a brief lore summary for the {theme} faction {name} based on the following ideology: {ideology} and appearance: {appearance}. Keep it to 2 sentences. Respond only with plain text, no markdown. No newlines; output a single paragraph.
