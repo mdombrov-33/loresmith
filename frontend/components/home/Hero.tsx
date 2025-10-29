@@ -6,8 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { Sparkles, Swords } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useParticleAnimation } from "@/hooks/styling/useParticleAnimation";
+import Logo from "@/components/shared/Logo";
 
 export default function Hero() {
   const router = useRouter();
@@ -50,13 +51,11 @@ export default function Hero() {
 
       <section className="relative container mx-auto px-4 py-24 md:py-32">
         <div className="flex flex-col items-center justify-center gap-8 text-center">
-          {/* Floating icon */}
+          {/* Logo */}
           <div className="relative">
-            <div className="animate-float">
-              <div className="bg-primary/10 border-primary relative flex h-24 w-24 items-center justify-center rounded-2xl border-2 backdrop-blur-sm">
-                <Swords className="text-primary h-12 w-12" />
-                <div className="bg-primary/20 absolute -inset-4 -z-10 animate-pulse rounded-3xl blur-xl" />
-              </div>
+            <div className="bg-primary/5 border-primary/30 relative rounded-2xl border-2 px-8 py-4 backdrop-blur-sm">
+              <Logo size="lg" showTagline />
+              <div className="bg-primary/10 absolute -inset-4 -z-10 animate-pulse rounded-3xl blur-xl" />
             </div>
           </div>
 

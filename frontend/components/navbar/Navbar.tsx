@@ -8,9 +8,10 @@ import { RegisterModal } from "@/components/navbar/RegisterModal";
 import { AudioToggle } from "@/components/navbar/AudioToggle";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
-import { Swords, LogOut, Globe } from "lucide-react";
+import { LogOut, Globe } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import Logo from "@/components/shared/Logo";
 
 export default function Navbar() {
   const router = useRouter();
@@ -61,14 +62,7 @@ export default function Navbar() {
         <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
           {/* Logo Section */}
           <Link href={`/?theme=${theme}`} className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xl font-bold">
-              <span className="text-primary">
-                <Swords />
-              </span>
-              <span className="from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent">
-                LoreSmith
-              </span>
-            </div>
+            <Logo size="sm" />
           </Link>
 
           {/* Center - Theme Switcher (Desktop) */}

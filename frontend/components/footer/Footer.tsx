@@ -1,5 +1,5 @@
-import { Swords } from "lucide-react";
 import { footerSections, socialLinks } from "@/data/footer-links";
+import Logo from "@/components/shared/Logo";
 
 export default function Footer() {
   return (
@@ -29,12 +29,7 @@ export default function Footer() {
 
         {/* Footer Bottom */}
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
-          <div className="flex items-center gap-2 text-xl font-bold">
-            <span className="text-primary">
-              <Swords />
-            </span>
-            <span className="text-foreground">LoreSmith</span>
-          </div>
+          <Logo size="sm" />
 
           {/* Social Icons */}
           <div className="flex items-center gap-4">
