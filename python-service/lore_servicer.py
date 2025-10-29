@@ -2,17 +2,19 @@ import grpc  # type: ignore
 import asyncio
 import lore_pb2  # type: ignore
 import lore_pb2_grpc  # type: ignore
-from chains.multi_variant import (
+from generate.chains.multi_variant import (
     generate_multiple_characters,
     generate_multiple_factions,
     generate_multiple_settings,
     generate_multiple_events,
     generate_multiple_relics,
 )
-from orchestrators.orchestrator_lore_variants import generate_lore_variants
-from orchestrators.orchestrator_full_story import generate_full_story_orchestrator
-from models.selected_lore_pieces import SelectedLorePieces
-from models.lore_piece import LorePiece
+from generate.orchestrators.orchestrator_lore_variants import generate_lore_variants
+from generate.orchestrators.orchestrator_full_story import (
+    generate_full_story_orchestrator,
+)
+from generate.models.selected_lore_pieces import SelectedLorePieces
+from generate.models.lore_piece import LorePiece
 from constants.themes import Theme
 from utils.logger import logger
 from search.reranker import rerank_with_fusion_dartboard
@@ -23,162 +25,97 @@ from services.embedding_client import (
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
-    async def GenerateCharacters(self, request, context):
+    # * Generation Methods
+    async def _handle_lore_generation(
+        self,
+        generate_func,
+        response_class,
+        response_field_name,
+        error_msg,
+        request,
+        context,
+    ):
+        """Generic handler for lore piece generation (characters, factions, etc.)."""
         try:
-            characters = await generate_multiple_characters(
+            pieces = await generate_func(
                 request.count, request.theme, request.regenerate
             )
-            grpc_characters = []
-            for char in characters:
-                grpc_char = lore_pb2.LorePiece(  # type: ignore
-                    name=char.name,
-                    type=char.type,
-                    description=char.description,
-                    details=char.details,
-                )
-                grpc_characters.append(grpc_char)
-            return lore_pb2.CharactersResponse(characters=grpc_characters)  # type: ignore
+            grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in pieces]
+            return response_class(**{response_field_name: grpc_pieces})
         except Exception as e:
-            logger.error(f"Generation failed: {str(e)}", exc_info=True)
+            logger.error(f"{error_msg}: {str(e)}", exc_info=True)
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Generation failed: {str(e)}")
-            return lore_pb2.CharactersResponse()  # type: ignore
+            context.set_details(f"{error_msg}: {str(e)}")
+            return response_class()
+
+    async def GenerateCharacters(self, request, context):
+        return await self._handle_lore_generation(
+            generate_multiple_characters,
+            lore_pb2.CharactersResponse,
+            "characters",
+            "Character generation failed",
+            request,
+            context,
+        )
 
     async def GenerateFactions(self, request, context):
-        try:
-            factions = await generate_multiple_factions(
-                request.count, request.theme, request.regenerate
-            )
-            grpc_factions = []
-            for faction in factions:
-                grpc_faction = lore_pb2.LorePiece(  # type: ignore
-                    name=faction.name,
-                    type=faction.type,
-                    description=faction.description,
-                    details=faction.details,
-                )
-                grpc_factions.append(grpc_faction)
-            return lore_pb2.FactionsResponse(factions=grpc_factions)  # type: ignore
-        except Exception as e:
-            logger.error(f"Factions generation failed: {str(e)}", exc_info=True)
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Factions generation failed: {str(e)}")
-            return lore_pb2.FactionsResponse()  # type: ignore
+        return await self._handle_lore_generation(
+            generate_multiple_factions,
+            lore_pb2.FactionsResponse,
+            "factions",
+            "Faction generation failed",
+            request,
+            context,
+        )
 
     async def GenerateSettings(self, request, context):
-        try:
-            settings = await generate_multiple_settings(
-                request.count, request.theme, request.regenerate
-            )
-            grpc_settings = []
-            for setting in settings:
-                grpc_setting = lore_pb2.LorePiece(  # type: ignore
-                    name=setting.name,
-                    type=setting.type,
-                    description=setting.description,
-                    details=setting.details,
-                )
-                grpc_settings.append(grpc_setting)
-            return lore_pb2.SettingsResponse(settings=grpc_settings)  # type: ignore
-        except Exception as e:
-            logger.error(f"Settings generation failed: {str(e)}", exc_info=True)
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Settings generation failed: {str(e)}")
-            return lore_pb2.SettingsResponse()  # type: ignore
+        return await self._handle_lore_generation(
+            generate_multiple_settings,
+            lore_pb2.SettingsResponse,
+            "settings",
+            "Setting generation failed",
+            request,
+            context,
+        )
 
     async def GenerateEvents(self, request, context):
-        try:
-            events = await generate_multiple_events(
-                request.count, request.theme, request.regenerate
-            )
-            grpc_events = []
-            for event in events:
-                grpc_event = lore_pb2.LorePiece(  # type: ignore
-                    name=event.name,
-                    type=event.type,
-                    description=event.description,
-                    details=event.details,
-                )
-                grpc_events.append(grpc_event)
-            return lore_pb2.EventsResponse(events=grpc_events)  # type: ignore
-        except Exception as e:
-            logger.error(f"Events generation failed: {str(e)}", exc_info=True)
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Events generation failed: {str(e)}")
-            return lore_pb2.EventsResponse()  # type: ignore
+        return await self._handle_lore_generation(
+            generate_multiple_events,
+            lore_pb2.EventsResponse,
+            "events",
+            "Event generation failed",
+            request,
+            context,
+        )
 
     async def GenerateRelics(self, request, context):
-        try:
-            relics = await generate_multiple_relics(
-                request.count, request.theme, request.regenerate
-            )
-            grpc_relics = []
-            for relic in relics:
-                grpc_relic = lore_pb2.LorePiece(  # type: ignore
-                    name=relic.name,
-                    type=relic.type,
-                    description=relic.description,
-                    details=relic.details,
-                )
-                grpc_relics.append(grpc_relic)
-            return lore_pb2.RelicsResponse(relics=grpc_relics)  # type: ignore
-        except Exception as e:
-            logger.error(f"Relics generation failed: {str(e)}", exc_info=True)
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Relics generation failed: {str(e)}")
-            return lore_pb2.RelicsResponse()  # type: ignore
+        return await self._handle_lore_generation(
+            generate_multiple_relics,
+            lore_pb2.RelicsResponse,
+            "relics",
+            "Relic generation failed",
+            request,
+            context,
+        )
 
     async def GenerateAll(self, request, context):
+        """Generate all lore types in parallel."""
         try:
             bundle = await generate_lore_variants(
                 request.count, request.theme, request.regenerate
             )
             return lore_pb2.AllResponse(  # type: ignore
                 characters=[
-                    lore_pb2.LorePiece(  # type: ignore
-                        name=char.name,
-                        type=char.type,
-                        description=char.description,
-                        details=char.details,
-                    )
-                    for char in bundle.characters
+                    convert_to_grpc_lore_piece(char) for char in bundle.characters
                 ],
                 factions=[
-                    lore_pb2.LorePiece(  # type: ignore
-                        name=faction.name,
-                        type=faction.type,
-                        description=faction.description,
-                        details=faction.details,
-                    )
-                    for faction in bundle.factions
+                    convert_to_grpc_lore_piece(faction) for faction in bundle.factions
                 ],
                 settings=[
-                    lore_pb2.LorePiece(  # type: ignore
-                        name=setting.name,
-                        type=setting.type,
-                        description=setting.description,
-                        details=setting.details,
-                    )
-                    for setting in bundle.settings
+                    convert_to_grpc_lore_piece(setting) for setting in bundle.settings
                 ],
-                events=[
-                    lore_pb2.LorePiece(  # type: ignore
-                        name=event.name,
-                        type=event.type,
-                        description=event.description,
-                        details=event.details,
-                    )
-                    for event in bundle.events
-                ],
-                relics=[
-                    lore_pb2.LorePiece(  # type: ignore
-                        name=relic.name,
-                        type=relic.type,
-                        description=relic.description,
-                        details=relic.details,
-                    )
-                    for relic in bundle.relics
-                ],
+                events=[convert_to_grpc_lore_piece(event) for event in bundle.events],
+                relics=[convert_to_grpc_lore_piece(relic) for relic in bundle.relics],
             )
         except Exception as e:
             logger.error(f"Full lore generation failed: {str(e)}", exc_info=True)
@@ -187,6 +124,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return lore_pb2.AllResponse()  # type: ignore
 
     async def GenerateFullStory(self, request, context):
+        """Generate complete story from selected lore pieces."""
         logger.info(f"DEBUG: Received pieces: {request.pieces}")
         try:
             selected_pieces = SelectedLorePieces(
@@ -213,9 +151,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             grpc_story = lore_pb2.FullStory(  # type: ignore
                 content=full_story.content,
                 theme=full_story.theme.value,
-                pieces=convert_selected_lore_pieces_to_grpc(
-                    full_story.pieces
-                ),  # <-- Changed from pieces=pieces_dict
+                pieces=convert_selected_lore_pieces_to_grpc(full_story.pieces),
                 quest=full_story.quest,
             )
             return lore_pb2.FullStoryResponse(story=grpc_story)  # type: ignore
@@ -225,7 +161,9 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_details(f"Full story generation failed: {str(e)}")
             return lore_pb2.FullStoryResponse()  # type: ignore
 
+    # * Search & Embedding Methods
     async def GenerateEmbedding(self, request, context):
+        """Generate embedding for search queries or content indexing."""
         try:
             if not request.text:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -233,7 +171,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
                 return lore_pb2.EmbeddingResponse()
 
             # Auto-detect: short text (<50 words) = search query (preprocess)
-            #             long text (>=50 words) = content to index (no preprocess)
+            # long text (>=50 words) = content to index (no preprocess)
             word_count = len(request.text.split())
             if word_count < 50:
                 logger.info(
@@ -244,7 +182,6 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
                 logger.info(
                     f"Generating content embedding for indexing ({word_count} words)"
                 )
-
                 embedding = await generate_content_embedding(request.text)
 
             return lore_pb2.EmbeddingResponse(embedding=embedding)
@@ -255,6 +192,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return lore_pb2.EmbeddingResponse()
 
     async def RerankResults(self, request, context):
+        """Rerank search results using fusion dartboard algorithm."""
         try:
             if not request.query:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -310,8 +248,13 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_details(f"Reranking failed: {str(e)}")
             return lore_pb2.RerankSearchResponse()
 
+    # * Adventure Methods
+    # TODO: Add adventure session management methods here
 
+
+# * Helper Functions
 def convert_lore_piece(grpc_piece):
+    """Convert gRPC LorePiece to Python model."""
     return LorePiece(
         name=grpc_piece.name,
         description=grpc_piece.description,
@@ -321,6 +264,7 @@ def convert_lore_piece(grpc_piece):
 
 
 def convert_to_grpc_lore_piece(piece):
+    """Convert Python LorePiece to gRPC message."""
     return lore_pb2.LorePiece(  # type: ignore
         name=piece.name,
         description=piece.description,
@@ -330,6 +274,7 @@ def convert_to_grpc_lore_piece(piece):
 
 
 def convert_selected_lore_pieces_to_grpc(selected_pieces):
+    """Convert SelectedLorePieces to gRPC message."""
     return lore_pb2.SelectedLorePieces(
         character=convert_to_grpc_lore_piece(selected_pieces.character)
         if selected_pieces.character
@@ -349,6 +294,7 @@ def convert_selected_lore_pieces_to_grpc(selected_pieces):
     )
 
 
+# * Server Startup
 async def serve():
     server = grpc.aio.server()
     lore_pb2_grpc.add_LoreServiceServicer_to_server(LoreServicer(), server)
