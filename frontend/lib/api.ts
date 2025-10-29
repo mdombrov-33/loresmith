@@ -296,6 +296,14 @@ export async function deleteAdventureSession(
   }
 }
 
+// TODO Phase 1: Add this function for adventure page theme syncing
+// export async function getAdventureSession(sessionId: number): Promise<{ id: number; world_id: number; ... }> {
+//   const url = `${API_BASE_URL}/adventure/${sessionId}`;
+//   const response = await fetchWithTimeout(url, { method: "GET", headers: await getAuthHeaders() });
+//   if (!response.ok) throw new Error("Failed to fetch adventure session");
+//   return response.json();
+// }
+
 export async function updateWorldVisibility(
   worldId: number,
   visibility: "private" | "published",

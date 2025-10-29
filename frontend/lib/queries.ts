@@ -203,3 +203,12 @@ export function useUpdateWorldVisibility() {
     },
   });
 }
+
+// TODO Phase 1: Add this hook for adventure page
+// export function useAdventureSession(sessionId: number) {
+//   return useQuery({
+//     queryKey: ["adventureSession", sessionId],
+//     queryFn: () => getAdventureSession(sessionId),
+//     enabled: !!sessionId && !isNaN(sessionId),
+//   });
+// }

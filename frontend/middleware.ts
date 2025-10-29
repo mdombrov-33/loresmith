@@ -14,5 +14,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/generate/:path*", "/search", "/worlds/:path*"],
+  matcher: ["/generate/:path*", "/worlds-hub", "/worlds/:path*"],
 };

@@ -6,13 +6,21 @@ import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { THEMES } from "@/constants/game-themes";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+function ThemeSyncronizer() {
   const { theme: storeTheme } = useAppStore();
   const { setTheme: setNextTheme } = useTheme();
 
   useEffect(() => {
-    setNextTheme(storeTheme);
+    if (storeTheme) {
+      setNextTheme(storeTheme);
+    }
   }, [storeTheme, setNextTheme]);
+
+  return null;
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const { theme: storeTheme, isHydrated } = useAppStore();
 
   return (
     <NextThemesProvider
@@ -28,6 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       enableSystem={false}
       disableTransitionOnChange={false}
     >
+      {isHydrated && <ThemeSyncronizer />}
       {children}
     </NextThemesProvider>
   );

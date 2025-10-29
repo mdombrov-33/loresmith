@@ -1,125 +1,92 @@
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { useWorld } from "@/lib/queries";
-import { useTheme } from "next-themes";
-import { useAppStore } from "@/stores/appStore";
-import { THEMES } from "@/constants/game-themes";
 import { FullStory } from "@/types/api";
+import { useAppStore } from "@/stores/appStore";
 
 export function useWorldsLogic() {
   const params = useParams();
-  const router = useRouter();
-  const themeParamRaw = params?.theme;
-  const idParamRaw = params?.id;
-  const themeParam = Array.isArray(themeParamRaw)
-    ? themeParamRaw[0]
-    : themeParamRaw || "fantasy";
-  const idParam = Array.isArray(idParamRaw) ? idParamRaw[0] : idParamRaw;
+  const worldId = parseInt(params.id as string, 10);
+  const actualTheme = params.theme as string;
+  const { setTheme, setAudioTheme } = useAppStore();
 
-  const urlToThemeMap: Record<string, string> = {
-    fantasy: THEMES.FANTASY,
-    norse: THEMES.NORSE,
-    cyberpunk: THEMES.CYBERPUNK,
-    "post-apoc": THEMES.POST_APOCALYPTIC,
-    steampunk: THEMES.STEAMPUNK,
-  };
+  const { data: world, isLoading, error } = useWorld(worldId);
 
-  const actualTheme = urlToThemeMap[themeParam] || themeParam;
+  // Sync theme when viewing a world
+  useEffect(() => {
+    if (actualTheme) {
+      setTheme(actualTheme);
+      setAudioTheme(actualTheme);
+    }
+  }, [actualTheme, setTheme, setAudioTheme]);
 
-  const { setTheme: setNextTheme } = useTheme();
-  const { setAppStage, setTheme: setStoreTheme, isHydrated } = useAppStore();
+  let parsedStory: FullStory | null = null;
+  let displayError: string | null = null;
+
+  if (error) {
+    displayError = "Failed to load world";
+  } else if (world?.full_story) {
+    try {
+      parsedStory = JSON.parse(world.full_story);
+    } catch (e) {
+      displayError = "Failed to parse world story";
+    }
+  }
+
+  const paragraphs = parsedStory?.content?.split("\n\n").filter(Boolean) || [];
+
+  const lorePieces = parsedStory?.pieces
+    ? [
+        parsedStory.pieces.character,
+        parsedStory.pieces.faction,
+        parsedStory.pieces.setting,
+        parsedStory.pieces.event,
+        parsedStory.pieces.relic,
+      ].filter(Boolean)
+    : [];
 
   const displayNames: Record<string, string> = {
-    character: "Character",
+    character: "Protagonist",
     faction: "Faction",
     setting: "Setting",
-    event: "Event",
-    relic: "Relic",
+    event: "Inciting Event",
+    relic: "Artifact",
   };
 
-  const truncateText = (text: string, maxLength: number = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength).trim() + "...";
-  };
-
-  const sortDetails = (details: Record<string, unknown>) => {
+  const sortDetails = (details: Record<string, string>) => {
     const order = [
-      "appearance",
       "personality",
-      "creativity",
-      "empathy",
-      "influence",
-      "lore_mastery",
-      "perception",
-      "resilience",
-      "health",
-      "stress",
+      "appearance",
+      "flaw",
       "skills",
+      "ideology",
+      "description",
+      "geography",
+      "climate",
+      "culture",
+      "conflict",
+      "power",
+      "origin",
+      "abilities",
     ];
 
-    return Object.entries(details).sort(([a], [b]) => {
-      const indexA = order.indexOf(a);
-      const indexB = order.indexOf(b);
+    return Object.entries(details).sort((a, b) => {
+      const indexA = order.indexOf(a[0]);
+      const indexB = order.indexOf(b[0]);
+      if (indexA === -1 && indexB === -1) return 0;
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
       return indexA - indexB;
     });
   };
 
-  const worldId = idParam ? Number(idParam) : NaN;
-  const { data: storyData, isLoading, error } = useWorld(worldId);
-
-  const parsedStory: FullStory = storyData
-    ? JSON.parse(storyData.full_story)
-    : {};
-
-  useEffect(() => {
-    setAppStage("story");
-    return () => setAppStage("home");
-  }, [setAppStage]);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    if (!idParam || isNaN(worldId)) {
-      router.replace("/");
-      return;
-    }
-
-    if (typeof actualTheme === "string") {
-      setStoreTheme(actualTheme);
-      setNextTheme(actualTheme);
-    }
-  }, [
-    idParam,
-    actualTheme,
-    isHydrated,
-    router,
-    setStoreTheme,
-    setNextTheme,
-    worldId,
-  ]);
-
-  const themeMismatch = storyData?.theme && storyData.theme !== actualTheme;
-  const displayError = error
-    ? error.message || "Failed to load world"
-    : themeMismatch
-      ? `This world was created with the "${storyData.theme}" theme, not "${actualTheme}". Please use the correct theme in the URL.`
-      : null;
-
-  const paragraphs = (parsedStory.content ?? "").split("\n\n").filter(Boolean);
-
-  const lorePieces = storyData?.lore_pieces || [];
-
   return {
     isLoading,
     displayError,
-    storyData,
-    parsedStory,
+    parsedStory: parsedStory!,
     paragraphs,
     lorePieces,
     displayNames,
-    truncateText,
     sortDetails,
     actualTheme,
     worldId,

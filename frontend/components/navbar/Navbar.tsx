@@ -8,7 +8,7 @@ import { RegisterModal } from "@/components/navbar/RegisterModal";
 import { AudioToggle } from "@/components/navbar/AudioToggle";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
-import { Swords, LogOut, Search } from "lucide-react";
+import { Swords, LogOut, Globe } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -52,7 +52,7 @@ export default function Navbar() {
     if (searchTheme) params.set("theme", searchTheme);
     if (searchStatus) params.set("status", searchStatus);
     const query = params.toString();
-    router.push(query ? `/search?${query}` : "/search");
+    router.push(query ? `/worlds-hub?${query}` : "/worlds-hub");
   };
 
   return (
@@ -85,9 +85,9 @@ export default function Navbar() {
                   variant="ghost"
                   size="sm"
                   onClick={handleSearchNavigation}
-                  icon={<Search className="h-4 w-4" />}
+                  icon={<Globe className="h-4 w-4" />}
                 >
-                  Search
+                  Worlds
                 </ActionButton>
                 <ActionButton
                   variant="ghost"

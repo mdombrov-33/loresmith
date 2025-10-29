@@ -39,11 +39,11 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
 };
 
 export function AudioToggle() {
-  const { theme, setTheme, userChangedTheme, setUserChangedTheme } =
+  const { theme, audioTheme, setAudioTheme, userChangedTheme, setUserChangedTheme } =
     useAppStore();
   const pathname = usePathname();
-  const [initialTheme, setInitialTheme] = useState<string | null>(null);
-  const hasEnteredSearchRef = useRef(false);
+  const [initialAudioTheme, setInitialAudioTheme] = useState<string | null>(null);
+  const hasEnteredHubRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([0.5]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -72,38 +72,46 @@ export function AudioToggle() {
       fade();
     });
   };
-  const effectiveTheme = useMemo(() => {
+  // Use visual theme for world pages, otherwise use audioTheme
+  const effectiveAudioTheme = useMemo(() => {
     if (pathname.startsWith("/worlds/")) {
+      // Extract theme from URL path
       const pathSegments = pathname.split("/");
-      return pathSegments[2] || theme;
-    } else if (pathname === "/search") {
-      return initialTheme || theme;
-    } else {
+      return pathSegments[2] || audioTheme;
+    } else if (pathname.startsWith("/adventure/")) {
+      // For adventure pages, use the current theme (should be set by the page)
       return theme;
+    } else if (pathname === "/worlds-hub") {
+      // Keep the theme from when they entered the hub
+      return initialAudioTheme || audioTheme;
+    } else {
+      // Home or other pages - use current audioTheme
+      return audioTheme;
     }
-  }, [pathname, theme, initialTheme]);
+  }, [pathname, theme, audioTheme, initialAudioTheme]);
 
-  const prevEffectiveThemeRef = useRef(effectiveTheme);
-
-  useEffect(() => {
-    if (pathname === "/search" && !hasEnteredSearchRef.current) {
-      hasEnteredSearchRef.current = true;
-      setInitialTheme(theme);
-    } else if (pathname !== "/search") {
-      hasEnteredSearchRef.current = false;
-      setInitialTheme(null);
-    }
-  }, [pathname, theme]);
+  const prevEffectiveAudioThemeRef = useRef(effectiveAudioTheme);
 
   useEffect(() => {
-    if (pathname !== "/search") {
-      setTheme(effectiveTheme);
+    if (pathname === "/worlds-hub" && !hasEnteredHubRef.current) {
+      hasEnteredHubRef.current = true;
+      setInitialAudioTheme(audioTheme);
+    } else if (pathname !== "/worlds-hub") {
+      hasEnteredHubRef.current = false;
+      setInitialAudioTheme(null);
     }
-  }, [effectiveTheme, pathname, setTheme]);
+  }, [pathname, audioTheme]);
+
+  // Sync audioTheme when not on hub
+  useEffect(() => {
+    if (pathname !== "/worlds-hub") {
+      setAudioTheme(effectiveAudioTheme);
+    }
+  }, [effectiveAudioTheme, pathname, setAudioTheme]);
 
   const playlist = useMemo(
-    () => themePlaylists[effectiveTheme] || [],
-    [effectiveTheme],
+    () => themePlaylists[effectiveAudioTheme] || [],
+    [effectiveAudioTheme],
   );
   const totalDuration = useMemo(
     () => playlist.reduce((sum, track) => sum + track.duration, 0),
@@ -119,8 +127,8 @@ export function AudioToggle() {
       return;
     }
 
-    const isThemeChange = prevEffectiveThemeRef.current !== effectiveTheme;
-    prevEffectiveThemeRef.current = effectiveTheme;
+    const isThemeChange = prevEffectiveAudioThemeRef.current !== effectiveAudioTheme;
+    prevEffectiveAudioThemeRef.current = effectiveAudioTheme;
 
     const switchAudio = async () => {
       const audio = audioRef.current!;
@@ -193,7 +201,7 @@ export function AudioToggle() {
       audioElement.removeEventListener("ended", handleEnded);
     };
   }, [
-    effectiveTheme,
+    effectiveAudioTheme,
     playlist,
     totalDuration,
     isPlaying,

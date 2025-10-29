@@ -27,7 +27,7 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
     if (searchTheme) params.set("theme", searchTheme);
     if (searchStatus) params.set("status", searchStatus);
     const query = params.toString();
-    router.push(query ? `/search?${query}` : "/search");
+    router.push(query ? `/worlds-hub?${query}` : "/worlds-hub");
   };
 
   const handleReturnHome = () => {
