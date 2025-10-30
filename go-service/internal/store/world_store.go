@@ -126,7 +126,21 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 				piece.piece.Details["is_protagonist"] = "true"
 			}
 
-			detailsJSON, _ := json.Marshal(piece.piece.Details)
+			// Deserialize any JSON strings in Details (e.g., skills array)
+			// before marshaling to JSONB for database storage
+			detailsMap := make(map[string]interface{})
+			for key, value := range piece.piece.Details {
+				var parsed interface{}
+				if err := json.Unmarshal([]byte(value), &parsed); err == nil {
+					// Successfully parsed - it was a JSON string
+					detailsMap[key] = parsed
+				} else {
+					// Not JSON - keep as string
+					detailsMap[key] = value
+				}
+			}
+
+			detailsJSON, _ := json.Marshal(detailsMap)
 			_, err = tx.Exec(`
 				INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
 				VALUES ($1, $2, $3, $4, $5, NOW())

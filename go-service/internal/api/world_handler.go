@@ -38,9 +38,15 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 
 	currentUser := middleware.GetUser(r)
 
+	// Accept deserialized format from frontend (details can have arrays/objects)
 	var req struct {
-		Pieces map[string]*lorepb.LorePiece `json:"pieces"`
-		Theme  string                       `json:"theme"`
+		Pieces map[string]struct {
+			Name        string         `json:"name"`
+			Description string         `json:"description"`
+			Details     map[string]any `json:"details"`
+			Type        string         `json:"type"`
+		} `json:"pieces"`
+		Theme string `json:"theme"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
@@ -49,13 +55,55 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 
 	log.Printf("DEBUG: HandleCreateDraftWorld received req: %+v", req)
 
+	// Convert to gRPC format (serialize complex types to JSON strings)
+	convertToGrpcPiece := func(piece struct {
+		Name        string         `json:"name"`
+		Description string         `json:"description"`
+		Details     map[string]any `json:"details"`
+		Type        string         `json:"type"`
+	}) *lorepb.LorePiece {
+		details := make(map[string]string)
+		for key, value := range piece.Details {
+			if v, ok := value.(string); ok {
+				details[key] = v
+			} else {
+				// Serialize arrays/objects to JSON strings
+				jsonBytes, _ := json.Marshal(value)
+				details[key] = string(jsonBytes)
+			}
+		}
+		return &lorepb.LorePiece{
+			Name:        piece.Name,
+			Description: piece.Description,
+			Details:     details,
+			Type:        piece.Type,
+		}
+	}
+
+	var character, faction, setting, event, relic *lorepb.LorePiece
+	if p, ok := req.Pieces["character"]; ok {
+		character = convertToGrpcPiece(p)
+	}
+	if p, ok := req.Pieces["faction"]; ok {
+		faction = convertToGrpcPiece(p)
+	}
+	if p, ok := req.Pieces["setting"]; ok {
+		setting = convertToGrpcPiece(p)
+	}
+	if p, ok := req.Pieces["event"]; ok {
+		event = convertToGrpcPiece(p)
+	}
+	if p, ok := req.Pieces["relic"]; ok {
+		relic = convertToGrpcPiece(p)
+	}
+
 	grpcReq := &lorepb.FullStoryRequest{
 		Pieces: &lorepb.SelectedLorePieces{
-			Character: req.Pieces["character"],
-			Faction:   req.Pieces["faction"],
-			Setting:   req.Pieces["setting"],
-			Event:     req.Pieces["event"],
-			Relic:     req.Pieces["relic"],
+			Character: character,
+			Faction:   faction,
+			Setting:   setting,
+			Event:     event,
+			Relic:     relic,
 		},
 		Theme: req.Theme,
 	}

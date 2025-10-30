@@ -10,6 +10,23 @@ import (
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
 )
 
+// deserializeDetails deserializes any JSON strings in the Details map
+// (e.g., skills array stored as JSON string from gRPC)
+func deserializeDetails(details map[string]string) map[string]any {
+	result := make(map[string]any)
+	for key, value := range details {
+		var parsed interface{}
+		if err := json.Unmarshal([]byte(value), &parsed); err == nil {
+			// Successfully parsed - it was a JSON string
+			result[key] = parsed
+		} else {
+			// Not JSON - keep as string
+			result[key] = value
+		}
+	}
+	return result
+}
+
 type LoreHandler struct {
 	loreClient lorepb.LoreServiceClient
 	logger     *log.Logger
@@ -67,7 +84,7 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 		characters[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details, // map[string]string
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -117,7 +134,7 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 		factions[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -167,7 +184,7 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 		settings[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -217,7 +234,7 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 		events[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -267,7 +284,7 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 		relics[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -317,7 +334,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		characters[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -327,7 +344,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		factions[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -337,7 +354,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		settings[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -347,7 +364,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		events[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
@@ -357,7 +374,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		relics[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
-			"details":     piece.Details,
+			"details":     deserializeDetails(piece.Details),
 			"type":        piece.Type,
 		}
 	}
