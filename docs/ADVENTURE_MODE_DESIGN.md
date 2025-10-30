@@ -1,6 +1,6 @@
 # LoreSmith Adventure Mode - Complete Design Document
 
-**Last Updated**: 2025-10-28
+**Last Updated**: 2025-10-30
 **Status**: Design Phase - Ready for Implementation
 
 ---
@@ -19,9 +19,10 @@
 10. [Inventory System](#inventory-system)
 11. [Breakpoint Events](#breakpoint-events)
 12. [Technical Architecture](#technical-architecture)
-13. [AI Generation Strategy](#ai-generation-strategy)
-14. [UI/UX Design](#uiux-design)
-15. [Implementation Roadmap](#implementation-roadmap)
+13. [Redis Architecture & Caching Strategy](#redis-architecture--caching-strategy)
+14. [AI Generation Strategy](#ai-generation-strategy)
+15. [UI/UX Design](#uiux-design)
+16. [Implementation Roadmap](#implementation-roadmap)
 
 ---
 
@@ -112,11 +113,24 @@ World now appears in global search
 
 ### Phase 3: Adventure Initialization
 
+**Key Distinction**: `world_id` vs `session_id`
+- **world_id**: The world template (quest, lore, protagonist) - shared across all players
+- **session_id**: One player's specific playthrough - unique to this player
+
+**Example**:
+```
+World ID 123: "Unlock the Aetherian Echo" (steampunk, Emmeline protagonist)
+  ↳ Session 456: Alice's playthrough (alive, act 2, companions: Bob + Kira)
+  ↳ Session 789: Bob's playthrough (failed, died in act 1)
+  ↳ Session 101: Carol's playthrough (completed, solo run)
+```
+
+**Flow**:
 ```
 1. User clicks "Begin Adventure" on world page (their own or someone else's)
 2. System creates adventure_session record:
-   - session_id: generated
-   - world_id: reference to world
+   - session_id: generated (unique to this player)
+   - world_id: reference to world (shared template)
    - user_id: player starting adventure
    - status: 'initializing'
    - current_scene_index: 0
@@ -327,7 +341,11 @@ CREATE TABLE IF NOT EXISTS adventure_sessions (
     -- {
     --   "scene_outcomes": [...],
     --   "story_flags": {"found_secret": true, ...},
-    --   "quest_progress": 0.65
+    --   "quest_progress": 0.65,
+    --   "companion_relationships": {
+    --     "party_member_id_1": {"level": 15, "last_change": "Saved them in scene 3"},
+    --     "party_member_id_2": {"level": -10, "last_change": "Disagreed with choice"}
+    --   }
     -- }
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -355,6 +373,10 @@ CREATE TABLE IF NOT EXISTS party_members (
     description TEXT,
     relationship_to_protagonist TEXT,
     -- e.g., "Old friend from the Under-Market", "Reluctant ally"
+    relationship_level INT DEFAULT 0,
+    -- Affection/trust level: -100 (hostile) to +100 (devoted)
+    -- Changes based on story choices and shared experiences
+    -- Does NOT apply to protagonist (they don't have self-relationship)
 
     -- Stats (copied from lore_pieces.details for protagonist)
     max_hp INT NOT NULL,
@@ -627,6 +649,41 @@ Output: Name, description, relationship, stats, skills, flaw
 - Session continues with remaining members
 - If only protagonist remains, can continue solo
 
+### Companion Relationships
+
+**Tracking Affection/Trust**:
+- Each companion has `relationship_level` (-100 to +100)
+- Starts at 0 (neutral)
+- Changes based on:
+  - Protagonist's choices (do they align with companion values?)
+  - Shared experiences (survived tough scene together → +5)
+  - Combat performance (protagonist protected them → +10)
+  - Stress events (protagonist caused stress → -5)
+
+**Relationship Effects** (Future Phase):
+- High relationship (+50+): Companion may help protagonist automatically
+- Low relationship (-50-): Companion may refuse certain actions
+- Very low (-75-): Risk of companion leaving party
+- Not implemented in MVP, but schema supports it
+
+**Storage**:
+- `party_members.relationship_level` column (persistent)
+- `session_state.companion_relationships` JSONB (tracks history)
+- Only tracked for companions (NOT protagonist)
+
+**Example Relationship Changes**:
+```json
+{
+  "scene_5_choice_2": {
+    "party_member_id": 123,
+    "old_level": 10,
+    "new_level": 25,
+    "reason": "You chose to help the informant, which Bob appreciated",
+    "change": +15
+  }
+}
+```
+
 ---
 
 ## Scene System
@@ -654,6 +711,12 @@ Adventure Session
 
 ### Scene Skeleton vs. Dynamic Content
 
+**Design Philosophy**:
+- **Scene Skeletons**: Pre-generated structure (challenge, location, NPCs, stakes)
+- **Beat Outcomes**: Pre-generated narrative branches for ALL possible outcomes
+- **Dynamic Intro**: Generated at runtime based on previous scene results
+- **No AI during gameplay**: Player choices select pre-generated outcome branches
+
 **Scene Skeleton** (Pre-generated in batch):
 ```json
 {
@@ -680,17 +743,114 @@ Adventure Session
       "beat_number": 1,
       "core_situation": "Locate the workshop in the crowded district",
       "challenge_attributes": ["perception", "lore_mastery"],
-      "base_dc": 15
+      "base_dc": 15,
+      "outcome_branches": {
+        "critical_success": {
+          "narrative": "Your keen eyes spot not just the workshop, but a hidden service entrance. You also notice the guard rotation pattern—a perfect window to slip inside unnoticed.",
+          "hp_change": 0,
+          "stress_change": -5,
+          "items_gained": ["Guard Schedule"],
+          "story_flags": {"found_secret_entrance": true, "knows_patrol_pattern": true}
+        },
+        "success": {
+          "narrative": "You find the workshop after some careful observation. The main entrance is guarded, but you've identified the building and know where to go.",
+          "hp_change": 0,
+          "stress_change": 0,
+          "items_gained": [],
+          "story_flags": {"found_workshop": true}
+        },
+        "partial": {
+          "narrative": "It takes longer than expected, and you think you've found it—but you're not entirely sure. The streets all look similar here. You'll need to proceed carefully.",
+          "hp_change": 0,
+          "stress_change": 5,
+          "items_gained": [],
+          "story_flags": {"workshop_location_uncertain": true}
+        },
+        "failure": {
+          "narrative": "You wander the industrial district for what feels like hours. Workers give you suspicious looks. You're lost, frustrated, and Lady Sophia gains more time to unlock the chronograph's secrets.",
+          "hp_change": -5,
+          "stress_change": 10,
+          "items_gained": [],
+          "story_flags": {"time_wasted": true, "workers_suspicious": true}
+        },
+        "critical_failure": {
+          "narrative": "In your desperate search, you accidentally stumble into a restricted factory zone. An alarm blares. Factory guards converge on your position. You flee, bruised and shaken, with no idea where the workshop is.",
+          "hp_change": -15,
+          "stress_change": 15,
+          "items_gained": [],
+          "story_flags": {"guards_alerted": true, "must_find_alternate_approach": true}
+        }
+      }
     },
     {
       "beat_number": 2,
       "core_situation": "Deal with workshop security",
       "challenge_attributes": ["influence", "resilience", "creativity"],
-      "base_dc": 18
+      "base_dc": 18,
+      "outcome_branches": {
+        "critical_success": "...",
+        "success": "...",
+        "partial": "...",
+        "failure": "...",
+        "critical_failure": "..."
+      }
     }
   ]
 }
 ```
+
+**Beat Outcome Branching**:
+
+Each beat has **5 pre-generated outcome branches**:
+1. **critical_success** (natural 20 or total ≥ DC+8): Best possible outcome, bonus rewards
+2. **success** (total ≥ DC): Standard good outcome
+3. **partial** (total ≥ DC-5): Mixed result, succeed but with cost/complication
+4. **failure** (total < DC-5): Bad outcome, take damage/stress, setback
+5. **critical_failure** (natural 1 or total ≤ DC-10): Worst outcome, severe consequences
+
+**Why Pre-generate All Branches?**:
+- **No AI latency during gameplay**: Player rolls → immediate narrative response
+- **Consistent quality**: All outcomes written together by AI, narratively coherent
+- **Story continuity**: AI knows all possible paths, can set appropriate flags
+- **Better pacing**: No waiting for LLM during tense moments
+
+**How It Works**:
+1. **Pre-generation** (during camp or session start):
+   ```python
+   # Generate scene batch with ALL outcome branches
+   scene = generate_scene_skeleton(...)
+   for beat in scene.beats:
+       beat.outcome_branches = generate_all_outcomes(
+           beat.core_situation,
+           beat.challenge_attributes,
+           scene.context
+       )
+   ```
+
+2. **During gameplay**:
+   ```python
+   # Player makes choice and rolls
+   roll_result = roll_d20() + modifier
+   outcome_type = determine_outcome(roll_result, dc)
+
+   # Select pre-generated branch (NO AI CALL)
+   outcome = beat.outcome_branches[outcome_type]
+
+   # Apply consequences immediately
+   apply_hp_change(outcome.hp_change)
+   apply_stress_change(outcome.stress_change)
+   add_items(outcome.items_gained)
+   set_story_flags(outcome.story_flags)
+
+   # Display narrative to player
+   return outcome.narrative
+   ```
+
+**Benefits**:
+- Gameplay feels snappy and responsive
+- Narratives flow naturally between beats
+- Story flags ensure continuity (e.g., if beat 1 sets "guards_alerted", beat 2's intro acknowledges it)
+- AI generates better outcomes when it sees all possibilities at once
 
 **Dynamic Intro** (Generated at runtime):
 ```python
@@ -934,11 +1094,182 @@ async def analyze_quest_complexity(
     # Return recommended range
 ```
 
-**Dynamic Continuation**:
-- After each act, check: "Is quest resolved?"
-- If quest can conclude naturally → Generate finale
-- If quest needs development → Generate next act
-- Hard cap: 15 scenes maximum
+**Dynamic Continuation & Natural Endings**:
+
+**How LLM Knows When to End**:
+
+The LLM can naturally conclude stories by analyzing quest state and providing clear signals.
+
+**Strategy**:
+1. **Pass Quest State to Each Act Generation**:
+   ```python
+   async def generate_scene_batch(
+       quest: dict,
+       act_number: int,
+       previous_outcomes: list,
+       quest_progress: float,  # 0.0 to 1.0
+       required_resolution_points: list  # ["find_chronograph", "confront_sophia"]
+   ):
+       prompt = f"""
+       Quest: {quest['title']}
+       Current Act: {act_number}
+       Quest Progress: {int(quest_progress * 100)}%
+
+       Required to complete quest:
+       {format_resolution_points(required_resolution_points)}
+
+       Previous outcomes summary:
+       {format_outcomes(previous_outcomes)}
+
+       Generate 3 scenes for this act.
+
+       IMPORTANT:
+       - If quest progress ≥ 90% AND all resolution points addressed:
+         * This should be the FINAL ACT
+         * Scene 3 should resolve the quest (confrontation/climax)
+         * Include epilogue elements
+         * Set flag: "is_final_act": true
+
+       - If quest progress < 90% OR resolution points remain:
+         * Continue building toward climax
+         * Advance at least one resolution point
+         * Set flag: "is_final_act": false
+       """
+   ```
+
+2. **Resolution Points Tracking**:
+   ```python
+   # Defined when quest is generated
+   resolution_points = [
+       {
+           "id": "find_chronograph",
+           "description": "Locate and retrieve the stolen chronograph",
+           "status": "in_progress",  # not_started, in_progress, completed
+           "required_for_ending": True
+       },
+       {
+           "id": "confront_sophia",
+           "description": "Confront Lady Sophia Windsor",
+           "status": "not_started",
+           "required_for_ending": True
+       },
+       {
+           "id": "understand_aetherian_power",
+           "description": "Learn why the chronograph is dangerous",
+           "status": "in_progress",
+           "required_for_ending": False  # Optional subplot
+       }
+   ]
+
+   # After each scene, update based on story_flags
+   if outcome.story_flags.get("found_chronograph"):
+       resolution_points["find_chronograph"]["status"] = "completed"
+       quest_progress += 0.3
+   ```
+
+3. **Final Act Detection**:
+   ```go
+   // After generating scene batch
+   func (h *AdventureHandler) ProcessSceneBatch(batch *SceneBatch) {
+       if batch.Metadata.IsFinalAct {
+           // Mark session for finale
+           session.Status = "finale_in_progress"
+
+           // Scene 3 of final act should trigger completion flow
+           lastScene := batch.Scenes[2]
+           lastScene.OnComplete = "trigger_quest_completion"
+       }
+   }
+   ```
+
+4. **Finale Scene Structure**:
+   ```json
+   {
+     "scene_number": 12,
+     "is_finale": true,
+     "core_challenge": "Confront Lady Sophia and secure the chronograph",
+     "beats": [
+       {
+         "beat_number": 1,
+         "type": "climax",
+         "core_situation": "Face-off with Lady Sophia in her workshop",
+         "challenge_attributes": ["influence", "resilience", "lore_mastery"]
+       },
+       {
+         "beat_number": 2,
+         "type": "resolution",
+         "core_situation": "Decide the fate of the chronograph",
+         "choice_consequence": "Determines ending variant"
+       },
+       {
+         "beat_number": 3,
+         "type": "epilogue",
+         "narrative_only": true,
+         "content": "Generated based on player's major choices throughout"
+       }
+     ]
+   }
+   ```
+
+5. **Hard Cap Fallback**:
+   - After 15 scenes (5 acts): Force finale generation
+   - Even if resolution points incomplete
+   - Prompt LLM to create "rushed but satisfying" conclusion
+   - Better to end than drag on indefinitely
+
+**Quest Progress Calculation**:
+```python
+def calculate_quest_progress(session) -> float:
+    """
+    Calculate 0.0 to 1.0 quest completion.
+
+    Factors:
+    - Resolution points completed (60% weight)
+    - Scenes completed (20% weight)
+    - Story flags set (20% weight)
+    """
+    required_points = [p for p in resolution_points if p["required_for_ending"]]
+    completed_required = [p for p in required_points if p["status"] == "completed"]
+
+    points_progress = len(completed_required) / len(required_points)
+    scenes_progress = min(session.current_scene_index / 12, 1.0)
+    flags_progress = len(session.story_flags) / 10  # Arbitrary: 10 flags = good coverage
+
+    total = (points_progress * 0.6) + (scenes_progress * 0.2) + (flags_progress * 0.2)
+    return min(total, 1.0)
+```
+
+**Example Progression**:
+```
+Act 1 (Scenes 1-3):
+- Quest progress: 0.15
+- Resolution: "find_chronograph" → in_progress
+- LLM generates: Introduction to conflict, locate workshop
+
+Act 2 (Scenes 4-6):
+- Quest progress: 0.45
+- Resolution: "find_chronograph" → completed
+- LLM generates: Retrieve chronograph, chase sequence
+
+Act 3 (Scenes 7-9):
+- Quest progress: 0.75
+- Resolution: "confront_sophia" → in_progress
+- LLM generates: Pursue Lady Sophia, allies/betrayals
+
+Act 4 (Scenes 10-12) - FINALE:
+- Quest progress: 0.95
+- Resolution: ALL required points completed
+- LLM detects finale conditions
+- Generates: Confrontation, resolution, epilogue
+- Session marked "completed"
+```
+
+**Benefits**:
+- LLM has clear signals for when to end
+- Natural story arcs (not abrupt cutoffs)
+- Player sees progress toward conclusion
+- Prevents endless procedural content
+- Allows for satisfying epilogues
 
 ---
 
@@ -967,6 +1298,108 @@ Examples:
 - Attribute 14 → Modifier +2
 - Attribute 18 → Modifier +4
 ```
+
+### Beat Types
+
+**Challenge Beats** (Most Common):
+- Player must make a choice that requires a skill check
+- Choices tied to different attributes (perception, influence, etc.)
+- Dice roll determines outcome
+- Examples: Sneak past guards, convince NPC, find hidden path
+
+**Story Beats** (Narrative Progression):
+- Can still have skill checks, but focus on story advancement
+- Choices may affect relationship with companions or set story flags
+- Can have rolls (e.g., "Comfort your wounded companion" → Empathy check)
+- Examples: Character conversations, lore reveals, relationship moments
+
+**Puzzle Beats** (Future Enhancement):
+- Present a logical problem or riddle
+- Player must figure out correct approach
+- May combine narrative clues with skill checks
+- Examples: Decode cipher, solve mechanical puzzle, navigate maze
+
+**Combat Beats** (Special Category):
+- High-stakes confrontations
+- Multiple rolls may be required
+- Party members can be wounded
+- Examples: Fight guards, flee pursuers, defend position
+
+**Exploration Beats**:
+- Discover new locations or information
+- Often Perception or Lore Mastery checks
+- Success reveals advantages for future beats
+- Examples: Scout ahead, search for clues, find alternate routes
+
+### Beat Pacing & Narrative Length
+
+**Avoiding "Button Clicker Syndrome"**:
+
+Each beat should feel substantial, not just "roll dice → see result → next beat". Target length:
+
+**Beat Narrative Structure**:
+1. **Setup** (50-100 words): Describe situation, set atmosphere
+2. **Choices Presented** (inline with setup)
+3. **Player Action** (choice + roll)
+4. **Outcome** (150-400 words): Rich narrative consequence, not just "you succeed"
+
+**Example - BAD (Too Short)**:
+```
+Setup: "You see guards. What do you do?"
+Outcome: "You sneak past them."
+```
+
+**Example - GOOD (Substantial)**:
+```
+Setup (75 words):
+"Two factory guards lean against the workshop entrance, their steam-
+powered rifles gleaming in the gaslight. One smokes a cheap cigar,
+the other checks his pocket watch every few seconds—nervous, on edge.
+Behind you, the street bustles with evening workers heading home.
+Lady Sophia's workshop looms three stories tall, its windows dark
+save for a faint blue glow on the top floor. Time is running out."
+
+[Player chooses: Sneak through shadows (Perception DC 15)]
+[Player rolls: 17 → Success]
+
+Outcome (250 words):
+"You press yourself against the damp brick wall, timing your movement
+with the rattle of a passing steam-carriage. The guard with the pocket
+watch turns away for just a moment—that's your window.
+
+Emmeline slides into the alley beside the workshop, her boots silent
+on the cobblestones. Behind you, the guards continue their patrol,
+oblivious. Bob follows close behind, his larger frame making the tight
+squeeze more difficult, but you both make it.
+
+The alley is darker here, and you spot what you were hoping for: a
+service entrance, half-hidden behind stacked crates. No guards. The
+door's lock is old, mechanical—child's play for someone with your
+skills.
+
+As you work the lock, you hear it: a faint mechanical humming from
+inside, punctuated by the rhythmic pulse of aetherian energy. Lady
+Sophia is already experimenting with the chronograph. Every second
+counts now.
+
+The lock clicks open.
+
+[Continue] button"
+```
+
+**Pacing Guidelines**:
+- **Scene intro**: 3-5 sentences (set the scene)
+- **Beat setup**: 2-4 sentences (immediate situation)
+- **Beat outcome**: 2-4 paragraphs (narrative consequence + next setup)
+- **Total reading time per beat**: 30-90 seconds
+- **Beats per scene**: 2-3 (not 5-7)
+
+**Why This Matters**:
+- Players feel immersed, not rushed
+- Outcomes feel meaningful, not arbitrary
+- Natural pacing allows tension to build
+- Room for character voice and world-building
+- Avoids mobile game "tap-tap-tap" feel
 
 ### Dice Roll System
 
@@ -1223,27 +1656,125 @@ for party_member in party:
 
 ### Background Scene Generation
 
-**While Player Reads Camp Event**:
+**Pre-generation Strategy**:
+
+Camps are perfect opportunities to generate the next act's content while the player is reading/resting. This eliminates loading screens during gameplay.
+
+**Timing**:
+- **Act 1 scenes**: Generated when adventure starts (before party selection)
+- **Act 2 scenes**: Generated in background during Act 1 Camp
+- **Act 3+ scenes**: Generated during previous act's camp
+- **Final act**: Detected dynamically, generates finale scene
+
+**Implementation**:
 ```python
-# Triggered when camp screen loads
-async def on_camp_enter(session_id: int):
-    # Display camp event to player
-    camp_event = await generate_camp_event(...)
+# go-service/internal/api/adventure_handler.go
+func (h *AdventureHandler) EnterCamp(c *gin.Context) {
+    sessionID := c.Query("session_id")
 
-    # Start background generation for next act
-    next_act = current_act + 1
-    asyncio.create_task(
-        generate_and_cache_next_batch(session_id, next_act)
-    )
+    // 1. Generate camp event narrative (quick, 2-4 paragraphs)
+    campEvent, err := h.pythonClient.GenerateCampEvent(ctx, &pb.CampEventRequest{
+        Theme: session.World.Theme,
+        Party: session.Party,
+        RecentScenes: session.LastThreeScenes,
+        QuestProgress: session.QuestProgress,
+    })
 
-    # Player reads camp event while batch generates
-    # By the time they click "Continue", next scenes are ready
+    // 2. Apply automatic stress reduction
+    for _, member := range session.Party {
+        member.Stress = max(0, member.Stress - 20)
+        h.store.UpdatePartyMember(member)
+    }
+
+    // 3. Start background generation (async, don't wait)
+    nextAct := session.CurrentAct + 1
+    go func() {
+        // This runs in background while player reads camp event
+        batch, err := h.pythonClient.GenerateSceneBatch(ctx, &pb.SceneBatchRequest{
+            Quest: session.World.Quest,
+            Lore: session.World.Lore,
+            ActNumber: nextAct,
+            PreviousOutcomes: session.GetActSummary(session.CurrentAct),
+        })
+
+        if err != nil {
+            log.Error("Failed to pre-generate next act", err)
+            // Graceful degradation: generate when player advances instead
+            return
+        }
+
+        // Save to scene_batches table
+        h.store.SaveSceneBatch(session.ID, nextAct, batch)
+        log.Info("Pre-generated act", nextAct, "during camp")
+    }()
+
+    // 4. Return camp event to player immediately (don't block)
+    c.JSON(200, gin.H{
+        "camp_event": campEvent.Narrative,
+        "stress_reduced": 20,
+        "party": session.Party,
+    })
+}
+```
+
+**Fallback Handling**:
+```python
+# When player clicks "Continue Journey" after camp
+func (h *AdventureHandler) AdvanceToNextAct(c *gin.Context) {
+    nextAct := session.CurrentAct + 1
+
+    // Check if batch already generated (during camp background)
+    batch, err := h.store.GetSceneBatch(session.ID, nextAct)
+
+    if err != nil || batch == nil {
+        // Batch not ready yet (slow generation or error)
+        // Generate now and wait
+        batch, err = h.pythonClient.GenerateSceneBatch(...)
+        if err != nil {
+            return c.JSON(500, gin.H{"error": "Failed to generate scenes"})
+        }
+        h.store.SaveSceneBatch(session.ID, nextAct, batch)
+    }
+
+    // Proceed with next act
+    session.CurrentAct = nextAct
+    session.CurrentSceneIndex = 0
+    c.JSON(200, gin.H{"scene": batch.Scenes[0]})
+}
 ```
 
 **User Experience**:
-- No waiting when clicking "Continue Journey"
-- Scenes pre-generated during downtime
-- Seamless transition to next act
+- **Best case**: Player reads camp event (30-60 seconds), batch generates in background, click "Continue" → instant transition
+- **Worst case**: Generation fails/slow, player waits when clicking "Continue" (same as old approach)
+- **Average case**: By the time player finishes reading camp event and reviewing party, batch is ready
+
+**Generation Time Estimates**:
+- Camp event: 2-4 seconds (small, 2-4 paragraphs)
+- Scene batch (3 scenes with outcome branches): 15-30 seconds
+- Player reading time: 30-90 seconds
+- **Result**: Batch ready before player clicks "Continue" 90% of the time
+
+**Monitoring**:
+```go
+// Log metrics to track pre-generation success rate
+metrics.IncrementCounter("camp.batch_pregeneration", map[string]string{
+    "act": strconv.Itoa(nextAct),
+    "status": "started",
+})
+
+// When player advances
+if batchAlreadyExists {
+    metrics.IncrementCounter("camp.batch_pregeneration", map[string]string{
+        "act": strconv.Itoa(nextAct),
+        "status": "cache_hit",
+    })
+} else {
+    metrics.IncrementCounter("camp.batch_pregeneration", map[string]string{
+        "act": strconv.Itoa(nextAct),
+        "status": "cache_miss",
+    })
+}
+```
 
 ---
 
@@ -1316,7 +1847,122 @@ async def on_camp_enter(session_id: int):
 }
 ```
 
-### Item Generation
+### Starting Inventory (Dynamic Generation)
+
+**Philosophy**:
+- Starting inventory should reflect the protagonist and world, not be hardcoded
+- Different protagonists = different starting items
+- World relic/theme should influence items
+
+**Generation Timing**:
+- When adventure starts (after party selection, before first scene)
+- Python chain generates 3-5 thematically appropriate items
+
+**Implementation**:
+```python
+# adventure/chains/starting_inventory_generator.py
+async def generate_starting_inventory(
+    protagonist: dict,
+    world: dict
+) -> list[dict]:
+    """
+    Generate 3-5 starting items based on protagonist and world.
+
+    Args:
+        protagonist: Protagonist character data
+        world: World lore (theme, relic, setting)
+
+    Returns:
+        List of item dicts
+    """
+
+    prompt = f"""
+    Theme: {world['theme']}
+    Setting: {world['setting']['name']} - {world['setting']['description']}
+    Relic in this world: {world['relic']['name']}
+
+    Protagonist: {protagonist['name']}
+    Skills: {protagonist['skills']}
+    Personality: {protagonist['personality']}
+
+    Generate 3-5 starting items this character would have:
+    1. One healing item (e.g., bandages, potion, medkit)
+    2. One utility item related to their skills
+    3. 1-3 thematic items based on world/setting
+    4. Optionally: A lesser version of the world's relic (if it makes sense)
+
+    For each item:
+    - Name: Thematic to world
+    - Description: 1-2 sentences
+    - Type: consumable, equipment, crafting
+    - Effect: Appropriate to item purpose
+
+    Examples:
+    - Steampunk mechanic: "Clockwork Repair Kit", "Steam-Powered Torch", "Healing Salve"
+    - Fantasy wizard: "Minor Healing Potion", "Spellbook Fragment", "Crystal Focus"
+    - Cyberpunk hacker: "Stim Pack", "Hacking Tool", "Encrypted Data Chip"
+
+    Output as JSON array of items.
+    """
+
+    items = await llm_generate(prompt)
+    return items
+
+
+# Example output for Emmeline (steampunk mechanic):
+[
+    {
+        "name": "Clockwork Repair Kit",
+        "description": "A worn leather case containing precision tools, gears, and springs. Essential for any mechanic.",
+        "type": "consumable",
+        "effect": {"type": "stat_buff", "stat": "creativity", "value": 2, "duration": "one_use"}
+    },
+    {
+        "name": "Minor Healing Salve",
+        "description": "A small tin of medicinal paste. Smells of herbs and oil.",
+        "type": "consumable",
+        "effect": {"type": "heal", "value": 15}
+    },
+    {
+        "name": "Steam-Powered Lantern",
+        "description": "A brass lantern that runs on pressurized steam. Lights the darkest workshops.",
+        "type": "equipment",
+        "effect": {"type": "stat_buff", "stat": "perception", "value": 1, "duration": "permanent"}
+    },
+    {
+        "name": "Broken Chronometer",
+        "description": "A damaged pocket watch with aetherian crystals. You found it years ago. It doesn't tell time, but sometimes it hums with energy.",
+        "type": "quest_item",
+        "effect": {"type": "lore_hint", "reveals": "aetherian_sensitivity"}
+    }
+]
+```
+
+**Go Integration**:
+```go
+// When player confirms party
+func (h *AdventureHandler) ConfirmParty(c *gin.Context) {
+    // ... save party members ...
+
+    // Generate starting inventory
+    items, err := h.pythonClient.GenerateStartingInventory(ctx, &pb.StartingInventoryRequest{
+        Protagonist: session.Protagonist,
+        World: session.World,
+    })
+
+    // Save items to inventory_items table (party_member_id = NULL = shared)
+    for _, item := range items {
+        h.store.CreateInventoryItem(session.ID, nil, item)
+    }
+
+    c.JSON(200, gin.H{
+        "party": session.Party,
+        "starting_items": items,
+    })
+}
+```
+
+### Item Generation During Scenes
 
 **During Scenes**:
 ```python
@@ -1542,6 +2188,28 @@ async def generate_stress_breakdown(
 ---
 
 ## Technical Architecture
+
+### Service Responsibilities
+
+**Go Service** (REST API + Database + State Management):
+- All HTTP endpoints for frontend
+- Database operations (PostgreSQL)
+- Redis caching for active sessions
+- Session lifecycle management
+- Party/inventory state management
+- Dice rolling and game mechanics
+- Calls Python via gRPC for AI generation
+
+**Python Service** (AI Generation ONLY):
+- **NO** database operations
+- **NO** Redis caching
+- **NO** state management
+- Receives context via gRPC request parameters
+- Generates AI content using LLM
+- Returns generated content to Go
+- Completely stateless (can scale horizontally)
+
+**Important**: Python service does NOT use Redis. All caching is handled by Go service.
 
 ### Backend Structure
 
@@ -1943,6 +2611,308 @@ class AdventureOrchestrator:
                 return await self.handle_stress_warning(member)
 
         return None
+```
+
+---
+
+## Redis Architecture & Caching Strategy
+
+### Overview
+
+**Key Principle**: Python does AI generation ONLY. Go handles all state management and caching.
+
+**Why Remove Redis from Python?**:
+- Python service should be stateless (AI generation as a function)
+- Go service owns all session state and data
+- Simpler architecture: single source of truth
+- Easier to scale: Python workers can be ephemeral
+
+### Data Storage Layers
+
+**Layer 1: PostgreSQL** (Permanent Storage):
+```
+- adventure_sessions (all sessions, even completed)
+- party_members (character data)
+- inventory_items (item data)
+- scene_log (full history of choices)
+- scene_batches (generated scene skeletons)
+```
+
+**Layer 2: Redis** (Hot Cache - Go Only):
+```
+Purpose: Speed up active session reads
+TTL: 1 hour (auto-expire inactive sessions)
+Keys:
+  - session:{session_id}:state
+  - session:{session_id}:party
+  - session:{session_id}:inventory
+  - session:{session_id}:current_scene
+```
+
+**Layer 3: Python Service** (NO caching):
+```
+- Receives requests via gRPC
+- Generates AI content
+- Returns response
+- Stores NOTHING
+```
+
+### Active Session State (Redis)
+
+**What Goes in Redis**:
+```go
+// session:{session_id}:state
+type SessionState struct {
+    SessionID        int64     `json:"session_id"`
+    WorldID          int64     `json:"world_id"`
+    UserID           int       `json:"user_id"`
+    Status           string    `json:"status"`
+    CurrentSceneIdx  int       `json:"current_scene_index"`
+    CurrentAct       int       `json:"current_act"`
+    QuestProgress    float64   `json:"quest_progress"`
+    StoryFlags       map[string]any `json:"story_flags"`
+    LastAccessed     time.Time `json:"last_accessed"`
+}
+
+// session:{session_id}:party
+type PartyCache struct {
+    Members []PartyMember `json:"members"`
+}
+
+// session:{session_id}:inventory
+type InventoryCache struct {
+    Items []InventoryItem `json:"items"`
+}
+
+// session:{session_id}:current_scene
+type CurrentSceneCache struct {
+    SceneSkeleton SceneSkeleton `json:"skeleton"`
+    CurrentBeat   int           `json:"current_beat"`
+    StoryContext  string        `json:"story_context"`
+}
+```
+
+**Cache Flow**:
+```go
+// 1. Load session state (with Redis cache)
+func (s *AdventureStore) GetSession(sessionID int64) (*Session, error) {
+    // Try Redis first
+    cacheKey := fmt.Sprintf("session:%d:state", sessionID)
+    cached, err := s.redis.Get(ctx, cacheKey).Result()
+
+    if err == nil {
+        // Cache hit!
+        var session Session
+        json.Unmarshal([]byte(cached), &session)
+        return &session, nil
+    }
+
+    // Cache miss - load from PostgreSQL
+    session, err := s.db.GetSession(sessionID)
+    if err != nil {
+        return nil, err
+    }
+
+    // Store in Redis (1 hour TTL)
+    sessionJSON, _ := json.Marshal(session)
+    s.redis.Set(ctx, cacheKey, sessionJSON, time.Hour)
+
+    return session, nil
+}
+
+// 2. Update session state (write-through cache)
+func (s *AdventureStore) UpdateSession(session *Session) error {
+    // Write to PostgreSQL first (source of truth)
+    err := s.db.UpdateSession(session)
+    if err != nil {
+        return err
+    }
+
+    // Update Redis cache
+    cacheKey := fmt.Sprintf("session:%d:state", session.ID)
+    sessionJSON, _ := json.Marshal(session)
+    s.redis.Set(ctx, cacheKey, sessionJSON, time.Hour)
+
+    return nil
+}
+
+// 3. Invalidate cache on critical changes
+func (s *AdventureStore) InvalidateSessionCache(sessionID int64) {
+    keys := []string{
+        fmt.Sprintf("session:%d:state", sessionID),
+        fmt.Sprintf("session:%d:party", sessionID),
+        fmt.Sprintf("session:%d:inventory", sessionID),
+        fmt.Sprintf("session:%d:current_scene", sessionID),
+    }
+
+    for _, key := range keys {
+        s.redis.Del(ctx, key)
+    }
+}
+```
+
+### Cache Invalidation Strategy
+
+**When to Invalidate**:
+- Choice resolved (party HP/stress changes)
+- Item used (inventory changes)
+- Scene advanced (new beat/scene)
+- Camp entered (stress reduction)
+- Breakpoint event (character death, etc.)
+
+**Write Patterns**:
+```go
+// Pattern 1: Write-through (common operations)
+func (h *AdventureHandler) ResolveChoice(c *gin.Context) {
+    // 1. Apply changes to PostgreSQL
+    h.store.UpdatePartyMember(member)
+    h.store.CreateSceneLogEntry(logEntry)
+
+    // 2. Update Redis cache
+    h.store.UpdateSessionCache(session)
+
+    // 3. Return to client
+    c.JSON(200, outcome)
+}
+
+// Pattern 2: Cache-aside (read-heavy operations)
+func (h *AdventureHandler) GetCurrentScene(c *gin.Context) {
+    // Try cache
+    scene, err := h.cache.GetCurrentScene(sessionID)
+    if err == nil {
+        return c.JSON(200, scene)
+    }
+
+    // Load from DB
+    scene, _ = h.store.GetSceneSkeleton(sessionID, sceneIndex)
+
+    // Cache it
+    h.cache.SetCurrentScene(sessionID, scene)
+
+    c.JSON(200, scene)
+}
+```
+
+### Session Lifecycle & TTL
+
+**TTL Strategy**:
+```
+Active session: Redis TTL = 1 hour, refreshed on each read/write
+Inactive for 1 hour: Redis evicts, but PostgreSQL retains
+Player returns: Reload from PostgreSQL into Redis
+```
+
+**Implementation**:
+```go
+// Refresh TTL on every session access
+func (s *AdventureStore) touchSession(sessionID int64) {
+    cacheKey := fmt.Sprintf("session:%d:state", sessionID)
+    s.redis.Expire(ctx, cacheKey, time.Hour)
+}
+
+// Middleware to touch session
+func (h *AdventureHandler) SessionMiddleware(c *gin.Context) {
+    sessionID := c.GetInt64("session_id")
+    h.store.touchSession(sessionID)
+    c.Next()
+}
+```
+
+### Python Redis Removal
+
+**Before** (Old Architecture):
+```python
+# ❌ REMOVE THIS
+class AdventureOrchestrator:
+    def __init__(self):
+        self.redis = redis.Redis(...)  # ❌
+        self.session_cache = {}        # ❌
+
+    async def get_session_state(self, session_id):
+        cached = self.redis.get(f"session:{session_id}")  # ❌
+        # ...
+```
+
+**After** (New Architecture):
+```python
+# ✅ CORRECT
+class AdventureOrchestrator:
+    """
+    Stateless AI generation orchestrator.
+
+    Does NOT store any session state.
+    Receives all context via gRPC request parameters.
+    """
+
+    def __init__(self):
+        self.llm = get_llm()  # Only LLM client needed
+
+    async def generate_scene_batch(
+        self,
+        world_lore: dict,      # ✅ Passed by Go
+        act_number: int,       # ✅ Passed by Go
+        previous_outcomes: list # ✅ Passed by Go
+    ) -> list[SceneSkeleton]:
+        """
+        Pure function: Input → AI generation → Output
+        No state management, no caching, no database operations.
+        """
+        # Generate content using LLM
+        batch = await self.llm_generate_batch(...)
+
+        # Return to Go (Go handles caching/storage)
+        return batch
+```
+
+### Performance Expectations
+
+**Without Redis** (All PostgreSQL):
+- GetSession: ~10-20ms per query
+- UpdateSession: ~15-30ms per query
+- GetParty: ~10ms per query
+- 5-10 queries per scene resolution
+- **Total**: ~100-200ms per action
+
+**With Redis** (Hot cache):
+- GetSession: ~1-2ms (Redis)
+- UpdateSession: ~15ms (PostgreSQL write) + ~1ms (Redis update)
+- GetParty: ~1ms (Redis)
+- 2-3 PostgreSQL writes per action, rest from Redis
+- **Total**: ~30-50ms per action
+
+**Cache Hit Rate Target**: 80-90% for active sessions
+
+### Monitoring & Metrics
+
+```go
+// Track cache performance
+type CacheMetrics struct {
+    Hits        int64
+    Misses      int64
+    Invalidations int64
+    Evictions   int64
+}
+
+func (s *AdventureStore) recordCacheHit(hit bool) {
+    if hit {
+        metrics.IncrementCounter("redis.cache.hits")
+    } else {
+        metrics.IncrementCounter("redis.cache.misses")
+    }
+}
+
+// Log slow queries
+func (s *AdventureStore) GetSession(sessionID int64) (*Session, error) {
+    start := time.Now()
+    defer func() {
+        duration := time.Since(start)
+        if duration > 50*time.Millisecond {
+            log.Warn("Slow session load", "session_id", sessionID, "duration", duration)
+        }
+    }()
+
+    // ... implementation
+}
 ```
 
 ---
