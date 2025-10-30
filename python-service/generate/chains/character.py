@@ -1,5 +1,5 @@
-import re
-from typing import Union
+import json
+from typing import Any
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -110,8 +110,33 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "appearance": appearance,
             }
         )
-        skills = clean_ai_text(skills_raw)
-        logger.info(f"Generated skills for {name}")
+        skills_text = clean_ai_text(skills_raw)
+
+        # Parse simple format: "Lockpicking:85, Combat:70, Survival:60"
+        skills_array = []
+        try:
+            for skill_item in skills_text.split(","):
+                skill_item = skill_item.strip()
+                if ":" in skill_item:
+                    parts = skill_item.split(":")
+                    skill_name = parts[0].strip()
+                    skill_level = int(parts[1].strip())
+                    # Clamp level to 1-100
+                    skill_level = max(1, min(100, skill_level))
+                    skills_array.append({"name": skill_name, "level": skill_level})
+
+            if len(skills_array) == 0:
+                raise ValueError("No skills parsed")
+
+            logger.info(f"Parsed {len(skills_array)} skills from simple format")
+        except (ValueError, IndexError) as e:
+            logger.warning(f"Failed to parse skills: {e}. Using fallback.")
+            # Fallback defaults
+            skills_array = [
+                {"name": "Basic Training", "level": 50},
+                {"name": "Survival", "level": 50},
+                {"name": "Combat", "level": 50},
+            ]
 
         # Generate Flaw
         with open("generate/prompts/character/character_flaw.txt", "r") as f:
@@ -145,85 +170,44 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "personality": personality,
                 "appearance": appearance,
                 "description": backstory,
-                "skills": skills,
+                "skills": json.dumps(skills_array),
             }
         )
-        stats = clean_ai_text(stats_raw)
-        logger.info(f"Generated stats for {name}")
+        stats_text = clean_ai_text(stats_raw)
 
-        # Parse Stats
-        health = 100
-        stress = 0
-        lore_mastery = 10
-        empathy = 10
-        resilience = 10
-        creativity = 10
-        influence = 10
-        perception = 10
+        # Parse JSON - extract if LLM added extra text
+        try:
+            # Try to find JSON object in the text
+            json_start = stats_text.find('{')
+            json_end = stats_text.rfind('}') + 1
 
-        health_match = re.search(r"health[:\s]*(\d+)", stats, re.IGNORECASE)
-        if health_match:
-            try:
-                health = int(health_match.group(1))
-                health = max(50, min(150, health))
-            except Exception as e:
-                logger.warning(f"Failed to parse health: {e}")
+            if json_start != -1 and json_end > json_start:
+                json_str = stats_text[json_start:json_end]
+                stats_json = json.loads(json_str)
+            else:
+                stats_json = json.loads(stats_text)
 
-        stress_match = re.search(r"stress[:\s]*(\d+)", stats, re.IGNORECASE)
-        if stress_match:
-            try:
-                stress = int(stress_match.group(1))
-                stress = max(0, min(50, stress))
-            except Exception as e:
-                logger.warning(f"Failed to parse stress: {e}")
+            health = max(50, min(150, stats_json.get("health", 100)))
+            stress = max(0, min(50, stats_json.get("stress", 0)))
+            lore_mastery = max(8, min(18, stats_json.get("lore_mastery", 10)))
+            empathy = max(8, min(18, stats_json.get("empathy", 10)))
+            resilience = max(8, min(18, stats_json.get("resilience", 10)))
+            creativity = max(8, min(18, stats_json.get("creativity", 10)))
+            influence = max(8, min(18, stats_json.get("influence", 10)))
+            perception = max(8, min(18, stats_json.get("perception", 10)))
 
-        lore_mastery_match = re.search(r"lore_mastery[:\s]*(\d+)", stats, re.IGNORECASE)
-        if lore_mastery_match:
-            try:
-                lore_mastery = int(lore_mastery_match.group(1))
-                lore_mastery = max(8, min(18, lore_mastery))
-            except Exception as e:
-                logger.warning(f"Failed to parse lore_mastery: {e}")
-
-        empathy_match = re.search(r"empathy[:\s]*(\d+)", stats, re.IGNORECASE)
-        if empathy_match:
-            try:
-                empathy = int(empathy_match.group(1))
-                empathy = max(8, min(18, empathy))
-            except Exception as e:
-                logger.warning(f"Failed to parse empathy: {e}")
-
-        resilience_match = re.search(r"resilience[:\s]*(\d+)", stats, re.IGNORECASE)
-        if resilience_match:
-            try:
-                resilience = int(resilience_match.group(1))
-                resilience = max(8, min(18, resilience))
-            except Exception as e:
-                logger.warning(f"Failed to parse resilience: {e}")
-
-        creativity_match = re.search(r"creativity[:\s]*(\d+)", stats, re.IGNORECASE)
-        if creativity_match:
-            try:
-                creativity = int(creativity_match.group(1))
-                creativity = max(8, min(18, creativity))
-            except Exception as e:
-                logger.warning(f"Failed to parse creativity: {e}")
-
-        influence_match = re.search(r"influence[:\s]*(\d+)", stats, re.IGNORECASE)
-        if influence_match:
-            try:
-                influence = int(influence_match.group(1))
-                influence = max(8, min(18, influence))
-            except Exception as e:
-                logger.warning(f"Failed to parse influence: {e}")
-
-        perception_match = re.search(r"perception[:\s]*(\d+)", stats, re.IGNORECASE)
-        if perception_match:
-            try:
-                perception = int(perception_match.group(1))
-                perception = max(8, min(18, perception))
-            except Exception as e:
-                logger.warning(f"Failed to parse perception: {e}")
+            logger.info(f"Parsed stats from JSON: health={health}, stress={stress}")
+        except (json.JSONDecodeError, ValueError, TypeError) as e:
+            logger.warning(f"Failed to parse stats JSON: {e}. Using defaults.")
+            # Fallback defaults
+            health = 100
+            stress = 0
+            lore_mastery = 10
+            empathy = 10
+            resilience = 10
+            creativity = 10
+            influence = 10
+            perception = 10
 
         # Increment Success Counter
         # All 6 steps completed successfully, track metrics
@@ -239,7 +223,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             f"Failed to generate character for theme {theme}: {str(e)}"
         )
 
-    details: dict[str, Union[str, str]] = {
+    details: dict[str, Any] = {
         "personality": personality,
         "appearance": appearance,
         "flaw": flaw,
@@ -251,7 +235,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "creativity": str(creativity),
         "influence": str(influence),
         "perception": str(perception),
-        "skills": skills,
+        "skills": skills_array,
     }
 
     return LorePiece(

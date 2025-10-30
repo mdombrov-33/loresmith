@@ -1,1 +1,16 @@
-Based on this character's description: {description}, appearance: {appearance}, personality: {personality}, and skills: {skills}, assign initial health (50-150), stress (0-50), and custom ability scores (lore_mastery, empathy, resilience, creativity, influence, perception, each 8-18) as realistic starting values for a {theme} character. Values should be integers: 8-12 below average, 13-15 average, 16-18 above average. Output in format: health:X, stress:Y, lore_mastery:Z, empathy:A, resilience:B, creativity:C, influence:D, perception:E
+Based on this character's description: {description}, appearance: {appearance}, personality: {personality}, and skills: {skills}, assign initial stats for a {theme} character.
+
+Health: 50-150
+Stress: 0-50
+Ability scores (each 8-18):
+- lore_mastery: knowledge of world lore/history
+- empathy: understanding others
+- resilience: physical/mental toughness
+- creativity: problem-solving
+- influence: persuasion/leadership
+- perception: noticing details
+
+Values guide: 8-12 below average, 13-15 average, 16-18 above average
+
+Output ONLY valid JSON (no other text):
+{{"health": 100, "stress": 0, "lore_mastery": 12, "empathy": 14, "resilience": 10, "creativity": 13, "influence": 11, "perception": 15}}
