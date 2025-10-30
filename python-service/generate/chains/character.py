@@ -178,8 +178,8 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Parse JSON - extract if LLM added extra text
         try:
             # Try to find JSON object in the text
-            json_start = stats_text.find('{')
-            json_end = stats_text.rfind('}') + 1
+            json_start = stats_text.find("{")
+            json_end = stats_text.rfind("}") + 1
 
             if json_start != -1 and json_end > json_start:
                 json_str = stats_text[json_start:json_end]
@@ -227,14 +227,14 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "personality": personality,
         "appearance": appearance,
         "flaw": flaw,
-        "health": str(health),
-        "stress": str(stress),
-        "lore_mastery": str(lore_mastery),
-        "empathy": str(empathy),
-        "resilience": str(resilience),
-        "creativity": str(creativity),
-        "influence": str(influence),
-        "perception": str(perception),
+        "health": health,
+        "stress": stress,
+        "lore_mastery": lore_mastery,
+        "empathy": empathy,
+        "resilience": resilience,
+        "creativity": creativity,
+        "influence": influence,
+        "perception": perception,
         "skills": skills_array,
     }
 
