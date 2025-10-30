@@ -15,6 +15,7 @@ type PartyMember struct {
 	Name                      string    `json:"name"`
 	Description               string    `json:"description"`
 	RelationshipToProtagonist *string   `json:"relationship_to_protagonist,omitempty"` //* NULL for protagonist
+	RelationshipLevel         *int      `json:"relationship_level,omitempty"`            //* NULL for protagonist, -100 to +100 for companions
 	MaxHP                     int       `json:"max_hp"`
 	CurrentHP                 int       `json:"current_hp"`
 	Stress                    int       `json:"stress"`
@@ -39,6 +40,7 @@ type PartyStore interface {
 	UpdatePartyMemberHP(memberID int, currentHP int) error
 	UpdatePartyMemberStress(memberID int, stress int) error
 	UpdatePartyMemberStats(memberID int, currentHP int, stress int) error
+	UpdatePartyMemberRelationship(memberID int, relationshipLevel int) error
 	DeletePartyMember(memberID int) error
 	GetProtagonist(sessionID int) (*PartyMember, error)
 }
@@ -54,10 +56,10 @@ func NewPostgresPartyStore(db *sql.DB) *PostgresPartyStore {
 func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error) {
 	query := `
 	INSERT INTO party_members(session_id, lore_character_id,
-		is_protagonist, name, description, relationship_to_protagonist,
+		is_protagonist, name, description, relationship_to_protagonist, relationship_level,
 		max_hp, current_hp, stress, lore_mastery, empathy, resilience, creativity,
 		influence, perception, skills, flaw, personality, appearance, position, created_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW())
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, NOW())
 	RETURNING id
 	`
 	var memberID int
@@ -69,6 +71,7 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 		member.Name,
 		member.Description,
 		member.RelationshipToProtagonist,
+		member.RelationshipLevel,
 		member.MaxHP,
 		member.CurrentHP,
 		member.Stress,
@@ -94,16 +97,17 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 
 func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, error) {
 	query := `
-    SELECT id, session_id, lore_character_id, is_protagonist, name, description, 
-           relationship_to_protagonist, max_hp, current_hp, stress, lore_mastery, 
-           empathy, resilience, creativity, influence, perception, skills, flaw, 
+    SELECT id, session_id, lore_character_id, is_protagonist, name, description,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
+           empathy, resilience, creativity, influence, perception, skills, flaw,
            personality, appearance, position, created_at
     FROM party_members WHERE id = $1
     `
 
 	var member PartyMember
-	var loreCharID sql.NullInt64    //* For nullable int
+	var loreCharID sql.NullInt64    //* For nullable int64
 	var relationship sql.NullString //* For nullable string
+	var relLevel sql.NullInt64      //* For nullable int (relationship_level)
 
 	err := s.db.QueryRow(query, memberID).Scan(
 		&member.ID,
@@ -113,6 +117,7 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 		&member.Name,
 		&member.Description,
 		&relationship,
+		&relLevel,
 		&member.MaxHP,
 		&member.CurrentHP,
 		&member.Stress,
@@ -133,6 +138,7 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 		return nil, err
 	}
 
+	//* Handle nullable fields
 	if loreCharID.Valid {
 		member.LoreCharacterID = &loreCharID.Int64
 	} else {
@@ -143,15 +149,21 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 	} else {
 		member.RelationshipToProtagonist = nil
 	}
+	if relLevel.Valid {
+		relLevelInt := int(relLevel.Int64)
+		member.RelationshipLevel = &relLevelInt
+	} else {
+		member.RelationshipLevel = nil
+	}
 
 	return &member, nil
 }
 
 func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember, error) {
 	query := `
-    SELECT id, session_id, lore_character_id, is_protagonist, name, description, 
-           relationship_to_protagonist, max_hp, current_hp, stress, lore_mastery, 
-           empathy, resilience, creativity, influence, perception, skills, flaw, 
+    SELECT id, session_id, lore_character_id, is_protagonist, name, description,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
+           empathy, resilience, creativity, influence, perception, skills, flaw,
            personality, appearance, position, created_at
     FROM party_members WHERE session_id = $1
     ORDER BY position ASC
@@ -167,6 +179,7 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 		var member PartyMember
 		var loreCharID sql.NullInt64    //* For nullable int64
 		var relationship sql.NullString //* For nullable string
+		var relLevel sql.NullInt64      //* For nullable int (relationship_level)
 
 		err := rows.Scan(
 			&member.ID,
@@ -176,6 +189,7 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 			&member.Name,
 			&member.Description,
 			&relationship,
+			&relLevel,
 			&member.MaxHP,
 			&member.CurrentHP,
 			&member.Stress,
@@ -206,6 +220,12 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 			member.RelationshipToProtagonist = &relationship.String
 		} else {
 			member.RelationshipToProtagonist = nil
+		}
+		if relLevel.Valid {
+			relLevelInt := int(relLevel.Int64)
+			member.RelationshipLevel = &relLevelInt
+		} else {
+			member.RelationshipLevel = nil
 		}
 
 		partyMembers = append(partyMembers, &member)
@@ -248,6 +268,16 @@ func (s *PostgresPartyStore) UpdatePartyMemberStats(memberID int, currentHP int,
 	return err
 }
 
+func (s *PostgresPartyStore) UpdatePartyMemberRelationship(memberID int, relationshipLevel int) error {
+	query := `
+	UPDATE party_members
+	SET relationship_level = $1
+	WHERE id = $2
+	`
+	_, err := s.db.Exec(query, relationshipLevel, memberID)
+	return err
+}
+
 func (s *PostgresPartyStore) DeletePartyMember(memberID int) error {
 	query := `
 	DELETE FROM party_members
@@ -257,10 +287,10 @@ func (s *PostgresPartyStore) DeletePartyMember(memberID int) error {
 	return err
 }
 
-func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error) { // Note: I changed the name to match the interface
+func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error) {
 	query := `
     SELECT id, session_id, lore_character_id, is_protagonist, name, description,
-           relationship_to_protagonist, max_hp, current_hp, stress, lore_mastery,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
            empathy, resilience, creativity, influence, perception, skills, flaw,
            personality, appearance, position, created_at
     FROM party_members
@@ -269,6 +299,7 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 	var protagonist PartyMember
 	var loreCharID sql.NullInt64    //* For nullable int64
 	var relationship sql.NullString //* For nullable string
+	var relLevel sql.NullInt64      //* For nullable int (relationship_level)
 
 	err := s.db.QueryRow(query, sessionID).Scan(
 		&protagonist.ID,
@@ -278,6 +309,7 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 		&protagonist.Name,
 		&protagonist.Description,
 		&relationship,
+		&relLevel,
 		&protagonist.MaxHP,
 		&protagonist.CurrentHP,
 		&protagonist.Stress,
@@ -308,6 +340,12 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 		protagonist.RelationshipToProtagonist = &relationship.String
 	} else {
 		protagonist.RelationshipToProtagonist = nil
+	}
+	if relLevel.Valid {
+		relLevelInt := int(relLevel.Int64)
+		protagonist.RelationshipLevel = &relLevelInt
+	} else {
+		protagonist.RelationshipLevel = nil
 	}
 
 	return &protagonist, nil
