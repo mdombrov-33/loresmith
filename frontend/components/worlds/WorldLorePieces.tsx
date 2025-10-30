@@ -151,6 +151,60 @@ function LorePieceCard({
                         ? { icon: AlertTriangle, color: "text-red-500" }
                         : getAttributeIcon(key);
 
+                      //* Special handling for skills array (parse JSON string if needed)
+                      if (key === "skills") {
+                        let skillsArray = value;
+                        if (typeof value === "string") {
+                          try {
+                            skillsArray = JSON.parse(value);
+                          } catch (e) {
+                            skillsArray = [];
+                            console.error("Failed to parse skills JSON:", e);
+                          }
+                        }
+                        if (Array.isArray(skillsArray)) {
+                          return (
+                            <div
+                              key={key}
+                              className="border-border/50 bg-muted/30 hover:border-primary/30 hover:bg-muted/50 flex flex-col gap-2 rounded-lg border p-4 transition-all"
+                            >
+                              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
+                                <AttributeIcon className={`h-3 w-3 ${color}`} />
+                                Skills
+                              </div>
+                              <div className="space-y-2">
+                                {skillsArray.map(
+                                  (
+                                    skill: { name: string; level: number },
+                                    index: number,
+                                  ) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <span className="text-foreground text-sm">
+                                        {skill.name}
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
+                                          <div
+                                            className="bg-primary h-full"
+                                            style={{ width: `${skill.level}%` }}
+                                          />
+                                        </div>
+                                        <span className="text-muted-foreground text-xs">
+                                          {skill.level}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ),
+                                )}
+                              </div>
+                            </div>
+                          );
+                        }
+                      }
+
                       return (
                         <div
                           key={key}

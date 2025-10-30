@@ -115,28 +115,26 @@ export default function CharacterCard({
             Skills
           </div>
           <div className="space-y-2">
-            {character.details.skills.split(", ").map((skill, index) => {
-              const match = skill.match(/^(.+?)\s*\((\d+)\)$/);
-              if (!match) return null;
-              const name = match[1].trim();
-              const level = parseInt(match[2]);
-              return (
+            {Array.isArray(character.details.skills) ? (
+              character.details.skills.map((skill: { name: string; level: number }, index: number) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-foreground text-sm">{name}</span>
+                  <span className="text-foreground text-sm">{skill.name}</span>
                   <div className="flex items-center gap-2">
                     <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
                       <div
                         className="bg-primary h-full"
-                        style={{ width: `${level}%` }}
+                        style={{ width: `${skill.level}%` }}
                       />
                     </div>
                     <span className="text-muted-foreground text-xs">
-                      {level}
+                      {skill.level}
                     </span>
                   </div>
                 </div>
-              );
-            })}
+              ))
+            ) : (
+              <div className="text-muted-foreground text-sm">No skills available</div>
+            )}
           </div>
         </div>
 
