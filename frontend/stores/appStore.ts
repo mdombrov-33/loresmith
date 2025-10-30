@@ -74,8 +74,8 @@ export const useAppStore = create<AppState>((set) => ({
   isHydrated: false,
 
   //* Actions
-  setTheme: (theme: string) => set({ theme }),
-  setAudioTheme: (audioTheme: string) => set({ audioTheme }),
+  setTheme: (theme: string) => set({ theme, audioTheme: theme }), //* Always sync audioTheme with theme
+  setAudioTheme: (audioTheme: string) => set({ audioTheme }), //* For manual override
   setUserChangedTheme: (changed: boolean) => set({ userChangedTheme: changed }),
 
   login: (token: string, user: User) => set({ token, user }),
@@ -119,6 +119,15 @@ if (typeof window !== "undefined") {
   if (data) {
     try {
       const partial = JSON.parse(data);
+
+      //* Safety check: Sync audioTheme with theme if they don't match
+      if (partial.theme && partial.audioTheme !== partial.theme) {
+        console.warn(
+          `[Store] Theme/Audio mismatch detected. Syncing audioTheme from "${partial.audioTheme}" to "${partial.theme}"`,
+        );
+        partial.audioTheme = partial.theme;
+      }
+
       useAppStore.setState({ ...partial, isHydrated: true });
     } catch (e) {
       console.error("Failed to load from localStorage", e);

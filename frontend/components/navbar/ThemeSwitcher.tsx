@@ -12,7 +12,6 @@ export function ThemeSwitcher() {
   const {
     theme: storeTheme,
     setTheme: setStoreTheme,
-    setAudioTheme,
     setUserChangedTheme,
   } = useAppStore();
   const [mounted, setMounted] = useState(false);
@@ -28,11 +27,9 @@ export function ThemeSwitcher() {
     if (storeTheme === newTheme) return;
 
     setStoreTheme(newTheme);
-    setAudioTheme(newTheme);
     setUserChangedTheme(true);
     setNextTheme(newTheme);
 
-    //* Update query param
     const params = new URLSearchParams(searchParams.toString());
     params.set("theme", newTheme);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
