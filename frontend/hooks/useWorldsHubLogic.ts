@@ -31,7 +31,7 @@ export function useWorldsHubLogic() {
   const pageSize = 6;
 
   useEffect(() => {
-    setAppStage("search");
+    setAppStage("hub");
   }, [setAppStage]);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ export interface User {
   email: string;
 }
 
-export type AppStage = "home" | "generating" | "story" | "adventure" | "search";
+export type AppStage = "home" | "generating" | "story" | "adventure" | "hub";
 
 interface AppState {
   //* Theme
