@@ -49,8 +49,8 @@ export function useWorldsLogic() {
     character: "Protagonist",
     faction: "Faction",
     setting: "Setting",
-    event: "Inciting Event",
-    relic: "Artifact",
+    event: "Event",
+    relic: "Relic",
   };
 
   const sortDetails = (details: Record<string, string>) => {
