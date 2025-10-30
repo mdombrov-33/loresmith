@@ -93,6 +93,8 @@ export function useGenerationLogic() {
   };
 
   const handleRegenerate = () => {
+    setGeneratedOptions([]); //* Clear cards immediately to prevent stacking
+    setSelectedIndex(null); //* Clear selection
     setRegenerateFlag(true);
     setHasRegenerated(true);
     refetch();
