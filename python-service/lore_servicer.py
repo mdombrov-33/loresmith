@@ -1,5 +1,6 @@
 import grpc  # type: ignore
 import asyncio
+import json
 import lore_pb2  # type: ignore
 import lore_pb2_grpc  # type: ignore
 from generate.chains.multi_variant import (
@@ -255,20 +256,40 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
 # * Helper Functions
 def convert_lore_piece(grpc_piece):
     """Convert gRPC LorePiece to Python model."""
+    # Deserialize JSON strings back to their original types (arrays, objects)
+    details_deserialized = {}
+    for key, value in dict(grpc_piece.details).items():
+        try:
+            # Try to parse as JSON (for arrays/objects like skills)
+            details_deserialized[key] = json.loads(value)
+        except (json.JSONDecodeError, ValueError):
+            # If not JSON, keep as string
+            details_deserialized[key] = value
+
     return LorePiece(
         name=grpc_piece.name,
         description=grpc_piece.description,
-        details=dict(grpc_piece.details),
+        details=details_deserialized,
         type=grpc_piece.type,
     )
 
 
 def convert_to_grpc_lore_piece(piece):
     """Convert Python LorePiece to gRPC message."""
+    # Convert details to dict[str, str] by serializing non-string values to JSON
+    details_serialized = {}
+    for key, value in piece.details.items():
+        if isinstance(value, (list, dict)):
+            # Serialize complex types (like skills array) to JSON string
+            details_serialized[key] = json.dumps(value)
+        else:
+            # Keep strings as-is
+            details_serialized[key] = str(value)
+
     return lore_pb2.LorePiece(  # type: ignore
         name=piece.name,
         description=piece.description,
-        details=piece.details,
+        details=details_serialized,
         type=piece.type,
     )
 
