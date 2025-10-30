@@ -65,7 +65,9 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
+
 	grpcReq := &lorepb.CharactersRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
@@ -115,7 +117,8 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
 	grpcReq := &lorepb.FactionsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
@@ -165,7 +168,8 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
 	grpcReq := &lorepb.SettingsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
@@ -215,7 +219,8 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
 	grpcReq := &lorepb.EventsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
@@ -265,7 +270,8 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
 	grpcReq := &lorepb.RelicsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
@@ -315,7 +321,8 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		req.Regenerate = true
 	}
 
-	ctx := r.Context()
+	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
+	defer cancel()
 	grpcReq := &lorepb.AllRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,

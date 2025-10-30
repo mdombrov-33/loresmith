@@ -11,7 +11,7 @@ import {
 } from "@/types/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-const REQUEST_TIMEOUT = 60000; //* 60 seconds
+const REQUEST_TIMEOUT = 180000; //* 180 seconds (3 minutes) - LLM generation can be slow
 
 async function getAuthHeaders() {
   const session = await getSession();

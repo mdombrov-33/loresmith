@@ -107,7 +107,11 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		},
 		Theme: req.Theme,
 	}
-	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
+
+	storyCtx, storyCancel := utils.NewGRPCContext(utils.OpGenerateFullStory)
+	defer storyCancel()
+
+	grpcResp, err := h.loreClient.GenerateFullStory(storyCtx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate full story"})
@@ -117,7 +121,11 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	embeddingReq := &lorepb.EmbeddingRequest{
 		Text: grpcResp.Story.Content,
 	}
-	embeddingResp, err := h.loreClient.GenerateEmbedding(r.Context(), embeddingReq)
+
+	embeddingCtx, embeddingCancel := utils.NewGRPCContext(utils.OpGenerateEmbedding)
+	defer embeddingCancel()
+
+	embeddingResp, err := h.loreClient.GenerateEmbedding(embeddingCtx, embeddingReq)
 	if err != nil {
 		h.logger.Printf("WARN: Failed to generate embedding, continuing without: %v", err)
 		embeddingResp = nil
@@ -229,7 +237,11 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 	embeddingReq := &lorepb.EmbeddingRequest{
 		Text: searchQuery,
 	}
-	embeddingResp, err := h.loreClient.GenerateEmbedding(r.Context(), embeddingReq)
+
+	searchEmbeddingCtx, searchEmbeddingCancel := utils.NewGRPCContext(utils.OpGenerateEmbedding)
+	defer searchEmbeddingCancel()
+
+	embeddingResp, err := h.loreClient.GenerateEmbedding(searchEmbeddingCtx, embeddingReq)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to generate search embedding: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate search embedding"})
@@ -263,7 +275,10 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 				QueryEmbedding: embeddingResp.Embedding,
 			}
 
-			rerankResp, err := h.loreClient.RerankResults(r.Context(), rerankReq)
+			rerankCtx, rerankCancel := utils.NewGRPCContext(utils.OpRerank)
+			defer rerankCancel()
+
+			rerankResp, err := h.loreClient.RerankResults(rerankCtx, rerankReq)
 			if err != nil {
 				h.logger.Printf("WARNING: reranking failed, using original results: %v", err)
 			} else {
