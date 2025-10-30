@@ -241,8 +241,21 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	if userID != nil {
 		argCount++
 		countArgCount++
-		query += ` AND w.user_id = $` + strconv.Itoa(argCount)
-		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
+		//* Include both worlds owned by user AND worlds where user has active sessions
+		query += ` AND (w.user_id = $` + strconv.Itoa(argCount) +
+			` OR w.id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+			strconv.Itoa(argCount) + ` AND status IN ('initializing', 'active')))`
+
+		//* countQuery needs table prefix only when includeUserName is true (has JOIN)
+		if includeUserName {
+			countQuery += ` AND (w.user_id = $` + strconv.Itoa(countArgCount) +
+				` OR w.id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+				strconv.Itoa(countArgCount) + ` AND status IN ('initializing', 'active')))`
+		} else {
+			countQuery += ` AND (user_id = $` + strconv.Itoa(countArgCount) +
+				` OR id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+				strconv.Itoa(countArgCount) + ` AND status IN ('initializing', 'active')))`
+		}
 		args = append(args, *userID)
 		countArgs = append(countArgs, *userID)
 	}
@@ -359,8 +372,21 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 	if userID != nil {
 		argCount++
 		countArgCount++
-		query += ` AND w.user_id = $` + strconv.Itoa(argCount)
-		countQuery += ` AND user_id = $` + strconv.Itoa(countArgCount)
+		//* Include both worlds owned by user AND worlds where user has active sessions
+		query += ` AND (w.user_id = $` + strconv.Itoa(argCount) +
+			` OR w.id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+			strconv.Itoa(argCount) + ` AND status IN ('initializing', 'active')))`
+
+		//* countQuery needs table prefix only when includeUserName is true (has JOIN)
+		if includeUserName {
+			countQuery += ` AND (w.user_id = $` + strconv.Itoa(countArgCount) +
+				` OR w.id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+				strconv.Itoa(countArgCount) + ` AND status IN ('initializing', 'active')))`
+		} else {
+			countQuery += ` AND (user_id = $` + strconv.Itoa(countArgCount) +
+				` OR id IN (SELECT DISTINCT world_id FROM adventure_sessions WHERE user_id = $` +
+				strconv.Itoa(countArgCount) + ` AND status IN ('initializing', 'active')))`
+		}
 		args = append(args, *userID)
 		countArgs = append(countArgs, *userID)
 	}
