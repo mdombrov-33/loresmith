@@ -106,25 +106,32 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 
 	protagonist := &store.PartyMember{
 		SessionID:                 sessionID,
-		LoreCharacterID:           int64Ptr(int64(protagonistLore.ID)),
+		LoreCharacterID:           utils.Int64Ptr(int64(protagonistLore.ID)),
 		IsProtagonist:             true,
 		Name:                      protagonistLore.Name,
 		Description:               protagonistLore.Description,
 		RelationshipToProtagonist: nil, //* NULL for protagonist
-		MaxHP:                     parseIntFromDetails(protagonistLore.Details, "health", 100),
-		CurrentHP:                 parseIntFromDetails(protagonistLore.Details, "health", 100),
-		Stress:                    parseIntFromDetails(protagonistLore.Details, "stress", 0),
-		LoreMastery:               parseIntFromDetails(protagonistLore.Details, "lore_mastery", 10),
-		Empathy:                   parseIntFromDetails(protagonistLore.Details, "empathy", 10),
-		Resilience:                parseIntFromDetails(protagonistLore.Details, "resilience", 10),
-		Creativity:                parseIntFromDetails(protagonistLore.Details, "creativity", 10),
-		Influence:                 parseIntFromDetails(protagonistLore.Details, "influence", 10),
-		Perception:                parseIntFromDetails(protagonistLore.Details, "perception", 10),
-		Skills:                    protagonistLore.Details["skills"],
-		Flaw:                      protagonistLore.Details["flaw"],
-		Personality:               protagonistLore.Details["personality"],
-		Appearance:                protagonistLore.Details["appearance"],
-		Position:                  0, //* Protagonist is always position 0
+		MaxHP:                     utils.ParseIntFromDetails(protagonistLore.Details, "max_health", 100),
+		CurrentHP:                 utils.ParseIntFromDetails(protagonistLore.Details, "health", 100),
+		Stress:                    utils.ParseIntFromDetails(protagonistLore.Details, "stress", 0),
+		LoreMastery:               utils.ParseIntFromDetails(protagonistLore.Details, "lore_mastery", 10),
+		Empathy:                   utils.ParseIntFromDetails(protagonistLore.Details, "empathy", 10),
+		Resilience:                utils.ParseIntFromDetails(protagonistLore.Details, "resilience", 10),
+		Creativity:                utils.ParseIntFromDetails(protagonistLore.Details, "creativity", 10),
+		Influence:                 utils.ParseIntFromDetails(protagonistLore.Details, "influence", 10),
+		Perception:                utils.ParseIntFromDetails(protagonistLore.Details, "perception", 10),
+		Skills: func() string {
+			if val, ok := protagonistLore.Details["skills"]; ok {
+				if jsonBytes, err := json.Marshal(val); err == nil {
+					return string(jsonBytes)
+				}
+			}
+			return "[]"
+		}(),
+		Flaw:        utils.GetStringFromDetails(protagonistLore.Details, "flaw"),
+		Personality: utils.GetStringFromDetails(protagonistLore.Details, "personality"),
+		Appearance:  utils.GetStringFromDetails(protagonistLore.Details, "appearance"),
+		Position:    0, //* Protagonist is always position 0
 	}
 
 	protagonistID, err := h.partyStore.CreatePartyMember(protagonist)
@@ -364,19 +371,4 @@ func (h *AdventureHandler) HandleDeleteSession(w http.ResponseWriter, r *http.Re
 	}
 
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true})
-}
-
-// * int64Ptr returns a pointer to an int64
-func int64Ptr(i int64) *int64 {
-	return &i
-}
-
-// * parseIntFromDetails parses an int from the lore details map with a default fallback
-func parseIntFromDetails(details map[string]string, key string, defaultVal int) int {
-	if val, ok := details[key]; ok {
-		if parsed, err := strconv.Atoi(val); err == nil {
-			return parsed
-		}
-	}
-	return defaultVal
 }

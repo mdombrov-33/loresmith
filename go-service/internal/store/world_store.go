@@ -30,13 +30,13 @@ type World struct {
 }
 
 type LorePiece struct {
-	ID          int               `json:"id"`
-	WorldID     int               `json:"world_id"`
-	Type        string            `json:"type"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Details     map[string]string `json:"details"`
-	CreatedAt   time.Time         `json:"created_at"`
+	ID          int                    `json:"id"`
+	WorldID     int                    `json:"world_id"`
+	Type        string                 `json:"type"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Details     map[string]interface{} `json:"details"`
+	CreatedAt   time.Time              `json:"created_at"`
 }
 
 type WorldStore interface {
@@ -132,12 +132,12 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 			for key, value := range piece.piece.Details {
 				var parsed interface{}
 				if err := json.Unmarshal([]byte(value), &parsed); err == nil {
-					// Successfully parsed as JSON - use the parsed value
-					// This converts "10" -> 10, "[...]" -> array, etc.
+					//* Successfully parsed as JSON - use the parsed value
+					//* This converts "10" -> 10, "[...]" -> array, etc.
 					detailsMap[key] = parsed
 				} else {
-					// Not valid JSON - keep as plain string
-					// This handles values like "Compulsive repairer" that aren't JSON
+					//* Not valid JSON - keep as plain string
+					//* This handles values like "Compulsive repairer" that aren't JSON
 					detailsMap[key] = value
 				}
 			}
