@@ -35,7 +35,7 @@ export default function CharacterCard({
   // Front side: Basic info
   const frontContent = (
     <div
-      className={`bg-card flex h-full flex-col rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-border"}`}
+      className={`bg-card flex h-full flex-col rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"}`}
     >
       {/* Title + Type Badge */}
       <div className="mb-3 flex items-center justify-between">
@@ -65,7 +65,7 @@ export default function CharacterCard({
   //* Back side: Detailed info
   const backContent = (
     <div
-      className={`bg-card h-full overflow-y-auto rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-border"}`}
+      className={`bg-card h-full overflow-y-auto rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"}`}
     >
       {/* Title */}
       <div className="mb-3">
@@ -116,24 +116,33 @@ export default function CharacterCard({
           </div>
           <div className="space-y-2">
             {Array.isArray(character.details.skills) ? (
-              character.details.skills.map((skill: { name: string; level: number }, index: number) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-foreground text-sm">{skill.name}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
-                      <div
-                        className="bg-primary h-full"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                    <span className="text-muted-foreground text-xs">
-                      {skill.level}
+              character.details.skills.map(
+                (skill: { name: string; level: number }, index: number) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-foreground text-sm">
+                      {skill.name}
                     </span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
+                        <div
+                          className="bg-primary h-full"
+                          style={{ width: `${skill.level}%` }}
+                        />
+                      </div>
+                      <span className="text-muted-foreground text-xs">
+                        {skill.level}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ),
+              )
             ) : (
-              <div className="text-muted-foreground text-sm">No skills available</div>
+              <div className="text-muted-foreground text-sm">
+                No skills available
+              </div>
             )}
           </div>
         </div>

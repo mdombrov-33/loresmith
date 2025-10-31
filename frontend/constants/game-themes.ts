@@ -12,8 +12,18 @@ export const THEMES = {
 export type GameTheme = (typeof THEMES)[keyof typeof THEMES];
 
 export const THEME_OPTIONS = [
-  { value: THEMES.FANTASY, label: "Fantasy", icon: Flame, font: "font-heading" },
-  { value: THEMES.NORSE, label: "Norse Mythology", icon: Axe, font: "font-heading" },
+  {
+    value: THEMES.FANTASY,
+    label: "Fantasy",
+    icon: Flame,
+    font: "font-heading",
+  },
+  {
+    value: THEMES.NORSE,
+    label: "Norse Mythology",
+    icon: Axe,
+    font: "font-fjalla-one",
+  },
   { value: THEMES.CYBERPUNK, label: "Cyberpunk", icon: Cpu, font: "font-mono" },
   {
     value: THEMES.POST_APOCALYPTIC,
@@ -25,6 +35,6 @@ export const THEME_OPTIONS = [
 ] as const;
 
 export function getThemeFont(theme: string): string {
-  const themeOption = THEME_OPTIONS.find(t => t.value === theme);
+  const themeOption = THEME_OPTIONS.find((t) => t.value === theme);
   return themeOption?.font || "font-sans";
 }
