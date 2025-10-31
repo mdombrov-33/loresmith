@@ -32,7 +32,16 @@ export default function CharacterCard({
   isSelected,
   onSelect,
 }: CharacterCardProps) {
-  // Front side: Basic info
+  const sortedSkills = Array.isArray(character.details.skills)
+    ? character.details.skills.sort((a, b) => {
+        if (b.level !== a.level) {
+          return b.level - a.level;
+        }
+        return a.name.localeCompare(b.name);
+      })
+    : [];
+
+  //* Front side: Basic info
   const frontContent = (
     <div
       className={`bg-card flex h-full flex-col rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"}`}
@@ -115,8 +124,8 @@ export default function CharacterCard({
             Skills
           </div>
           <div className="space-y-2">
-            {Array.isArray(character.details.skills) ? (
-              character.details.skills.map(
+            {sortedSkills.length > 0 ? (
+              sortedSkills.map(
                 (skill: { name: string; level: number }, index: number) => (
                   <div
                     key={index}
