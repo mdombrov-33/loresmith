@@ -38,13 +38,13 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 
 		if authHeader == "" {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "missing authorization header"})
+			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "missing authorization header"})
 			return
 		}
 
 		headerParts := strings.Split(authHeader, " ")
 		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid authentication header"})
+			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid authentication header"})
 			return
 		}
 
@@ -52,14 +52,14 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 		claims := &jwt.MapClaims{}
 		parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) { return []byte(os.Getenv("JWT_SECRET")), nil })
 		if err != nil || !parsedToken.Valid {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid or expired token"})
+			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid or expired token"})
 			return
 		}
 
 		userID := int64((*claims)["user_id"].(float64))
 		user, err := um.UserStore.GetUserByID(userID)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid or expired token"})
+			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid or expired token"})
 			return
 		}
 
@@ -72,7 +72,7 @@ func (um *UserMiddleware) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := GetUser(r)
 		if user == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "unauthorized"})
+			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "unauthorized"})
 			return
 		}
 		next.ServeHTTP(w, r)

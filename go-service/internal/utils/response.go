@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-type Envelope map[string]any
+type ResponseEnvelope map[string]any
 
-func WriteJSON(w http.ResponseWriter, status int, data Envelope) error {
+func WriteResponseJSON(w http.ResponseWriter, status int, data ResponseEnvelope) error {
 	js, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		return err

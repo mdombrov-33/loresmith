@@ -74,14 +74,14 @@ func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		h.logger.Printf("ERROR: decoding register request: %v", err)
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request payload"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request payload"})
 		return
 	}
 
 	err = h.validateRegisterRequest(&req)
 
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": err.Error()})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": err.Error()})
 		return
 	}
 
@@ -93,18 +93,18 @@ func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	err = user.PasswordHash.Set(req.Password)
 	if err != nil {
 		h.logger.Printf("ERROR: hashing password: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
 	err = h.userStore.CreateUser(user)
 	if err != nil {
 		h.logger.Printf("ERROR: creating user: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"user": user})
+	utils.WriteResponseJSON(w, http.StatusCreated, utils.ResponseEnvelope{"user": user})
 
 }
 
@@ -115,31 +115,31 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		h.logger.Printf("ERROR: decoding login request: %v", err)
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request payload"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request payload"})
 		return
 	}
 
 	user, err := h.userStore.GetUserByUsername(req.Username)
 	if err != nil {
 		h.logger.Printf("ERROR: fetching user by username: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
 	if user == nil {
-		utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid credentials"})
+		utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid credentials"})
 		return
 	}
 
 	match, err := user.PasswordHash.Matches(req.Password)
 	if err != nil {
 		h.logger.Printf("ERROR: comparing password hash: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
 	if !match {
-		utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid credentials"})
+		utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid credentials"})
 		return
 	}
 
@@ -152,11 +152,11 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		h.logger.Printf("ERROR: signing token: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"token": tokenString,
 		"user": map[string]interface{}{
 			"id":       user.ID,
@@ -173,19 +173,19 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		h.logger.Printf("ERROR: decoding google auth request: %v", err)
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request payload"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request payload"})
 		return
 	}
 
 	if req.Email == "" || req.ProviderID == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "email and provider_id are required"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "email and provider_id are required"})
 		return
 	}
 
 	user, err := h.userStore.GetUserByEmailAndProvider(req.Email, "google")
 	if err != nil {
 		h.logger.Printf("ERROR: fetching user by email and provider: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
@@ -199,7 +199,7 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		err = h.userStore.CreateUser(user)
 		if err != nil {
 			h.logger.Printf("ERROR: creating google user: %v", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 			return
 		}
 	}
@@ -213,11 +213,11 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		h.logger.Printf("ERROR: signing token: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"token": tokenString,
 		"user": map[string]interface{}{
 			"id":       user.ID,

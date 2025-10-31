@@ -32,7 +32,7 @@ func NewWorldHandler(loreClient lorepb.LoreServiceClient, worldStore store.World
 
 func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -49,7 +49,7 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		Theme string `json:"theme"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	grpcResp, err := h.loreClient.GenerateFullStory(storyCtx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate full story"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate full story"})
 		return
 	}
 
@@ -140,43 +140,43 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 	worldID, err := h.worldStore.CreateWorldWithEmbedding(int(currentUser.ID), req.Theme, grpcResp.Story, "draft", embedding)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to save draft world: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to save draft"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to save draft"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"world_id": worldID})
+	utils.WriteResponseJSON(w, http.StatusCreated, utils.ResponseEnvelope{"world_id": worldID})
 }
 
 func (h *WorldHandler) HandleGetWorldById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	worldIDStr := chi.URLParam(r, "id")
 	worldID, err := strconv.Atoi(worldIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
 		return
 	}
 
 	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get world: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get world"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get world"})
 		return
 	}
 	if world == nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "world not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "world not found"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"world": world})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"world": world})
 }
 
 func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -184,7 +184,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 	searchQuery := query.Get("q")
 
 	if searchQuery == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "search query 'q' is required"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "search query 'q' is required"})
 		return
 	}
 
@@ -210,7 +210,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 	case "global":
 		//* userID remains nil for global
 	default:
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid scope"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid scope"})
 		return
 	}
 
@@ -244,13 +244,13 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 	embeddingResp, err := h.loreClient.GenerateEmbedding(searchEmbeddingCtx, embeddingReq)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to generate search embedding: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate search embedding"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate search embedding"})
 		return
 	}
 
 	if len(embeddingResp.Embedding) == 0 {
 		h.logger.Printf("ERROR: received empty embedding")
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "invalid embedding generated"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "invalid embedding generated"})
 		return
 	}
 
@@ -263,7 +263,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 		allWorlds, _, err := h.worldStore.SearchWorldsByEmbedding(embeddingResp.Embedding, userID, theme, status, includeUserName, currentUserID, 100, 0)
 		if err != nil {
 			h.logger.Printf("ERROR: failed to search all worlds: %v", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to search worlds"})
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to search worlds"})
 			return
 		}
 
@@ -293,7 +293,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 		initialWorlds, totalCount, err := h.worldStore.SearchWorldsByEmbedding(embeddingResp.Embedding, userID, theme, status, includeUserName, currentUserID, limit, offset)
 		if err != nil {
 			h.logger.Printf("ERROR: failed to search worlds: %v", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to search worlds"})
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to search worlds"})
 			return
 		}
 
@@ -347,7 +347,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 	//* Once all are done, the program continues to the next line
 	wg.Wait()
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"worlds": finalWorlds,
 		"total":  total,
 		"query":  searchQuery,
@@ -356,7 +356,7 @@ func (h *WorldHandler) HandleSearchWorlds(w http.ResponseWriter, r *http.Request
 
 func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -383,7 +383,7 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 	case "global":
 		//* userID remains nil for global
 	default:
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid scope"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid scope"})
 		return
 	}
 
@@ -410,7 +410,7 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 	worlds, total, err := h.worldStore.GetWorldsByFilters(userID, theme, status, includeUserName, currentUserID, limit, offset)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get worlds: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get worlds"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get worlds"})
 		return
 	}
 
@@ -440,7 +440,7 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 
 	wg.Wait()
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"worlds": worlds,
 		"total":  total,
 	})
@@ -448,37 +448,37 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 
 func (h *WorldHandler) HandleDeleteWorldById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	worldIDStr := chi.URLParam(r, "id")
 	worldID, err := strconv.Atoi(worldIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
 		return
 	}
 
 	err = h.worldStore.DeleteWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to delete world: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to delete world"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to delete world"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"message": "world deleted successfully"})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"message": "world deleted successfully"})
 }
 
 func (h *WorldHandler) HandleUpdateWorldVisibility(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPatch {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	worldIDStr := chi.URLParam(r, "id")
 	worldID, err := strconv.Atoi(worldIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
 		return
 	}
 
@@ -486,33 +486,33 @@ func (h *WorldHandler) HandleUpdateWorldVisibility(w http.ResponseWriter, r *htt
 		Visibility string `json:"visibility"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
 		return
 	}
 
 	if req.Visibility != "private" && req.Visibility != "published" {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "visibility must be 'private' or 'published'"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "visibility must be 'private' or 'published'"})
 		return
 	}
 
 	currentUser := middleware.GetUser(r)
 	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "world not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "world not found"})
 		return
 	}
 
 	if world.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized to update this world"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized to update this world"})
 		return
 	}
 
 	err = h.worldStore.UpdateWorldVisibility(worldID, req.Visibility)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to update world visibility: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to update visibility"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to update visibility"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"success": true, "visibility": req.Visibility})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true, "visibility": req.Visibility})
 }

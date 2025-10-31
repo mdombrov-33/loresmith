@@ -35,7 +35,7 @@ func NewAdventureHandler(
 
 func (h *AdventureHandler) HandleCheckActiveSession(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -44,24 +44,24 @@ func (h *AdventureHandler) HandleCheckActiveSession(w http.ResponseWriter, r *ht
 	worldIDStr := chi.URLParam(r, "id")
 	worldID, err := strconv.Atoi(worldIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
 		return
 	}
 
 	activeSession, err := h.adventureStore.GetActiveSessionForWorld(worldID, int(currentUser.ID))
 	if err != nil {
 		h.logger.Printf("ERROR: failed to check active session: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to check session"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to check session"})
 		return
 	}
 
 	if activeSession == nil {
-		utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+		utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 			"has_active_session": false,
 			"session":            nil,
 		})
 	} else {
-		utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+		utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 			"has_active_session": true,
 			"session":            activeSession,
 		})
@@ -70,7 +70,7 @@ func (h *AdventureHandler) HandleCheckActiveSession(w http.ResponseWriter, r *ht
 
 func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -79,28 +79,28 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 	worldIDStr := chi.URLParam(r, "id")
 	worldID, err := strconv.Atoi(worldIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid world ID"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
 		return
 	}
 
 	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get world: %v", err)
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "world not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "world not found"})
 		return
 	}
 
 	sessionID, err := h.adventureStore.CreateSession(worldID, int(currentUser.ID))
 	if err != nil {
 		h.logger.Printf("ERROR: failed to create session: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to create adventure session"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to create adventure session"})
 		return
 	}
 
 	protagonistLore, err := h.worldStore.GetProtagonistForWorld(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get protagonist: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "protagonist character not found"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "protagonist character not found"})
 		return
 	}
 
@@ -130,7 +130,7 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 	protagonistID, err := h.partyStore.CreatePartyMember(protagonist)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to create protagonist party member: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to create party"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to create party"})
 		return
 	}
 	protagonist.ID = protagonistID
@@ -142,7 +142,7 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusCreated, utils.ResponseEnvelope{
 		"session_id":  sessionID,
 		"protagonist": protagonist,
 	})
@@ -150,14 +150,14 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 
 func (h *AdventureHandler) HandleGetAdventureState(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	sessionIDStr := chi.URLParam(r, "session_id")
 	sessionID, err := strconv.Atoi(sessionIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid session_id"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid session_id"})
 		return
 	}
 
@@ -166,30 +166,30 @@ func (h *AdventureHandler) HandleGetAdventureState(w http.ResponseWriter, r *htt
 	session, err := h.adventureStore.GetSessionByID(sessionID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get session: %v", err)
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "session not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "session not found"})
 		return
 	}
 
 	if session.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized to access this session"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized to access this session"})
 		return
 	}
 
 	party, err := h.partyStore.GetPartyBySessionID(sessionID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get party: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get party"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get party"})
 		return
 	}
 
 	world, err := h.worldStore.GetWorldById(session.WorldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get world: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get world"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get world"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"session": session,
 		"party":   party,
 		"world":   world,
@@ -198,14 +198,14 @@ func (h *AdventureHandler) HandleGetAdventureState(w http.ResponseWriter, r *htt
 
 func (h *AdventureHandler) HandleUpdateSessionProgress(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	sessionIDStr := chi.URLParam(r, "session_id")
 	sessionID, err := strconv.Atoi(sessionIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid session_id"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid session_id"})
 		return
 	}
 
@@ -214,7 +214,7 @@ func (h *AdventureHandler) HandleUpdateSessionProgress(w http.ResponseWriter, r 
 		Act        int `json:"act"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
 		return
 	}
 
@@ -222,28 +222,28 @@ func (h *AdventureHandler) HandleUpdateSessionProgress(w http.ResponseWriter, r 
 
 	session, err := h.adventureStore.GetSessionByID(sessionID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "session not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "session not found"})
 		return
 	}
 
 	if session.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized"})
 		return
 	}
 
 	err = h.adventureStore.UpdateSessionProgress(sessionID, req.SceneIndex, req.Act)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to update session progress: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to update progress"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to update progress"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"success": true})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true})
 }
 
 func (h *AdventureHandler) HandleUpdatePartyStats(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
@@ -253,43 +253,43 @@ func (h *AdventureHandler) HandleUpdatePartyStats(w http.ResponseWriter, r *http
 		Stress        int `json:"stress"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
 		return
 	}
 
 	member, err := h.partyStore.GetPartyMemberByID(req.PartyMemberID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "party member not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "party member not found"})
 		return
 	}
 
 	currentUser := middleware.GetUser(r)
 	session, err := h.adventureStore.GetSessionByID(member.SessionID)
 	if err != nil || session.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized"})
 		return
 	}
 
 	err = h.partyStore.UpdatePartyMemberStats(req.PartyMemberID, req.CurrentHP, req.Stress)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to update party member stats: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to update stats"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to update stats"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"success": true})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true})
 }
 
 func (h *AdventureHandler) HandleGetParty(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	sessionIDStr := chi.URLParam(r, "session_id")
 	sessionID, err := strconv.Atoi(sessionIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid session_id"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid session_id"})
 		return
 	}
 
@@ -297,37 +297,37 @@ func (h *AdventureHandler) HandleGetParty(w http.ResponseWriter, r *http.Request
 
 	session, err := h.adventureStore.GetSessionByID(sessionID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "session not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "session not found"})
 		return
 	}
 
 	if session.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized"})
 		return
 	}
 
 	party, err := h.partyStore.GetPartyBySessionID(sessionID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get party: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to get party"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get party"})
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"party": party,
 	})
 }
 
 func (h *AdventureHandler) HandleDeleteSession(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	sessionIDStr := chi.URLParam(r, "session_id")
 	sessionID, err := strconv.Atoi(sessionIDStr)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid session_id"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid session_id"})
 		return
 	}
 
@@ -335,19 +335,19 @@ func (h *AdventureHandler) HandleDeleteSession(w http.ResponseWriter, r *http.Re
 
 	session, err := h.adventureStore.GetSessionByID(sessionID)
 	if err != nil {
-		utils.WriteJSON(w, http.StatusNotFound, utils.Envelope{"error": "session not found"})
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "session not found"})
 		return
 	}
 
 	if session.UserID != int(currentUser.ID) {
-		utils.WriteJSON(w, http.StatusForbidden, utils.Envelope{"error": "not authorized"})
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized"})
 		return
 	}
 
 	err = h.adventureStore.DeleteSession(sessionID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to delete session: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to delete session"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to delete session"})
 		return
 	}
 
@@ -363,7 +363,7 @@ func (h *AdventureHandler) HandleDeleteSession(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"success": true})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true})
 }
 
 // * int64Ptr returns a pointer to an int64

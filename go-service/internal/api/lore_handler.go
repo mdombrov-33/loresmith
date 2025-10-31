@@ -56,7 +56,7 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -77,7 +77,7 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 	grpcResp, err := h.loreClient.GenerateCharacters(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating characters failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate characters"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate characters"})
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"characters": characters})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"characters": characters})
 }
 
 func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +108,7 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -128,7 +128,7 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 	grpcResp, err := h.loreClient.GenerateFactions(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating factions failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate factions"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate factions"})
 		return
 	}
 
@@ -142,7 +142,7 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"factions": factions})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"factions": factions})
 }
 
 func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Request) {
@@ -159,7 +159,7 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -179,7 +179,7 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 	grpcResp, err := h.loreClient.GenerateSettings(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating settings failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate settings"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate settings"})
 		return
 	}
 
@@ -193,7 +193,7 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"settings": settings})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"settings": settings})
 }
 
 func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Request) {
@@ -210,7 +210,7 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -230,7 +230,7 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 	grpcResp, err := h.loreClient.GenerateEvents(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating events failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate events"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate events"})
 		return
 	}
 
@@ -244,7 +244,7 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"events": events})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"events": events})
 }
 
 func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Request) {
@@ -261,7 +261,7 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -281,7 +281,7 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 	grpcResp, err := h.loreClient.GenerateRelics(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating relics failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate relics"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate relics"})
 		return
 	}
 
@@ -295,7 +295,7 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"relics": relics})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"relics": relics})
 }
 
 func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) {
@@ -312,7 +312,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
 			req.Count = int32(parsed)
 		} else {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid count (1-10)"})
+			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
 			return
 		}
 	}
@@ -332,7 +332,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 	grpcResp, err := h.loreClient.GenerateAll(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating all lore variants failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate all lore variants"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate all lore variants"})
 		return
 	}
 
@@ -386,7 +386,7 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"characters": characters,
 		"factions":   factions,
 		"settings":   settings,
@@ -397,13 +397,13 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 
 func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Envelope{"error": "method not allowed"})
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
 		return
 	}
 
 	var selectedLorePieces lorepb.SelectedLorePieces
 	if err := json.NewDecoder(r.Body).Decode(&selectedLorePieces); err != nil {
-		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid JSON body"})
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
 		return
 	}
 
@@ -422,7 +422,7 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate full story"})
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate full story"})
 		return
 	}
 
@@ -440,5 +440,5 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 		"quest":   grpcResp.Story.Quest,
 	}
 
-	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"story": response})
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"story": response})
 }
