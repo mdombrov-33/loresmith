@@ -3,6 +3,7 @@
 ## TL;DR
 
 Instead of this:
+
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 defer cancel()
@@ -10,6 +11,7 @@ resp, err := client.GenerateCharacters(ctx, req)
 ```
 
 Do this:
+
 ```go
 ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 defer cancel()
@@ -21,6 +23,7 @@ resp, err := client.GenerateCharacters(ctx, req)
 ## Why?
 
 **Problem**: We had manual timeout code duplicated in every handler:
+
 - Hard to maintain (change timeout → change 10 files)
 - Easy to forget `defer cancel()` → memory leaks
 - Inconsistent timeouts across similar operations
@@ -34,6 +37,7 @@ resp, err := client.GenerateCharacters(ctx, req)
 Located in `internal/utils/grpc.go`:
 
 ### Slow Operations (3 minutes)
+
 ```go
 utils.OpGenerateLore        // Multiple lore pieces (characters, factions, etc.)
 utils.OpGenerateFullStory   // Full quest generation
@@ -41,6 +45,7 @@ utils.OpGenerateSceneBatch  // 3 scenes × 5 outcome branches = 15 LLM calls
 ```
 
 ### Medium Operations (1 minute)
+
 ```go
 utils.OpGenerateBeats       // Expand scene beats
 utils.OpGenerateCompanion   // Single character with fewer details
@@ -49,6 +54,7 @@ utils.OpRerank              // Rerank search results
 ```
 
 ### Quick Operations (30 seconds)
+
 ```go
 utils.OpGenerateConsequence // Single outcome generation
 utils.OpGenerateEmbedding   // Text embedding
@@ -73,7 +79,7 @@ func (h *AdventureHandler) HandleGenerateSceneBatch(w http.ResponseWriter, r *ht
     if err != nil {
         // Handle timeout or other errors
         h.logger.Printf("ERROR: Scene batch generation failed: %v", err)
-        utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "failed to generate scenes"})
+        utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate scenes"})
         return
     }
 
@@ -126,6 +132,7 @@ resp, err := client.SomeVerySlowOperation(ctx, req)
 ## Common Mistakes
 
 ### ❌ Mistake 1: Forgetting `defer cancel()`
+
 ```go
 // BAD - memory leak!
 ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -141,6 +148,7 @@ resp, err := client.GenerateCharacters(ctx, req)
 ```
 
 ### ❌ Mistake 2: Using `r.Context()`
+
 ```go
 // BAD - tied to HTTP request lifecycle
 ctx := r.Context()
@@ -157,6 +165,7 @@ resp, err := client.GenerateCharacters(ctx, req)
 ```
 
 ### ❌ Mistake 3: Wrong operation type
+
 ```go
 // BAD - scene batch takes 3 minutes, but OpGenerateConsequence is 30s
 ctx, cancel := utils.NewGRPCContext(utils.OpGenerateConsequence) // ❌ Too short!
