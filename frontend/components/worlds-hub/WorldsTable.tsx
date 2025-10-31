@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAppStore } from "@/stores/appStore";
 
 interface WorldsTableProps {
   worlds: World[];
@@ -47,6 +48,7 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
     type: "world" | "session";
     sessionId?: number;
   } | null>(null);
+  const user = useAppStore((state) => state.user);
 
   if (isLoading) {
     return (
@@ -174,7 +176,7 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                         {world.status.charAt(0).toUpperCase() +
                           world.status.slice(1)}
                       </Badge>
-                      {world.visibility && (
+                      {world.visibility && world.user_id === user?.id && (
                         <Badge
                           variant="outline"
                           className="hover:bg-accent cursor-pointer gap-1 text-xs transition-colors"
