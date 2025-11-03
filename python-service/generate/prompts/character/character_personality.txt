@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe {name}'s personality using exactly 3 distinctive traits (comma-separated). This character exists in a {theme} world and has the appearance: {appearance}.
 
 CRITICAL RULES:

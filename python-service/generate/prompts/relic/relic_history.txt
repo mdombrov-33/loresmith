@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Explain the history and significance of the relic {name} in a {theme} world. The relic looks like this: {description}
 
 CRITICAL RULES:

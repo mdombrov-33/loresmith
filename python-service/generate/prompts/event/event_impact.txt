@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Explain the lasting impact of {name} (described as: {description}) in EXACTLY 1 sentence (maximum 40 words) in a {theme} world.
 
 RULES:

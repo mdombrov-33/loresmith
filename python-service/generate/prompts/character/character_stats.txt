@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Based on this character's description: {description}, appearance: {appearance}, personality: {personality}, and skills: {skills}, assign initial stats for a {theme} character.
 
 Health: 50-150

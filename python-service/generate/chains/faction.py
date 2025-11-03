@@ -27,6 +27,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
     Theme controls the genre/world setting.
     """
     try:
+        # Load shared theme references
+        with open("generate/prompts/shared/theme_references.txt", "r") as f:
+            theme_references = f.read()
+
         # Generate Name
         with open("generate/prompts/faction/faction_name.txt", "r") as f:
             name_prompt_text = f.read()
@@ -35,7 +39,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
         name_raw = await name_chain.ainvoke(
-            {"theme": theme, "blacklist": blacklist_str}
+            {"theme": theme, "theme_references": theme_references, "blacklist": blacklist_str}
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated faction name: {name}")
@@ -47,7 +51,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         ideology_prompt = PromptTemplate.from_template(ideology_prompt_text)
         ideology_llm = get_llm(max_tokens=100)
         ideology_chain = ideology_prompt | ideology_llm | StrOutputParser()
-        ideology_raw = await ideology_chain.ainvoke({"theme": theme, "name": name})
+        ideology_raw = await ideology_chain.ainvoke({"theme": theme, "theme_references": theme_references, "name": name})
         ideology = clean_ai_text(ideology_raw)
         logger.info(f"Generated ideology for {name}")
 
@@ -61,6 +65,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         appearance_raw = await appearance_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "ideology": ideology,
             }
@@ -78,6 +83,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         summary_raw = await summary_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "ideology": ideology,
                 "appearance": appearance,

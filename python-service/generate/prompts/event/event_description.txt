@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe the event {name} in EXACTLY 2-3 sentences (maximum 75 words total) in a {theme} world.
 
 RULES:

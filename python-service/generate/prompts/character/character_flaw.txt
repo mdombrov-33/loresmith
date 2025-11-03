@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Generate ONE distinctive character flaw or negative quirk for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
 
 CRITICAL: VARY THE TYPE OF FLAW. Rotate between these categories:

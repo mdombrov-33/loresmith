@@ -27,6 +27,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
     Theme controls the genre/world setting.
     """
     try:
+        # Load shared theme references
+        with open("generate/prompts/shared/theme_references.txt", "r") as f:
+            theme_references = f.read()
+
         # Generate Name
         with open("generate/prompts/setting/setting_name.txt", "r") as f:
             name_prompt_text = f.read()
@@ -35,7 +39,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
         name_raw = await name_chain.ainvoke(
-            {"theme": theme, "blacklist": blacklist_str}
+            {"theme": theme, "theme_references": theme_references, "blacklist": blacklist_str}
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated setting name: {name}")
@@ -47,7 +51,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         landscape_prompt = PromptTemplate.from_template(landscape_prompt_text)
         landscape_llm = get_llm(max_tokens=150)
         landscape_chain = landscape_prompt | landscape_llm | StrOutputParser()
-        landscape_raw = await landscape_chain.ainvoke({"theme": theme, "name": name})
+        landscape_raw = await landscape_chain.ainvoke({"theme": theme, "theme_references": theme_references, "name": name})
         landscape = clean_ai_text(landscape_raw)
         logger.info(f"Generated landscape for {name}")
 
@@ -61,6 +65,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         dangers_raw = await dangers_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "landscape": landscape,
             }
@@ -78,6 +83,7 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         summary_raw = await summary_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "landscape": landscape,
                 "dangers": dangers,

@@ -1,18 +1,37 @@
+{theme_references}
+
+---
+
 Write a 3-4 sentence backstory for {name}, a character in a {theme} world with the following personality traits: {personality}.
 
 CRITICAL RULES:
 - MAXIMUM 75 WORDS TOTAL - be ruthlessly concise
-- Start with a specific moment, image, or action - NOT "X grew up in Y" or "X was born in Z"
-- VARY YOUR OPENING - don't always start with "{name}'s fingers..." or "{name} rummages..." - use different verbs and structures
+- VARY YOUR OPENING - Choose ONE of these approaches:
+
+  OPTION 1 - Object/Item: "{name} keeps/carries [specific item]. [What it reveals]..."
+  Example: "Rina keeps her daughter's baby shoe in a ziplock bag, rubber sole still caked with pre-war mud."
+
+  OPTION 2 - Action/Habit: "{name} [specific recurring action]. [Context/Why]..."
+  Example: "Every morning, Rina checks the same three radio frequencies, pen hovering over her daughter's name in a worn notebook."
+
+  OPTION 3 - Reputation: "People know {name} for [specific trait/action]. [The truth behind it]..."
+  Example: "People know Rina for setting bones with zero bedside manner. What they don't know: she can't afford to care about anyone new."
+
+  OPTION 4 - Physical detail: "[Scar/mark/feature] on {name}'s [body part] [tells a story]. [What happened]..."
+  Example: "The burn scar across Rina's left hand still aches when it rains. She got it pulling her daughter from a collapsed building—too late."
+
+  OPTION 5 - Present moment: "{name} [current action] while [revealing detail]. [What drives them]..."
+  Example: "Rina trades medical supplies in Detroit's ruins, a baby shoe tucked in her pack. Finding her daughter is the only thing that gets her out of bed."
+
 - Include ONE concrete detail that reveals character (what they carry, what they fear, a habit, a scar)
 - Show their personality through actions, NOT by describing it
 - End with what drives them NOW in the present
 - Use short, punchy sentences - avoid long clauses
+- Draw inspiration from theme references for tone and details
 
-Good example (post-apocalyptic, 68 words):
-"Rina keeps her daughter's baby shoe in a ziplock bag, rubber sole still caked with pre-war mud. She trades medical supplies in Detroit's ruins, known for setting bones with steady hands and zero bedside manner. Most think she's cold. She just can't afford to care about anyone new. The only thing that gets her out of bed is finding out what happened to her daughter."
-
-Bad example (too long, too passive, too generic):
-"Rina grew up in Detroit after the apocalypse. Her parents died when she was young, so she learned medicine to survive on her own and help others. She lost her daughter during a raid years ago and now helps people in the wasteland while searching for answers about what happened, though the memories haunt her and she struggles to trust anyone."
+BANNED OPENINGS:
+- "{name}'s fingers/eyes/hands [verb]..." (too repetitive!)
+- "{name} grew up in..." (too passive!)
+- "{name} was born..." (too generic!)
 
 Output only plain text backstory (3-4 sentences, max 75 words), no formatting.

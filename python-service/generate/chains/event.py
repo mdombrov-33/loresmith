@@ -27,6 +27,10 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
     Theme controls the genre/world setting.
     """
     try:
+        # Load shared theme references
+        with open("generate/prompts/shared/theme_references.txt", "r") as f:
+            theme_references = f.read()
+
         # Generate Name
         with open("generate/prompts/event/event_name.txt", "r") as f:
             name_prompt_text = f.read()
@@ -35,7 +39,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
         name_raw = await name_chain.ainvoke(
-            {"theme": theme, "blacklist": blacklist_str}
+            {"theme": theme, "theme_references": theme_references, "blacklist": blacklist_str}
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated event name: {name}")
@@ -48,7 +52,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         description_llm = get_llm(max_tokens=200)
         description_chain = description_prompt | description_llm | StrOutputParser()
         description_raw = await description_chain.ainvoke(
-            {"theme": theme, "name": name}
+            {"theme": theme, "theme_references": theme_references, "name": name}
         )
         description = clean_ai_text(description_raw)
         logger.info(f"Generated description for {name}")
@@ -63,6 +67,7 @@ async def generate_event(theme: str = "post-apocalyptic") -> LorePiece:
         impact_raw = await impact_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "description": description,
             }

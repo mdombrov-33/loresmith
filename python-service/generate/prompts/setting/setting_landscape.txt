@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe the landscape of {name} in a {theme} world using 2-3 sentences (maximum 60 words total).
 
 RULES:

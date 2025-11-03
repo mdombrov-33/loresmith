@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Generate 3-4 unique, specific skills for {name} in a {theme} world based on their personality: {personality} and appearance: {appearance}. Each skill should be distinctive and reflect their background story. Assign proficiency level 1-100.
 
 Make each skill feel personal to this character's story. Use flavorful, thematic skill names (2-4 words) suitable for checks and encounters.

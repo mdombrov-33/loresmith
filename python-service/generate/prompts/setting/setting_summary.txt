@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Write a concise lore summary for the setting {name} in a {theme} world, using:
 
 Landscape: {landscape}

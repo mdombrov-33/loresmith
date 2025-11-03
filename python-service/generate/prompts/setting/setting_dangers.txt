@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 List 2-3 main dangers in {name} (a {theme} world with this landscape: {landscape}) in ONE sentence (maximum 40 words).
 
 RULES:

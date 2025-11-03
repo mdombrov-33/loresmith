@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe the core beliefs and goals of the faction named {name} in a {theme} world using EXACTLY 1 sentence.
 
 Make it SPECIFIC and distinctive - avoid generic faction descriptions. Focus on what makes THIS faction unique, not just "they want power" or "they seek knowledge."

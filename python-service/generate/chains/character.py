@@ -29,6 +29,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     """
 
     try:
+        # Load shared theme references
+        with open("generate/prompts/shared/theme_references.txt", "r") as f:
+            theme_references = f.read()
+
         # Generate Name
         with open("generate/prompts/character/character_name.txt", "r") as f:
             name_prompt_text = f.read()
@@ -39,6 +43,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         name_raw = await name_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "blacklist": blacklist_str,
             }
         )
@@ -55,6 +60,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         appearance_raw = await appearance_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
             }
         )
@@ -71,6 +77,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         personality_raw = await personality_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "appearance": appearance,
             }
@@ -88,6 +95,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         backstory_raw = await backstory_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "personality": personality,
             }
@@ -105,6 +113,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         skills_raw = await skills_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "personality": personality,
                 "appearance": appearance,
@@ -148,6 +157,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         flaw_raw = await flaw_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "personality": personality,
                 "description": backstory,
@@ -166,6 +176,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         stats_raw = await stats_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "name": name,
                 "personality": personality,
                 "appearance": appearance,

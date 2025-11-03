@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Generate EXACTLY ONE character name for a {theme} world. The name must be realistic and human-like (1-2 words: first name and/or surname).
 
 Do not use these banned words: {blacklist}

@@ -31,6 +31,10 @@ async def generate_full_story(
     A FullStory containing the generated story, selected pieces, quest title, and quest description.
     """
     try:
+        # Load shared theme references
+        with open("generate/prompts/shared/theme_references.txt", "r") as f:
+            theme_references = f.read()
+
         character = selected_pieces.character
         faction = selected_pieces.faction
         setting = selected_pieces.setting
@@ -48,6 +52,7 @@ async def generate_full_story(
         full_story_raw = await full_story_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "character_name": character.name if character else "N/A",
                 "character_description": character.description if character else "N/A",
                 "character_details": format_details(character.details)
@@ -85,6 +90,7 @@ async def generate_full_story(
         quest_title_raw = await quest_title_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "story_content": full_story_content,
             }
         )
@@ -106,6 +112,7 @@ async def generate_full_story(
         quest_description_raw = await quest_description_chain.ainvoke(
             {
                 "theme": theme,
+                "theme_references": theme_references,
                 "story_content": full_story_content,
                 "quest_title": quest_title,
             }

@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe the relic named {name} in a {theme} setting using EXACTLY 2 sentences (maximum 40 words total).
 
 CRITICAL RULES:

@@ -1,3 +1,7 @@
+{theme_references}
+
+---
+
 Describe {name}'s appearance in EXACTLY 2 sentences (maximum 40 words total). This is a {theme} world.
 
 RULES:
