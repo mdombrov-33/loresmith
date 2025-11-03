@@ -8,11 +8,14 @@ export function useWorldsLogic() {
   const params = useParams();
   const worldId = parseInt(params.id as string, 10);
   const actualTheme = params.theme as string;
-  const { setTheme, setAudioTheme } = useAppStore();
+  const { setTheme, setAudioTheme, setAppStage } = useAppStore();
 
   const { data: world, isLoading, error } = useWorld(worldId);
 
-  // Sync theme when viewing a world
+  useEffect(() => {
+    setAppStage("story");
+  }, [setAppStage]);
+
   useEffect(() => {
     if (actualTheme) {
       setTheme(actualTheme);

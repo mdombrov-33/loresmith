@@ -1,14 +1,14 @@
 import { Compass } from "lucide-react";
 
-interface LoadingSpinnerProps {
+interface ActionLoadingProps {
   title?: string;
   description?: string;
 }
 
-export default function LoadingSpinner({
+export default function ActionLoading({
   title = "Loading",
   description = "Please wait...",
-}: LoadingSpinnerProps) {
+}: ActionLoadingProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-6">

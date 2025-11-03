@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
-import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { ActionLoading } from "@/components/shared/LoadingStates";
 import { Compass, Wand2, Eye, Home, ChevronRight, Play } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 import { useStartAdventure, useCheckActiveSession } from "@/lib/queries";
@@ -56,7 +56,7 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
   return (
     <>
       {startAdventureMutation.isPending && (
-        <LoadingSpinner
+        <ActionLoading
           title={hasActiveSession ? "Resuming Adventure" : "Initializing Adventure"}
           description={hasActiveSession ? "Loading your journey..." : "Preparing your journey..."}
         />
