@@ -18,8 +18,8 @@ import {
   AlertTriangle,
   RotateCw,
 } from "lucide-react";
-import FlipCard from "@/components/shared/FlipCard";
-import SelectionEffect from "@/components/shared/SelectionEffect";
+import FlipCard from "@/components/generate/FlipCard";
+import SelectionEffect from "@/components/generate/SelectionEffect";
 
 interface CharacterCardProps {
   character: LorePiece;

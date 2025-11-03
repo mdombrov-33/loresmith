@@ -4,7 +4,7 @@ import FactionCard from "@/components/generate/cards/FactionCard";
 import SettingCard from "@/components/generate/cards/SettingCard";
 import EventCard from "@/components/generate/cards/EventCard";
 import RelicCard from "@/components/generate/cards/RelicCard";
-import StaggeredReveal from "@/components/shared/StaggeredReveal";
+import StaggeredReveal from "@/components/generate/StaggeredReveal";
 
 interface GenerateGridProps {
   generatedOptions: LorePiece[];

@@ -11,7 +11,7 @@ import GenerateEmpty from "@/components/generate/GenerateEmpty";
 import GenerateOverlay from "@/components/generate/GenerateOverlay";
 import ActionButton from "@/components/shared/ActionButton";
 import StageProgress from "@/components/generate/StageProgress";
-import StageTransition from "@/components/shared/StageTransition";
+import StageTransition from "@/components/generate/StageTransition";
 import { getThemeFont } from "@/constants/game-themes";
 
 export default function GeneratePageClient() {
