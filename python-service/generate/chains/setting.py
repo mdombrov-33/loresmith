@@ -22,8 +22,8 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 @observe()
 async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
     """
-    Generate a setting by prompting for:
-    name, landscape description, dangers, and summary.
+    Generate a comprehensive setting by prompting for:
+    name, landscape, culture, history, economy, and summary.
     Theme controls the genre/world setting.
     """
     try:
@@ -55,14 +55,14 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         landscape = clean_ai_text(landscape_raw)
         logger.info(f"Generated landscape for {name}")
 
-        # Generate Dangers
-        with open("generate/prompts/setting/setting_dangers.txt", "r") as f:
-            dangers_prompt_text = f.read()
+        # Generate Culture
+        with open("generate/prompts/setting/setting_culture.txt", "r") as f:
+            culture_prompt_text = f.read()
 
-        dangers_prompt = PromptTemplate.from_template(dangers_prompt_text)
-        dangers_llm = get_llm(max_tokens=150)
-        dangers_chain = dangers_prompt | dangers_llm | StrOutputParser()
-        dangers_raw = await dangers_chain.ainvoke(
+        culture_prompt = PromptTemplate.from_template(culture_prompt_text)
+        culture_llm = get_llm(max_tokens=150)
+        culture_chain = culture_prompt | culture_llm | StrOutputParser()
+        culture_raw = await culture_chain.ainvoke(
             {
                 "theme": theme,
                 "theme_references": theme_references,
@@ -70,8 +70,47 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
                 "landscape": landscape,
             }
         )
-        dangers = clean_ai_text(dangers_raw)
-        logger.info(f"Generated dangers for {name}")
+        culture = clean_ai_text(culture_raw)
+        logger.info(f"Generated culture for {name}")
+
+        # Generate History
+        with open("generate/prompts/setting/setting_history.txt", "r") as f:
+            history_prompt_text = f.read()
+
+        history_prompt = PromptTemplate.from_template(history_prompt_text)
+        history_llm = get_llm(max_tokens=150)
+        history_chain = history_prompt | history_llm | StrOutputParser()
+        history_raw = await history_chain.ainvoke(
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "name": name,
+                "landscape": landscape,
+                "culture": culture,
+            }
+        )
+        history = clean_ai_text(history_raw)
+        logger.info(f"Generated history for {name}")
+
+        # Generate Economy
+        with open("generate/prompts/setting/setting_economy.txt", "r") as f:
+            economy_prompt_text = f.read()
+
+        economy_prompt = PromptTemplate.from_template(economy_prompt_text)
+        economy_llm = get_llm(max_tokens=150)
+        economy_chain = economy_prompt | economy_llm | StrOutputParser()
+        economy_raw = await economy_chain.ainvoke(
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "name": name,
+                "landscape": landscape,
+                "culture": culture,
+                "history": history,
+            }
+        )
+        economy = clean_ai_text(economy_raw)
+        logger.info(f"Generated economy for {name}")
 
         # Generate Summary
         with open("generate/prompts/setting/setting_summary.txt", "r") as f:
@@ -86,7 +125,9 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme_references": theme_references,
                 "name": name,
                 "landscape": landscape,
-                "dangers": dangers,
+                "culture": culture,
+                "history": history,
+                "economy": economy,
             }
         )
         summary = clean_ai_text(summary_raw)
@@ -105,7 +146,9 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
 
     details: dict[str, Union[str, str]] = {
         "landscape": landscape,
-        "dangers": dangers,
+        "culture": culture,
+        "history": history,
+        "economy": economy,
     }
 
     return LorePiece(

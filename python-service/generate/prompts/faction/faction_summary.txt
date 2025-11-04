@@ -2,4 +2,17 @@
 
 ---
 
-Write a brief lore summary for the {theme} faction {name} based on the following ideology: {ideology} and appearance: {appearance}. Keep it to 2 sentences. Respond only with plain text, no markdown. No newlines; output a single paragraph.
+Write a brief lore summary for the {theme} faction {name} based on the following ideology: {ideology} and appearance: {appearance}.
+
+CRITICAL RULES:
+- Exactly 2 sentences
+- Weave ideology and appearance together naturally
+- Show what makes this faction dangerous, interesting, or important
+- NO specific event names or dates (those are generated separately)
+
+OUTPUT FORMAT:
+- Plain text ONLY, single paragraph, 2 sentences
+- NO markdown, NO special characters, NO newlines
+- DO NOT include: "Here's...", "Here is...", "(Note:...", explanatory text, meta-commentary
+- Start DIRECTLY with the description
+- Example: "The Iron Judges control water distribution..." NOT "Here's a summary: The Iron Judges..."

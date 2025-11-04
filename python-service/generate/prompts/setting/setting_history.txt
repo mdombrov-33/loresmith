@@ -1,0 +1,35 @@
+{theme_references}
+
+---
+
+Describe the historical background of {name} in a {theme} world. Write EXACTLY 2-3 sentences (maximum 50 words).
+
+The setting landscape: {landscape}
+The culture: {culture}
+
+CRITICAL RULES:
+- MAXIMUM 50 WORDS - be concise
+- Focus on what KIND of place this was/is - its historical ROLE or LEGACY
+- NO specific events, dates, battles, or named incidents (those are generated separately)
+- Describe patterns, eras, or long-term changes - not single moments
+- Make it RELEVANT to current culture/landscape
+- Draw inspiration from theme references for historical tone
+
+Good examples:
+
+Post-apocalyptic: "Built as a pre-war military bunker, the complex survived multiple waves of refugees over decades. Each group left their mark - graffiti, makeshift repairs, scavenged additions - creating layers of history visible in the walls."
+
+Fantasy: "Generations of dragon-slayers trained here, drawn by the mountain's natural wards against magical detection. The old training grounds are still scarred with blade marks and scorch patterns from centuries of practice."
+
+Cyberpunk: "Once corporate territory, the district changed hands through hostile takeovers and market crashes. Every regime left behind legacy code and hidden server farms, making it a maze of competing networks."
+
+Norse Mythology: "This valley has hosted Thing assemblies for countless winters, where jarls gathered to settle disputes. The ancient oaths carved into standing stones still carry weight among those who remember the old ways."
+
+Bad example (specific event): "The Great Fire of 2154 destroyed everything. Now people rebuild on the ashes of what came before."
+
+OUTPUT FORMAT:
+- Plain text ONLY, 2-3 sentences, max 50 words
+- NO markdown, NO special characters, NO formatting
+- DO NOT include: "Here's...", "Here is...", "(Note:...", explanatory text, meta-commentary
+- Start DIRECTLY with the description
+- Example: "Built as a pre-war military bunker..." NOT "Here's a description: Built as..."

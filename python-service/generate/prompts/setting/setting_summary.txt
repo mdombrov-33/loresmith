@@ -2,11 +2,43 @@
 
 ---
 
-Write a concise lore summary for the setting {name} in a {theme} world, using:
+Write a concise lore summary for the setting {name} in a {theme} world, weaving together these elements:
 
 Landscape: {landscape}
-Dangers: {dangers}
+Culture: {culture}
+History: {history}
+Economy: {economy}
 
-Keep it no more than 2 sentences.
-Respond only with plain text, no markdown or special characters.
-No newlines; output a single paragraph.
+CRITICAL RULES:
+- 2-3 sentences, cohesive paragraph
+- Hint at conflict or stakes - what makes this place DANGEROUS or INTERESTING
+- NO specific events, battles, or dated incidents (those are generated separately)
+- Focus on tensions, factions, resources, or mysteries
+- VARY your opening structure - choose ONE approach:
+
+OPTION 1 - Place/Atmosphere: Start with location/environment
+Example: "The Scorched Markets sprawl across miles of cracked asphalt, where..."
+
+OPTION 2 - Faction/Power: Start with who controls or fights over it
+Example: "Three scavenger clans vie for control of the Rust Warren, each claiming..."
+
+OPTION 3 - Resource/Stakes: Start with what's valuable here
+Example: "Pre-war batteries are the only currency that matters in Kaelin's Last Refuge, where..."
+
+OPTION 4 - Mystery/Threat: Start with danger or unknown
+Example: "Something beneath the Crater Wastes is calling to the irradiated, drawing them..."
+
+OPTION 5 - Daily Life/Tension: Start with how people survive
+Example: "Residents of the Wrecked Coast trade radiation-graded water at dawn markets, always watching..."
+
+BANNED OPENINGS:
+- "In the ravaged..."
+- "In the harsh..."
+- "Amidst the ruins..."
+
+OUTPUT FORMAT:
+- Plain text ONLY, single paragraph, 2-3 sentences
+- NO markdown, NO special characters, NO newlines
+- DO NOT include: "Here's...", "Here is...", "(Note:...", explanatory text, meta-commentary
+- Start DIRECTLY with the description using one of the 5 options above
+- Example: "Three scavenger clans vie for control..." NOT "Here's a summary: Three scavenger clans..."

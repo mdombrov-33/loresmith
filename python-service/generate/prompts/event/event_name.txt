@@ -2,4 +2,10 @@
 
 ---
 
-Invent a unique name for a significant {theme} event that does NOT contain or match any of the following words or names: {blacklist}. Respond only with plain text, no markdown or special characters. No newlines; output a single paragraph. Name should be 2-5 words only.
+Invent a unique name for a significant {theme} event that does NOT contain or match any of the following words or names: {blacklist}.
+
+OUTPUT FORMAT:
+- ONLY the name, 2-5 words
+- NO explanations, NO descriptions, NO metadata, NO dates
+- DO NOT include: "Here's...", parenthetical descriptions like "(a great battle)", quotes, or any extra text
+- Example: "The Crimson Exodus" NOT "The Crimson Exodus of 2154" or "The Crimson Exodus (a migration)"

@@ -20,4 +20,8 @@ Good examples (specific, concrete):
 Bad examples (too vague):
 "The event fundamentally changed society and how people view the world, leaving lasting scars on civilization that persist to this day."
 
-Output: Exactly 1 sentence, plain text, max 40 words, no formatting.
+OUTPUT FORMAT:
+- Plain text ONLY, exactly 1 sentence, max 40 words
+- NO markdown, NO special characters
+- DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
+- Start DIRECTLY with the description

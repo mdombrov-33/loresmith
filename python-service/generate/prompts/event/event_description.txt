@@ -20,4 +20,8 @@ Good examples (concise, specific):
 Bad examples (too vague, too dramatic):
 "The Cataclysm was a devastating event that changed the world forever. Everything people knew was destroyed, and society had to rebuild from scratch. The survivors would never forget what happened that day."
 
-Output: 2-3 sentences, plain text, max 75 words total, no formatting.
+OUTPUT FORMAT:
+- Plain text ONLY, 2-3 sentences, max 75 words
+- NO markdown, NO special characters
+- DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
+- Start DIRECTLY with the description

@@ -2,4 +2,10 @@
 
 ---
 
-Describe the typical appearance of members of the faction {name}, including attire, symbols, or colors that reflect their ideology: {ideology}, in a {theme} setting. Respond only with plain text, no markdown. No newlines; output exactly 1 sentence.
+Describe the typical appearance of members of the faction {name}, including attire, symbols, or colors that reflect their ideology: {ideology}, in a {theme} setting.
+
+OUTPUT FORMAT:
+- Plain text ONLY, exactly 1 sentence
+- NO markdown, NO special characters
+- DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
+- Start DIRECTLY with the description

@@ -23,4 +23,8 @@ Bad examples (too generic):
 "The Kraelion Brotherhood is a militant faction that seeks to reclaim and rebuild society through brutal means and worship of ancient deities."
 "A technocratic organization that wants to use technology to transcend humanity and achieve immortality."
 
-Output: Plain text, exactly 1 sentence, no extra formatting.
+OUTPUT FORMAT:
+- Plain text ONLY, exactly 1 sentence
+- NO markdown, NO special characters
+- DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
+- Start DIRECTLY with the description

@@ -62,10 +62,28 @@ export default function SettingCard({
 
         <div>
           <div className="text-accent mb-1 text-xs font-semibold uppercase">
-            Dangers
+            Culture
           </div>
           <div className="text-foreground text-sm">
-            {setting.details.dangers}
+            {setting.details.culture}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-accent mb-1 text-xs font-semibold uppercase">
+            History
+          </div>
+          <div className="text-foreground text-sm">
+            {setting.details.history}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-accent mb-1 text-xs font-semibold uppercase">
+            Economy
+          </div>
+          <div className="text-foreground text-sm">
+            {setting.details.economy}
           </div>
         </div>
       </div>

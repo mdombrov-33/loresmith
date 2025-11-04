@@ -1,0 +1,37 @@
+{theme_references}
+
+---
+
+Describe the economy and resources of {name} in a {theme} world. Write EXACTLY 2-3 sentences (maximum 50 words).
+
+The setting landscape: {landscape}
+The culture: {culture}
+
+CRITICAL RULES:
+- MAXIMUM 50 WORDS - be concise
+- Focus on ONE of these aspects:
+  - Primary resource/trade (what people fight over, what drives survival)
+  - Economic conflict (who controls wealth, scarcity, monopolies)
+  - Survival mechanics (how people get food, water, shelter, currency)
+- Be SPECIFIC - name actual resources, prices, trade routes
+- Show STAKES - make it clear why economy matters for survival/conflict
+- Draw inspiration from theme references for economic systems
+
+Good examples:
+
+Post-apocalyptic: "Clean water flows from the old municipal pipes for two hours each dawn. Families pay in scrap metal for access codes, while gang enforcers skim 20% off the top to look the other way during extended pumping."
+
+Fantasy: "Moonstone veins run deep beneath the mountain, but mining them requires Windcaller blood to breathe at altitude. The guild pays miners in oxygen charms that expire after one week, ensuring constant dependence."
+
+Cyberpunk: "Data brokers trade corporate secrets at the Night Market, prices fluctuating by the nanosecond based on IC countermeasure strength. A good zero-day exploit can buy you a new body—or get you erased trying to extract it."
+
+Steampunk: "Coal shipments from the southern mines arrive every third day, rationed by the Regulator's Guild. Blacksmiths hoard coke in hidden cellars, selling it at triple price when the rail line 'experiences delays.'"
+
+Bad example (too vague): "The economy here is based on trade and resources. People work hard to survive and exchange goods and services with each other."
+
+OUTPUT FORMAT:
+- Plain text ONLY, 2-3 sentences, max 50 words
+- NO markdown, NO special characters, NO formatting
+- DO NOT include: "Here's...", "Here is...", "(Note:...", explanatory text, meta-commentary
+- Start DIRECTLY with the description
+- Example: "Clean water flows from the old municipal pipes..." NOT "Here's a description: Clean water..."

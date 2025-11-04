@@ -19,4 +19,8 @@ Good examples (vague, intriguing):
 Bad examples (too specific, invents events):
 "The Oracle was created during the Great Forgetting, a cataclysmic event that ravaged the world and caused widespread memory loss. It possesses the ability to erase the essence of existence from reality itself."
 
-Output: Exactly 2 sentences, plain text, max 50 words, no markdown.
+OUTPUT FORMAT:
+- Plain text ONLY, exactly 2 sentences, max 50 words
+- NO markdown, NO special characters
+- DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
+- Start DIRECTLY with the description

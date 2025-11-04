@@ -1,0 +1,34 @@
+{theme_references}
+
+---
+
+Describe the culture and society of {name} in a {theme} world. Focus on how people live, social structure, and customs. Write EXACTLY 2-3 sentences (maximum 50 words).
+
+The setting landscape: {landscape}
+
+CRITICAL RULES:
+- MAXIMUM 50 WORDS - be concise
+- Focus on ONE of these aspects:
+  - Social hierarchy (who has power, class divisions)
+  - Daily life customs (how people survive, work, trade)
+  - Cultural identity (traditions, beliefs, what defines them)
+- Be SPECIFIC - use concrete details, not vague generalizations
+- Make it feel LIVED-IN - show how culture emerged from the landscape/history
+- Draw inspiration from theme references for cultural tone
+
+Good examples:
+
+Post-apocalyptic: "Scavengers trade pre-war tech at dawn markets, prices set by whoever can prove authenticity with a working Geiger counter. The old corporate hierarchy collapsed, replaced by repair guilds who hoard knowledge like currency."
+
+Fantasy: "The Windcallers control access to the Spires through hereditary rites, while groundbound merchants bribe their children for safe passage. Every family keeps a wind-chime altar, believing still air means the ancestors have abandoned them."
+
+Cyberpunk: "Street vendors hawk black-market neural patches alongside synthetic noodles, both priced by the hour. Corporate citizens never touch ground level—they're born, live, and die in the arcology towers above the smog."
+
+Bad example (too vague): "The people here have a rich cultural heritage and strong traditions passed down through generations. Society is divided into different social classes with varying levels of power."
+
+OUTPUT FORMAT:
+- Plain text ONLY, 2-3 sentences, max 50 words
+- NO markdown, NO special characters, NO formatting
+- DO NOT include: "Here's...", "Here is...", "(Note:...", explanatory text, meta-commentary
+- Start DIRECTLY with the description
+- Example: "Scavengers trade pre-war tech..." NOT "Here's a description: Scavengers trade..."
