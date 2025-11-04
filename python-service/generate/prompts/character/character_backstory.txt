@@ -2,7 +2,7 @@
 
 ---
 
-Write a 3-4 sentence backstory for {name}, a character in a {theme} world with the following personality traits: {personality}.
+Write a 3-4 sentence backstory for {name}, a character in a {theme} world with the following appearance: {appearance}.
 
 CRITICAL RULES:
 - MAXIMUM 75 WORDS TOTAL - be ruthlessly concise
@@ -24,7 +24,7 @@ CRITICAL RULES:
   Example: "Rina trades medical supplies in Detroit's ruins, a baby shoe tucked in her pack. Finding her daughter is the only thing that gets her out of bed."
 
 - Include ONE concrete detail that reveals character (what they carry, what they fear, a habit, a scar)
-- Show their personality through actions, NOT by describing it
+- Show their personality through actions and choices, NOT by describing it
 - End with what drives them NOW in the present
 - Use short, punchy sentences - avoid long clauses
 - Draw inspiration from theme references for tone and details
@@ -35,3 +35,5 @@ BANNED OPENINGS:
 - "{name} was born..." (too generic!)
 
 Output only plain text backstory (3-4 sentences, max 75 words), no formatting.
+
+Do not write what option you selected or thought process. Start directly with character backstory.

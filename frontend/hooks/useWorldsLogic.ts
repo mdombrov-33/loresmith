@@ -58,7 +58,7 @@ export function useWorldsLogic() {
 
   const sortDetails = (details: Record<string, string>) => {
     const order = [
-      "personality",
+      "traits",
       "appearance",
       "flaw",
       "skills",

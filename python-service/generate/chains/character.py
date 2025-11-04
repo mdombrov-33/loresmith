@@ -16,6 +16,13 @@ from services.llm_client import (
 )
 from exceptions.generation import CharacterGenerationError
 from utils.format_text import clean_ai_text
+from generate.traits import (
+    PersonalityTrait,
+    get_trait_list_for_prompt,
+    get_all_trait_names,
+    validate_trait_selection,
+    TRAIT_METADATA,
+)
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -67,25 +74,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         appearance = clean_ai_text(appearance_raw)
         logger.info(f"Generated appearance for {name}")
 
-        # Generate Personality
-        with open("generate/prompts/character/character_personality.txt", "r") as f:
-            personality_prompt_text = f.read()
-
-        personality_prompt = PromptTemplate.from_template(personality_prompt_text)
-        personality_llm = get_llm(max_tokens=70)
-        personality_chain = personality_prompt | personality_llm | StrOutputParser()
-        personality_raw = await personality_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "appearance": appearance,
-            }
-        )
-        personality = clean_ai_text(personality_raw)
-        logger.info(f"Generated personality for {name}")
-
-        # Generate Backstory
+        # Generate Backstory (moved before traits so traits can reference backstory)
         with open("generate/prompts/character/character_backstory.txt", "r") as f:
             backstory_prompt_text = f.read()
 
@@ -97,11 +86,114 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": personality,
+                "appearance": appearance,
             }
         )
         backstory = clean_ai_text(backstory_raw)
         logger.info(f"Generated backstory for {name}")
+
+        # Generate Personality Traits (using new trait system)
+        with open("generate/prompts/character/character_traits.txt", "r") as f:
+            traits_prompt_text = f.read()
+
+        traits_prompt = PromptTemplate.from_template(traits_prompt_text)
+        traits_llm = get_llm(max_tokens=50)
+        traits_chain = traits_prompt | traits_llm | StrOutputParser()
+
+        # Get the formatted trait list for the prompt
+        trait_list = get_trait_list_for_prompt()
+
+        traits_raw = await traits_chain.ainvoke(
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "name": name,
+                "appearance": appearance,
+                "backstory": backstory,
+                "trait_list": trait_list,
+            }
+        )
+        traits_text = clean_ai_text(traits_raw)
+
+        # Parse and validate traits
+        personality_traits = []
+        try:
+            # Clean up common LLM mistakes - be VERY aggressive
+            logger.debug(f"Raw traits text: {traits_text}")
+
+            # Remove surrounding quotes
+            traits_text = traits_text.strip('"').strip("'")
+
+            # Remove everything after first period or dash (explanations)
+            if '.' in traits_text:
+                traits_text = traits_text.split('.')[0].strip()
+            if ' - ' in traits_text:
+                traits_text = traits_text.split(' - ')[0].strip()
+
+            # If there's a colon, take everything AFTER the last colon
+            # Handles: "I have selected: Trait1, Trait2, Trait3"
+            if ':' in traits_text:
+                traits_text = traits_text.split(':')[-1].strip()
+
+            # Remove common prefixes (after colon removal)
+            prefixes_to_remove = [
+                "I choose ", "I select ", "I have selected ", "Here are ", "Here's ",
+                "The traits are ", "These traits are ", "Output: ", "Based on ",
+                "For ", "Given ", "The ", "A possible ", "Possible "
+            ]
+            for prefix in prefixes_to_remove:
+                if traits_text.lower().startswith(prefix.lower()):
+                    traits_text = traits_text[len(prefix):].strip()
+
+            # Remove surrounding quotes again (in case they were after prefix)
+            traits_text = traits_text.strip('"').strip("'")
+
+            logger.debug(f"Cleaned traits text: {traits_text}")
+
+            # Parse comma-separated trait names
+            trait_names = [t.strip() for t in traits_text.split(",")]
+            all_valid_traits = get_all_trait_names()
+
+            # Convert to PersonalityTrait enum values
+            for trait_name in trait_names:
+                # Only take the first word if there's extra text after the trait name
+                first_word = trait_name.split()[0] if trait_name else ""
+
+                if trait_name in all_valid_traits:
+                    personality_traits.append(PersonalityTrait(trait_name))
+                elif first_word in all_valid_traits:
+                    # Try first word if full string didn't match
+                    personality_traits.append(PersonalityTrait(first_word))
+                    logger.warning(f"Extracted trait '{first_word}' from malformed '{trait_name}'")
+                else:
+                    logger.warning(f"Invalid trait '{trait_name}' generated, will use fallback")
+
+            # Validate we have exactly 3 compatible traits
+            if len(personality_traits) != 3:
+                raise ValueError(f"Expected 3 traits, got {len(personality_traits)}")
+
+            if not validate_trait_selection(personality_traits):
+                raise ValueError("Traits contain contradictions")
+
+            logger.info(f"Generated traits for {name}: {[t.value for t in personality_traits]}")
+
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Failed to parse traits: {e}. Using theme-based fallback.")
+            # Theme-based fallback traits
+            theme_fallbacks = {
+                "post-apocalyptic": [PersonalityTrait.CAUTIOUS, PersonalityTrait.PRAGMATIC, PersonalityTrait.STOIC],
+                "fantasy": [PersonalityTrait.BRAVE, PersonalityTrait.HONORABLE, PersonalityTrait.CURIOUS],
+                "cyberpunk": [PersonalityTrait.CYNICAL, PersonalityTrait.ANALYTICAL, PersonalityTrait.REBELLIOUS],
+                "norse-mythology": [PersonalityTrait.FEARLESS, PersonalityTrait.HONORABLE, PersonalityTrait.COMPETITIVE],
+                "steampunk": [PersonalityTrait.CREATIVE, PersonalityTrait.METHODICAL, PersonalityTrait.AMBITIOUS],
+            }
+            personality_traits = theme_fallbacks.get(
+                theme.lower(),
+                [PersonalityTrait.ADAPTABLE, PersonalityTrait.PERCEPTIVE, PersonalityTrait.HONEST]
+            )
+
+        # Convert traits to list of strings for storage
+        traits_list = [trait.value for trait in personality_traits]
 
         # Generate Skills
         with open("generate/prompts/character/character_skills.txt", "r") as f:
@@ -115,7 +207,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": personality,
+                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
                 "appearance": appearance,
             }
         )
@@ -159,7 +251,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": personality,
+                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
                 "description": backstory,
             }
         )
@@ -178,7 +270,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": personality,
+                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
                 "appearance": appearance,
                 "description": backstory,
                 "skills": json.dumps(skills_array),
@@ -235,7 +327,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
 
     details: dict[str, Any] = {
-        "personality": personality,
+        "traits": traits_list,  # List of 3 standardized personality trait strings
         "appearance": appearance,
         "flaw": flaw,
         "health": health,

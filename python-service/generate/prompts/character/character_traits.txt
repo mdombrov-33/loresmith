@@ -1,0 +1,96 @@
+{theme_references}
+
+---
+
+Select exactly 3 personality traits for {name}, a character in a {theme} world.
+
+CHARACTER CONTEXT:
+- Name: {name}
+- Appearance: {appearance}
+- Backstory: {backstory}
+
+AVAILABLE TRAITS - YOU MUST CHOOSE FROM THIS LIST ONLY:
+{trait_list}
+
+⚠️ CRITICAL: You can ONLY use traits from the list above. Do not invent new traits like "Adventurous", "Resourceful", "Determined", etc. If a trait is not in the list, you cannot use it.
+
+SELECTION RULES:
+1. Choose exactly 3 traits that fit the character's backstory and appearance
+2. ALL THREE TRAITS MUST BE FROM THE LIST ABOVE - NO EXCEPTIONS
+3. Traits should be diverse - pick from different categories (emotional, social, behavioral, cognitive, moral, etc.)
+4. Traits must NOT contradict each other (e.g., don't pick both "Brave" and "Cowardly")
+5. Consider the theme - traits should fit the world setting
+6. Create a coherent personality profile that tells a story
+
+THEME-SPECIFIC GUIDANCE:
+- Post-Apocalyptic: Favor survival-oriented traits (Cautious, Ruthless, Paranoid, Adaptable, Pragmatic)
+- Fantasy: Consider honor codes and courage (Honorable, Brave, Curious, Loyal, Fearless)
+- Cyberpunk: Tech-savvy and morally gray (Cynical, Analytical, Rebellious, Pragmatic)
+- Norse Mythology: Warrior culture and honor (Fearless, Honorable, Competitive, Brave, Loyal)
+- Steampunk: Innovation and class-consciousness (Creative, Curious, Ambitious, Methodical)
+
+EXAMPLES - LEARN FROM THESE:
+
+Example 1:
+Character: Marcus Kane, a scarred veteran survivor
+Appearance: Weathered face, gray hair, wears tattered military jacket
+Backstory: Former soldier who lost his squad, now searches for meaning
+YOUR OUTPUT: Cautious, Loyal, Melancholic
+
+Example 2:
+Character: Zara Ghost, a young hacker in a cyberpunk city
+Appearance: Short purple hair, cybernetic eye implant, leather jacket
+Backstory: Orphaned by corporate war, now fights the system with code
+YOUR OUTPUT: Rebellious, Analytical, Cynical
+
+Example 3:
+Character: Sir Aldric, a knight sworn to protect the realm
+Appearance: Tall, armored, bears a sword with family crest
+Backstory: Last of his order, refuses to abandon his oath despite defeat
+YOUR OUTPUT: Honorable, Brave, Stubborn
+
+Example 4:
+Character: Riko, a wasteland scavenger seeking survival
+Appearance: Ragged clothes, multiple scars, carries salvaged gear
+Backstory: Trusts no one after betrayal, hoards supplies obsessively
+YOUR OUTPUT: Paranoid, Greedy, Adaptable
+
+Example 5:
+Character: Elena Frost, a scientist searching for a cure
+Appearance: White lab coat, tired eyes, carries research notes
+Backstory: Lost family to plague, believes she can still save others
+YOUR OUTPUT: Compassionate, Analytical, Stubborn
+
+BAD EXAMPLES - NEVER DO THIS:
+- "Brave, Cowardly, Honest" (contradictory traits)
+- "Empathetic, Compassionate, Merciful" (too similar, all from same category)
+- "Brave. These traits fit because..." (has explanation after trait)
+- "Adventurous, Bold, Resourceful" (WRONG - these traits are NOT in the list!)
+- "Perceptive These traits fit the character..." (explanation added to trait name)
+
+====================
+OUTPUT INSTRUCTIONS
+====================
+
+Look at the examples above. Your output must look EXACTLY like "YOUR OUTPUT:" in those examples.
+
+Format: TraitName, TraitName, TraitName
+
+That's it. Nothing else.
+
+COPY THIS EXACT FORMAT:
+Cautious, Loyal, Melancholic
+
+DO NOT WRITE:
+- Based on {name}'s backstory: Cautious, Loyal, Melancholic
+- I select: Cautious, Loyal, Melancholic
+- Cautious, Loyal, Melancholic - These traits fit because...
+- Cautious. These traits reflect the character's...
+- The traits are Cautious, Loyal, Melancholic
+- "Cautious, Loyal, Melancholic"
+- For {name}: Cautious, Loyal, Melancholic
+
+ONLY WRITE:
+Cautious, Loyal, Melancholic
+
+Three trait names. Two commas. Nothing else.

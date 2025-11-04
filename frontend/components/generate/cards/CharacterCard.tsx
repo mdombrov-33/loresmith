@@ -20,6 +20,11 @@ import {
 } from "lucide-react";
 import FlipCard from "@/components/generate/FlipCard";
 import SelectionEffect from "@/components/generate/SelectionEffect";
+import {
+  getTraitIcon,
+  getTraitColor,
+  getTraitDescription,
+} from "@/lib/trait-icons";
 
 interface CharacterCardProps {
   character: LorePiece;
@@ -85,15 +90,38 @@ export default function CharacterCard({
 
       {/* Details */}
       <div className="space-y-3">
-        {/* Personality */}
-        <div>
-          <div className="text-accent mb-1 text-xs font-semibold uppercase">
-            Personality
+        {/* Personality Traits */}
+        {character.details.traits && Array.isArray(character.details.traits) && (
+          <div>
+            <div className="text-accent mb-2 text-xs font-semibold uppercase">
+              Personality Traits
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {character.details.traits.map((trait: string, index: number) => {
+                const TraitIcon = getTraitIcon(trait);
+                const colorClass = getTraitColor(trait);
+                const description = getTraitDescription(trait);
+                return (
+                  <TooltipProvider key={index}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="bg-muted/50 border-border flex cursor-help items-center gap-1.5 rounded-lg border px-3 py-1.5">
+                          <TraitIcon className={`h-4 w-4 ${colorClass}`} />
+                          <span className="text-foreground text-sm font-medium">
+                            {trait}
+                          </span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">{description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
+            </div>
           </div>
-          <div className="text-foreground text-sm">
-            {character.details.personality}
-          </div>
-        </div>
+        )}
 
         {/* Appearance */}
         <div>

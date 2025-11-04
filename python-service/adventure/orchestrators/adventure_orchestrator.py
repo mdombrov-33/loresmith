@@ -298,7 +298,7 @@ class AdventureOrchestrator:
         Args:
             protagonist_info: {
                 "name": "...",
-                "personality": "...",
+                "traits": ["Cautious", "Loyal", "Analytical"],
                 "backstory": "...",
                 "skills": "..."
             }
@@ -324,7 +324,7 @@ class AdventureOrchestrator:
                 "perception": 13,
                 "skills": "Lockpicking, Street contacts, Quick reflexes",
                 "flaw": "Doesn't trust authority figures",
-                "personality": "Sarcastic but loyal, risk-taker",
+                "traits": "Reckless, Loyal, Perceptive",
                 "appearance": "Short, wiry build, always wears a hood",
                 "position": 1  # 0 = protagonist, 1-3 = companions
             }

@@ -17,7 +17,7 @@ class CompanionRequest(BaseModel):
     """Request to generate a companion character."""
 
     protagonist_info: dict[str, str] = Field(
-        description="Protagonist data: name, personality, backstory, skills"
+        description="Protagonist data: name, traits (list), backstory, skills"
     )
     relationship_type: str = Field(
         description="ally, rival, mentor, friend, etc."
@@ -50,6 +50,6 @@ class CompanionResponse(BaseModel):
     perception: int
     skills: str  # Will be stored as JSONB in party_members table (via migration 00008)
     flaw: str
-    personality: str
+    traits: str  # Comma-separated list of 3 standardized personality traits
     appearance: str
     position: int  # 1-3 for companions (0 is protagonist)
