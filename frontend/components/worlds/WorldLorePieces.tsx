@@ -11,6 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Scroll,
   Eye,
   ChevronRight,
@@ -19,6 +25,11 @@ import {
 } from "lucide-react";
 import { LorePiece } from "@/types/api";
 import { loreIcons, getAttributeIcon } from "@/constants/lore";
+import {
+  getTraitIcon,
+  getTraitColor,
+  getTraitDescription,
+} from "@/lib/trait-icons";
 
 interface WorldLorePiecesProps {
   lorePieces: LorePiece[];
@@ -150,6 +161,58 @@ function LorePieceCard({
                       const { icon: AttributeIcon, color } = isFlaw
                         ? { icon: AlertTriangle, color: "text-red-500" }
                         : getAttributeIcon(key);
+
+                      //* Special handling for traits array
+                      if (key === "traits") {
+                        let traitsArray = value;
+                        if (typeof value === "string") {
+                          try {
+                            traitsArray = JSON.parse(value);
+                          } catch (e) {
+                            traitsArray = [];
+                            console.error("Failed to parse traits JSON:", e);
+                          }
+                        }
+                        if (Array.isArray(traitsArray)) {
+                          return (
+                            <div
+                              key={key}
+                              className="border-border/50 bg-muted/30 hover:border-primary/30 hover:bg-muted/50 flex flex-col gap-2 rounded-lg border p-4 transition-all"
+                            >
+                              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
+                                <AttributeIcon className={`h-3 w-3 ${color}`} />
+                                Personality Traits
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {traitsArray.map((trait: string, index: number) => {
+                                  const TraitIcon = getTraitIcon(trait);
+                                  const colorClass = getTraitColor(trait);
+                                  const description = getTraitDescription(trait);
+                                  return (
+                                    <TooltipProvider key={index}>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div className="bg-muted/50 border-border flex cursor-help items-center gap-1.5 rounded-lg border px-3 py-1.5">
+                                            <TraitIcon
+                                              className={`h-4 w-4 ${colorClass}`}
+                                            />
+                                            <span className="text-foreground text-sm font-medium">
+                                              {trait}
+                                            </span>
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p className="max-w-xs">{description}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        }
+                      }
 
                       //* Special handling for skills array (parse JSON string if needed)
                       if (key === "skills") {
