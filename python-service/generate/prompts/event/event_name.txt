@@ -5,7 +5,7 @@
 Invent a unique name for a significant {theme} event that does NOT contain or match any of the following words or names: {blacklist}.
 
 OUTPUT FORMAT:
-- ONLY the name, 2-5 words
-- NO explanations, NO descriptions, NO metadata, NO dates
-- DO NOT include: "Here's...", parenthetical descriptions like "(a great battle)", quotes, or any extra text
-- Example: "The Crimson Exodus" NOT "The Crimson Exodus of 2154" or "The Crimson Exodus (a migration)"
+- ONE event name name
+- Minimum length - one word. Maximum length - three words
+- No quotes. For example - The Great Devouring, not "The Great Devouring"
+- No additional text or metadata, just output a name

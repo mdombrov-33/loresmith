@@ -4,6 +4,8 @@
 
 Describe {name}'s appearance in EXACTLY 2 sentences (maximum 40 words total). This is a {theme} world.
 
+Start directly with character appearance, don't include metadata or thought process.
+
 RULES:
 - First sentence: Height/build, hair, eye color, one facial feature
 - Second sentence: Practical clothing + ONE memorable detail (scar, tattoo, distinctive item)

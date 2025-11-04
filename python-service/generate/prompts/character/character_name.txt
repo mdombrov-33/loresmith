@@ -6,6 +6,7 @@ Generate EXACTLY ONE character name for a {theme} world. The name must be realis
 
 Do not use these banned words: {blacklist}
 
-Output ONLY the name, nothing else. No explanations, no multiple options, just ONE name.
-
-Example output format: "Marcus Drake"
+OUTPUT FORMAT:
+- ONLY the name, nothing else
+- NO quotes, NO explanations, NO multiple options, just ONE name
+- Example: Marcus Drake (NOT "Marcus Drake")

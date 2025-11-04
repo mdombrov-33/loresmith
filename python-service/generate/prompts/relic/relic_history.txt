@@ -5,7 +5,7 @@
 Explain the history and significance of the relic {name} in a {theme} world. The relic looks like this: {description}
 
 CRITICAL RULES:
-- Exactly 2 sentences, maximum 50 words total
+- Exactly 3 sentences, maximum 100 words total
 - BE VAGUE about specific events - use phrases like "after the collapse", "in the old world", "when everything fell", "before the calamity"
 - DO NOT invent specific event names (no "The Great Forgetting", "The Devourment", etc.)
 - Focus on WHY the relic matters NOW, not detailed ancient history
@@ -20,7 +20,7 @@ Bad examples (too specific, invents events):
 "The Oracle was created during the Great Forgetting, a cataclysmic event that ravaged the world and caused widespread memory loss. It possesses the ability to erase the essence of existence from reality itself."
 
 OUTPUT FORMAT:
-- Plain text ONLY, exactly 2 sentences, max 50 words
+- Plain text ONLY, exactly 3 sentences, max 100 words
 - NO markdown, NO special characters
 - DO NOT include: "Here's...", "Here is...", explanatory text, meta-commentary
 - Start DIRECTLY with the description

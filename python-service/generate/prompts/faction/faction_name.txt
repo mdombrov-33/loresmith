@@ -5,7 +5,7 @@
 Invent a unique name for a {theme} faction that does NOT contain or match any of the following words or names: {blacklist}.
 
 OUTPUT FORMAT:
-- ONLY the name, 2-3 words
-- NO explanations, NO descriptions, NO metadata
-- DO NOT include: "Here's...", parenthetical descriptions like "(a fierce gang)", quotes, or any extra text
-- Example: "The Rust Collective" NOT "The Rust Collective (a scavenger group)"
+- ONE faction name
+- Minimum length - one word. Maximum length - three words
+- No quotes. For example - Rust Collective, not "Rust Collective"
+- No additional text or metadata, just output a name
