@@ -24,6 +24,8 @@ dependencies = [
     "numpy (>=2.1.0,<3.0.0)",
     "scipy (>=1.16.2,<2.0.0)",
     "spacy (>=3.7.0,<4.0.0)",
+    "replicate (>=1.0.7,<2.0.0)",
+    "aiohttp (>=3.13.2,<4.0.0)", 
 ]
 
 [tool.poetry.dependencies]

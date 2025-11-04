@@ -1,5 +1,6 @@
 import json
 from typing import Any
+import re
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -21,8 +22,8 @@ from generate.traits import (
     get_trait_list_for_prompt,
     get_all_trait_names,
     validate_trait_selection,
-    TRAIT_METADATA,
 )
+from services.image_generator import generate_character_images
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -125,25 +126,36 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             traits_text = traits_text.strip('"').strip("'")
 
             # Remove everything after first period or dash (explanations)
-            if '.' in traits_text:
-                traits_text = traits_text.split('.')[0].strip()
-            if ' - ' in traits_text:
-                traits_text = traits_text.split(' - ')[0].strip()
+            if "." in traits_text:
+                traits_text = traits_text.split(".")[0].strip()
+            if " - " in traits_text:
+                traits_text = traits_text.split(" - ")[0].strip()
 
             # If there's a colon, take everything AFTER the last colon
             # Handles: "I have selected: Trait1, Trait2, Trait3"
-            if ':' in traits_text:
-                traits_text = traits_text.split(':')[-1].strip()
+            if ":" in traits_text:
+                traits_text = traits_text.split(":")[-1].strip()
 
             # Remove common prefixes (after colon removal)
             prefixes_to_remove = [
-                "I choose ", "I select ", "I have selected ", "Here are ", "Here's ",
-                "The traits are ", "These traits are ", "Output: ", "Based on ",
-                "For ", "Given ", "The ", "A possible ", "Possible "
+                "I choose ",
+                "I select ",
+                "I have selected ",
+                "Here are ",
+                "Here's ",
+                "The traits are ",
+                "These traits are ",
+                "Output: ",
+                "Based on ",
+                "For ",
+                "Given ",
+                "The ",
+                "A possible ",
+                "Possible ",
             ]
             for prefix in prefixes_to_remove:
                 if traits_text.lower().startswith(prefix.lower()):
-                    traits_text = traits_text[len(prefix):].strip()
+                    traits_text = traits_text[len(prefix) :].strip()
 
             # Remove surrounding quotes again (in case they were after prefix)
             traits_text = traits_text.strip('"').strip("'")
@@ -164,9 +176,13 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 elif first_word in all_valid_traits:
                     # Try first word if full string didn't match
                     personality_traits.append(PersonalityTrait(first_word))
-                    logger.warning(f"Extracted trait '{first_word}' from malformed '{trait_name}'")
+                    logger.warning(
+                        f"Extracted trait '{first_word}' from malformed '{trait_name}'"
+                    )
                 else:
-                    logger.warning(f"Invalid trait '{trait_name}' generated, will use fallback")
+                    logger.warning(
+                        f"Invalid trait '{trait_name}' generated, will use fallback"
+                    )
 
             # Validate we have exactly 3 compatible traits
             if len(personality_traits) != 3:
@@ -175,21 +191,47 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             if not validate_trait_selection(personality_traits):
                 raise ValueError("Traits contain contradictions")
 
-            logger.info(f"Generated traits for {name}: {[t.value for t in personality_traits]}")
+            logger.info(
+                f"Generated traits for {name}: {[t.value for t in personality_traits]}"
+            )
 
         except (ValueError, KeyError) as e:
             logger.warning(f"Failed to parse traits: {e}. Using theme-based fallback.")
             # Theme-based fallback traits
             theme_fallbacks = {
-                "post-apocalyptic": [PersonalityTrait.CAUTIOUS, PersonalityTrait.PRAGMATIC, PersonalityTrait.STOIC],
-                "fantasy": [PersonalityTrait.BRAVE, PersonalityTrait.HONORABLE, PersonalityTrait.CURIOUS],
-                "cyberpunk": [PersonalityTrait.CYNICAL, PersonalityTrait.ANALYTICAL, PersonalityTrait.REBELLIOUS],
-                "norse-mythology": [PersonalityTrait.FEARLESS, PersonalityTrait.HONORABLE, PersonalityTrait.COMPETITIVE],
-                "steampunk": [PersonalityTrait.CREATIVE, PersonalityTrait.METHODICAL, PersonalityTrait.AMBITIOUS],
+                "post-apocalyptic": [
+                    PersonalityTrait.CAUTIOUS,
+                    PersonalityTrait.PRAGMATIC,
+                    PersonalityTrait.STOIC,
+                ],
+                "fantasy": [
+                    PersonalityTrait.BRAVE,
+                    PersonalityTrait.HONORABLE,
+                    PersonalityTrait.CURIOUS,
+                ],
+                "cyberpunk": [
+                    PersonalityTrait.CYNICAL,
+                    PersonalityTrait.ANALYTICAL,
+                    PersonalityTrait.REBELLIOUS,
+                ],
+                "norse-mythology": [
+                    PersonalityTrait.FEARLESS,
+                    PersonalityTrait.HONORABLE,
+                    PersonalityTrait.COMPETITIVE,
+                ],
+                "steampunk": [
+                    PersonalityTrait.CREATIVE,
+                    PersonalityTrait.METHODICAL,
+                    PersonalityTrait.AMBITIOUS,
+                ],
             }
             personality_traits = theme_fallbacks.get(
                 theme.lower(),
-                [PersonalityTrait.ADAPTABLE, PersonalityTrait.PERCEPTIVE, PersonalityTrait.HONEST]
+                [
+                    PersonalityTrait.ADAPTABLE,
+                    PersonalityTrait.PERCEPTIVE,
+                    PersonalityTrait.HONEST,
+                ],
             )
 
         # Convert traits to list of strings for storage
@@ -207,7 +249,9 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
+                "personality": ", ".join(
+                    traits_list
+                ),  # Pass traits as comma-separated string
                 "appearance": appearance,
             }
         )
@@ -251,7 +295,9 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
+                "personality": ", ".join(
+                    traits_list
+                ),  # Pass traits as comma-separated string
                 "description": backstory,
             }
         )
@@ -270,7 +316,9 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": ", ".join(traits_list),  # Pass traits as comma-separated string
+                "personality": ", ".join(
+                    traits_list
+                ),  # Pass traits as comma-separated string
                 "appearance": appearance,
                 "description": backstory,
                 "skills": json.dumps(skills_array),
@@ -312,6 +360,18 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             influence = 10
             perception = 10
 
+        # Generate Character Images
+        # Use sanitized name as ID since database ID doesn't exist yet
+        character_id = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+
+        image_data = await generate_character_images(
+            name=name,
+            appearance=appearance,
+            theme=theme,
+            world_id=0,  # Temp value, images will be in /generated/0/ directory
+            character_id=character_id,
+        )
+
         # Increment Success Counter
         # All 6 steps completed successfully, track metrics
         increment_success_counter()
@@ -327,7 +387,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
 
     details: dict[str, Any] = {
-        "traits": traits_list,  # List of 3 standardized personality trait strings
+        "traits": traits_list,
         "appearance": appearance,
         "flaw": flaw,
         "health": health,
@@ -340,6 +400,12 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "perception": perception,
         "skills": skills_array,
     }
+
+    # Only add image fields if they have valid values (not None)
+    if image_data.get("image_card"):
+        details["image_card"] = image_data["image_card"]
+    if image_data.get("image_portrait"):
+        details["image_portrait"] = image_data["image_portrait"]
 
     return LorePiece(
         name=name,

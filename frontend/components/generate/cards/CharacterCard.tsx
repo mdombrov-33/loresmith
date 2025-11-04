@@ -1,4 +1,5 @@
 import { LorePiece } from "@/types/generate-world";
+import Image from "next/image";
 import {
   Tooltip,
   TooltipContent,
@@ -49,29 +50,46 @@ export default function CharacterCard({
   //* Front side: Basic info
   const frontContent = (
     <div
-      className={`bg-card flex h-full flex-col rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"}`}
+      className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"} overflow-hidden`}
     >
-      {/* Title + Type Badge */}
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-foreground text-xl font-semibold">
-          {character.name}
-        </h3>
-        <span className="text-accent bg-accent/10 rounded px-2 py-1 text-xs font-semibold uppercase">
-          Character
-        </span>
-      </div>
+      {/* Character Image */}
+      {character.details.image_card &&
+       character.details.image_card !== "None" &&
+       character.details.image_card.startsWith("/") && (
+        <div className="relative h-48 w-full">
+          <Image
+            src={character.details.image_card}
+            alt={character.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+      )}
 
-      {/* Description (Backstory) */}
-      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-        {character.description}
-      </p>
+      <div className="flex flex-col p-6 flex-1">
+        {/* Title + Type Badge */}
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-foreground text-xl font-semibold">
+            {character.name}
+          </h3>
+          <span className="text-accent bg-accent/10 rounded px-2 py-1 text-xs font-semibold uppercase">
+            Character
+          </span>
+        </div>
 
-      {/* Hover hint - pushed to bottom */}
-      <div className="bg-primary/5 border-primary/20 mt-auto flex items-center justify-center gap-2 rounded-lg border p-3">
-        <RotateCw className="text-primary h-4 w-4" />
-        <span className="text-muted-foreground text-xs">
-          Hover to see full details
-        </span>
+        {/* Description (Backstory) */}
+        <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+          {character.description}
+        </p>
+
+        {/* Hover hint - pushed to bottom */}
+        <div className="bg-primary/5 border-primary/20 mt-auto flex items-center justify-center gap-2 rounded-lg border p-3">
+          <RotateCw className="text-primary h-4 w-4" />
+          <span className="text-muted-foreground text-xs">
+            Hover to see full details
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -79,17 +97,33 @@ export default function CharacterCard({
   //* Back side: Detailed info
   const backContent = (
     <div
-      className={`bg-card h-full overflow-y-auto rounded-xl border-2 p-6 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"}`}
+      className={`bg-card h-full overflow-y-auto rounded-xl border-2 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"} overflow-hidden`}
     >
-      {/* Title */}
-      <div className="mb-3">
-        <h3 className="text-foreground text-xl font-semibold">
-          {character.name}
-        </h3>
-      </div>
+      {/* Character Image */}
+      {character.details.image_card &&
+       character.details.image_card !== "None" &&
+       character.details.image_card.startsWith("/") && (
+        <div className="relative h-48 w-full">
+          <Image
+            src={character.details.image_card}
+            alt={character.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+      )}
 
-      {/* Details */}
-      <div className="space-y-3">
+      <div className="p-6">
+        {/* Title */}
+        <div className="mb-3">
+          <h3 className="text-foreground text-xl font-semibold">
+            {character.name}
+          </h3>
+        </div>
+
+        {/* Details */}
+        <div className="space-y-3">
         {/* Personality Traits */}
         {character.details.traits && Array.isArray(character.details.traits) && (
           <div>
@@ -359,6 +393,7 @@ export default function CharacterCard({
             </TooltipProvider>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

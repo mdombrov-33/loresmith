@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"
     LANGFUSE_ENABLED: bool = True
 
+    # Image Generation Settings
+    ENABLE_IMAGE_GENERATION: bool = True
+    IMAGE_PROVIDER: str = "local"  # Options: 'replicate', 'local'
+    REPLICATE_API_TOKEN: str = ""  # Get from https://replicate.com/account/api-tokens
+    AUTOMATIC1111_URL: str = (
+        "http://host.docker.internal:7860"  # For local Automatic1111 WebUI
+    )
+
 
 @lru_cache()
 def get_settings() -> Settings:

@@ -25,6 +25,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./python-service/prompts:/app/prompts
+      - ./frontend/public/generated:/app/generated
 
   redis:
     image: redis:8

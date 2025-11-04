@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,22 @@ function LorePieceCard({
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-6 pt-4">
+              {/* Character Image */}
+              {piece.type === "character" &&
+               piece.details.image_card &&
+               piece.details.image_card !== "None" &&
+               piece.details.image_card.startsWith("/") && (
+                <div className="relative h-64 w-full overflow-hidden rounded-lg">
+                  <Image
+                    src={piece.details.image_card}
+                    alt={piece.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 672px"
+                  />
+                </div>
+              )}
+
               <div>
                 <h4 className="mb-3 flex items-center gap-2 font-semibold">
                   <BookOpen className="text-primary h-4 w-4" />
