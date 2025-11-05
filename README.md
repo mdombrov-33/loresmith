@@ -141,6 +141,178 @@ This hybrid approach enables both thematic exploration ("desert oasis with pyram
    OPENROUTER_API_KEY=your_api_key_here
    ```
 
+### Character Image Generation (Optional)
+
+LoreSmith can generate AI images for characters (768x768 card + 256x256 portrait). Choose between cloud or local generation:
+
+#### Option A: Cloud Generation with Replicate (PAID, High Quality)
+
+Uses Stable Diffusion XL via Replicate API - professional quality, no local setup required.
+
+1. **Get API Token**: https://replicate.com/account/api-tokens
+   - New accounts get $5 free credits (~500-600 images)
+   - Pricing: ~$0.008-0.01 per image after free credits
+
+2. **Configure .env:**
+   ```env
+   ENABLE_IMAGE_GENERATION=true
+   IMAGE_PROVIDER=replicate
+   REPLICATE_API_TOKEN=your_token_here
+   ```
+
+**Performance**: ~30-60 seconds per character (generates 2 images)
+
+#### Option B: Local Generation with Automatic1111 (FREE, Customizable)
+
+Run Stable Diffusion locally - completely free, full control over models and settings.
+
+1. **Install Automatic1111 WebUI** (in WSL2 or native Linux):
+
+   ```bash
+   cd ~
+   git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+   cd stable-diffusion-webui
+
+   # Start with API enabled (keeps terminal window open)
+   ./webui.sh --api --listen --skip-torch-cuda-test
+   ```
+
+   First run downloads SD 1.5 (~4GB, takes 5-10 minutes).
+
+2. **Download Better Model** (recommended - SDXL-Turbo):
+
+   Open a second terminal:
+   ```bash
+   cd ~/stable-diffusion-webui/models/Stable-diffusion/
+
+   # Download SDXL-Turbo (~7GB, much better quality)
+   wget https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors
+   ```
+
+   Then select it in the Web UI:
+   - Open http://localhost:7860
+   - Top-left dropdown: Select `sd_xl_turbo_1.0_fp16.safetensors`
+   - Wait 10-15 seconds for model to load
+
+3. **Configure .env:**
+   ```env
+   ENABLE_IMAGE_GENERATION=true
+   IMAGE_PROVIDER=local
+   AUTOMATIC1111_URL=http://host.docker.internal:7860
+   ```
+
+**Performance**:
+- SD 1.5 (default): ~20-30 seconds per character, decent quality
+- SDXL-Turbo: ~10-15 seconds per character, very good quality
+
+**Running Automatic1111 in the Future**:
+
+Automatic1111 needs to be running when generating characters (unlike Ollama daemon). You have options:
+
+**Option 1: Keep Terminal Open (Simple)**
+```bash
+cd ~/stable-diffusion-webui
+./webui.sh --api --listen --skip-torch-cuda-test
+```
+Leave this terminal running while using LoreSmith.
+
+**Option 2: Run in Background (Convenient)**
+```bash
+cd ~/stable-diffusion-webui
+nohup ./webui.sh --api --listen --skip-torch-cuda-test > webui.log 2>&1 &
+```
+To stop: `pkill -f webui.sh`
+
+**Option 3: Use tmux/screen (Best for SSH)**
+```bash
+tmux new -s webui
+cd ~/stable-diffusion-webui
+./webui.sh --api --listen --skip-torch-cuda-test
+# Press Ctrl+B, then D to detach
+# Reattach later: tmux attach -t webui
+```
+
+**How Model Selection Works**:
+- Whatever model is selected in the Web UI dropdown gets used for API calls
+- Our code calls Automatic1111's API with generation parameters (steps, guidance, etc.)
+- UI settings (like denoising strength, etc.) **don't** apply to API calls
+- API parameters are in `python-service/services/image_generator.py`
+
+**Customizing Image Generation**:
+
+Edit `python-service/services/image_generator.py` to tweak:
+- `num_inference_steps`: Higher = better quality, slower (default: 20 for cards, 15 for portraits)
+- `cfg_scale`: Prompt adherence strength (default: 7.5)
+- `sampler_name`: Algorithm used (default: "DPM++ 2M Karras")
+- Theme-specific prompts and negative prompts
+
+**Recommended Models**:
+- **SD 1.5** (default): 4GB, fast but dated quality
+- **SDXL-Turbo**: 7GB, best balance of speed/quality for testing
+- **SDXL Base 1.0**: 13GB, highest quality but slower (~60s per character)
+
+**Daily Usage - Quick Commands**:
+
+```bash
+# Start Automatic1111 (keep terminal open)
+cd ~/stable-diffusion-webui
+./webui.sh --api --listen --skip-torch-cuda-test
+
+# OR run in background (recommended)
+cd ~/stable-diffusion-webui
+nohup ./webui.sh --api --listen --skip-torch-cuda-test > webui.log 2>&1 &
+
+# Check if running
+ps aux | grep webui.sh
+# OR check the API
+curl http://localhost:7860/sdapi/v1/sd-models
+
+# Stop background process
+pkill -f webui.sh
+
+# View logs (if running in background)
+tail -f ~/stable-diffusion-webui/webui.log
+
+# Switch models:
+# 1. Open http://localhost:7860
+# 2. Top-left dropdown: Select model (e.g., sd_xl_turbo_1.0_fp16)
+# 3. Wait 10-15 seconds for model to load
+# 4. Generate character in LoreSmith - uses selected model
+```
+
+**Important Notes**:
+- Automatic1111 **must be running** when generating characters (unlike Ollama)
+- Whatever model is selected in the Web UI dropdown gets used for API calls
+- UI settings (sliders, checkboxes) don't apply to API calls
+- To customize generation parameters, edit `python-service/services/image_generator.py`
+- Images saved to `frontend/public/generated/` (gitignored)
+
+**Troubleshooting**:
+```bash
+# Can't connect to Automatic1111
+# → Check it's running with --api flag
+curl http://localhost:7860/sdapi/v1/sd-models
+
+# Images not appearing in frontend
+# → Check Docker volume mount exists
+ls frontend/public/generated/0/
+
+# Generation too slow
+# → Use SDXL-Turbo instead of SDXL Base
+# → Reduce steps in image_generator.py (20 → 8 for turbo models)
+
+# Out of memory
+# → Use smaller model (SD 1.5 instead of SDXL)
+# → Reduce batch size or image dimensions in code
+```
+
+#### Disable Image Generation
+
+To turn off image generation entirely:
+```env
+ENABLE_IMAGE_GENERATION=false
+```
+
 ### Setup
 
 1. Copy `.env.example` to `.env` and configure your values:
