@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { Plus, Play, TrendingUp } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
-import { World } from "@/types/api";
+import { World } from "@/lib/schemas";
 
 interface QuickActionsProps {
   myWorlds: World[];

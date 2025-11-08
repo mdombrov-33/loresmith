@@ -1,4 +1,4 @@
-import { GenerationStage, LorePiece } from "@/types/generate-world";
+import { GenerationStage, LorePiece } from "@/lib/schemas";
 import CharacterCard from "@/components/generate/cards/CharacterCard";
 import FactionCard from "@/components/generate/cards/FactionCard";
 import SettingCard from "@/components/generate/cards/SettingCard";

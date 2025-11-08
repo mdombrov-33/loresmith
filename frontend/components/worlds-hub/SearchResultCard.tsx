@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -22,12 +21,14 @@ import {
 } from "@/components/ui/tooltip";
 import { HelpCircle, Eye, EyeOff } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { World } from "@/types/api";
+import { World } from "@/lib/schemas";
 import {
   useDeleteWorld,
-  useDeleteAdventureSession,
   useUpdateWorldVisibility,
-} from "@/lib/queries";
+} from "@/lib/queries/world";
+import {
+  useDeleteAdventureSession,
+} from "@/lib/queries/adventure";
 
 interface SearchResultCardProps {
   world: World;
@@ -230,21 +231,22 @@ export default function SearchResultCard({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button
+                      <ActionButton
                         variant="outline"
                         size="sm"
                         onClick={handleToggleVisibility}
                         disabled={updateVisibilityMutation.isPending}
+                        icon={
+                          updateVisibilityMutation.isPending ? (
+                            <span className="h-4 w-4">...</span>
+                          ) : world.visibility === "published" ? (
+                            <Eye className="h-4 w-4" />
+                          ) : (
+                            <EyeOff className="h-4 w-4" />
+                          )
+                        }
                         className="hover:bg-primary hover:text-primary-foreground px-2 transition-colors"
-                      >
-                        {updateVisibilityMutation.isPending ? (
-                          <span className="h-4 w-4">...</span>
-                        ) : world.visibility === "published" ? (
-                          <Eye className="h-4 w-4" />
-                        ) : (
-                          <EyeOff className="h-4 w-4" />
-                        )}
-                      </Button>
+                      />
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
@@ -299,7 +301,7 @@ export default function SearchResultCard({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
+            <ActionButton
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={
@@ -307,8 +309,8 @@ export default function SearchResultCard({
               }
             >
               Cancel
-            </Button>
-            <Button
+            </ActionButton>
+            <ActionButton
               variant="destructive"
               onClick={handleConfirmDelete}
               disabled={
@@ -318,7 +320,7 @@ export default function SearchResultCard({
               {deleteWorldMutation.isPending || deleteSessionMutation.isPending
                 ? "Deleting..."
                 : "Delete"}
-            </Button>
+            </ActionButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

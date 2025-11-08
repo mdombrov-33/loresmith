@@ -55,7 +55,7 @@ export default function Hero() {
           <div className="relative">
             <div className="bg-primary/5 border-primary/30 relative rounded-2xl border-2 px-8 py-4 backdrop-blur-sm">
               <Logo size="lg" showTagline />
-              <div className="bg-primary/10 absolute -inset-4 -z-10 animate-pulse rounded-3xl blur-xl" />
+              <div className="bg-primary/5 absolute -inset-2 -z-10 rounded-3xl blur-md" />
             </div>
           </div>
 

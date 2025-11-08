@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import { useWorld } from "@/lib/queries";
+import { useWorld } from "@/lib/queries/world";
 import { useAppStore } from "@/stores/appStore";
 
 export default function AdventurePageClient() {

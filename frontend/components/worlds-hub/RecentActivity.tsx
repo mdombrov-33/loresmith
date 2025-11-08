@@ -1,6 +1,6 @@
 "use client";
 
-import { World } from "@/types/api";
+import { World } from "@/lib/schemas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Plus, Play, CheckCircle } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";

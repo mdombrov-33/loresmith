@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
-import { loginUser } from "@/lib/api";
+import { loginUser } from "@/lib/api/auth";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -73,7 +73,7 @@ export function LoginModal({
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
-      console.error("Google sign-in failed:", error);
+      console.error(error);
       setError("Google sign-in failed");
     }
   };

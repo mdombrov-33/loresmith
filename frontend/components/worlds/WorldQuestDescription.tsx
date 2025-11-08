@@ -1,6 +1,6 @@
 import { Card, CardHeader } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
-import { FullStory } from "@/types/api";
+import { FullStory } from "@/lib/schemas";
 
 interface WorldQuestDescriptionProps {
   parsedStory: FullStory;

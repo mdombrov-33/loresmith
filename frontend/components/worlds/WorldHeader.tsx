@@ -1,6 +1,6 @@
 import { Compass, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { FullStory } from "@/types/api";
+import { FullStory } from "@/lib/schemas";
 
 interface WorldHeaderProps {
   parsedStory: FullStory;

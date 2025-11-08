@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useWorlds } from "@/lib/queries";
+import { useWorlds } from "@/lib/queries/world";
 import { useAppStore } from "@/stores/appStore";
 
 export function useWorldsHubLogic() {

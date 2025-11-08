@@ -6,9 +6,9 @@ import {
   GenerationStage,
   SelectedLore,
   LorePiece,
-} from "@/types/generate-world";
+} from "@/lib/schemas";
 import { useAppStore } from "@/stores/appStore";
-import { useGenerateLore, useGenerateDraft } from "@/lib/queries";
+import { useGenerateLore, useGenerateDraft } from "@/lib/queries/generation";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 import { LOADING_MESSAGES } from "@/constants/loading-messages";
 

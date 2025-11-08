@@ -1,6 +1,6 @@
 "use client";
 
-import { World } from "@/types/api";
+import { World } from "@/lib/schemas";
 import { Card, CardContent } from "@/components/ui/card";
 import { Globe, Sparkles, Users, Eye } from "lucide-react";
 

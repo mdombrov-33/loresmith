@@ -1,4 +1,5 @@
-import ActionButton from "@/components/generate/ActionButton";
+import ActionButton from "@/components/shared/ActionButton";
+import { RotateCw, ArrowRight, Check, Sparkles } from "lucide-react";
 
 interface GenerateActionsProps {
   hasSelection: boolean;
@@ -20,23 +21,31 @@ export default function GenerateActions({
   return (
     <section className="mt-8 flex items-center justify-between gap-4">
       <ActionButton
-        type="regenerate"
-        hasSelection={hasSelection}
-        hasRegenerated={hasRegenerated}
-        isLoading={isLoading}
-        isLastStage={isLastStage}
-        onRegenerate={onRegenerate}
-        onNext={onNext}
-      />
+        variant="outline"
+        size="lg"
+        onClick={onRegenerate}
+        disabled={hasRegenerated || isLoading}
+        icon={hasRegenerated ? <Check className="h-4 w-4" /> : <RotateCw className="h-4 w-4" />}
+      >
+        {hasRegenerated ? "Used" : "Regenerate Once"}
+      </ActionButton>
+
       <ActionButton
-        type="next"
-        hasSelection={hasSelection}
-        hasRegenerated={hasRegenerated}
-        isLoading={isLoading}
-        isLastStage={isLastStage}
-        onRegenerate={onRegenerate}
-        onNext={onNext}
-      />
+        variant="default"
+        size="lg"
+        onClick={onNext}
+        disabled={!hasSelection || isLoading}
+        icon={isLastStage ? <Sparkles className="h-4 w-4" /> : undefined}
+      >
+        {isLastStage ? (
+          "Generate Full Story"
+        ) : (
+          <>
+            Continue to Next
+            <ArrowRight className="h-4 w-4" />
+          </>
+        )}
+      </ActionButton>
     </section>
   );
 }

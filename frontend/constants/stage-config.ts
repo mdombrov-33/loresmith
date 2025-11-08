@@ -1,4 +1,4 @@
-import { GenerationStage } from "@/types/generate-world";
+import { GenerationStage } from "@/lib/schemas";
 
 export interface StageConfig {
   title: string;

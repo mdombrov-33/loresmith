@@ -49,7 +49,6 @@ const handler = NextAuth({
           },
         );
         if (!response.ok) {
-          console.error("Failed to authenticate with backend");
           return false;
         }
         const data = await response.json();
@@ -59,7 +58,7 @@ const handler = NextAuth({
           user as unknown as { token: string; backendUser: BackendUser }
         ).backendUser = data.user as BackendUser;
       } catch (error) {
-        console.error("Error calling backend:", error);
+        console.error(error);
         return false;
       }
       return true;

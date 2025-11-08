@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/shared/ActionButton";
 import { Search } from "lucide-react";
 
 interface SearchBarProps {
@@ -28,14 +28,14 @@ export default function SearchBar({
             disabled={isLoading}
           />
         </div>
-        <Button
+        <ActionButton
           onClick={onSearch}
           disabled={isLoading || !searchQuery.trim()}
+          icon={<Search className="h-4 w-4" />}
           className="px-4"
         >
-          <Search className="h-4 w-4" />
           Search
-        </Button>
+        </ActionButton>
       </div>
     </section>
   );

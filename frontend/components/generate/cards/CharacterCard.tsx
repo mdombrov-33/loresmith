@@ -1,5 +1,4 @@
-import { LorePiece } from "@/types/generate-world";
-import Image from "next/image";
+import { LorePiece } from "@/lib/schemas";
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +25,8 @@ import {
   getTraitColor,
   getTraitDescription,
 } from "@/lib/trait-icons";
+import StatItem from "@/components/shared/card/StatItem";
+import CardImage from "@/components/shared/card/CardImage";
 
 interface CharacterCardProps {
   character: LorePiece;
@@ -47,27 +48,24 @@ export default function CharacterCard({
       })
     : [];
 
+  //* Common card border styling
+  const borderClass = isSelected
+    ? "border-primary shadow-primary/20 shadow-lg"
+    : "border-border";
+
   //* Front side: Basic info
   const frontContent = (
     <div
-      className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"} overflow-hidden`}
+      className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
-      {/* Character Image */}
-      {character.details.image_card &&
-       character.details.image_card !== "None" &&
-       character.details.image_card.startsWith("/") && (
-        <div className="relative h-48 w-full">
-          <Image
-            src={character.details.image_card}
-            alt={character.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-      )}
+      <CardImage
+        src={character.details.image_card}
+        alt={character.name}
+        objectFit="contain"
+        height="h-56"
+      />
 
-      <div className="flex flex-col p-6 flex-1">
+      <div className="flex flex-col p-6 flex-1 min-h-0">
         {/* Title + Type Badge */}
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-foreground text-xl font-semibold">
@@ -79,7 +77,7 @@ export default function CharacterCard({
         </div>
 
         {/* Description (Backstory) */}
-        <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+        <p className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-4">
           {character.description}
         </p>
 
@@ -97,24 +95,15 @@ export default function CharacterCard({
   //* Back side: Detailed info
   const backContent = (
     <div
-      className={`bg-card h-full overflow-y-auto rounded-xl border-2 transition-all ${isSelected ? "border-primary shadow-primary/20 shadow-lg" : "border-border"} overflow-hidden`}
+      className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
-      {/* Character Image */}
-      {character.details.image_card &&
-       character.details.image_card !== "None" &&
-       character.details.image_card.startsWith("/") && (
-        <div className="relative h-48 w-full">
-          <Image
-            src={character.details.image_card}
-            alt={character.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-      )}
-
-      <div className="p-6">
+      <CardImage
+        src={character.details.image_card}
+        alt={character.name}
+        objectFit="contain"
+        height="h-56"
+      />
+      <div className="flex-1 overflow-y-auto min-h-0 p-6">
         {/* Title */}
         <div className="mb-3">
           <h3 className="text-foreground text-xl font-semibold">
@@ -237,160 +226,68 @@ export default function CharacterCard({
 
           {/* Health and Stress */}
           <div className="flex gap-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Heart className="h-3 w-3 text-red-500" />
-                    <div className="text-muted-foreground text-xs">Health</div>
-                    <div className="text-success text-sm font-semibold">
-                      {character.details.health}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents physical well-being. Determines survival in
-                    challenges.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Brain className="h-3 w-3 text-blue-500" />
-                    <div className="text-muted-foreground text-xs">Stress</div>
-                    <div className="text-warning text-sm font-semibold">
-                      {character.details.stress}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents mental strain. Affects decision-making and
-                    stability.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <StatItem
+              icon={Heart}
+              iconColor="text-red-500"
+              label="Health"
+              value={character.details.health}
+              valueColor="text-success"
+              tooltip="Represents physical well-being. Determines survival in challenges."
+            />
+            <StatItem
+              icon={Brain}
+              iconColor="text-blue-500"
+              label="Stress"
+              value={character.details.stress}
+              valueColor="text-warning"
+              tooltip="Represents mental strain. Affects decision-making and stability."
+            />
           </div>
 
           {/* Custom Stats */}
           <div className="grid grid-cols-3 gap-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <BookOpen className="h-3 w-3 text-yellow-500" />
-                    <div className="text-muted-foreground text-xs">
-                      Lore Mastery
-                    </div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.lore_mastery}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents knowledge of history and myths. Improves
-                    storytelling abilities.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Users className="h-3 w-3 text-pink-500" />
-                    <div className="text-muted-foreground text-xs">Empathy</div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.empathy}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents understanding of emotions and relationships. Aids
-                    character interactions.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Shield className="h-3 w-3 text-green-500" />
-                    <div className="text-muted-foreground text-xs">
-                      Resilience
-                    </div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.resilience}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents physical and mental endurance. Handles stress and
-                    adversity.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Lightbulb className="h-3 w-3 text-orange-500" />
-                    <div className="text-muted-foreground text-xs">
-                      Creativity
-                    </div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.creativity}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents imaginative problem-solving. Generates unique and
-                    innovative ideas.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Crown className="h-3 w-3 text-purple-500" />
-                    <div className="text-muted-foreground text-xs">
-                      Influence
-                    </div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.influence}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents social persuasion and charisma. Affects alliances
-                    and negotiations.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex cursor-help items-center gap-1">
-                    <Eye className="h-3 w-3 text-indigo-500" />
-                    <div className="text-muted-foreground text-xs">
-                      Perception
-                    </div>
-                    <div className="text-foreground text-sm font-semibold">
-                      {character.details.perception}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Represents awareness of details and clues. Enhances
-                    exploration.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <StatItem
+              icon={BookOpen}
+              iconColor="text-yellow-500"
+              label="Lore Mastery"
+              value={character.details.lore_mastery}
+              tooltip="Represents knowledge of history and myths. Improves storytelling abilities."
+            />
+            <StatItem
+              icon={Users}
+              iconColor="text-pink-500"
+              label="Empathy"
+              value={character.details.empathy}
+              tooltip="Represents understanding of emotions and relationships. Aids character interactions."
+            />
+            <StatItem
+              icon={Shield}
+              iconColor="text-green-500"
+              label="Resilience"
+              value={character.details.resilience}
+              tooltip="Represents physical and mental endurance. Handles stress and adversity."
+            />
+            <StatItem
+              icon={Lightbulb}
+              iconColor="text-orange-500"
+              label="Creativity"
+              value={character.details.creativity}
+              tooltip="Represents imaginative problem-solving. Generates unique and innovative ideas."
+            />
+            <StatItem
+              icon={Crown}
+              iconColor="text-purple-500"
+              label="Influence"
+              value={character.details.influence}
+              tooltip="Represents social persuasion and charisma. Affects alliances and negotiations."
+            />
+            <StatItem
+              icon={Eye}
+              iconColor="text-indigo-500"
+              label="Perception"
+              value={character.details.perception}
+              tooltip="Represents awareness of details and clues. Enhances exploration."
+            />
           </div>
         </div>
       </div>

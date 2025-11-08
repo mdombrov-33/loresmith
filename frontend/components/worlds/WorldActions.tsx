@@ -5,7 +5,7 @@ import ActionButton from "@/components/shared/ActionButton";
 import { ActionLoading } from "@/components/shared/LoadingStates";
 import { Compass, Wand2, Eye, Home, ChevronRight, Play } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
-import { useStartAdventure, useCheckActiveSession } from "@/lib/queries";
+import { useStartAdventure, useCheckActiveSession } from "@/lib/queries/adventure";
 
 interface WorldActionsProps {
   theme: string;

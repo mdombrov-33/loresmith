@@ -1,4 +1,4 @@
-import { LorePiece } from "@/types/generate-world";
+import { LorePiece } from "@/lib/schemas";
 import { RotateCw } from "lucide-react";
 import FlipCard from "@/components/generate/FlipCard";
 import SelectionEffect from "@/components/generate/SelectionEffect";

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { LorePiece, SelectedLore } from "@/types/generate-world";
+import { LorePiece, SelectedLore } from "@/lib/schemas";
 
 export interface User {
   id: number;

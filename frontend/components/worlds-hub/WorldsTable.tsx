@@ -1,7 +1,7 @@
 "use client";
 
-import { World } from "@/types/api";
-import { Button } from "@/components/ui/button";
+import { World } from "@/lib/schemas";
+import ActionButton from "@/components/shared/ActionButton";
 import { Badge } from "@/components/ui/badge";
 import {
   Eye,
@@ -16,9 +16,11 @@ import { useRouter } from "next/navigation";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import {
   useDeleteWorld,
-  useDeleteAdventureSession,
   useUpdateWorldVisibility,
-} from "@/lib/queries";
+} from "@/lib/queries/world";
+import {
+  useDeleteAdventureSession,
+} from "@/lib/queries/adventure";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -222,56 +224,56 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                 <div className="flex gap-2">
                   {world.status === "active" && world.session_id ? (
                     <>
-                      <Button
+                      <ActionButton
                         size="sm"
                         variant="default"
                         onClick={() => handleResume(world.session_id!)}
+                        icon={<Play className="h-3 w-3" />}
                         className="h-8"
                       >
-                        <Play className="mr-1 h-3 w-3" />
                         Resume
-                      </Button>
-                      <Button
+                      </ActionButton>
+                      <ActionButton
                         size="sm"
                         variant="outline"
                         onClick={() => handleView(world)}
+                        icon={<Eye className="h-3 w-3" />}
                         className="h-8"
                       >
-                        <Eye className="mr-1 h-3 w-3" />
                         View
-                      </Button>
-                      <Button
+                      </ActionButton>
+                      <ActionButton
                         size="sm"
                         variant="ghost"
                         onClick={() =>
                           handleDelete(world.id, "session", world.session_id)
                         }
+                        icon={<Trash2 className="h-3 w-3" />}
                         className="text-destructive hover:text-destructive h-8"
                       >
-                        <Trash2 className="mr-1 h-3 w-3" />
                         Delete Session
-                      </Button>
+                      </ActionButton>
                     </>
                   ) : (
                     <>
-                      <Button
+                      <ActionButton
                         size="sm"
                         variant="outline"
                         onClick={() => handleView(world)}
+                        icon={<Eye className="h-3 w-3" />}
                         className="h-8"
                       >
-                        <Eye className="mr-1 h-3 w-3" />
                         View
-                      </Button>
-                      <Button
+                      </ActionButton>
+                      <ActionButton
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDelete(world.id, "world")}
+                        icon={<Trash2 className="h-3 w-3" />}
                         className="text-destructive hover:text-destructive h-8"
                       >
-                        <Trash2 className="mr-1 h-3 w-3" />
                         Delete World
-                      </Button>
+                      </ActionButton>
                     </>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import SearchResultCard from "./SearchResultCard";
 import SearchEmpty from "./SearchEmpty";
-import { World } from "@/types/api";
+import { World } from "@/lib/schemas";
 
 interface SearchResultsProps {
   worlds: World[];

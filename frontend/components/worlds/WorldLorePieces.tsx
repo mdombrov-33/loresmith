@@ -24,7 +24,7 @@ import {
   BookOpen,
   AlertTriangle,
 } from "lucide-react";
-import { LorePiece } from "@/types/api";
+import { LorePiece } from "@/lib/schemas";
 import { loreIcons, getAttributeIcon } from "@/constants/lore";
 import {
   getTraitIcon,
@@ -141,19 +141,19 @@ function LorePieceCard({
             <div className="space-y-6 pt-4">
               {/* Character Image */}
               {piece.type === "character" &&
-               piece.details.image_card &&
-               piece.details.image_card !== "None" &&
-               piece.details.image_card.startsWith("/") && (
-                <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                  <Image
-                    src={piece.details.image_card}
-                    alt={piece.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 672px"
-                  />
-                </div>
-              )}
+                piece.details.image_card &&
+                piece.details.image_card !== "None" &&
+                piece.details.image_card.startsWith("/") && (
+                  <div className="relative h-64 w-full overflow-hidden rounded-lg">
+                    <Image
+                      src={piece.details.image_card}
+                      alt={piece.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 672px"
+                    />
+                  </div>
+                )}
 
               <div>
                 <h4 className="mb-3 flex items-center gap-2 font-semibold">
@@ -187,7 +187,6 @@ function LorePieceCard({
                             traitsArray = JSON.parse(value);
                           } catch (e) {
                             traitsArray = [];
-                            console.error("Failed to parse traits JSON:", e);
                           }
                         }
                         if (Array.isArray(traitsArray)) {
@@ -201,30 +200,35 @@ function LorePieceCard({
                                 Personality Traits
                               </div>
                               <div className="flex flex-wrap gap-2">
-                                {traitsArray.map((trait: string, index: number) => {
-                                  const TraitIcon = getTraitIcon(trait);
-                                  const colorClass = getTraitColor(trait);
-                                  const description = getTraitDescription(trait);
-                                  return (
-                                    <TooltipProvider key={index}>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <div className="bg-muted/50 border-border flex cursor-help items-center gap-1.5 rounded-lg border px-3 py-1.5">
-                                            <TraitIcon
-                                              className={`h-4 w-4 ${colorClass}`}
-                                            />
-                                            <span className="text-foreground text-sm font-medium">
-                                              {trait}
-                                            </span>
-                                          </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p className="max-w-xs">{description}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                  );
-                                })}
+                                {traitsArray.map(
+                                  (trait: string, index: number) => {
+                                    const TraitIcon = getTraitIcon(trait);
+                                    const colorClass = getTraitColor(trait);
+                                    const description =
+                                      getTraitDescription(trait);
+                                    return (
+                                      <TooltipProvider key={index}>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <div className="bg-muted/50 border-border flex cursor-help items-center gap-1.5 rounded-lg border px-3 py-1.5">
+                                              <TraitIcon
+                                                className={`h-4 w-4 ${colorClass}`}
+                                              />
+                                              <span className="text-foreground text-sm font-medium">
+                                                {trait}
+                                              </span>
+                                            </div>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p className="max-w-xs">
+                                              {description}
+                                            </p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    );
+                                  },
+                                )}
                               </div>
                             </div>
                           );
@@ -239,7 +243,6 @@ function LorePieceCard({
                             skillsArray = JSON.parse(value);
                           } catch (e) {
                             skillsArray = [];
-                            console.error("Failed to parse skills JSON:", e);
                           }
                         }
                         if (Array.isArray(skillsArray)) {
