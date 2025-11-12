@@ -141,12 +141,12 @@ function LorePieceCard({
             <div className="space-y-6 pt-4">
               {/* Character Image */}
               {piece.type === "character" &&
-                piece.details.image_card &&
-                piece.details.image_card !== "None" &&
-                piece.details.image_card.startsWith("/") && (
+                piece.details.image_portrait &&
+                piece.details.image_portrait !== "None" &&
+                piece.details.image_portrait.startsWith("/") && (
                   <div className="relative h-64 w-full overflow-hidden rounded-lg">
                     <Image
-                      src={piece.details.image_card}
+                      src={piece.details.image_portrait}
                       alt={piece.name}
                       fill
                       className="object-cover"

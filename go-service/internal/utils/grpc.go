@@ -8,10 +8,10 @@ import (
 type OperationType string
 
 const (
-	//* LLM generation operations (slowest)
-	OpGenerateLore       OperationType = "generate_lore"        //* 3 minutes - multiple LLM calls
-	OpGenerateFullStory  OperationType = "generate_full_story"  //* 3 minutes - full quest generation
-	OpGenerateSceneBatch OperationType = "generate_scene_batch" //* 3 minutes - multiple scenes with branches
+	//* LLM + Image generation operations (slowest)
+	OpGenerateLore       OperationType = "generate_lore"        //* 5 minutes - LLM calls + image generation
+	OpGenerateFullStory  OperationType = "generate_full_story"  //* 5 minutes - full quest generation
+	OpGenerateSceneBatch OperationType = "generate_scene_batch" //* 5 minutes - multiple scenes with branches
 
 	//* Medium operations
 	OpGenerateBeats     OperationType = "generate_beats"     //* 1 minute - expand scene beats
@@ -25,10 +25,10 @@ const (
 )
 
 var operationTimeouts = map[OperationType]time.Duration{
-	//* Slow operations (3 minutes)
-	OpGenerateLore:       3 * time.Minute,
-	OpGenerateFullStory:  3 * time.Minute,
-	OpGenerateSceneBatch: 3 * time.Minute,
+	//* Slow operations (5 minutes) - increased for image generation
+	OpGenerateLore:       5 * time.Minute,
+	OpGenerateFullStory:  5 * time.Minute,
+	OpGenerateSceneBatch: 5 * time.Minute,
 
 	//* Medium operations (1 minute)
 	OpGenerateBeats:     1 * time.Minute,

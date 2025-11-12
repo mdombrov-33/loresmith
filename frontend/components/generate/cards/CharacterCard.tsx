@@ -59,16 +59,16 @@ export default function CharacterCard({
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
       <CardImage
-        src={character.details.image_card}
+        src={character.details.image_portrait}
         alt={character.name}
         objectFit="contain"
-        height="h-56"
+        height="h-44"
       />
 
-      <div className="flex flex-col p-6 flex-1 min-h-0">
+      <div className="flex flex-col p-4 flex-1 min-h-0">
         {/* Title + Type Badge */}
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-foreground text-xl font-semibold">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-foreground text-lg font-semibold">
             {character.name}
           </h3>
           <span className="text-accent bg-accent/10 rounded px-2 py-1 text-xs font-semibold uppercase">
@@ -77,12 +77,12 @@ export default function CharacterCard({
         </div>
 
         {/* Description (Backstory) */}
-        <p className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-4">
+        <p className="text-muted-foreground mb-3 text-sm leading-relaxed flex-1 overflow-y-auto">
           {character.description}
         </p>
 
         {/* Hover hint - pushed to bottom */}
-        <div className="bg-primary/5 border-primary/20 mt-auto flex items-center justify-center gap-2 rounded-lg border p-3">
+        <div className="bg-primary/5 border-primary/20 mt-auto flex items-center justify-center gap-2 rounded-lg border p-2">
           <RotateCw className="text-primary h-4 w-4" />
           <span className="text-muted-foreground text-xs">
             Hover to see full details
@@ -97,13 +97,15 @@ export default function CharacterCard({
     <div
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
-      <CardImage
-        src={character.details.image_card}
-        alt={character.name}
-        objectFit="contain"
-        height="h-56"
-      />
-      <div className="flex-1 overflow-y-auto min-h-0 p-6">
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <CardImage
+          src={character.details.image_portrait}
+          alt={character.name}
+          objectFit="contain"
+          height="h-48"
+          className="mb-4"
+        />
+        <div className="px-4">
         {/* Title */}
         <div className="mb-3">
           <h3 className="text-foreground text-xl font-semibold">
@@ -290,6 +292,7 @@ export default function CharacterCard({
             />
           </div>
         </div>
+      </div>
       </div>
       </div>
     </div>

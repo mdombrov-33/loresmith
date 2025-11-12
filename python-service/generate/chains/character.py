@@ -23,7 +23,7 @@ from generate.traits import (
     get_all_trait_names,
     validate_trait_selection,
 )
-from services.image_generator import generate_character_images
+from services.image_gen.generator import generate_character_images
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -370,6 +370,8 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             theme=theme,
             world_id=0,  # Temp value, images will be in /generated/0/ directory
             character_id=character_id,
+            traits=traits_list,  # Pass personality traits
+            skills=skills_array,  # Pass skills for visual elements
         )
 
         # Increment Success Counter
@@ -401,9 +403,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "skills": skills_array,
     }
 
-    # Only add image fields if they have valid values (not None)
-    if image_data.get("image_card"):
-        details["image_card"] = image_data["image_card"]
+    # Only add image field if it has a valid value (not None)
     if image_data.get("image_portrait"):
         details["image_portrait"] = image_data["image_portrait"]
 
