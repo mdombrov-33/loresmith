@@ -39,16 +39,16 @@ async def generate_via_replicate(
     try:
         os.environ["REPLICATE_API_TOKEN"] = settings.REPLICATE_API_TOKEN
 
-        # Generate portrait image (768x768)
-        logger.info("Generating portrait image (768x768) via Replicate...")
+        # Generate portrait image (1024x1024)
+        logger.info("Generating portrait image (1024x1024) via Replicate...")
         portrait_output = await asyncio.to_thread(
             replicate.run,
             "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
             input={
                 "prompt": prompt,
                 "negative_prompt": negative_prompt,
-                "width": 768,
-                "height": 768,
+                "width": 1024,
+                "height": 1024,
                 "num_inference_steps": 40,
                 "guidance_scale": 7.5,
                 "scheduler": "DPMSolverMultistep",
@@ -71,9 +71,7 @@ async def generate_via_replicate(
                 return str(output)
 
         portrait_url = extract_url(portrait_output)
-        await download_and_save_image(
-            portrait_url, world_id, character_id, "portrait"
-        )
+        await download_and_save_image(portrait_url, world_id, character_id, "portrait")
 
         logger.info("Successfully generated portrait via Replicate")
         return build_image_urls(world_id, character_id)
@@ -101,20 +99,20 @@ async def generate_via_automatic1111(
     try:
         api_url = settings.AUTOMATIC1111_URL.rstrip("/")
 
-        # Generate portrait image (768x768)
-        # SD XL Turbo optimized settings
-        logger.info("Generating portrait image via Automatic1111 (768x768)...")
+        # Generate portrait image (1024x1024)
+        # Optimized settings for character portrait models
+        logger.info("Generating portrait image via Automatic1111 (1024x1024)...")
         portrait_payload = {
             "prompt": prompt,
             "negative_prompt": negative_prompt,
-            "width": 768,
-            "height": 768,
-            # SD XL Turbo optimal settings
-            "steps": 8,  # Turbo works best with 4-8 steps
-            "cfg_scale": 2.0,  # Lower CFG for Turbo (1.5-2.5 range)
-            "sampler_name": "DPM++ SDE",  # Best sampler for Turbo
+            "width": 1024,
+            "height": 1024,
+            # Optimized for quality character models
+            "steps": 20,  # Higher steps for better quality
+            "cfg_scale": 7.0,
+            "sampler_name": "DPM++ 2M Karras",  # Good balance of quality and speed
             "seed": -1,  # Random seed
-            "enable_hr": False,  # Disable hires fix for speed
+            "enable_hr": False,  # Disable for consistency
         }
 
         async with aiohttp.ClientSession() as session:

@@ -1,6 +1,7 @@
 import json
 from typing import Any
 import re
+import uuid
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -63,7 +64,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             appearance_prompt_text = f.read()
 
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
-        appearance_llm = get_llm(max_tokens=150)
+        appearance_llm = get_llm(max_tokens=250)  # Increased for richer descriptions
         appearance_chain = appearance_prompt | appearance_llm | StrOutputParser()
         appearance_raw = await appearance_chain.ainvoke(
             {
@@ -361,8 +362,8 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             perception = 10
 
         # Generate Character Images
-        # Use sanitized name as ID since database ID doesn't exist yet
-        character_id = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+        # Use UUID to ensure uniqueness and prevent overwrites
+        character_id = str(uuid.uuid4())
 
         image_data = await generate_character_images(
             name=name,

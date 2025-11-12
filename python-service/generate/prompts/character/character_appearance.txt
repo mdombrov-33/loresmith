@@ -2,23 +2,28 @@
 
 ---
 
-Describe {name}'s appearance in EXACTLY 2 sentences (maximum 40 words total). This is a {theme} world.
+Describe {name}'s appearance in EXACTLY 3-4 sentences (50-70 words total). This is a {theme} world.
+
+Focus on creating a DISTINCTIVE, MEMORABLE character with unique facial features. This will be used for portrait generation.
 
 Start directly with character appearance, don't include metadata or thought process.
 
 RULES:
-- First sentence: Height/build, hair, eye color, one facial feature
-- Second sentence: Practical clothing + ONE memorable detail (scar, tattoo, distinctive item)
-- Be concise - no flowery language or long clauses
-- Avoid: "often", "usually", "typically", "seems to", "appears to"
+- Sentence 1: Age range, ethnicity/skin tone, face shape, distinctive facial structure
+- Sentence 2: Hair (style, length, color, texture), eye color and shape, eyebrow detail
+- Sentence 3: Distinctive facial features (scars, marks, wrinkles, bone structure, jawline, nose, lips, etc.)
+- Sentence 4: Practical clothing or accessories (brief, portrait-relevant only)
+- Be specific with colors, shapes, and details to create variety
+- Avoid generic descriptions like "attractive" or "handsome"
 - Natural human features only - no glowing/magical effects
+- Avoid: "often", "usually", "typically", "seems to", "appears to"
 
-Good examples (concise):
-"Rina stands 5'8" with a lean build, short dark hair, and tired brown eyes. She wears a worn leather jacket over scavenged fatigues, a thin scar above her left eyebrow."
+Good examples (distinctive):
+"A weathered woman in her early 40s with deep bronze skin and a strong, angular face. Her jet-black hair is cropped short with gray streaks at the temples, framing sharp amber eyes and thick, expressive brows. A jagged scar runs from her left cheekbone to her jaw, and deep laugh lines frame her wide mouth. She wears a faded olive tactical vest."
 
-"Marcus is a stocky 6'2" with buzz-cut gray hair and sharp green eyes. He wears patched military gear and keeps a faded dog tag around his neck."
+"A lean man in his late 20s with pale, freckled skin and a narrow face with high cheekbones. His copper-red hair falls in messy waves past his shoulders, and his intense green eyes are deep-set beneath straight brows. He has a thin, hawkish nose, a cleft chin, and a small burn mark on his right temple. His neck shows the edge of a worn scarf."
 
-Bad examples (too wordy):
-"Kael Jensen stands at about 5'9" with a lean yet athletic build, his dark brown hair often tied back in a practical ponytail to keep it out of his face as he navigates the harsh environment, and his bright blue eyes are framed by sharp cheekbones."
+Bad examples (too generic):
+"A tall, handsome man with dark hair and blue eyes. He wears leather armor and looks strong."
 
-Output: Exactly 2 sentences, plain text, max 40 words total, no newlines.
+Output: 3-4 sentences, plain text, 50-70 words total, rich facial details, no newlines.
