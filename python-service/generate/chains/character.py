@@ -12,6 +12,11 @@ from utils.blacklist import BLACKLIST
 from utils.logger import logger
 from utils.name_tracker import add_generated_name, get_excluded_names
 from generate.models.lore_piece import LorePiece
+from generate.flaw_templates import (
+    get_flaw_by_id,
+    format_flaw_for_storage,
+    get_random_flaw_ids,
+)
 from services.llm_client import (
     get_llm,
     increment_success_counter,
@@ -289,26 +294,49 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "Awareness",
             ]
 
-        # Generate Flaw
+        # Generate Flaw (using template selection)
         with open("generate/prompts/character/character_flaw.txt", "r") as f:
             flaw_prompt_text = f.read()
 
+        # Get 10 random flaw template IDs and format them for the prompt
+        flaw_ids = get_random_flaw_ids(10)
+        flaw_options_list = []
+        for flaw_id in flaw_ids:
+            template = get_flaw_by_id(flaw_id)
+            if template:
+                flaw_options_list.append(
+                    f"{template['id']}: {template['name']} - {template['description']}"
+                )
+        flaw_options = "\n".join(flaw_options_list)
+
         flaw_prompt = PromptTemplate.from_template(flaw_prompt_text)
-        flaw_llm = get_llm(max_tokens=70)
+        flaw_llm = get_llm(max_tokens=30)
         flaw_chain = flaw_prompt | flaw_llm | StrOutputParser()
         flaw_raw = await flaw_chain.ainvoke(
             {
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
-                "personality": ", ".join(
-                    traits_list
-                ),  # Pass traits as comma-separated string
+                "personality": ", ".join(traits_list),
                 "description": backstory,
+                "flaw_options": flaw_options,
             }
         )
-        flaw = clean_ai_text(flaw_raw)
-        logger.info(f"Generated flaw for {name}")
+        flaw_id_raw = clean_ai_text(flaw_raw)
+
+        # Parse the template ID from LLM response
+        flaw_template = get_flaw_by_id(flaw_id_raw)
+
+        # Fallback: if LLM returned invalid ID, pick first from the list
+        if not flaw_template:
+            logger.warning(
+                f"Invalid flaw ID '{flaw_id_raw}' returned. Using fallback from options."
+            )
+            flaw_template = get_flaw_by_id(flaw_ids[0])
+
+        # Format flaw for storage: "name | trigger | penalty | duration"
+        flaw = format_flaw_for_storage(flaw_template)
+        logger.info(f"Generated flaw for {name}: {flaw_template['name']}")
 
         # Generate Stats
         with open("generate/prompts/character/character_stats.txt", "r") as f:

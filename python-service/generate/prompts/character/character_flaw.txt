@@ -2,36 +2,28 @@
 
 ---
 
-Generate ONE mechanical character flaw for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
+Select ONE flaw template that best matches {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
 
-Flaws are gameplay mechanics that trigger during adventure encounters. Each flaw must specify:
-1. TRIGGER: When/where it activates (situation, location, NPC type, stress level)
-2. EFFECT: What penalty it causes (attribute checks, auto-fail, stress gain, etc.)
+Available flaw templates:
+{flaw_options}
 
-CRITICAL: VARY THE TYPE OF FLAW. Rotate between these categories:
-- Physical limitation (injury, chronic condition, disability, addiction withdrawal)
-- Phobia/Fear (specific triggers that cause stress or prevent actions)
-- Social dysfunction (trust issues with specific groups, authority problems)
-- Moral compulsion (cannot resist certain actions, even when dangerous)
-- Combat trauma (freezes/panics in specific situations)
+CRITICAL INSTRUCTIONS:
+1. Read the character's personality and backstory carefully
+2. Pick the MOST APPROPRIATE flaw template ID from the list above
+3. Output ONLY the flaw template ID, nothing else
+4. NO explanations, NO preambles like "Here's a flaw:", just the ID
 
-Format: "Flaw description (TRIGGER → EFFECT)"
+OUTPUT FORMAT:
+- Output ONLY the template ID (e.g., "missing_eye" or "claustrophobia")
+- ONE ID only, no other text
+- NO quotes, NO explanations, NO commentary
 
-Good examples (clear trigger + mechanical effect):
-- "Missing left eye (Perception checks for distant objects → auto-fail)"
-- "Addicted to painkillers (12+ hours without dose → Stress +10, all checks -2)"
-- "Terrified of enclosed spaces (Underground/tight spaces → Stress +5 per scene, Empathy -3)"
-- "Distrusts all authority figures (Influence checks with guards/officials → auto-fail)"
-- "Compulsive thief from corpses (Near dead bodies → must succeed Resilience check or attempt to loot, gaining stress +3 if caught)"
-- "Freezes when hearing children cry (Child in danger → must succeed Resilience check or lose 1 turn, unable to act)"
-- "Old shoulder injury (Strength-based checks → -3 penalty)"
-- "Paranoid about betrayal (New NPCs offering help → must succeed Empathy check to trust them, otherwise refuse aid)"
-- "Refuses pre-war technology (When encountering old tech → cannot use it, party must find alternatives)"
+Example outputs (CORRECT):
+stim_addiction
+claustrophobia
+distrust_everyone
 
-Bad examples (vague, no clear trigger/effect):
-- "Has trust issues" (too vague, no mechanical effect)
-- "Doesn't like loud noises" (not gameplay-relevant)
-- "Interrupts people" (communication quirk, not mechanical)
-- "Gets angry sometimes" (no trigger, no effect)
-
-Output: Plain text in format "Description (Trigger → Effect)", one sentence, 20-30 words. Make the trigger and effect CLEAR and SPECIFIC for gameplay.
+Example outputs (WRONG - DO NOT DO THIS):
+"Here's a good flaw: stim_addiction"
+I think claustrophobia would work
+The character should have missing_eye because...
