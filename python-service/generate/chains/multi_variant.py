@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 from generate.models.lore_piece import LorePiece
 from constants.themes import Theme
@@ -8,9 +7,6 @@ from generate.chains.faction import generate_faction
 from generate.chains.setting import generate_setting
 from generate.chains.event import generate_event
 from generate.chains.relic import generate_relic
-from exceptions.redis import RedisGetError, RedisSetError
-from services.redis_utils import redis_get_with_retries, redis_set_with_retries
-from utils.logger import logger
 
 
 async def generate_multiple_generic(
@@ -18,81 +14,59 @@ async def generate_multiple_generic(
     generate_func,
     count: int,
     theme: Theme,
-    regenerate: bool = False,
-    cache_expire: int = 3600,
 ) -> list[LorePiece]:
     """
-    Generic helper to generate multiple lore pieces with caching and error handling.
+    Generic helper to generate multiple lore pieces.
 
     Args:
-        prefix: Redis key prefix (e.g. "characters", "factions").
+        prefix: Unused (kept for API compatibility).
         generate_func: Async function to generate a single lore piece.
         count: Number of lore pieces to generate.
         theme: Theme for generation.
-        regenerate: If True, bypass cache and generate fresh data.
-        cache_expire: Cache TTL in seconds.
 
     Returns:
         List of LorePiece instances.
     """
-    cache_key = f"{prefix}:{theme}:{count}"
-
-    if not regenerate:
-        try:
-            cached = await redis_get_with_retries(cache_key)
-            if cached:
-                data = json.loads(cached)
-                return [LorePiece.model_validate(item) for item in data]
-        except RedisGetError as e:
-            logger.error(f"Redis GET error for key {cache_key}: {e}")
-
+    # Generate items without caching
     items = await asyncio.gather(*(generate_func(theme) for _ in range(count)))
-
-    json_data = json.dumps([item.model_dump() for item in items])
-
-    try:
-        await redis_set_with_retries(cache_key, json_data, ex=cache_expire)
-    except RedisSetError as e:
-        logger.error(f"Redis SET error for key {cache_key}: {e}")
-
     return items
 
 
 async def generate_multiple_characters(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
+    count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
     return await generate_multiple_generic(
-        "characters", generate_character, count, theme, regenerate
+        "characters", generate_character, count, theme
     )
 
 
 async def generate_multiple_factions(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
+    count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
     return await generate_multiple_generic(
-        "factions", generate_faction, count, theme, regenerate
+        "factions", generate_faction, count, theme
     )
 
 
 async def generate_multiple_settings(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
+    count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
     return await generate_multiple_generic(
-        "settings", generate_setting, count, theme, regenerate
+        "settings", generate_setting, count, theme
     )
 
 
 async def generate_multiple_events(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
+    count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
     return await generate_multiple_generic(
-        "events", generate_event, count, theme, regenerate
+        "events", generate_event, count, theme
     )
 
 
 async def generate_multiple_relics(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic, regenerate: bool = False
+    count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
     return await generate_multiple_generic(
-        "relics", generate_relic, count, theme, regenerate
+        "relics", generate_relic, count, theme
     )

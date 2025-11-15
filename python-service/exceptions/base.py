@@ -8,9 +8,3 @@ class OpenRouterException(LoreSmithException):
     """Base class for OpenRouter API related errors."""
 
     pass
-
-
-class RedisException(LoreSmithException):
-    """Base class for Redis related errors."""
-
-    pass

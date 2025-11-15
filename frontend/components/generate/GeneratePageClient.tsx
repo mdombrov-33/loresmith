@@ -25,7 +25,6 @@ export default function GeneratePageClient() {
     error,
     generatedOptions,
     selectedIndex,
-    hasRegenerated,
     generateDraftMutation,
     currentLoadingMessage,
     generationMode,
@@ -85,7 +84,6 @@ export default function GeneratePageClient() {
           </StageTransition>
           <GenerateActions
             hasSelection={selectedIndex !== null}
-            hasRegenerated={hasRegenerated}
             isLoading={isLoading || generateDraftMutation.isPending}
             isLastStage={stageConfig.category === "relics"}
             onRegenerate={handleRegenerate}

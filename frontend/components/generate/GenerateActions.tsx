@@ -1,9 +1,8 @@
 import ActionButton from "@/components/shared/ActionButton";
-import { RotateCw, ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, RotateCw } from "lucide-react";
 
 interface GenerateActionsProps {
   hasSelection: boolean;
-  hasRegenerated: boolean;
   isLoading: boolean;
   isLastStage: boolean;
   onRegenerate: () => void;
@@ -12,7 +11,6 @@ interface GenerateActionsProps {
 
 export default function GenerateActions({
   hasSelection,
-  hasRegenerated,
   isLoading,
   isLastStage,
   onRegenerate,
@@ -24,10 +22,10 @@ export default function GenerateActions({
         variant="outline"
         size="lg"
         onClick={onRegenerate}
-        disabled={hasRegenerated || isLoading}
-        icon={hasRegenerated ? <Check className="h-4 w-4" /> : <RotateCw className="h-4 w-4" />}
+        disabled={isLoading}
+        icon={<RotateCw className="h-4 w-4" />}
       >
-        {hasRegenerated ? "Used" : "Regenerate Once"}
+        Regenerate
       </ActionButton>
 
       <ActionButton

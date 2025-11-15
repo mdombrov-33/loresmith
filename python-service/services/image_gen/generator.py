@@ -37,9 +37,9 @@ async def generate_character_images(
     try:
         logger.info(f"Generating images for {name} using {settings.IMAGE_PROVIDER}")
 
-        # Build optimized prompt
+        # Build optimized prompt (skills not used for portraits)
         prompt, negative_prompt = build_character_prompt(
-            name, appearance, theme, traits, skills
+            name, appearance, theme, traits
         )
 
         if settings.IMAGE_PROVIDER == "replicate":

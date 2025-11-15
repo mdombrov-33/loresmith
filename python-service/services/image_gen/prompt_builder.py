@@ -15,7 +15,6 @@ def build_character_prompt(
         appearance: Physical appearance description
         theme: World theme
         traits: List of personality traits
-        skills: List of skills with levels
 
     Returns:
         Tuple of (positive_prompt, negative_prompt)

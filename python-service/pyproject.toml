@@ -9,7 +9,6 @@ readme = "README.md"
 dependencies = [
     "grpcio (>=1.75.0,<2.0.0)",
     "grpcio-tools (>=1.75.0,<2.0.0)",
-    "redis (>=6.4.0,<7.0.0)",
     "prometheus-client (>=0.23.1,<0.24.0)",
     "sentry-sdk (>=2.38.0,<3.0.0)",
     "pydantic (>=2.11.9,<3.0.0)",

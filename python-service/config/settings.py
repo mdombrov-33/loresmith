@@ -20,10 +20,6 @@ class Settings(BaseSettings):
     LOCAL_EMBEDDING_MODEL: str = "nomic-embed-text"
     OLLAMA_URL: str = "http://host.docker.internal:11434"
 
-    REDIS_HOST: str = "redis"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-
     LANGFUSE_PUBLIC_KEY: str = ""
     LANGFUSE_SECRET_KEY: str = ""
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"

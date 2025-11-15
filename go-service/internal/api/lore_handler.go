@@ -35,7 +35,6 @@ type LoreHandler struct {
 type generateLoreRequest struct {
 	Theme      string
 	Count      int32
-	Regenerate bool
 }
 
 func NewLoreHandler(loreClient lorepb.LoreServiceClient, logger *log.Logger) *LoreHandler {
@@ -62,7 +61,6 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -71,7 +69,6 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 	grpcReq := &lorepb.CharactersRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateCharacters(ctx, grpcReq)
@@ -114,7 +111,6 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -122,7 +118,6 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 	grpcReq := &lorepb.FactionsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateFactions(ctx, grpcReq)
@@ -165,7 +160,6 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -173,7 +167,6 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 	grpcReq := &lorepb.SettingsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateSettings(ctx, grpcReq)
@@ -216,7 +209,6 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -224,7 +216,6 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 	grpcReq := &lorepb.EventsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateEvents(ctx, grpcReq)
@@ -267,7 +258,6 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -275,7 +265,6 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 	grpcReq := &lorepb.RelicsRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateRelics(ctx, grpcReq)
@@ -318,7 +307,6 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
-		req.Regenerate = true
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
@@ -326,7 +314,6 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 	grpcReq := &lorepb.AllRequest{
 		Theme:      req.Theme,
 		Count:      req.Count,
-		Regenerate: req.Regenerate,
 	}
 
 	grpcResp, err := h.loreClient.GenerateAll(ctx, grpcReq)

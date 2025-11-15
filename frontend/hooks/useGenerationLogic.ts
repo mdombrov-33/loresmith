@@ -21,9 +21,7 @@ export function useGenerationLogic() {
   const [stage, setStage] = useState<GenerationStage>("characters");
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [hasRegenerated, setHasRegenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [regenerateFlag, setRegenerateFlag] = useState(false);
   const [generationMode, setGenerationMode] = useState<
     "random" | "custom" | null
   >(null);
@@ -43,7 +41,6 @@ export function useGenerationLogic() {
       | "relics",
     theme,
     3,
-    regenerateFlag,
     true,
   );
 
@@ -93,11 +90,9 @@ export function useGenerationLogic() {
   };
 
   const handleRegenerate = () => {
-    setGeneratedOptions([]); //* Clear cards immediately to prevent stacking
+    setGeneratedOptions([]); //* Clear cards immediately
     setSelectedIndex(null); //* Clear selection
-    setRegenerateFlag(true);
-    setHasRegenerated(true);
-    refetch();
+    refetch(); //* Trigger new generation
   };
 
   const handleNext = async () => {
@@ -141,8 +136,6 @@ export function useGenerationLogic() {
         );
       } else {
         setStage(nextStage);
-        setHasRegenerated(false);
-        setRegenerateFlag(false);
       }
     }
   };
@@ -161,7 +154,6 @@ export function useGenerationLogic() {
     error,
     generatedOptions,
     selectedIndex,
-    hasRegenerated,
     generateDraftMutation,
     currentLoadingMessage,
     generationMode,

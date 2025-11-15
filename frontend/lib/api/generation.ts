@@ -6,11 +6,10 @@ export async function generateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
   theme?: string,
   count: number = 3,
-  regenerate: boolean = false,
 ): Promise<LorePiece[]> {
   const storeTheme = useAppStore.getState().theme;
   const finalTheme = theme || storeTheme;
-  const url = `${API_BASE_URL}/generate/${category}?theme=${finalTheme}&count=${count}${regenerate ? "&regenerate=true" : ""}`;
+  const url = `${API_BASE_URL}/generate/${category}?theme=${finalTheme}&count=${count}`;
 
   const response = await fetchWithTimeout(url, {
     method: "GET",

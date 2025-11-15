@@ -39,7 +39,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
         """Generic handler for lore piece generation (characters, factions, etc.)."""
         try:
             pieces = await generate_func(
-                request.count, request.theme, request.regenerate
+                request.count, request.theme
             )
             grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in pieces]
             return response_class(**{response_field_name: grpc_pieces})
@@ -103,7 +103,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
         """Generate all lore types in parallel."""
         try:
             bundle = await generate_lore_variants(
-                request.count, request.theme, request.regenerate
+                request.count, request.theme
             )
             return lore_pb2.AllResponse(  # type: ignore
                 characters=[

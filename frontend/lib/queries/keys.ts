@@ -29,8 +29,7 @@ export const queryKeys = {
     category: string,
     theme: string,
     count: number,
-    regenerate?: boolean,
-  ) => ["lore", category, theme, count, regenerate || false],
+  ) => ["lore", category, theme, count],
   fullStory: (selectedLore: SelectedLore, theme: string) => [
     "fullStory",
     selectedLore,

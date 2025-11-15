@@ -7,13 +7,17 @@ export function useGenerateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
   theme: string,
   count: number = 3,
-  regenerate: boolean = false,
   enabled: boolean = false,
 ) {
   return useQuery({
-    queryKey: queryKeys.lore(category, theme, count, regenerate),
-    queryFn: () => generateLore(category, theme, count, regenerate),
+    queryKey: queryKeys.lore(category, theme, count),
+    queryFn: () => generateLore(category, theme, count),
     enabled,
+    staleTime: Infinity, // Never mark data as stale
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
+    retry: false, // Don't retry failed requests automatically
   });
 }
 

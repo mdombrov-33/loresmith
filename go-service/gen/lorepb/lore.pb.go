@@ -25,7 +25,6 @@ type CharactersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,18 +73,10 @@ func (x *CharactersRequest) GetCount() int32 {
 	return 0
 }
 
-func (x *CharactersRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
-}
-
 type FactionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -134,18 +125,10 @@ func (x *FactionsRequest) GetCount() int32 {
 	return 0
 }
 
-func (x *FactionsRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
-}
-
 type SettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,18 +177,10 @@ func (x *SettingsRequest) GetCount() int32 {
 	return 0
 }
 
-func (x *SettingsRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
-}
-
 type EventsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,18 +229,10 @@ func (x *EventsRequest) GetCount() int32 {
 	return 0
 }
 
-func (x *EventsRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
-}
-
 type RelicsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -312,13 +279,6 @@ func (x *RelicsRequest) GetCount() int32 {
 		return x.Count
 	}
 	return 0
-}
-
-func (x *RelicsRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
 }
 
 type LorePiece struct {
@@ -613,7 +573,6 @@ type AllRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
 	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Regenerate    bool                   `protobuf:"varint,3,opt,name=regenerate,proto3" json:"regenerate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -660,13 +619,6 @@ func (x *AllRequest) GetCount() int32 {
 		return x.Count
 	}
 	return 0
-}
-
-func (x *AllRequest) GetRegenerate() bool {
-	if x != nil {
-		return x.Regenerate
-	}
-	return false
 }
 
 type AllResponse struct {
@@ -1258,37 +1210,22 @@ var File_lore_proto protoreflect.FileDescriptor
 const file_lore_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"lore.proto\x12\x04lore\"_\n" +
+	"lore.proto\x12\x04lore\"?\n" +
 	"\x11CharactersRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"]\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"=\n" +
 	"\x0fFactionsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"]\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"=\n" +
 	"\x0fSettingsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"[\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\";\n" +
 	"\rEventsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"[\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\";\n" +
 	"\rRelicsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"\xc9\x01\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"\xc9\x01\n" +
 	"\tLorePiece\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x126\n" +
@@ -1308,14 +1245,11 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eEventsResponse\x12'\n" +
 	"\x06events\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06events\"9\n" +
 	"\x0eRelicsResponse\x12'\n" +
-	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"X\n" +
+	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"8\n" +
 	"\n" +
 	"AllRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1e\n" +
-	"\n" +
-	"regenerate\x18\x03 \x01(\bR\n" +
-	"regenerate\"\xea\x01\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"\xea\x01\n" +
 	"\vAllResponse\x12/\n" +
 	"\n" +
 	"characters\x18\x01 \x03(\v2\x0f.lore.LorePieceR\n" +

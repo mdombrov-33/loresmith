@@ -7,54 +7,44 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CharactersRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class FactionsRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class SettingsRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class EventsRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class RelicsRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class LorePiece(_message.Message):
     __slots__ = ("name", "description", "details", "type")
@@ -106,14 +96,12 @@ class RelicsResponse(_message.Message):
     def __init__(self, relics: _Optional[_Iterable[_Union[LorePiece, _Mapping]]] = ...) -> None: ...
 
 class AllRequest(_message.Message):
-    __slots__ = ("theme", "count", "regenerate")
+    __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
-    REGENERATE_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    regenerate: bool
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., regenerate: bool = ...) -> None: ...
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class AllResponse(_message.Message):
     __slots__ = ("characters", "factions", "settings", "events", "relics")
