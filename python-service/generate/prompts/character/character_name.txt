@@ -4,7 +4,12 @@
 
 Generate EXACTLY ONE character name for a {theme} world. The name must be realistic and human-like (1-2 words: first name and/or surname).
 
+CRITICAL - DO NOT USE THESE RECENTLY USED NAMES (pick something DIFFERENT):
+{excluded_names}
+
 Do not use these banned words: {blacklist}
+
+IMPORTANT: Generate a UNIQUE name that is NOT in the excluded names list above. Ensure variety and avoid repetition.
 
 OUTPUT FORMAT:
 - ONLY the name, nothing else

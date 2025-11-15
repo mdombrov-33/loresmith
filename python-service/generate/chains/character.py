@@ -10,6 +10,7 @@ from langfuse import observe
 
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
+from utils.name_tracker import add_generated_name, get_excluded_names
 from generate.models.lore_piece import LorePiece
 from services.llm_client import (
     get_llm,
@@ -46,6 +47,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         with open("generate/prompts/character/character_name.txt", "r") as f:
             name_prompt_text = f.read()
 
+        # Get recently used names to exclude
+        excluded_names_list = get_excluded_names(limit=50)
+        excluded_names_str = ", ".join(excluded_names_list) if excluded_names_list else "None"
+
         name_prompt = PromptTemplate.from_template(name_prompt_text)
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
@@ -54,10 +59,14 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "theme": theme,
                 "theme_references": theme_references,
                 "blacklist": blacklist_str,
+                "excluded_names": excluded_names_str,
             }
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated character name: {name}")
+
+        # Track this name to prevent immediate reuse
+        add_generated_name(name)
 
         # Generate Appearance
         with open("generate/prompts/character/character_appearance.txt", "r") as f:
