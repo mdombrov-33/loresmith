@@ -1,4 +1,31 @@
 import random
+import re
+from utils.logger import logger
+
+
+def _extract_gender(appearance: str) -> str:
+    """
+    Extract gender from appearance description.
+    Returns 'male', 'female', or 'neutral' based on keywords.
+    """
+    appearance_lower = appearance.lower()
+
+    # Check for explicit gender keywords
+    male_keywords = ["man", "boy", "male", " he ", " his ", "himself"]
+    female_keywords = ["woman", "girl", "female", " she ", " her ", "herself"]
+
+    male_count = sum(1 for keyword in male_keywords if keyword in appearance_lower)
+    female_count = sum(1 for keyword in female_keywords if keyword in appearance_lower)
+
+    if male_count > female_count:
+        gender = "male"
+    elif female_count > male_count:
+        gender = "female"
+    else:
+        gender = "neutral"
+
+    logger.info(f"Detected gender: {gender} (male_keywords={male_count}, female_keywords={female_count})")
+    return gender
 
 
 def build_character_prompt(
@@ -19,6 +46,17 @@ def build_character_prompt(
     Returns:
         Tuple of (positive_prompt, negative_prompt)
     """
+
+    # Extract gender from appearance
+    gender = _extract_gender(appearance)
+
+    # Gender tags for character models (critical for correct gender generation)
+    if gender == "male":
+        gender_tags = "1boy, male focus, man, masculine features"
+    elif gender == "female":
+        gender_tags = "1girl, female focus, woman, feminine features"
+    else:
+        gender_tags = "1person, androgynous"
 
     # Portrait-focused composition for character headshots
     portrait_types = [
@@ -132,6 +170,7 @@ def build_character_prompt(
     # Build main prompt - Portrait-focused, optimized for character models
     positive_prompt = f"""
     masterpiece, best quality, highly detailed portrait,
+    {gender_tags},
     {portrait_type}, {angle}, {expression}{trait_details},
     {appearance},
     {style},
@@ -139,11 +178,11 @@ def build_character_prompt(
     detailed eyes, expressive face, realistic skin texture with pores and details,
     detailed hair strands, fabric texture on clothing,
     dramatic lighting on face, soft rim lighting, depth of field,
-    painterly style, high-quality illustration,
-    character portrait composition, Pathfinder style, Baldur's Gate style,
+    semi-realistic style, painterly illustration, digital painting,
+    character portrait composition, Pathfinder RPG style, Baldur's Gate character art,
     distinctive facial features, unique character design,
     simple clean background, gradient or solid color background,
-    portrait photography composition, professional digital art
+    portrait photography composition, high-quality character illustration
     """.strip()
 
     # Negative prompt optimized for character portrait models
@@ -171,6 +210,12 @@ def build_character_prompt(
 
     3d render, low-poly, video game screenshot,
     chibi, child-like proportions, infantile,
+
+    overly anime, extreme anime style, manga style, cartoon,
+    huge eyes, anime eyes, oversized eyes, sparkly eyes,
+    tiny nose, button nose, minimal nose,
+    unrealistic proportions, stylized proportions,
+    cel shading, flat colors, lineart,
 
     busy background, cluttered background, detailed background, complex background,
     landscape, scenery, buildings, environment,
