@@ -114,7 +114,7 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 		MaxHP:                     utils.ParseIntFromDetails(protagonistLore.Details, "max_health", 100),
 		CurrentHP:                 utils.ParseIntFromDetails(protagonistLore.Details, "health", 100),
 		Stress:                    utils.ParseIntFromDetails(protagonistLore.Details, "stress", 0),
-		LoreMastery:               utils.ParseIntFromDetails(protagonistLore.Details, "lore_mastery", 10),
+		Knowledge:                 utils.ParseIntFromDetails(protagonistLore.Details, "knowledge", 10),
 		Empathy:                   utils.ParseIntFromDetails(protagonistLore.Details, "empathy", 10),
 		Resilience:                utils.ParseIntFromDetails(protagonistLore.Details, "resilience", 10),
 		Creativity:                utils.ParseIntFromDetails(protagonistLore.Details, "creativity", 10),

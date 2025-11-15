@@ -24,7 +24,7 @@ export const getAttributeIcon = (key: string) => {
   const iconMap: Record<string, { icon: React.ElementType; color: string }> = {
     health: { icon: Heart, color: "text-red-500" },
     stress: { icon: Brain, color: "text-blue-500" },
-    "lore mastery": { icon: BookOpen, color: "text-yellow-500" },
+    "knowledge": { icon: BookOpen, color: "text-yellow-500" },
     empathy: { icon: Users, color: "text-pink-500" },
     resilience: { icon: Shield, color: "text-green-500" },
     creativity: { icon: Lightbulb, color: "text-orange-500" },

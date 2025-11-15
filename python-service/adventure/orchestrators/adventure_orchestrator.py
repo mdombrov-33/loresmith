@@ -316,7 +316,7 @@ class AdventureOrchestrator:
                 "max_hp": 80,
                 "current_hp": 80,
                 "stress": 0,
-                "lore_mastery": 8,
+                "knowledge": 8,
                 "empathy": 12,
                 "resilience": 10,
                 "creativity": 14,

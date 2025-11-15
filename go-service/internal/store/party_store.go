@@ -19,7 +19,7 @@ type PartyMember struct {
 	MaxHP                     int       `json:"max_hp"`
 	CurrentHP                 int       `json:"current_hp"`
 	Stress                    int       `json:"stress"`
-	LoreMastery               int       `json:"lore_mastery"`
+	Knowledge                 int       `json:"knowledge"`
 	Empathy                   int       `json:"empathy"`
 	Resilience                int       `json:"resilience"`
 	Creativity                int       `json:"creativity"`
@@ -57,7 +57,7 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 	query := `
 	INSERT INTO party_members(session_id, lore_character_id,
 		is_protagonist, name, description, relationship_to_protagonist, relationship_level,
-		max_hp, current_hp, stress, lore_mastery, empathy, resilience, creativity,
+		max_hp, current_hp, stress, knowledge, empathy, resilience, creativity,
 		influence, perception, skills, flaw, personality, appearance, position, created_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, NOW())
 	RETURNING id
@@ -75,7 +75,7 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 		member.MaxHP,
 		member.CurrentHP,
 		member.Stress,
-		member.LoreMastery,
+		member.Knowledge,
 		member.Empathy,
 		member.Resilience,
 		member.Creativity,
@@ -121,7 +121,7 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 		&member.MaxHP,
 		&member.CurrentHP,
 		&member.Stress,
-		&member.LoreMastery,
+		&member.Knowledge,
 		&member.Empathy,
 		&member.Resilience,
 		&member.Creativity,
@@ -193,7 +193,7 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 			&member.MaxHP,
 			&member.CurrentHP,
 			&member.Stress,
-			&member.LoreMastery,
+			&member.Knowledge,
 			&member.Empathy,
 			&member.Resilience,
 			&member.Creativity,
@@ -313,7 +313,7 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 		&protagonist.MaxHP,
 		&protagonist.CurrentHP,
 		&protagonist.Stress,
-		&protagonist.LoreMastery,
+		&protagonist.Knowledge,
 		&protagonist.Empathy,
 		&protagonist.Resilience,
 		&protagonist.Creativity,

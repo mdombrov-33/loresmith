@@ -231,8 +231,8 @@ export default function CharacterCard({
             <StatItem
               icon={BookOpen}
               iconColor="text-yellow-500"
-              label="Lore Mastery"
-              value={character.details.lore_mastery}
+              label="Knowledge"
+              value={character.details.knowledge}
               tooltip="Represents knowledge of history and myths. Improves storytelling abilities."
             />
             <StatItem

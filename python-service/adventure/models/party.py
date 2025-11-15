@@ -42,7 +42,7 @@ class CompanionResponse(BaseModel):
     max_hp: int
     current_hp: int
     stress: int
-    lore_mastery: int
+    knowledge: int
     empathy: int
     resilience: int
     creativity: int

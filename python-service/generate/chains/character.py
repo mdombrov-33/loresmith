@@ -346,7 +346,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
 
             health = max(50, min(150, stats_json.get("health", 100)))
             stress = max(0, min(50, stats_json.get("stress", 0)))
-            lore_mastery = max(8, min(18, stats_json.get("lore_mastery", 10)))
+            knowledge = max(8, min(18, stats_json.get("knowledge", 10)))
             empathy = max(8, min(18, stats_json.get("empathy", 10)))
             resilience = max(8, min(18, stats_json.get("resilience", 10)))
             creativity = max(8, min(18, stats_json.get("creativity", 10)))
@@ -359,7 +359,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             # Fallback defaults
             health = 100
             stress = 0
-            lore_mastery = 10
+            knowledge = 10
             empathy = 10
             resilience = 10
             creativity = 10
@@ -400,7 +400,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "flaw": flaw,
         "health": health,
         "stress": stress,
-        "lore_mastery": lore_mastery,
+        "knowledge": knowledge,
         "empathy": empathy,
         "resilience": resilience,
         "creativity": creativity,

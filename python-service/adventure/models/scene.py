@@ -70,7 +70,7 @@ class BeatSkeleton(BaseModel):
     )
     challenge_attributes: list[str] = Field(
         default_factory=list,
-        description="Which attributes can be used (e.g., ['perception', 'lore_mastery'])",
+        description="Which attributes can be used (e.g., ['perception', 'knowledge'])",
     )
     base_dc: int = Field(
         default=15, description="Base difficulty class (choices vary ±3)"
