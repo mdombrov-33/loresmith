@@ -172,7 +172,7 @@ function LorePieceCard({
                   </h4>
                   <div className="grid gap-3">
                     {sortDetails(piece.details).map(([key, value]) => {
-                      if (key === "is_protagonist") return null;
+                      if (key === "is_protagonist" || key === "image_portrait") return null;
 
                       const isFlaw = key === "flaw";
                       const { icon: AttributeIcon, color } = isFlaw
@@ -273,6 +273,45 @@ function LorePieceCard({
                             </div>
                           );
                         }
+                      }
+
+                      //* Special handling for flaw (show name + description)
+                      if (key === "flaw") {
+                        let flawObj: { name?: string; description?: string } = {};
+
+                        // Handle both object and string formats
+                        if (typeof value === "object" && value !== null) {
+                          flawObj = value as { name?: string; description?: string };
+                        } else if (typeof value === "string") {
+                          try {
+                            flawObj = JSON.parse(value);
+                          } catch (e) {
+                            // If parsing fails, treat as legacy string format
+                            flawObj = { name: value.split('|')[0]?.trim() || value };
+                          }
+                        }
+
+                        return (
+                          <div
+                            key={key}
+                            className="border-red-500/20 bg-red-500/5 hover:border-red-500/30 hover:bg-red-500/10 flex flex-col gap-2 rounded-lg border p-4 transition-all"
+                          >
+                            <div className="flex items-center gap-2 text-sm font-medium text-red-500">
+                              <AlertTriangle className="h-3 w-3 text-red-500" />
+                              Flaw
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-red-400">
+                                {flawObj.name || "Unknown Flaw"}
+                              </p>
+                              {flawObj.description && (
+                                <p className="text-xs text-red-300/70">
+                                  {flawObj.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
                       }
 
                       return (
