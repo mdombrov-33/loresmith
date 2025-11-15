@@ -2,36 +2,36 @@
 
 ---
 
-Generate ONE distinctive character flaw or negative quirk for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
+Generate ONE mechanical character flaw for {name}, who has the personality: {personality} and backstory: {description}. This is a {theme} world.
+
+Flaws are gameplay mechanics that trigger during adventure encounters. Each flaw must specify:
+1. TRIGGER: When/where it activates (situation, location, NPC type, stress level)
+2. EFFECT: What penalty it causes (attribute checks, auto-fail, stress gain, etc.)
 
 CRITICAL: VARY THE TYPE OF FLAW. Rotate between these categories:
-- Physical limitation or addiction (injury, substance dependence, chronic condition)
-- Irrational fear or superstition (phobias, paranoid beliefs, rituals)
-- Social dysfunction (trust issues, authority problems, attachment styles)
-- Moral blind spot (justifies certain behaviors, ignores specific suffering)
-- Cognitive distortion (obsessive thoughts, denial, black-and-white thinking)
+- Physical limitation (injury, chronic condition, disability, addiction withdrawal)
+- Phobia/Fear (specific triggers that cause stress or prevent actions)
+- Social dysfunction (trust issues with specific groups, authority problems)
+- Moral compulsion (cannot resist certain actions, even when dangerous)
+- Combat trauma (freezes/panics in specific situations)
 
-The flaw should be:
-- Specific and behavioral with CONCRETE consequences
-- A potential liability that could get them killed or betrayed
-- Related to their backstory trauma if possible
-- NOT a communication quirk (avoid "interrupts", "repeats words", "finishes sentences")
+Format: "Flaw description (TRIGGER → EFFECT)"
 
-Good examples (VARIED types):
-- "Addicted to stims - shakes and hallucinates after 12 hours without a dose"
-- "Refuses to use pre-war tech, convinced it's cursed by the dead"
-- "Trusts anyone who shares food, even obvious threats"
-- "Cannot sleep indoors after being buried alive during the collapse"
-- "Lies reflexively to authority figures, even when truth would save them"
-- "Freezes completely when they hear children crying - just stands there"
-- "Steals from the dead compulsively, can't resist looting corpses"
-- "Believes they're prophetically blessed, ignores obvious danger signs"
+Good examples (clear trigger + mechanical effect):
+- "Missing left eye (Perception checks for distant objects → auto-fail)"
+- "Addicted to painkillers (12+ hours without dose → Stress +10, all checks -2)"
+- "Terrified of enclosed spaces (Underground/tight spaces → Stress +5 per scene, Empathy -3)"
+- "Distrusts all authority figures (Influence checks with guards/officials → auto-fail)"
+- "Compulsive thief from corpses (Near dead bodies → must succeed Resilience check or attempt to loot, gaining stress +3 if caught)"
+- "Freezes when hearing children cry (Child in danger → must succeed Resilience check or lose 1 turn, unable to act)"
+- "Old shoulder injury (Strength-based checks → -3 penalty)"
+- "Paranoid about betrayal (New NPCs offering help → must succeed Empathy check to trust them, otherwise refuse aid)"
+- "Refuses pre-war technology (When encountering old tech → cannot use it, party must find alternatives)"
 
-Bad examples (too vague OR repetitive communication quirks):
-- "Has trust issues" (too vague)
-- "Interrupts people mid-sentence" (communication quirk)
-- "Repeats back what people say" (communication quirk)
-- "Finishes other people's sentences" (communication quirk)
-- "Doesn't listen when stressed" (communication quirk)
+Bad examples (vague, no clear trigger/effect):
+- "Has trust issues" (too vague, no mechanical effect)
+- "Doesn't like loud noises" (not gameplay-relevant)
+- "Interrupts people" (communication quirk, not mechanical)
+- "Gets angry sometimes" (no trigger, no effect)
 
-Output: Plain text, one sentence describing the flaw with concrete detail, no explanation or extra formatting. Length ideally 15-20 words.
+Output: Plain text in format "Description (Trigger → Effect)", one sentence, 20-30 words. Make the trigger and effect CLEAR and SPECIFIC for gameplay.
