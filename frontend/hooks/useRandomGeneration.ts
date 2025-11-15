@@ -27,12 +27,18 @@ export function useRandomGeneration() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  //* DEBUG: Log generatedOptions changes
+  useEffect(() => {
+    console.log("[DEBUG] generatedOptions state updated:", generatedOptions.length, "items");
+  }, [generatedOptions]);
+
   const stageConfig = STAGE_CONFIG[stage];
 
   const {
     data: loreData,
     isLoading,
     refetch,
+    error: queryError,
   } = useGenerateLore(
     stageConfig.category as
       | "characters"
@@ -44,6 +50,17 @@ export function useRandomGeneration() {
     3,
     true, //* Always enabled for random generation
   );
+
+  //* DEBUG: Log query state changes
+  useEffect(() => {
+    console.log("[DEBUG] Query state:", {
+      isLoading,
+      hasData: !!loreData,
+      dataLength: loreData?.length,
+      hasError: !!queryError,
+      error: queryError,
+    });
+  }, [isLoading, loreData, queryError]);
 
   const generateDraftMutation = useGenerateDraft();
 
@@ -65,13 +82,18 @@ export function useRandomGeneration() {
 
   //* Set app stage on mount and cleanup on unmount
   useEffect(() => {
+    console.log("[DEBUG] useRandomGeneration MOUNTED");
     setAppStage("generating");
     setSelectedLore({}); //* Clear previous selections for new generation
-    return () => setAppStage("home");
+    return () => {
+      console.log("[DEBUG] useRandomGeneration UNMOUNTED");
+      setAppStage("home");
+    };
   }, [setAppStage, setSelectedLore]);
 
   //* Clear generated options when stage changes
   useEffect(() => {
+    console.log("[DEBUG] Stage changed to:", stage);
     setGeneratedOptions([]);
     setSelectedIndex(null);
     setError(null);
@@ -79,10 +101,14 @@ export function useRandomGeneration() {
 
   //* Update generated options when data changes
   useEffect(() => {
+    console.log("[DEBUG] loreData changed:", loreData);
     if (loreData) {
+      console.log("[DEBUG] Setting generatedOptions with", loreData.length, "items");
       setGeneratedOptions(loreData);
       setSelectedIndex(null);
       setError(null);
+    } else {
+      console.log("[DEBUG] loreData is falsy, not setting options");
     }
   }, [loreData]);
 

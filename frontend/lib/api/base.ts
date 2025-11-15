@@ -21,6 +21,15 @@ export async function fetchWithTimeout(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  //* If an external signal is provided (e.g., from React Query), abort our request when it aborts
+  const externalSignal = options.signal;
+  if (externalSignal) {
+    externalSignal.addEventListener("abort", () => {
+      controller.abort();
+      console.log("[DEBUG] Request aborted by external signal (unmount/navigation)");
+    });
+  }
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -31,6 +40,11 @@ export async function fetchWithTimeout(
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === "AbortError") {
+      //* Check if it was an external abort vs timeout
+      if (externalSignal?.aborted) {
+        console.log("[DEBUG] Request cancelled (component unmounted or navigated away)");
+        throw new Error("Request cancelled");
+      }
       throw new Error(
         `Request timed out after ${timeout / 1000} seconds. Please try again.`,
       );

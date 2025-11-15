@@ -11,7 +11,7 @@ export function useGenerateLore(
 ) {
   return useQuery({
     queryKey: queryKeys.lore(category, theme, count),
-    queryFn: () => generateLore(category, theme, count),
+    queryFn: ({ signal }) => generateLore(category, theme, count, signal), //* Pass abort signal
     enabled,
     staleTime: Infinity, // Never mark data as stale
     refetchOnMount: false, // Don't refetch when component mounts

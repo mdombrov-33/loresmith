@@ -6,6 +6,7 @@ export async function generateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
   theme?: string,
   count: number = 3,
+  signal?: AbortSignal,
 ): Promise<LorePiece[]> {
   const storeTheme = useAppStore.getState().theme;
   const finalTheme = theme || storeTheme;
@@ -14,6 +15,7 @@ export async function generateLore(
   const response = await fetchWithTimeout(url, {
     method: "GET",
     headers: await getAuthHeaders(),
+    signal, //* Pass the abort signal from React Query
   });
 
   if (!response.ok) {
@@ -21,7 +23,10 @@ export async function generateLore(
   }
 
   const data = await response.json();
-  return data[category] || data;
+  console.log("[DEBUG] API response for", category, ":", data);
+  const result = data[category] || data;
+  console.log("[DEBUG] Returning:", result);
+  return result;
 }
 
 export async function generateFullStory(
