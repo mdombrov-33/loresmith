@@ -1,5 +1,5 @@
-import GeneratePageClient from "@/components/generate/GeneratePageClient";
+import ModeSelectionClient from "@/components/generate/ModeSelectionClient";
 
 export default function GeneratePage() {
-  return <GeneratePageClient />;
+  return <ModeSelectionClient />;
 }

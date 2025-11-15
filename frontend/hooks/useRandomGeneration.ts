@@ -12,7 +12,11 @@ import { useGenerateLore, useGenerateDraft } from "@/lib/queries/generation";
 import { STAGE_CONFIG, getNextStage } from "@/constants/stage-config";
 import { LOADING_MESSAGES } from "@/constants/loading-messages";
 
-export function useGenerationLogic() {
+/**
+ * Hook for random adventure generation flow
+ * Automatically generates 3 random options per stage
+ */
+export function useRandomGeneration() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const theme = searchParams.get("theme") || "fantasy";
@@ -22,9 +26,6 @@ export function useGenerationLogic() {
   const [generatedOptions, setGeneratedOptions] = useState<LorePiece[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [generationMode, setGenerationMode] = useState<
-    "random" | "custom" | null
-  >(null);
 
   const stageConfig = STAGE_CONFIG[stage];
 
@@ -41,7 +42,7 @@ export function useGenerationLogic() {
       | "relics",
     theme,
     3,
-    true,
+    true, //* Always enabled for random generation
   );
 
   const generateDraftMutation = useGenerateDraft();
@@ -140,14 +141,6 @@ export function useGenerationLogic() {
     }
   };
 
-  const handleSelectRandom = () => {
-    setGenerationMode("random");
-  };
-
-  const handleSelectCustom = () => {
-    setGenerationMode("custom");
-  };
-
   return {
     stageConfig,
     isLoading,
@@ -156,12 +149,9 @@ export function useGenerationLogic() {
     selectedIndex,
     generateDraftMutation,
     currentLoadingMessage,
-    generationMode,
     handleSelectCard,
     handleRegenerate,
     handleNext,
-    handleSelectRandom,
-    handleSelectCustom,
     refetch,
   };
 }
