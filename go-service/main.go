@@ -26,9 +26,9 @@ func main() {
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      r,
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  10 * time.Minute,   //* Allow long-running connections
+		ReadTimeout:  30 * time.Second,   //* Reading request headers
+		WriteTimeout: 6 * time.Minute,    //* Writing response (image generation takes 2-4 minutes)
 	}
 
 	app.Logger.Printf("Application started successfully on port %d", port)

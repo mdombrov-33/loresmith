@@ -14,7 +14,7 @@ export function useGenerateLore(
     queryFn: ({ signal }) => generateLore(category, theme, count, signal), //* Pass abort signal
     enabled,
     staleTime: Infinity, // Never mark data as stale
-    refetchOnMount: false, // Don't refetch when component mounts
+    gcTime: 0, // Don't cache aborted/failed requests
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnReconnect: false, // Don't refetch on network reconnect
     retry: false, // Don't retry failed requests automatically
