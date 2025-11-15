@@ -13,7 +13,7 @@ async def generate_character_images(
     world_id: int,
     character_id: str,
     traits: list[str] | None = None,
-    skills: list[dict] | None = None,
+    skills: list[str] | None = None,
 ) -> dict[str, str | None]:
     """
     Generate portrait image for a character.
@@ -25,7 +25,7 @@ async def generate_character_images(
         world_id: ID of the world this character belongs to
         character_id: Unique identifier for the character
         traits: List of personality traits
-        skills: List of skills with levels
+        skills: List of skill names (unused for portrait generation)
 
     Returns:
         Dict with image_portrait URL (or None if disabled/failed)

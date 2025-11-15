@@ -258,30 +258,26 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
         skills_text = clean_ai_text(skills_raw)
 
-        # Parse simple format: "Lockpicking:85, Combat:70, Survival:60"
+        # Parse comma-separated skill names (no levels)
         skills_array = []
         try:
             for skill_item in skills_text.split(","):
-                skill_item = skill_item.strip()
-                if ":" in skill_item:
-                    parts = skill_item.split(":")
-                    skill_name = parts[0].strip()
-                    skill_level = int(parts[1].strip())
-                    # Clamp level to 1-100
-                    skill_level = max(1, min(100, skill_level))
-                    skills_array.append({"name": skill_name, "level": skill_level})
+                skill_name = skill_item.strip()
+                if skill_name:  # Skip empty strings
+                    skills_array.append(skill_name)
 
             if len(skills_array) == 0:
                 raise ValueError("No skills parsed")
 
-            logger.info(f"Parsed {len(skills_array)} skills from simple format")
+            logger.info(f"Parsed {len(skills_array)} skills: {skills_array}")
         except (ValueError, IndexError) as e:
             logger.warning(f"Failed to parse skills: {e}. Using fallback.")
             # Fallback defaults
             skills_array = [
-                {"name": "Basic Training", "level": 50},
-                {"name": "Survival", "level": 50},
-                {"name": "Combat", "level": 50},
+                "Basic Training",
+                "Combat",
+                "Survival",
+                "Awareness",
             ]
 
         # Generate Flaw

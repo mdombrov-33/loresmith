@@ -2,13 +2,21 @@
 
 ---
 
-Generate 3-4 unique, specific skills for {name} in a {theme} world based on their personality: {personality} and appearance: {appearance}. Each skill should be distinctive and reflect their background story. Assign proficiency level 1-100.
+Generate 4-5 unique, specific skills for {name} in a {theme} world based on their personality: {personality} and appearance: {appearance}. Each skill should be distinctive and reflect their background story.
 
-Make each skill feel personal to this character's story. Use flavorful, thematic skill names (2-4 words) suitable for checks and encounters.
+Make each skill feel personal to this character's story. Use flavorful, thematic skill names (2-5 words) suitable for checks and encounters in adventure mode.
 
-Format as comma-separated list: skill_name:level, skill_name:level
+Skills represent what the character CAN DO - these enable specific actions and choices during adventures.
+
+Format as comma-separated list of skill names only (no numbers).
 Output ONLY the comma-separated list, no other text.
 
-Examples:
-- Frost Hammer Combat:90, Pre-War Tech Hacking:75, Wasteland Scavenging:85
-- Lockpicking:80, Street Contacts:70, Quick Reflexes:85
+Good examples:
+- Frost Hammer Combat, Pre-War Tech Hacking, Wasteland Scavenging, Guerrilla Tactics
+- Lockpicking, Street Contacts, Quick Reflexes, Shadow Movement, Trap Detection
+- Ancient Lore Knowledge, Arcane Ritual Casting, Rune Deciphering, Mystical Defense
+- Sniper Marksmanship, Urban Tracking, Explosive Handling, Tactical Planning
+
+Bad examples (too generic):
+- Combat, Magic, Stealth
+- Fighting, Running, Talking

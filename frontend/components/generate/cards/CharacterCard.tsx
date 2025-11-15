@@ -39,13 +39,8 @@ export default function CharacterCard({
   isSelected,
   onSelect,
 }: CharacterCardProps) {
-  const sortedSkills = Array.isArray(character.details.skills)
-    ? character.details.skills.sort((a, b) => {
-        if (b.level !== a.level) {
-          return b.level - a.level;
-        }
-        return a.name.localeCompare(b.name);
-      })
+  const skills = Array.isArray(character.details.skills)
+    ? character.details.skills
     : [];
 
   //* Common card border styling
@@ -176,31 +171,16 @@ export default function CharacterCard({
           <div className="text-accent mb-2 text-xs font-semibold uppercase">
             Skills
           </div>
-          <div className="space-y-2">
-            {sortedSkills.length > 0 ? (
-              sortedSkills.map(
-                (skill: { name: string; level: number }, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="text-foreground text-sm">
-                      {skill.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
-                        <div
-                          className="bg-primary h-full"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
-                      <span className="text-muted-foreground text-xs">
-                        {skill.level}
-                      </span>
-                    </div>
-                  </div>
-                ),
-              )
+          <div className="flex flex-wrap gap-2">
+            {skills.length > 0 ? (
+              skills.map((skill: string, index: number) => (
+                <span
+                  key={index}
+                  className="bg-accent/10 text-accent rounded-full px-3 py-1 text-xs font-medium"
+                >
+                  {skill}
+                </span>
+              ))
             ) : (
               <div className="text-muted-foreground text-sm">
                 No skills available

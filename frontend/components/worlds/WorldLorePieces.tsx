@@ -255,31 +255,18 @@ function LorePieceCard({
                                 <AttributeIcon className={`h-3 w-3 ${color}`} />
                                 Skills
                               </div>
-                              <div className="space-y-2">
+                              <div className="flex flex-wrap gap-2">
                                 {skillsArray.map(
                                   (
-                                    skill: { name: string; level: number },
+                                    skill: string,
                                     index: number,
                                   ) => (
-                                    <div
+                                    <span
                                       key={index}
-                                      className="flex items-center justify-between"
+                                      className="bg-accent/10 text-accent rounded-full px-3 py-1 text-xs font-medium"
                                     >
-                                      <span className="text-foreground text-sm">
-                                        {skill.name}
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
-                                          <div
-                                            className="bg-primary h-full"
-                                            style={{ width: `${skill.level}%` }}
-                                          />
-                                        </div>
-                                        <span className="text-muted-foreground text-xs">
-                                          {skill.level}
-                                        </span>
-                                      </div>
-                                    </div>
+                                      {skill}
+                                    </span>
                                   ),
                                 )}
                               </div>
