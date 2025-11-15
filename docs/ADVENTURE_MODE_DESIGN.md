@@ -1445,69 +1445,218 @@ Result: Failure. Guard calls for backup, combat ensues.
 
 ### Flaw System
 
-**Flaw Triggers**:
-- Each character has one flaw (AI-generated during creation)
-- Flaws are descriptions, not single words
+**Flaw Structure**:
+- Each character has one flaw selected from 52 predefined templates
+- Flaws are stored as structured JSON for reliable gameplay mechanics
+- Categories: Physical Injury, Addiction, Phobia, Social Dysfunction, Trauma
 
-**Example Flaws**:
+**Flaw Template Format**:
+```json
+{
+  "name": "Betrayal Trauma",
+  "description": "Was betrayed by trusted ally in the past",
+  "trigger": "ally_suspicious,secret_kept,trust_test",
+  "penalty": "stress+7,empathy-4,preemptive_hostility",
+  "duration": "permanent"
+}
 ```
-Emmeline: "Compulsively repairs every mechanical device she
-           encounters, even if it's not hers, often leaving her
-           financially strained and socially awkward"
 
-Bob: "Freezes in combat when reminded of his brother's death,
-      requiring allies to snap him out of it"
+**Example Flaws Across Categories**:
+```
+Physical Injury:
+- Missing Eye: perception-3 on ranged_combat, distant_objects
+- Chronic Pain: all_checks-1, stress+2_per_scene when stress > 20
+
+Addiction:
+- Stim Addiction: stress+10, all_checks-2 when no_stims_12_hours
+- Combat Junkie: must_pass_resilience_13_or_attack in peaceful situations
+
+Phobia:
+- Claustrophobia: stress+8_per_scene, empathy-3 in underground/tunnels
+- Fear of Fire: stress+10, flee_or_freeze near fire/explosions
+
+Social:
+- Paranoid Distrust: must_pass_empathy_15_or_refuse new allies
+- Violent Temper: must_pass_resilience_14_or_attack when insulted
+
+Trauma:
+- Combat PTSD: stress+8, pass_resilience_14_or_freeze_1_turn in combat
+- Survivor's Guilt: stress+10, empathy-3, self_destructive when companion hurt
 ```
 
-**Mechanical Effect**:
-- When action might trigger flaw → **Disadvantage**
-- Disadvantage: Roll 2d20, take the lower result
+**Storage & Access**:
 
-**UI Warning**:
+**In Generation (lore_pieces.details)**:
+```json
+{
+  "flaw": {
+    "name": "Betrayal Trauma",
+    "description": "Was betrayed by trusted ally in the past",
+    "trigger": "ally_suspicious,secret_kept,trust_test",
+    "penalty": "stress+7,empathy-4,preemptive_hostility",
+    "duration": "permanent"
+  }
+}
+```
+
+**In Adventure (party_members.flaw column - TEXT)**:
+```
+{"name":"Betrayal Trauma","description":"Was betrayed...","trigger":"ally_suspicious,secret_kept,trust_test","penalty":"stress+7,empathy-4,preemptive_hostility","duration":"permanent"}
+```
+
+**Flaw Detection (Keyword-Based)**:
+```python
+import json
+
+def check_flaw_trigger(choice: Choice, party_member: PartyMember) -> tuple[bool, dict]:
+    """
+    Check if choice triggers character's flaw using keyword matching.
+
+    Args:
+        choice: Scene choice with flaw_triggers list
+        party_member: Character with flaw JSON
+
+    Returns:
+        (triggered: bool, flaw_data: dict or None)
+    """
+    # Parse flaw JSON
+    flaw = json.loads(party_member.flaw)
+
+    # Get scene triggers (set by LLM during scene generation)
+    scene_triggers = choice.flaw_triggers  # e.g., ["ally_suspicious", "trust_test"]
+
+    # Parse character's flaw triggers
+    character_triggers = flaw["trigger"].split(",")
+    # e.g., ["ally_suspicious", "secret_kept", "trust_test"]
+
+    # Check for keyword match
+    triggered = any(t.strip() in character_triggers for t in scene_triggers)
+
+    return triggered, flaw if triggered else None
+
+# Example usage:
+triggered, flaw_data = check_flaw_trigger(choice, party_member)
+if triggered:
+    print(f"⚠️ {party_member.name}'s {flaw_data['name']} is triggered!")
+    apply_flaw_penalty(party_member, flaw_data)
+```
+
+**Penalty Application**:
+```python
+def apply_flaw_penalty(party_member: PartyMember, flaw_data: dict):
+    """
+    Parse and apply flaw penalty string.
+
+    Penalty formats:
+    - "stat+value": Increase stat (e.g., "stress+7")
+    - "stat-value": Apply modifier to next check (e.g., "empathy-4")
+    - "special_effect": Behavioral flag (e.g., "preemptive_hostility")
+    - "must_pass_stat_dc_or_action": Forced save (e.g., "must_pass_resilience_14_or_attack")
+    """
+    penalty_string = flaw_data["penalty"]
+    penalties = penalty_string.split(",")
+
+    for penalty in penalties:
+        penalty = penalty.strip()
+
+        # Stat increase: "stress+7"
+        if "+" in penalty:
+            stat, value = penalty.split("+")
+            current = getattr(party_member, stat)
+            setattr(party_member, stat, current + int(value))
+            log_penalty(f"{stat} increased by {value}")
+
+        # Stat modifier: "empathy-4"
+        elif "-" in penalty and not penalty.startswith("-"):
+            stat, value = penalty.split("-")
+            apply_temp_modifier(party_member, stat, -int(value))
+            log_penalty(f"{stat} check receives -{value} penalty")
+
+        # Special effect: "preemptive_hostility"
+        elif "_" in penalty:
+            apply_special_effect(party_member, penalty)
+            log_penalty(f"Special effect: {penalty}")
+```
+
+**Gameplay Integration**:
+
+**During Scene Choice Resolution**:
+```python
+async def resolve_choice(session_id: int, choice_index: int):
+    # 1. Get party and current scene
+    party = get_party_members(session_id)
+    scene = get_current_scene(session_id)
+    choice = scene.choices[choice_index]
+
+    # 2. Check if acting character's flaw triggers
+    acting_character = get_selected_character()
+    triggered, flaw_data = check_flaw_trigger(choice, acting_character)
+
+    if triggered:
+        # 3. Show UI warning
+        display_flaw_warning(acting_character, flaw_data)
+
+        # 4. Apply penalties before roll
+        apply_flaw_penalty(acting_character, flaw_data)
+
+        # 5. Add narrative flavor
+        add_narrative(f"{acting_character.name} struggles with {flaw_data['name']}...")
+
+    # 6. Proceed with dice roll (with any modifiers applied)
+    perform_attribute_check(acting_character, choice)
+```
+
+**UI Display Examples**:
+
+**Character Card (Generation Phase)**:
+```
+┌─────────────────────────────────┐
+│ FLAW                            │
+│ Betrayal Trauma                 │ ← Bold name
+│ Was betrayed by trusted ally... │ ← Description
+│                                 │
+│ [Hover for mechanics]           │
+└─────────────────────────────────┘
+```
+
+**Tooltip (on hover)**:
+```
+Trigger: ally_suspicious, secret_kept, trust_test
+Penalty: stress+7, empathy-4, preemptive_hostility
+Duration: permanent
+```
+
+**Adventure Warning**:
 ```
 ┌────────────────────────────────────┐
-│ ⚠️ Bob's Flaw May Trigger          │
+│ ⚠️ Flaw Triggered!                 │
 │                                    │
-│ This combat situation reminds      │
-│ Bob of his brother's death.        │
+│ Augusta's Betrayal Trauma          │
+│ Was betrayed by trusted ally...    │
 │                                    │
-│ Disadvantage: Roll 2d20, use lower │
+│ Effects:                           │
+│ • Stress +7 (now 27)               │
+│ • Empathy -4 on this check         │
+│ • Preemptive hostility active      │
 │                                    │
-│    [Choose Anyway] [Pick Other]    │
+│    [Proceed] [Choose Other]        │
 └────────────────────────────────────┘
 ```
 
-**Flaw Detection**:
-```python
-def check_flaw_trigger(choice: Choice, character: PartyMember) -> bool:
-    """
-    Check if choice triggers character's flaw.
+**Flaw Template List** (52 total):
+See `python-service/generate/flaw_templates.py` for complete list.
 
-    Uses LLM to determine semantic match:
-    - Choice context
-    - Character flaw description
+**Template Categories**:
+- Physical Injury (15): missing_eye, bad_leg, hand_tremor, chronic_pain, etc.
+- Addiction (8): stim_addiction, alcohol_dependence, combat_junkie, etc.
+- Phobia (12): claustrophobia, fear_of_heights, fear_of_fire, etc.
+- Social (10): distrust_everyone, violent_temper, social_anxiety, etc.
+- Trauma (7): combat_ptsd, survivors_guilt, torture_scars, etc.
 
-    Returns True if flaw would hinder this action.
-    """
-
-    prompt = f"""
-    Character Flaw: {character.flaw}
-
-    Action: {choice.action_text}
-    Situation: {choice.context}
-
-    Would this character's flaw hinder them in this action?
-    Answer: yes/no with brief explanation.
-    """
-
-    # Quick LLM call (small model, fast)
-    # Cache common checks
-```
-
-**Overcoming Flaws**:
-- If character succeeds despite flaw trigger → Bonus reward
-- Narrative recognition: "Despite her compulsion, Emmeline focuses..."
-- Future feature: Reduce flaw impact over time (character growth)
+**Future Enhancements**:
+- Character growth: Reduce flaw penalties over successful sessions
+- Narrative recognition: Bonus rewards for succeeding despite flaw trigger
+- Companion flaws interact: Phobias/traumas can cascade in party dynamics
 
 ### Health & Stress
 

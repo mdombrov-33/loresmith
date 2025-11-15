@@ -334,8 +334,14 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             )
             flaw_template = get_flaw_by_id(flaw_ids[0])
 
-        # Format flaw for storage: "name | trigger | penalty | duration"
-        flaw = format_flaw_for_storage(flaw_template)
+        # Store flaw as structured object (adventure mode will use this directly)
+        flaw_data = {
+            "name": flaw_template["name"],
+            "description": flaw_template["description"],
+            "trigger": flaw_template["trigger"],
+            "penalty": flaw_template["penalty"],
+            "duration": flaw_template["duration"],
+        }
         logger.info(f"Generated flaw for {name}: {flaw_template['name']}")
 
         # Generate Stats
@@ -425,7 +431,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     details: dict[str, Any] = {
         "traits": traits_list,
         "appearance": appearance,
-        "flaw": flaw,
+        "flaw": flaw_data,
         "health": health,
         "stress": stress,
         "knowledge": knowledge,

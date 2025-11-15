@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 )
@@ -25,6 +26,25 @@ func GetStringFromDetails(details map[string]interface{}, key string) string {
 	if val, ok := details[key]; ok {
 		if str, ok := val.(string); ok {
 			return str
+		}
+	}
+	return ""
+}
+
+// * getFlawJSONFromDetails retrieves the flaw object and serializes it to JSON string
+// If flaw is already a string (legacy), returns it as-is
+// If flaw is an object, marshals it to JSON
+func GetFlawJSONFromDetails(details map[string]interface{}) string {
+	if val, ok := details["flaw"]; ok {
+		// If it's already a string (legacy format), return as-is
+		if str, ok := val.(string); ok {
+			return str
+		}
+		// If it's an object (new format), marshal to JSON
+		if flawObj, ok := val.(map[string]interface{}); ok {
+			if jsonBytes, err := json.Marshal(flawObj); err == nil {
+				return string(jsonBytes)
+			}
 		}
 	}
 	return ""

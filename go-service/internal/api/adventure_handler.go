@@ -128,7 +128,7 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 			}
 			return "[]"
 		}(),
-		Flaw:        utils.GetStringFromDetails(protagonistLore.Details, "flaw"),
+		Flaw:        utils.GetFlawJSONFromDetails(protagonistLore.Details),
 		Personality: utils.GetStringFromDetails(protagonistLore.Details, "personality"),
 		Appearance:  utils.GetStringFromDetails(protagonistLore.Details, "appearance"),
 		Position:    0, //* Protagonist is always position 0

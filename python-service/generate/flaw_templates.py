@@ -1,9 +1,3 @@
-"""
-Predefined mechanical flaw templates for character generation.
-
-Each flaw has a strict structure that adventure mode can parse and apply.
-"""
-
 from typing import TypedDict
 
 

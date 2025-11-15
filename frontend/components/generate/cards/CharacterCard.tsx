@@ -155,15 +155,56 @@ export default function CharacterCard({
 
         {/* Flaw */}
         {character.details.flaw && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-            <div className="mb-1 flex items-center gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
-              <div className="text-xs font-semibold text-red-500 uppercase">
-                Flaw
-              </div>
-            </div>
-            <div className="text-sm text-red-400">{character.details.flaw}</div>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 cursor-help">
+                  <div className="mb-1 flex items-center gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
+                    <div className="text-xs font-semibold text-red-500 uppercase">
+                      Flaw
+                    </div>
+                  </div>
+                  <div className="text-sm font-semibold text-red-400">
+                    {typeof character.details.flaw === 'string'
+                      ? character.details.flaw.split('|')[0].trim()
+                      : character.details.flaw.name}
+                  </div>
+                  <div className="text-xs text-red-300/70 mt-0.5">
+                    {typeof character.details.flaw === 'object' && character.details.flaw.description}
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <div className="space-y-1.5">
+                  <div>
+                    <span className="font-semibold">Trigger:</span>{" "}
+                    <span className="text-muted-foreground">
+                      {typeof character.details.flaw === 'object'
+                        ? character.details.flaw.trigger?.replace(/,/g, ', ')
+                        : 'Unknown'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Penalty:</span>{" "}
+                    <span className="text-muted-foreground">
+                      {typeof character.details.flaw === 'object'
+                        ? character.details.flaw.penalty
+                        : 'Unknown'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Duration:</span>{" "}
+                    <span className="text-muted-foreground">
+                      {typeof character.details.flaw === 'object'
+                        ? character.details.flaw.duration
+                        : 'Unknown'}
+                    </span>
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {/* Skills */}
