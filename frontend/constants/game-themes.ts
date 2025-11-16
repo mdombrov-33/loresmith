@@ -27,7 +27,7 @@ export const THEME_OPTIONS = [
   { value: THEMES.CYBERPUNK, label: "Cyberpunk", icon: Cpu, font: "font-mono" },
   {
     value: THEMES.POST_APOCALYPTIC,
-    label: "Post-Apocalypse",
+    label: "Post-Apocalyptic",
     icon: Radiation,
     font: "font-sans",
   },

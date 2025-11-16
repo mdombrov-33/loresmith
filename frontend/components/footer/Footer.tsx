@@ -1,4 +1,4 @@
-import { footerSections, socialLinks } from "@/data/footer-links";
+import { footerSections, socialLinks } from "@/constants/footer-links";
 import Logo from "@/components/shared/Logo";
 
 export default function Footer() {

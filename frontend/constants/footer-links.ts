@@ -24,7 +24,7 @@ export const footerSections: FooterSection[] = [
       { label: "High Fantasy", href: "#" },
       { label: "Norse Mythology", href: "#" },
       { label: "Cyberpunk Future", href: "#" },
-      { label: "Post-Apocalyptic", href: "#" },
+      { label: "Post-Apocalypse", href: "#" },
       { label: "Steampunk", href: "#" },
     ],
   },

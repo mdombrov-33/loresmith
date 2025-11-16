@@ -74,10 +74,10 @@ export function useParticleAnimation({ theme }: UseParticleAnimationProps) {
         return {
           preset: "links",
           particles: {
-            color: { value: "#00ff00" },
+            color: { value: "#ff00ff" },
             links: {
               enable: true,
-              color: "#00ff00",
+              color: "#ff00ff",
               distance: 150,
               opacity: 0.4,
               width: 1,

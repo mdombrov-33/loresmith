@@ -1,27 +1,40 @@
 "use client";
 
-import HowItWorksCard from "@/components/home/HowItWorksCard";
 import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function HowItWorks() {
   const { elementRef, isVisible } = useIntersectionObserver();
 
-  return (
-    <section ref={elementRef} className="relative overflow-hidden py-24">
-      {/* Grid pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
+  const steps = [
+    {
+      number: "01",
+      title: "Choose Your Theme",
+      description:
+        "Select from five distinct worlds - each with its own visual style, narrative voice, and storytelling elements. Your theme choice sets the foundation for everything that follows.",
+      details: "Themes: Fantasy · Norse Mythology · Cyberpunk · Steampunk · Post-Apocalyptic",
+    },
+    {
+      number: "02",
+      title: "Generate & Customize",
+      description:
+        "Our AI crafts a complete world: rich backstory, compelling characters, intricate factions, and story hooks. Then build your party - choose your protagonist and companions with unique abilities and flaws.",
+      details: "Generated: World Lore · Characters · Factions · Story Hooks · Visual Portraits",
+    },
+    {
+      number: "03",
+      title: "Play Your Story",
+      description:
+        "Embark on an interactive narrative where every choice matters. Face moral dilemmas, manage your party's health and stress, make strategic decisions, and shape the fate of your world.",
+      details: "Features: Choice-driven narrative · Character progression · Consequence system",
+    },
+  ];
 
+  return (
+    <section ref={elementRef} className="relative overflow-hidden py-16">
       <div className="relative container mx-auto px-4">
         {/* Section Header */}
-        <div className="mb-16 text-center">
+        <div className="mb-12 text-center">
           <div
             className={`transition-all duration-700 ${
               isVisible
@@ -29,88 +42,59 @@ export default function HowItWorks() {
                 : "translate-y-4 opacity-0"
             }`}
           >
-            <div className="mb-4 flex items-center justify-center gap-2">
-              <Sparkles className="text-primary h-6 w-6" />
-              <h2 className="text-foreground text-4xl font-bold md:text-5xl">
-                Your Journey Begins Here
-              </h2>
-              <Sparkles className="text-primary h-6 w-6" />
-            </div>
+            <h2 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
+              How It Works
+            </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              From idea to epic adventure in three simple steps
+              From concept to adventure in minutes
             </p>
           </div>
         </div>
 
-        {/* Timeline Container */}
-        <div className="relative mx-auto max-w-6xl">
-          {/* Desktop: Horizontal connecting line */}
-          <div className="absolute top-24 right-0 left-0 hidden h-0.5 md:block">
-            <div
-              className={`from-primary via-secondary to-primary h-full bg-gradient-to-r transition-all duration-[1500ms] ${
-                isVisible ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"
-              }`}
-              style={{ transformOrigin: "left" }}
-            />
-          </div>
+        {/* Steps */}
+        <div className="mx-auto max-w-5xl">
+          <div className="space-y-8">
+            {steps.map((step, index) => (
+              <div
+                key={index}
+                className={`border-border bg-card/30 group relative overflow-hidden rounded-2xl border backdrop-blur-sm transition-all duration-700 hover:border-primary/50 ${
+                  isVisible
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-12 opacity-0"
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
+                <div className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:gap-8">
+                  {/* Number */}
+                  <div className="flex-shrink-0">
+                    <div className="from-primary to-primary/50 bg-gradient-to-br bg-clip-text text-6xl font-bold text-transparent md:text-7xl">
+                      {step.number}
+                    </div>
+                  </div>
 
-          {/* Mobile: Vertical connecting line */}
-          <div className="absolute top-0 bottom-0 left-10 w-0.5 md:hidden">
-            <div
-              className={`from-primary via-secondary to-primary h-full bg-gradient-to-b transition-all duration-[1500ms] ${
-                isVisible ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"
-              }`}
-              style={{ transformOrigin: "top" }}
-            />
-          </div>
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h3 className="text-foreground mb-3 text-2xl font-bold md:text-3xl">
+                      {step.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-4 text-lg leading-relaxed">
+                      {step.description}
+                    </p>
+                    <div className="bg-background/50 border-primary/20 rounded-lg border px-4 py-3">
+                      <p className="text-primary/80 text-sm">{step.details}</p>
+                    </div>
+                  </div>
 
-          {/* Steps Grid */}
-          <div className="grid gap-16 md:grid-cols-3 md:gap-8">
-            <HowItWorksCard
-              step={1}
-              title="Generate a World"
-              description="Choose a theme, set the tone, and let our AI craft a unique world filled with lore, locations, and quests"
-              colorClass="primary"
-              delay={200}
-            />
-            <HowItWorksCard
-              step={2}
-              title="Assemble Your Party"
-              description="Create and customize your adventuring party with diverse characters, each with their own skills and backstories"
-              colorClass="secondary"
-              delay={400}
-            />
-            <HowItWorksCard
-              step={3}
-              title="Embark on Your Adventure"
-              description="Dive into an interactive story where your choices shape the narrative and lead to epic outcomes"
-              colorClass="accent"
-              delay={600}
-            />
-          </div>
+                  {/* Arrow indicator */}
+                  <div className="flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
+                    <ArrowRight className="text-primary h-8 w-8" />
+                  </div>
+                </div>
 
-          {/* Connecting arrows (desktop only) */}
-          <div className="absolute top-24 left-[calc(33.33%-1.5rem)] hidden md:block">
-            <div
-              className={`text-primary/50 transition-all delay-500 duration-700 ${
-                isVisible
-                  ? "translate-x-0 opacity-100"
-                  : "translate-x-4 opacity-0"
-              }`}
-            >
-              <ArrowRight className="h-6 w-6" />
-            </div>
-          </div>
-          <div className="absolute top-24 left-[calc(66.66%-1.5rem)] hidden md:block">
-            <div
-              className={`text-secondary/50 transition-all delay-700 duration-700 ${
-                isVisible
-                  ? "translate-x-0 opacity-100"
-                  : "translate-x-4 opacity-0"
-              }`}
-            >
-              <ArrowRight className="h-6 w-6" />
-            </div>
+                {/* Hover gradient effect */}
+                <div className="from-primary/5 to-transparent absolute inset-0 translate-x-full bg-gradient-to-r transition-transform duration-500 group-hover:translate-x-0" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
