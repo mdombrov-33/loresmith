@@ -11,6 +11,11 @@ from langfuse import observe
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
 from utils.name_tracker import add_generated_name, get_excluded_names
+from utils.appearance_tracker import (
+    get_random_constraints,
+    get_excluded_features,
+    add_generated_features,
+)
 from generate.models.lore_piece import LorePiece
 from generate.flaw_templates import (
     get_flaw_by_id,
@@ -73,22 +78,40 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Track this name to prevent immediate reuse
         add_generated_name(name)
 
-        # Generate Appearance
+        # Generate Appearance with diversity constraints
         with open("generate/prompts/character/character_appearance.txt", "r") as f:
             appearance_prompt_text = f.read()
 
+        # Get random constraints for variety
+        constraints = get_random_constraints()
+
+        # Get recently used features to avoid
+        excluded_features_list = get_excluded_features(limit=15)
+        excluded_features_str = (
+            ", ".join(excluded_features_list) if excluded_features_list else "None"
+        )
+
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
-        appearance_llm = get_llm(max_tokens=250)  # Increased for richer descriptions
+        appearance_llm = get_llm(max_tokens=250)
         appearance_chain = appearance_prompt | appearance_llm | StrOutputParser()
         appearance_raw = await appearance_chain.ainvoke(
             {
                 "theme": theme,
                 "theme_references": theme_references,
                 "name": name,
+                "age": constraints["age"],
+                "build": constraints["build"],
+                "distinctive_feature": constraints["distinctive_feature"],
+                "excluded_features": excluded_features_str,
             }
         )
         appearance = clean_ai_text(appearance_raw)
-        logger.info(f"Generated appearance for {name}")
+        logger.info(
+            f"Generated appearance for {name} (age: {constraints['age']}, build: {constraints['build']})"
+        )
+
+        # Track appearance features to prevent repetition
+        add_generated_features(appearance)
 
         # Generate Backstory (moved before traits so traits can reference backstory)
         with open("generate/prompts/character/character_backstory.txt", "r") as f:

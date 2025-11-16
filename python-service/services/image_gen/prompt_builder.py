@@ -66,6 +66,8 @@ def build_character_prompt(
         "upper body portrait",
         "character portrait",
         "facial portrait",
+        "detailed character portrait",
+        "hero portrait",
     ]
 
     expressions = [
@@ -81,6 +83,11 @@ def build_character_prompt(
         "contemplative gaze",
         "knowing smile",
         "weathered expression",
+        "calm demeanor",
+        "wary expression",
+        "subtle smirk",
+        "neutral expression",
+        "calculating gaze",
     ]
 
     angles = [
@@ -90,12 +97,26 @@ def build_character_prompt(
         "turned slightly to side",
         "looking over shoulder",
         "profile view",
+        "dynamic angle",
+        "cinematic angle",
+    ]
+
+    # Art style variations for diversity
+    art_styles = [
+        "detailed digital portrait art",
+        "painterly character illustration",
+        "concept art portrait style",
+        "fantasy character art",
+        "realistic character portrait",
+        "illustrated RPG portrait",
+        "cinematic character design",
     ]
 
     # Randomize for variety
     portrait_type = random.choice(portrait_types)
     expression = random.choice(expressions)
     angle = random.choice(angles)
+    art_style = random.choice(art_styles)
 
     # Build personality visual cues from traits (portrait-focused)
     trait_details = ""
@@ -120,35 +141,33 @@ def build_character_prompt(
             trait_details = ", " + ", ".join(trait_visuals)
 
     # Theme-specific style guidance - Portrait focused with simple backgrounds
+    # Note: Removed mandatory goggles/implants/scars to allow more variety
     theme_styles = {
         "post-apocalyptic": """
             post-apocalyptic survivor aesthetic, weathered rugged look, battle-hardened features,
-            worn tactical clothing visible at shoulders/collar, muted earthy color palette,
-            dust and grime weathering on skin, survival gear aesthetic,
+            practical worn clothing visible at shoulders/collar, muted earthy color palette,
+            dust and grime weathering on skin, survival aesthetic,
             dramatic side lighting, gritty realistic style,
             simple dark background - charcoal gray or dusty brown gradient,
             inspired by The Last of Us and Mad Max character portraits
         """,
         "steampunk": """
             Victorian steampunk aesthetic, brass and leather accents visible on collar,
-            goggles resting on head or around neck, rich warm color palette,
-            sepia and bronze tones, intricate Victorian-era clothing details,
-            warm golden lighting, painterly style,
+            rich warm color palette, sepia and bronze tones,
+            intricate Victorian-era clothing details, warm golden lighting, painterly style,
             simple background - warm brown or sepia gradient,
             inspired by Dishonored and Bioshock character portraits
         """,
         "norse-mythology": """
-            Norse Viking aesthetic, braided hair with beads, fur-lined collar visible,
-            traditional Nordic war paint or tribal markings on face,
+            Norse Viking aesthetic, fur-lined collar visible,
             cold muted color palette - grays, blues, earth tones,
             weathered battle-worn features, dramatic side lighting,
             simple background - dark gray or cold blue gradient,
             inspired by God of War and Vikings series character portraits
         """,
         "cyberpunk": """
-            cyberpunk futuristic aesthetic, cybernetic implants visible on face/neck,
-            sleek tech-wear collar, neon accent lighting on face,
-            vibrant neon colors - hot pink, electric blue, purple rim lighting,
+            cyberpunk futuristic aesthetic, sleek tech-wear collar,
+            neon accent lighting on face, vibrant neon colors - hot pink, electric blue, purple rim lighting,
             dark noir atmosphere, dramatic contrast lighting,
             simple background - solid black or dark blue gradient,
             inspired by Blade Runner and Cyberpunk 2077 character portraits
@@ -174,18 +193,19 @@ def build_character_prompt(
     {portrait_type}, {angle}, {expression}{trait_details},
     {appearance},
     {style},
+    {art_style},
     professional character art, intricate facial details, sharp focus,
     detailed eyes, expressive face, realistic skin texture with pores and details,
     detailed hair strands, fabric texture on clothing,
     dramatic lighting on face, soft rim lighting, depth of field,
-    semi-realistic style, painterly illustration, digital painting,
-    character portrait composition, Pathfinder RPG style, Baldur's Gate character art,
     distinctive facial features, unique character design,
+    diverse body type, varied appearance, unconventional design,
     simple clean background, gradient or solid color background,
     portrait photography composition, high-quality character illustration
     """.strip()
 
     # Negative prompt optimized for character portrait models
+    # Added stereotypical features to avoid repetitive designs
     negative_prompt = """
     worst quality, low quality, low resolution, blurry, fuzzy, out of focus,
     jpeg artifacts, compression artifacts, pixelated, grainy,
@@ -222,7 +242,11 @@ def build_character_prompt(
     full body, cowboy shot, wide shot,
     weapons, holding object, props in hands,
 
-    modern clothing in fantasy setting, anachronistic elements
+    modern clothing in fantasy setting, anachronistic elements,
+
+    generic design, stereotypical, cliché appearance,
+    same face syndrome, repetitive design,
+    overly similar characters, cookie-cutter design
     """.strip()
 
     return positive_prompt, negative_prompt

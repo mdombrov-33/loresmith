@@ -8,15 +8,24 @@ Focus on creating a DISTINCTIVE, MEMORABLE character with unique facial features
 
 Start directly with character appearance, don't include metadata or thought process.
 
+CHARACTER CONSTRAINTS (incorporate these naturally):
+- Age: {age}
+- Build: {build}
+- Distinctive Feature: {distinctive_feature}
+
+CRITICAL - AVOID THESE OVERUSED FEATURES (pick something DIFFERENT):
+{excluded_features}
+
 RULES:
 - Sentence 1: Age range, ethnicity/skin tone, face shape, distinctive facial structure
 - Sentence 2: Hair (style, length, color, texture), eye color and shape, eyebrow detail
-- Sentence 3: Distinctive facial features (scars, marks, wrinkles, bone structure, jawline, nose, lips, etc.)
-- Sentence 4: Practical clothing or accessories (brief, portrait-relevant only)
+- Sentence 3: Distinctive facial features (use the distinctive feature constraint, avoid clichés)
+- Sentence 4: Practical clothing or accessories (brief, portrait-relevant, avoid stereotypes)
 - Be specific with colors, shapes, and details to create variety
 - Avoid generic descriptions like "attractive" or "handsome"
 - Natural human features only - no glowing/magical effects
 - Avoid: "often", "usually", "typically", "seems to", "appears to"
+- DO NOT use goggles, random facial scars, or facial implants unless truly unique to this character
 
 Good examples (distinctive):
 "A weathered woman in her early 40s with deep bronze skin and a strong, angular face. Her jet-black hair is cropped short with gray streaks at the temples, framing sharp amber eyes and thick, expressive brows. A jagged scar runs from her left cheekbone to her jaw, and deep laugh lines frame her wide mouth. She wears a faded olive tactical vest."
