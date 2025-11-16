@@ -178,27 +178,6 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                         {world.status.charAt(0).toUpperCase() +
                           world.status.slice(1)}
                       </Badge>
-                      {world.visibility && world.user_id === user?.id && (
-                        <Badge
-                          variant="outline"
-                          className="hover:bg-accent cursor-pointer gap-1 text-xs transition-colors"
-                          onClick={() =>
-                            handleToggleVisibility(world.id, world.visibility)
-                          }
-                        >
-                          {world.visibility === "published" ? (
-                            <>
-                              <Eye className="h-3 w-3" />
-                              Published
-                            </>
-                          ) : (
-                            <>
-                              <EyeOff className="h-3 w-3" />
-                              Private
-                            </>
-                          )}
-                        </Badge>
-                      )}
                     </div>
                   </div>
 
@@ -221,7 +200,7 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {world.status === "active" && world.session_id ? (
                     <>
                       <ActionButton
@@ -242,6 +221,27 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                       >
                         View
                       </ActionButton>
+                      {world.visibility && world.user_id === user?.id && (
+                        <ActionButton
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            handleToggleVisibility(world.id, world.visibility)
+                          }
+                          icon={
+                            world.visibility === "published" ? (
+                              <Eye className="h-3 w-3" />
+                            ) : (
+                              <EyeOff className="h-3 w-3" />
+                            )
+                          }
+                          className="h-8"
+                        >
+                          {world.visibility === "published"
+                            ? "Published"
+                            : "Private"}
+                        </ActionButton>
+                      )}
                       <ActionButton
                         size="sm"
                         variant="ghost"
@@ -265,6 +265,27 @@ export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
                       >
                         View
                       </ActionButton>
+                      {world.visibility && world.user_id === user?.id && (
+                        <ActionButton
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            handleToggleVisibility(world.id, world.visibility)
+                          }
+                          icon={
+                            world.visibility === "published" ? (
+                              <Eye className="h-3 w-3" />
+                            ) : (
+                              <EyeOff className="h-3 w-3" />
+                            )
+                          }
+                          className="h-8"
+                        >
+                          {world.visibility === "published"
+                            ? "Published"
+                            : "Private"}
+                        </ActionButton>
+                      )}
                       <ActionButton
                         size="sm"
                         variant="ghost"

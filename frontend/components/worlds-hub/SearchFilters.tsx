@@ -1,9 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ActionButton from "@/components/shared/ActionButton";
-import { Separator } from "@/components/ui/separator";
-import { Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { STATUS_OPTIONS, LORE_TYPE_OPTIONS } from "@/constants/search";
+import { STATUS_OPTIONS } from "@/constants/search";
 
 interface SearchFiltersProps {
   selectedTheme: string;
@@ -19,99 +22,50 @@ export default function SearchFilters({
   onStatusChange,
 }: SearchFiltersProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          Filters
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Theme Filter */}
-        <div>
-          <h3 className="mb-3 font-medium">Theme</h3>
-          <div className="space-y-2">
-            <ActionButton
-              variant={selectedTheme === "" ? "default" : "outline"}
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => onThemeChange("")}
-            >
-              All Themes
-            </ActionButton>
-            {THEME_OPTIONS.map((theme) => (
-              <ActionButton
-                key={theme.value}
-                variant={selectedTheme === theme.value ? "default" : "outline"}
-                size="sm"
-                className={`w-full justify-start ${selectedTheme === theme.value ? theme.value : ""}`}
-                onClick={() => onThemeChange(theme.value)}
-                icon={<theme.icon className="h-4 w-4" />}
-              >
-                {theme.label}
-              </ActionButton>
-            ))}
-          </div>
-        </div>
+    <div className="flex flex-wrap items-center gap-3">
+      {/* Theme Filter */}
+      <Select value={selectedTheme || "all"} onValueChange={(val) => onThemeChange(val === "all" ? "" : val)}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by theme" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Themes</SelectItem>
+          {THEME_OPTIONS.map((theme) => (
+            <SelectItem key={theme.value} value={theme.value}>
+              {theme.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        <Separator />
+      {/* Status Filter */}
+      <Select value={selectedStatus || "all"} onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          {STATUS_OPTIONS.map((status) => (
+            <SelectItem key={status.value} value={status.value}>
+              {status.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Status Filter */}
-        <div>
-          <h3 className="mb-3 font-medium">Status</h3>
-          <div className="space-y-2">
-            <ActionButton
-              variant={selectedStatus === "" ? "default" : "outline"}
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => onStatusChange("")}
-            >
-              All Statuses
-            </ActionButton>
-            {STATUS_OPTIONS.map((status) => (
-              <ActionButton
-                key={status.value}
-                variant={
-                  selectedStatus === status.value ? "default" : "outline"
-                }
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => onStatusChange(status.value)}
-              >
-                {status.label}
-              </ActionButton>
-            ))}
-          </div>
-        </div>
+      {/* Rating Filter - Placeholder */}
+      <Select disabled>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Rating (Coming Soon)" />
+        </SelectTrigger>
+      </Select>
 
-        <Separator />
-
-        {/* Lore Type Filter - Placeholder */}
-        <div>
-          <h3 className="mb-3 font-medium">Lore Type</h3>
-          <div className="space-y-2">
-            <ActionButton
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              disabled
-            >
-              Coming Soon
-            </ActionButton>
-            {LORE_TYPE_OPTIONS.map((type) => (
-              <ActionButton
-                key={type.value}
-                variant="outline"
-                size="sm"
-                className="w-full justify-start"
-                disabled
-              >
-                {type.label}
-              </ActionButton>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Active Players Filter - Placeholder */}
+      <Select disabled>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Active Players (Soon)" />
+        </SelectTrigger>
+      </Select>
+    </div>
   );
 }
