@@ -2,6 +2,7 @@
 
 import Hero from "@/components/home/Hero";
 import ThemeShowcase from "@/components/home/ThemeShowcase";
+import GeneratedShowcase from "@/components/home/GeneratedShowcase";
 import HowItWorks from "@/components/home/HowItWorks";
 import CTA from "@/components/home/CTA";
 import { useAppStore } from "@/stores/appStore";
@@ -27,6 +28,7 @@ export default function Home() {
     <main className="bg-background min-h-screen">
       <Hero />
       <ThemeShowcase />
+      <GeneratedShowcase />
       <HowItWorks />
       <CTA />
     </main>
