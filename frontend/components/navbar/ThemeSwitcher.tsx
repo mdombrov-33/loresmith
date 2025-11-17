@@ -7,7 +7,11 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { useAppStore } from "@/stores/appStore";
 
-export function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  variant?: "desktop" | "mobile";
+}
+
+export function ThemeSwitcher({ variant = "desktop" }: ThemeSwitcherProps) {
   const { setTheme: setNextTheme } = useTheme();
   const {
     theme: storeTheme,
@@ -36,8 +40,13 @@ export function ThemeSwitcher() {
   };
 
   if (!mounted) {
+    const containerClass =
+      variant === "mobile"
+        ? "grid grid-cols-2 gap-4"
+        : "flex flex-wrap items-center justify-center gap-2";
+
     return (
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className={containerClass}>
         {THEME_OPTIONS.map((t) => {
           const Icon = t.icon;
           return (
@@ -46,8 +55,12 @@ export function ThemeSwitcher() {
               variant="outline"
               size="sm"
               disabled
-              icon={<Icon />}
-              className="text-sm"
+              icon={<Icon className="h-4 w-4 shrink-0" />}
+              className={
+                variant === "mobile"
+                  ? "h-auto min-h-[2.75rem] w-full justify-start whitespace-normal py-2.5 text-left text-sm leading-tight"
+                  : "text-sm"
+              }
             >
               {t.label}
             </ActionButton>
@@ -57,8 +70,13 @@ export function ThemeSwitcher() {
     );
   }
 
+  const containerClass =
+    variant === "mobile"
+      ? "grid grid-cols-2 gap-4"
+      : "flex flex-wrap items-center justify-center gap-2";
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className={containerClass}>
       {THEME_OPTIONS.map((t) => {
         const Icon = t.icon;
         return (
@@ -67,8 +85,12 @@ export function ThemeSwitcher() {
             variant={storeTheme === t.value ? "default" : "outline"}
             size="sm"
             onClick={() => handleThemeChange(t.value)}
-            icon={<Icon />}
-            className="text-sm"
+            icon={<Icon className="h-4 w-4 shrink-0" />}
+            className={
+              variant === "mobile"
+                ? "h-auto min-h-[2.75rem] w-full justify-start whitespace-normal py-2.5 text-left text-sm leading-tight"
+                : "text-sm"
+            }
           >
             {t.label}
           </ActionButton>
@@ -77,3 +99,4 @@ export function ThemeSwitcher() {
     </div>
   );
 }
+
