@@ -3,10 +3,8 @@
 import { useWorldsLogic } from "@/hooks/useWorldsLogic";
 import WorldLoading from "@/components/worlds/WorldLoading";
 import WorldError from "@/components/worlds/WorldError";
-import WorldHeader from "@/components/worlds/WorldHeader";
-import WorldQuestDescription from "@/components/worlds/WorldQuestDescription";
-import WorldStoryContent from "@/components/worlds/WorldStoryContent";
-import WorldLorePieces from "@/components/worlds/WorldLorePieces";
+import WorldHero from "@/components/worlds/WorldHero";
+import WorldTabbedContent from "@/components/worlds/WorldTabbedContent";
 import WorldActions from "@/components/worlds/WorldActions";
 
 export default function WorldsPageClient() {
@@ -30,13 +28,20 @@ export default function WorldsPageClient() {
     return <WorldError error={displayError} />;
   }
 
+  // Extract character piece for hero portrait
+  const characterPiece = lorePieces?.find((piece) => piece.type === "character");
+
   return (
     <main className="bg-background min-h-screen pb-20">
       <div className="container mx-auto px-4 py-8">
-        <WorldHeader parsedStory={parsedStory} theme={actualTheme} />
-        <WorldQuestDescription parsedStory={parsedStory} />
-        <WorldStoryContent paragraphs={paragraphs} />
-        <WorldLorePieces
+        <WorldHero
+          parsedStory={parsedStory}
+          theme={actualTheme}
+          characterPiece={characterPiece}
+        />
+        <WorldTabbedContent
+          parsedStory={parsedStory}
+          paragraphs={paragraphs}
           lorePieces={lorePieces}
           displayNames={displayNames}
           sortDetails={sortDetails}
