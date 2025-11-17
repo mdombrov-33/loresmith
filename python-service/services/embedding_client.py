@@ -39,7 +39,7 @@ async def generate_search_embedding(query: str) -> list[float]:
     Used when user searches for worlds.
     """
     try:
-        preprocessed_query = preprocess_search_query(query)
+        preprocessed_query = await preprocess_search_query(query)
         logger.debug(f"Search query: '{query[:100]}...' -> Preprocessed: '{preprocessed_query[:100]}...'")
 
         model = get_embedding_model()

@@ -20,7 +20,7 @@ class QueryPreprocessor:
         """Initialize with optional LLM instance."""
         self.llm = llm or get_llm(max_tokens=200, temperature=0.3)
 
-    def preprocess_query(self, query: str) -> str:
+    async def preprocess_query(self, query: str) -> str:
         """
         Apply query preprocessing to enhance semantic search relevance.
 
@@ -39,7 +39,7 @@ class QueryPreprocessor:
         logger.info(f"Starting query preprocessing for: '{query}'")
 
         try:
-            rewritten_query = self._rewrite_query(query)
+            rewritten_query = await self._rewrite_query(query)
 
             logger.info(
                 f"Query preprocessing complete: '{query}' -> '{rewritten_query}'"
@@ -50,7 +50,7 @@ class QueryPreprocessor:
             logger.warning(f"Query preprocessing failed, using original: {e}")
             return query
 
-    def _rewrite_query(self, query: str) -> str:
+    async def _rewrite_query(self, query: str) -> str:
         """
         Directly rewrite the query for better semantic matching.
 
@@ -71,7 +71,7 @@ class QueryPreprocessor:
         """)
 
         chain = prompt | self.llm
-        response = chain.invoke({"query": query})
+        response = await chain.ainvoke({"query": query})
 
         # Handle different response content types
         content = response.content
@@ -85,7 +85,7 @@ class QueryPreprocessor:
         return content.strip()
 
 
-def preprocess_search_query(query: str) -> str:
+async def preprocess_search_query(query: str) -> str:
     """
     Convenience function to preprocess a search query.
 
@@ -96,4 +96,4 @@ def preprocess_search_query(query: str) -> str:
         Preprocessed query optimized for semantic search
     """
     preprocessor = QueryPreprocessor()
-    return preprocessor.preprocess_query(query)
+    return await preprocessor.preprocess_query(query)

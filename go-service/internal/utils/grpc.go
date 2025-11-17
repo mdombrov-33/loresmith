@@ -36,9 +36,9 @@ var operationTimeouts = map[OperationType]time.Duration{
 	OpGenerateInventory: 1 * time.Minute,
 	OpRerank:            1 * time.Minute,
 
-	//* Quick operations (30 seconds)
+	//* Quick operations
 	OpGenerateConsequence: 30 * time.Second,
-	OpGenerateEmbedding:   30 * time.Second,
+	OpGenerateEmbedding:   3 * time.Minute, //* Increased for Ollama model loading time
 }
 
 // NewGRPCContext creates a context with appropriate timeout for the operation type.

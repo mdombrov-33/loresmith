@@ -19,6 +19,7 @@ from generate.models.lore_piece import LorePiece
 from constants.themes import Theme
 from utils.logger import logger
 from search.reranker import rerank_with_fusion_dartboard
+from search.query_preprocessor import preprocess_search_query
 from services.embedding_client import (
     generate_search_embedding,
     generate_content_embedding,
@@ -321,6 +322,22 @@ async def serve():
     lore_pb2_grpc.add_LoreServiceServicer_to_server(LoreServicer(), server)
     server.add_insecure_port("0.0.0.0:50051")
     logger.info("gRPC server running on port 50051")
+
+    # * Preload Ollama models to avoid cold start delays
+    try:
+        logger.info("Preloading embedding model...")
+        await generate_search_embedding("warmup")
+        logger.info("Embedding model preloaded successfully")
+    except Exception as e:
+        logger.warning(f"Failed to preload embedding model: {e}")
+
+    try:
+        logger.info("Preloading LLM model for query preprocessing...")
+        await preprocess_search_query("test query warmup")
+        logger.info("LLM model preloaded successfully")
+    except Exception as e:
+        logger.warning(f"Failed to preload LLM model: {e}")
+
     await server.start()
     await server.wait_for_termination()
 

@@ -27,7 +27,7 @@ func main() {
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      r,
 		IdleTimeout:  10 * time.Minute,   //* Allow long-running connections
-		ReadTimeout:  30 * time.Second,   //* Reading request headers
+		ReadTimeout:  4 * time.Minute,    //* Allow search with Ollama model loading (3min) + buffer
 		WriteTimeout: 6 * time.Minute,    //* Writing response (image generation takes 2-4 minutes)
 	}
 
