@@ -46,8 +46,8 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Center - Theme Switcher (Desktop only) */}
-          <div className="hidden flex-1 items-center justify-center md:flex">
+          {/* Center - Theme Switcher (Desktop only - 1280px+) */}
+          <div className="hidden flex-1 items-center justify-center xl:flex">
             {showThemeSwitcher && <ThemeSwitcher variant="desktop" />}
           </div>
 
@@ -55,7 +55,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <AudioToggle />
             {isAuthenticated ? (
-              <div className="hidden md:flex">
+              <div className="hidden xl:flex">
                 <UserMenu />
               </div>
             ) : (
