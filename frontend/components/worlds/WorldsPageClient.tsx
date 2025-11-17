@@ -18,6 +18,7 @@ export default function WorldsPageClient() {
     sortDetails,
     actualTheme,
     worldId,
+    world,
   } = useWorldsLogic();
 
   if (isLoading) {
@@ -28,8 +29,8 @@ export default function WorldsPageClient() {
     return <WorldError error={displayError} />;
   }
 
-  // Extract character piece for hero portrait
-  const characterPiece = lorePieces?.find((piece) => piece.type === "character");
+  //* Extract character piece for hero portrait
+  const characterPiece = lorePieces?.find((piece) => piece?.type === "character");
 
   return (
     <main className="bg-background min-h-screen pb-20">
@@ -38,6 +39,7 @@ export default function WorldsPageClient() {
           parsedStory={parsedStory}
           theme={actualTheme}
           characterPiece={characterPiece}
+          activeSessions={world?.active_sessions}
         />
         <WorldTabbedContent
           parsedStory={parsedStory}

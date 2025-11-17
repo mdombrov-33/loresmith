@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Users, MessageSquare, Sparkles } from "lucide-react";
+import { Star, Users, MessageSquare, Sparkles, Activity } from "lucide-react";
 import { FullStory, LorePiece } from "@/lib/schemas";
 import RatingDialog from "./RatingDialog";
 
@@ -12,12 +12,14 @@ interface WorldHeroProps {
   parsedStory: FullStory;
   theme: string;
   characterPiece?: LorePiece;
+  activeSessions?: number;
 }
 
 export default function WorldHero({
   parsedStory,
   theme,
   characterPiece,
+  activeSessions,
 }: WorldHeroProps) {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
 
@@ -85,6 +87,12 @@ export default function WorldHero({
 
               {/* Stats */}
               <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
+                <div className="flex items-center gap-1.5">
+                  <Activity className="h-4 w-4 text-green-500" />
+                  <span className="text-green-500 font-medium">
+                    {activeSessions ?? 0} {activeSessions === 1 ? "player" : "players"}
+                  </span>
+                </div>
                 <div className="flex items-center gap-1.5">
                   <Users className="h-4 w-4" />
                   <span>{mockPlayCount} plays</span>

@@ -171,6 +171,16 @@ func (h *WorldHandler) HandleGetWorldById(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	//* Enrich active world with session count
+	if world.Status == "active" {
+		count, err := h.adventureStore.CountActiveSessions(world.ID)
+		if err != nil {
+			h.logger.Printf("WARNING: Failed to count sessions for world %d: %v", world.ID, err)
+		} else {
+			world.ActiveSessions = &count
+		}
+	}
+
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"world": world})
 }
 

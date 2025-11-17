@@ -45,7 +45,7 @@ export function useWorldsLogic() {
         parsedStory.pieces.setting,
         parsedStory.pieces.event,
         parsedStory.pieces.relic,
-      ].filter(Boolean)
+      ].filter((piece): piece is NonNullable<typeof piece> => piece !== undefined && piece !== null)
     : [];
 
   const displayNames: Record<string, string> = {
@@ -56,7 +56,7 @@ export function useWorldsLogic() {
     relic: "Relic",
   };
 
-  const sortDetails = (details: Record<string, string>) => {
+  const sortDetails = (details: Record<string, unknown>) => {
     const order = [
       "traits",
       "appearance",
@@ -93,5 +93,6 @@ export function useWorldsLogic() {
     sortDetails,
     actualTheme,
     worldId,
+    world,
   };
 }
