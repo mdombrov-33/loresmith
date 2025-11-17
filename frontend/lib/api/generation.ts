@@ -23,9 +23,7 @@ export async function generateLore(
   }
 
   const data = await response.json();
-  console.log("[DEBUG] API response for", category, ":", data);
   const result = data[category] || data;
-  console.log("[DEBUG] Returning:", result);
   return result;
 }
 

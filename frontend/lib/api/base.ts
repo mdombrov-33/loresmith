@@ -26,7 +26,6 @@ export async function fetchWithTimeout(
   if (externalSignal) {
     externalSignal.addEventListener("abort", () => {
       controller.abort();
-      console.log("[DEBUG] Request aborted by external signal (unmount/navigation)");
     });
   }
 
@@ -42,7 +41,6 @@ export async function fetchWithTimeout(
     if (error instanceof Error && error.name === "AbortError") {
       //* Check if it was an external abort vs timeout
       if (externalSignal?.aborted) {
-        console.log("[DEBUG] Request cancelled (component unmounted or navigated away)");
         throw new Error("Request cancelled");
       }
       throw new Error(

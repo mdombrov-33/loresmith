@@ -127,7 +127,6 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
 
     async def GenerateFullStory(self, request, context):
         """Generate complete story from selected lore pieces."""
-        logger.info(f"DEBUG: Received pieces: {request.pieces}")
         try:
             selected_pieces = SelectedLorePieces(
                 character=convert_lore_piece(request.pieces.character)

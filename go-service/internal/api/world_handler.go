@@ -53,8 +53,6 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	log.Printf("DEBUG: HandleCreateDraftWorld received req: %+v", req)
-
 	// Convert to gRPC format (serialize complex types to JSON strings)
 	convertToGrpcPiece := func(piece struct {
 		Name        string         `json:"name"`

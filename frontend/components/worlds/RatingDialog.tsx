@@ -24,7 +24,6 @@ export default function RatingDialog({ open, onOpenChange }: RatingDialogProps) 
   const handleSubmit = () => {
     if (selectedRating > 0) {
       // TODO: API call to submit rating
-      console.log("Submitting rating:", selectedRating);
       onOpenChange(false);
       setSelectedRating(0);
       setHoveredRating(0);

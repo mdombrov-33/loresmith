@@ -404,8 +404,6 @@ func (h *LoreHandler) HandleGenerateFullStory(w http.ResponseWriter, r *http.Req
 		Theme:  theme,
 	}
 
-	log.Printf("DEBUG: FullStoryRequest pieces: %+v", grpcReq.Pieces)
-
 	grpcResp, err := h.loreClient.GenerateFullStory(r.Context(), grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating full story failed: %v", err)
