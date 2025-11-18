@@ -22,6 +22,19 @@ class BM25Indexer:
         texts = []
         for doc in documents:
             text = f"{doc.get('title', '')} {doc.get('theme', '')} {doc.get('full_story', '')}"
+            text_length = len(text)
+            world_id = doc.get('id', 'unknown')
+            logger.info(f"World {world_id}: text length = {text_length} chars")
+
+            # if text_length > 1000000:  # spaCy limit
+            #     logger.error(f"World {world_id} exceeds spaCy limit! Length: {text_length}")
+            #     logger.error(f"Title: {doc.get('title', '')[:100]}")
+            #     logger.error(f"Theme: {doc.get('theme', '')}")
+            #     logger.error(f"full_story length: {len(doc.get('full_story', ''))}")
+            #     # Skip this world to avoid crash
+            #     texts.append([])  # Empty tokens
+            #     continue
+
             texts.append(tokenize(text))
 
         self.index = BM25Okapi(texts)
