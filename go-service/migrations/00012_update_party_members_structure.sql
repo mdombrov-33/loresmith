@@ -23,11 +23,11 @@ ALTER COLUMN flaw TYPE JSONB USING NULL;
 
 COMMENT ON COLUMN party_members.flaw IS 'Character flaw as JSONB: {name, description, trigger (comma-separated), penalty (comma-separated), duration}';
 
--- 4. Add portrait_url column for character portraits (S3 URL)
+-- 4. Add portrait_url column for character portraits (R2/S3-compatible URL)
 ALTER TABLE party_members
 ADD COLUMN image_portrait VARCHAR(500);
 
-COMMENT ON COLUMN party_members.image_portrait IS 'Portrait image URL from S3: https://bucket-name.s3.region.amazonaws.com/portraits/{world_id}/{uuid}_portrait.png';
+COMMENT ON COLUMN party_members.image_portrait IS 'Portrait image URL from R2 (S3-compatible): https://bucket-name.account-id.r2.cloudflarestorage.com/portraits/{world_id}/{uuid}_portrait.png';
 
 -- +goose StatementEnd
 
