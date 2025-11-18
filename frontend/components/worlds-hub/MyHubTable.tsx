@@ -34,12 +34,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAppStore } from "@/stores/appStore";
 
-interface WorldsTableProps {
+interface MyHubTableProps {
   worlds: World[];
   isLoading?: boolean;
 }
 
-export default function WorldsTable({ worlds, isLoading }: WorldsTableProps) {
+export default function MyHubTable({ worlds, isLoading }: MyHubTableProps) {
   const router = useRouter();
   const deleteWorldMutation = useDeleteWorld();
   const deleteSessionMutation = useDeleteAdventureSession();

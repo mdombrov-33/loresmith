@@ -1,8 +1,8 @@
-interface SearchErrorProps {
+interface ErrorStateProps {
   error: Error | null;
 }
 
-export default function SearchError({ error }: SearchErrorProps) {
+export default function ErrorState({ error }: ErrorStateProps) {
   return (
     <section className="py-12 text-center">
       <p className="text-destructive">

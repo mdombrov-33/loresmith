@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
 
-export default function SearchLoading() {
+export default function LoadingState() {
   return (
     <section className="flex min-h-[400px] flex-col items-center justify-center space-y-4">
       <div className="relative">

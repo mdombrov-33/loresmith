@@ -6,21 +6,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { STATUS_OPTIONS } from "@/constants/search";
+import { STATUS_OPTIONS } from "@/constants/hub-filters";
 
-interface SearchFiltersProps {
+interface DiscoverFiltersProps {
   selectedTheme: string;
   selectedStatus: string;
   onThemeChange: (theme: string) => void;
   onStatusChange: (status: string) => void;
 }
 
-export default function SearchFilters({
+export default function DiscoverFilters({
   selectedTheme,
   selectedStatus,
   onThemeChange,
   onStatusChange,
-}: SearchFiltersProps) {
+}: DiscoverFiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       {/* Theme Filter */}

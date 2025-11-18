@@ -127,12 +127,6 @@ export default function SearchResultCard({
           <Badge variant="secondary">
             {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
           </Badge>
-          {world.status === "active" && world.active_sessions !== undefined && (
-            <Badge variant="default" className="bg-green-600">
-              {world.active_sessions}{" "}
-              {world.active_sessions === 1 ? "player" : "players"}
-            </Badge>
-          )}
         </div>
         <CardTitle className="line-clamp-2 text-lg transition-colors duration-200 group-hover:text-primary mt-2">
           {fullStory.quest?.title || "Untitled World"}

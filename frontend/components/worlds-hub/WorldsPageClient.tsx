@@ -1,14 +1,15 @@
 "use client";
 
 import { useWorldsHubLogic } from "@/hooks/useWorldsHubLogic";
-import WorldsStats from "@/components/worlds-hub/WorldsStats";
-import QuickActions from "@/components/worlds-hub/QuickActions";
-import WorldsTable from "@/components/worlds-hub/WorldsTable";
-import SearchFilters from "@/components/worlds-hub/SearchFilters";
-import SearchBar from "@/components/worlds-hub/SearchBar";
-import SearchResults from "@/components/worlds-hub/SearchResults";
-import SearchLoading from "@/components/worlds-hub/SearchLoading";
-import SearchError from "@/components/worlds-hub/SearchError";
+import MyHubStats from "@/components/worlds-hub/MyHubStats";
+import MyHubActions from "@/components/worlds-hub/MyHubActions";
+import MyHubFilters from "@/components/worlds-hub/MyHubFilters";
+import MyHubTable from "@/components/worlds-hub/MyHubTable";
+import DiscoverFilters from "@/components/worlds-hub/DiscoverFilters";
+import SearchBar from "@/components/worlds-hub/DiscoverSearch";
+import DiscoverGrid from "@/components/worlds-hub/DiscoverGrid";
+import LoadingState from "@/components/worlds-hub/states/LoadingState";
+import ErrorState from "@/components/worlds-hub/states/ErrorState";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Pagination,
@@ -18,13 +19,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function WorldsPageClient() {
   const {
@@ -76,31 +70,17 @@ export default function WorldsPageClient() {
           {/* MY HUB TAB - Dashboard Layout */}
           <TabsContent value="my" className="mt-0 space-y-6">
             {/* Quick Actions */}
-            <QuickActions myWorlds={myWorlds} />
+            <MyHubActions myWorlds={myWorlds} />
 
             {/* Stats */}
-            <WorldsStats myWorlds={myWorlds} scope="my" />
+            <MyHubStats myWorlds={myWorlds} scope="my" />
 
-            {/* Filter Bar - Minimal */}
-            <div className="flex items-center gap-4">
-              <Select
-                value={selectedStatus || "all"}
-                onValueChange={(val) => setSelectedStatus(val === "all" ? "" : val)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-muted-foreground text-sm">
-                {worlds.length} {worlds.length === 1 ? "world" : "worlds"}
-              </p>
-            </div>
+            {/* Filters */}
+            <MyHubFilters
+              selectedStatus={selectedStatus}
+              onStatusChange={setSelectedStatus}
+              worldCount={worlds.length}
+            />
 
             {/* Worlds Table */}
             {isLoading ? (
@@ -113,10 +93,10 @@ export default function WorldsPageClient() {
                 ))}
               </div>
             ) : error ? (
-              <SearchError error={error} />
+              <ErrorState error={error} />
             ) : (
               <>
-                <WorldsTable worlds={worlds} isLoading={isLoading} />
+                <MyHubTable worlds={worlds} isLoading={isLoading} />
                 {totalPages > 1 && (
                   <Pagination className="mt-6">
                     <PaginationContent>
@@ -173,6 +153,7 @@ export default function WorldsPageClient() {
             )}
           </TabsContent>
 
+          {/* DISCOVER TAB - Search & Filter Layout */}
           <TabsContent value="global" className="mt-0 space-y-6">
             {/* Search */}
             <SearchBar
@@ -183,7 +164,7 @@ export default function WorldsPageClient() {
             />
 
             {/* Filters */}
-            <SearchFilters
+            <DiscoverFilters
               selectedTheme={selectedTheme}
               selectedStatus={selectedStatus}
               onThemeChange={handleThemeChange}
@@ -192,12 +173,12 @@ export default function WorldsPageClient() {
 
             {/* Results */}
             {isLoading ? (
-              <SearchLoading />
+              <LoadingState />
             ) : error ? (
-              <SearchError error={error} />
+              <ErrorState error={error} />
             ) : (
               <>
-                <SearchResults worlds={worlds} scope={selectedScope} />
+                <DiscoverGrid worlds={worlds} scope={selectedScope} />
                 {totalPages > 1 && (
                   <Pagination className="mt-6">
                     <PaginationContent>

@@ -7,11 +7,11 @@ import { World } from "@/lib/schemas";
 import ActionButton from "@/components/shared/ActionButton";
 import { useAppStore } from "@/stores/appStore";
 
-interface QuickActionsProps {
+interface MyHubActionsProps {
   myWorlds: World[];
 }
 
-export default function QuickActions({ myWorlds }: QuickActionsProps) {
+export default function MyHubActions({ myWorlds }: MyHubActionsProps) {
   const router = useRouter();
   const { setTheme } = useAppStore();
 

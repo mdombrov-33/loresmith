@@ -4,12 +4,12 @@ import { World } from "@/lib/schemas";
 import { Card, CardContent } from "@/components/ui/card";
 import { Globe, Sparkles, Users, Eye } from "lucide-react";
 
-interface WorldsStatsProps {
+interface MyHubStatsProps {
   myWorlds: World[];
   scope: "my" | "global";
 }
 
-export default function WorldsStats({ myWorlds, scope }: WorldsStatsProps) {
+export default function MyHubStats({ myWorlds, scope }: MyHubStatsProps) {
   const totalWorlds = myWorlds.length;
   const activeWorlds = myWorlds.filter((w) => w.status === "active").length;
   const publishedWorlds = myWorlds.filter(
