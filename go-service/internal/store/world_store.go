@@ -22,6 +22,7 @@ type World struct {
 	LorePieces     []*LorePiece `json:"lore_pieces,omitempty"`
 	SessionID      *int         `json:"session_id,omitempty"`
 	ActiveSessions *int         `json:"active_sessions,omitempty"`
+	PortraitURL    *string      `json:"portrait_url,omitempty"`
 	Visibility     string       `json:"visibility"`
 	CreatedAt      time.Time    `json:"created_at"`
 	UpdatedAt      time.Time    `json:"updated_at"`
@@ -258,9 +259,11 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                (SELECT id FROM adventure_sessions
                 WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
                 ORDER BY created_at DESC LIMIT 1) as session_id,
-               w.visibility, w.created_at, w.updated_at
+               w.visibility, w.created_at, w.updated_at,
+               lp.details->>'image_portrait' as portrait_url
         FROM worlds w
         JOIN users u ON w.user_id = u.id
+        LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
         WHERE 1=1`, currentUserID)
 		countQuery = `
         SELECT COUNT(*)
@@ -273,8 +276,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                (SELECT id FROM adventure_sessions
                 WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
                 ORDER BY created_at DESC LIMIT 1) as session_id,
-               w.visibility, w.created_at, w.updated_at
+               w.visibility, w.created_at, w.updated_at,
+               lp.details->>'image_portrait' as portrait_url
         FROM worlds w
+        LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
         WHERE 1=1`, currentUserID)
 		countQuery = `
         SELECT COUNT(*)
@@ -338,13 +343,17 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 	for rows.Next() {
 		var world World
 		var sessionID sql.NullInt64
-		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
+		var portraitURL sql.NullString
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt, &portraitURL)
 		if err != nil {
 			return nil, 0, err
 		}
 		if sessionID.Valid {
 			sessionIDInt := int(sessionID.Int64)
 			world.SessionID = &sessionIDInt
+		}
+		if portraitURL.Valid && portraitURL.String != "" {
+			world.PortraitURL = &portraitURL.String
 		}
 		worlds = append(worlds, &world)
 	}
@@ -389,9 +398,11 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		       (SELECT id FROM adventure_sessions
 		        WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
 		        ORDER BY created_at DESC LIMIT 1) as session_id,
-		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding,
+		       lp.details->>'image_portrait' as portrait_url
 		FROM worlds w
 		JOIN users u ON w.user_id = u.id
+		LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
 		WHERE w.%s IS NOT NULL`, currentUserID, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
@@ -404,8 +415,10 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		       (SELECT id FROM adventure_sessions
 		        WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
 		        ORDER BY created_at DESC LIMIT 1) as session_id,
-		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding
+		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding,
+		       lp.details->>'image_portrait' as portrait_url
 		FROM worlds w
+		LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
 		WHERE w.%s IS NOT NULL`, currentUserID, column, column, column)
 		countQuery = fmt.Sprintf(`
 		SELECT COUNT(*)
@@ -470,6 +483,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		var world World
 		var sessionID sql.NullInt64
 		var embedding pgvector.Vector
+		var portraitURL sql.NullString
 		err := rows.Scan(
 			&world.ID,
 			&world.UserID,
@@ -483,6 +497,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 			&world.UpdatedAt,
 			&world.Relevance,
 			&embedding,
+			&portraitURL,
 		)
 		if err != nil {
 			return nil, 0, err
@@ -493,6 +508,9 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		}
 		if embedding.Slice() != nil {
 			world.Embedding = embedding.Slice()
+		}
+		if portraitURL.Valid && portraitURL.String != "" {
+			world.PortraitURL = &portraitURL.String
 		}
 		worlds = append(worlds, &world)
 	}

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Eye, EyeOff } from "lucide-react";
+import { HelpCircle, Eye, EyeOff, Star, MessageSquare, Users } from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/lib/schemas";
 import {
@@ -133,7 +134,7 @@ export default function SearchResultCard({
             </Badge>
           )}
         </div>
-        <CardTitle className="line-clamp-2 text-lg transition-colors duration-200 group-hover:text-primary">
+        <CardTitle className="line-clamp-2 text-lg transition-colors duration-200 group-hover:text-primary mt-2">
           {fullStory.quest?.title || "Untitled World"}
         </CardTitle>
         {world.user_name && (
@@ -141,11 +142,58 @@ export default function SearchResultCard({
             by {world.user_name}
           </Badge>
         )}
+
+        {/* Social metadata (global scope only) */}
+        {scope === "global" && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+            {/* Star Rating */}
+            <div className="flex items-center gap-1">
+              <Star className="text-amber-400 h-3.5 w-3.5 fill-amber-400" />
+              <span className="text-foreground font-medium">0.0</span>
+              <span className="text-muted-foreground">(0)</span>
+            </div>
+
+            {/* Comments */}
+            <div className="text-muted-foreground flex items-center gap-1">
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>0</span>
+            </div>
+
+            {/* Active Players */}
+            {world.active_sessions !== undefined && world.active_sessions > 0 && (
+              <div className="flex items-center gap-1 text-green-400">
+                <Users className="h-3.5 w-3.5" />
+                <span>
+                  {world.active_sessions} {world.active_sessions === 1 ? "player" : "players"}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
-          {fullStory.content || "No description available"}
-        </p>
+        <div className="flex gap-4">
+          {/* Portrait on left (global scope only) */}
+          {scope === "global" && world.portrait_url && (
+            <div className="flex-shrink-0">
+              <div className="border-primary/30 relative h-24 w-24 overflow-hidden rounded-lg border-2 shadow-md">
+                <Image
+                  src={world.portrait_url}
+                  alt="Character portrait"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Text content */}
+          <div className="flex-1 min-w-0">
+            <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
+              {fullStory.content || "No description available"}
+            </p>
+          </div>
+        </div>
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-muted-foreground text-xs">

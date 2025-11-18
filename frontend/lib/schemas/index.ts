@@ -89,6 +89,7 @@ export const worldSchema = z.object({
   lore_pieces: z.array(lorePieceSchema).optional(),
   session_id: z.number().optional(),
   active_sessions: z.number().optional(),
+  portrait_url: z.string().optional(),
   visibility: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
