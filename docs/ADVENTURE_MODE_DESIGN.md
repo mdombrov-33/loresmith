@@ -1,7 +1,7 @@
 # LoreSmith Adventure Mode - Complete Design Document
 
-**Last Updated**: 2025-10-30
-**Status**: Design Phase - Ready for Implementation
+**Last Updated**: 2025-11-18
+**Status**: Design Phase - Ready for Implementation (Approach 2: World-Scoped Scene Batches)
 
 ---
 
@@ -20,9 +20,10 @@
 11. [Breakpoint Events](#breakpoint-events)
 12. [Technical Architecture](#technical-architecture)
 13. [Redis Architecture & Caching Strategy](#redis-architecture--caching-strategy)
-14. [AI Generation Strategy](#ai-generation-strategy)
-15. [UI/UX Design](#uiux-design)
-16. [Implementation Roadmap](#implementation-roadmap)
+14. [Design Approach: World-Scoped Scene Batches](#design-approach-world-scoped-scene-batches)
+15. [AI Generation Strategy](#ai-generation-strategy)
+16. [UI/UX Design](#uiux-design)
+17. [Implementation Roadmap](#implementation-roadmap)
 
 ---
 
@@ -35,7 +36,7 @@ Adventure Mode transforms LoreSmith's generated worlds into playable, interactiv
 - **Reactive Storytelling**: Scenes acknowledge previous choices and outcomes
 - **Tactical Choice**: Party composition and character selection matter
 - **Manageable Length**: 5-15 scenes based on quest complexity, not endless
-- **Replayability**: Same world generates different experiences for different players
+- **Replayability**: Same world has consistent encounters but different experiences through companion choice, dice variance, and party composition
 - **Consequence-Driven**: Meaningful failure states (death, stress, resource loss)
 
 ---
@@ -174,10 +175,12 @@ World ID 123: "Unlock the Aetherian Echo" (steampunk, Emmeline protagonist)
 
 ```
 SCENE START:
-1. Check if scene batch exists for current act
-   - If not: Generate scene batch (3 skeletons)
+1. Check if scene batch exists for current act (world-scoped)
+   - Look up by world_id + act_number
+   - If not found: Generate scene batch (3 skeletons) and cache for this world
+   - If found: Use cached batch (shared with all other sessions)
 
-2. Load current scene skeleton
+2. Load current scene skeleton from batch
 
 3. Generate dynamic scene intro:
    - Input: scene skeleton + previous scene outcomes + party state
@@ -471,16 +474,19 @@ CREATE TABLE IF NOT EXISTS scene_log (
 CREATE INDEX idx_scene_log_session_id ON scene_log(session_id);
 CREATE INDEX idx_scene_log_scene_index ON scene_log(scene_index);
 
--- Scene Batches (cache generated scene skeletons)
+-- Scene Batches (cache generated scene skeletons per world)
+-- IMPORTANT: Scene batches are scoped to world_id, not session_id
+-- All players of the same world share the same encounters/challenges
+-- This provides consistency for reviews/ratings and reduces AI costs
 CREATE TABLE IF NOT EXISTS scene_batches (
     id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL REFERENCES adventure_sessions(id) ON DELETE CASCADE,
+    world_id BIGINT NOT NULL REFERENCES worlds(id) ON DELETE CASCADE,
 
     act_number INT NOT NULL,
     -- Act 1, Act 2, etc.
 
     scenes JSONB NOT NULL,
-    -- Array of scene skeleton objects
+    -- Array of scene skeleton objects with pre-generated outcome branches
     -- [
     --   {
     --     "scene_number": 1,
@@ -488,15 +494,30 @@ CREATE TABLE IF NOT EXISTS scene_batches (
     --     "challenge_type": "stealth",
     --     "key_npcs": [...],
     --     "stakes": "...",
-    --     "continuity_hooks": {...}
+    --     "continuity_hooks": {...},
+    --     "beats": [
+    --       {
+    --         "beat_number": 1,
+    --         "outcome_branches": {
+    --           "critical_success": {...},
+    --           "success": {...},
+    --           "partial": {...},
+    --           "failure": {...},
+    --           "critical_failure": {...}
+    --         }
+    --       }
+    --     ]
     --   },
     --   ...
     -- ]
 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(world_id, act_number)
+    -- One batch per act per world (shared across all sessions)
 );
 
-CREATE INDEX idx_scene_batches_session_id ON scene_batches(session_id);
+CREATE INDEX idx_scene_batches_world_id ON scene_batches(world_id);
 CREATE INDEX idx_scene_batches_act_number ON scene_batches(act_number);
 ```
 
@@ -884,10 +905,16 @@ is unlocking the chronograph's secrets.
 
 ### Scene Batch Generation
 
-**When**:
-- Act 1 batch: Generated when adventure starts
-- Act 2 batch: Generated in background during Act 1 Camp
-- Act 3+ batches: Generated during previous camp
+**When** (World-Scoped Generation):
+- **First playthrough of a world**: Generate all act batches progressively
+  - Act 1 batch: Generated when first player starts adventure
+  - Act 2 batch: Generated in background during Act 1 Camp
+  - Act 3+ batches: Generated during previous camp
+- **Subsequent playthroughs**: Use cached batches from database
+  - No generation needed - instant scene loading
+  - All players face same encounters for consistency
+
+**Storage**: Batches stored with `world_id`, not `session_id`, so they're shared across all sessions
 
 **How**:
 ```python
@@ -939,9 +966,10 @@ async def generate_scene_batch(
 ```
 
 **Storage**:
-- Skeletons stored in `scene_batches` table as JSONB
-- Retrieved when player enters each scene
-- Not regenerated unless session restarted
+- Skeletons stored in `scene_batches` table as JSONB with `world_id` reference
+- Shared across all sessions of the same world
+- Generated once on first playthrough, cached permanently for that world
+- All players face the same encounters for consistency in reviews/ratings
 
 ### Dynamic Intro Generation
 
@@ -1658,6 +1686,225 @@ See `python-service/generate/flaw_templates.py` for complete list.
 - Narrative recognition: Bonus rewards for succeeding despite flaw trigger
 - Companion flaws interact: Phobias/traumas can cascade in party dynamics
 
+---
+
+### Skills System
+
+**Purpose**: Skills gate certain choices and unlock special actions.
+
+**Storage**:
+- JSONB array in `party_members.skills`: `["Lockpicking", "Battle Cry Fury", "Runic Tattoo Reading"]`
+- 3-7 skills per character (AI-generated based on backstory)
+
+**Mechanic**: Choice Unlocking
+
+Skills determine **which choices are available** to the party, not bonuses to rolls (attributes handle that).
+
+**Scene Generation**:
+```json
+{
+  "choices": [
+    {
+      "text": "Pick the lock",
+      "attribute": "creativity",
+      "dc": 15,
+      "required_skill": "Lockpicking"
+    },
+    {
+      "text": "Bribe the guard",
+      "attribute": "influence",
+      "dc": 12,
+      "required_skill": null  // Anyone can attempt
+    },
+    {
+      "text": "Intimidate with Battle Cry",
+      "attribute": "influence",
+      "dc": 10,
+      "required_skill": "Battle Cry Fury"
+    }
+  ]
+}
+```
+
+**Frontend Check**:
+```typescript
+// When displaying choices, check if party has required skill
+function isChoiceAvailable(choice: Choice, party: PartyMember[]): boolean {
+  if (!choice.required_skill) return true; // No skill required
+
+  // Check if ANY party member has the skill
+  return party.some(member =>
+    member.skills.includes(choice.required_skill)
+  );
+}
+
+// UI Display:
+// Available choice: Normal button
+// Unavailable choice: Grayed out + tooltip "Requires: Lockpicking"
+```
+
+**Gameplay Impact**:
+- **Party composition matters**: Different companions unlock different paths
+- **Replayability**: Try world again with different companions = different available choices
+- **Strategic depth**: "Do we bring the lockpicker or the diplomat?"
+
+**Example Skills by Archetype**:
+- **Warrior**: Combat Tactics, Weapon Mastery, Intimidation
+- **Rogue**: Lockpicking, Stealth, Trap Detection, Sleight of Hand
+- **Scholar**: Ancient Languages, Arcane Knowledge, Research
+- **Diplomat**: Negotiation, Reading People, Etiquette
+- **Tinker**: Mechanical Repair, Crafting, Engineering
+
+**Balance**:
+- Not all choices should require skills (most are attribute-based)
+- Skills add flavor and strategic choice, not mandatory gates
+- Estimate: 20-30% of choices skill-gated, 70-80% available to all
+
+---
+
+### Traits System
+
+**Purpose**: Personality flavor + minor situational modifiers + AI context.
+
+**Storage**:
+- JSONB array in `party_members.personality_traits`: `["Fearless", "Honorable", "Competitive"]`
+- Exactly 3 traits per character (standardized list of ~50 traits)
+
+**Primary Use**: AI Generation Context
+
+Traits are primarily used by AI to generate contextual narratives:
+
+**1. Dynamic Scene Intros**:
+```python
+# AI prompt includes traits
+generate_scene_intro(
+    scene_skeleton=scene,
+    party_state={
+        "members": [
+            {"name": "Erik", "traits": ["Fearless", "Honorable", "Competitive"]},
+            {"name": "Kira", "traits": ["Reckless", "Loyal", "Perceptive"]}
+        ]
+    }
+)
+
+# Output acknowledges traits:
+"Erik strides forward fearlessly, his hand on his sword hilt. Kira hangs
+back, her sharp eyes scanning for danger—she's reckless but not stupid."
+```
+
+**2. Camp Events**:
+```python
+# AI generates character interactions based on traits
+camp_event = generate_camp_event(
+    party=[
+        {"name": "Erik", "traits": ["Competitive", "Honorable"]},
+        {"name": "Bob", "traits": ["Cautious", "Analytical"]}
+    ]
+)
+
+# Output:
+"Erik challenges Bob to a sparring match. 'Come on, it'll keep us sharp!'
+Bob shakes his head. 'We need to conserve energy. Be smart about this.'"
+```
+
+**Secondary Use**: Optional Situational Modifiers (LIGHTWEIGHT)
+
+Traits can provide **small, situational bonuses/penalties** when relevant:
+
+```typescript
+// In choice resolution (Go service):
+function calculateFinalDC(
+  choice: Choice,
+  character: PartyMember,
+  situation: string
+): number {
+  let dc = choice.base_dc;
+
+  // OPTIONAL: Apply trait modifiers (keep minimal)
+  if (character.traits.includes("Fearless") && situation === "intimidation") {
+    dc -= 2;  // Easier to intimidate when you're fearless
+  }
+
+  if (character.traits.includes("Cowardly") && choice.is_brave_action) {
+    dc += 2;  // Harder for cowards to do brave things
+  }
+
+  if (character.traits.includes("Analytical") && choice.type === "puzzle") {
+    dc -= 2;  // Analytical minds excel at puzzles
+  }
+
+  return dc;
+}
+```
+
+**Trait Categories** (Standardized List):
+
+**Courage**: Fearless, Brave, Cowardly, Cautious
+**Morality**: Honorable, Ruthless, Compassionate, Cynical
+**Social**: Charismatic, Awkward, Loyal, Manipulative
+**Intellect**: Analytical, Perceptive, Naive, Curious
+**Temperament**: Competitive, Calm, Hotheaded, Patient
+**Motivation**: Ambitious, Content, Reckless, Careful
+
+**Balance Guidelines**:
+- **Narrative > Mechanical**: Traits are primarily flavor for AI generation
+- **Keep modifiers minimal**: -2 or +2 DC at most, only when directly relevant
+- **Don't gate choices**: Skills gate choices, traits just add flavor
+- **Avoid complexity**: No complicated trait interaction systems
+
+**Example Trait Effects** (OPTIONAL - can be added later):
+```typescript
+const TRAIT_MODIFIERS = {
+  "Fearless": { situations: ["intimidation", "brave_action"], modifier: -2 },
+  "Cowardly": { situations: ["brave_action", "combat_start"], modifier: +2 },
+  "Analytical": { situations: ["puzzle", "investigation"], modifier: -2 },
+  "Perceptive": { situations: ["perception_check", "ambush"], modifier: -1 },
+  "Hotheaded": { situations: ["negotiation", "patience_test"], modifier: +2 },
+  "Charismatic": { situations: ["persuasion", "first_impression"], modifier: -1 }
+};
+```
+
+**UI Display**:
+- Character card: Show 3 traits as colored badges
+- Tooltip: Brief description of what trait means
+- NO mechanical details shown (keep it narrative)
+
+---
+
+### Character Mechanics Summary
+
+**Hierarchy of Systems**:
+
+1. **Attributes** (Core Mechanic - Always Active)
+   - 6 stats: Knowledge, Empathy, Resilience, Creativity, Influence, Perception
+   - Range: 8-18
+   - Used for: d20 + modifier vs DC on every check
+   - **Impact**: Major (determines success/failure)
+
+2. **Flaws** (Conditional Penalties - Trigger-Based)
+   - 1 flaw per character
+   - Structure: `{name, description, trigger, penalty, duration}`
+   - Used for: Apply penalties when trigger keywords match
+   - **Impact**: Moderate (adds risk/drama to specific situations)
+
+3. **Skills** (Choice Gating - Unlock Paths)
+   - 3-7 skills per character
+   - Array: `["Lockpicking", "Combat Tactics", ...]`
+   - Used for: Determine which choices are available
+   - **Impact**: Strategic (party composition matters)
+
+4. **Traits** (Narrative Flavor - AI Context)
+   - Exactly 3 traits per character
+   - Array: `["Fearless", "Honorable", "Competitive"]`
+   - Used for: AI narrative generation + optional minor DC modifiers
+   - **Impact**: Light (enhances immersion, minimal mechanical effect)
+
+**Design Philosophy**:
+- Attributes are the foundation (D&D-style)
+- Flaws add drama and consequence (Darkest Dungeon-style)
+- Skills add strategic depth (party composition matters)
+- Traits add personality (narrative > mechanical)
+
 ### Health & Stress
 
 **Health (HP)**:
@@ -1809,10 +2056,12 @@ for party_member in party:
 
 Camps are perfect opportunities to generate the next act's content while the player is reading/resting. This eliminates loading screens during gameplay.
 
+**IMPORTANT**: Since scene batches are world-scoped, we check if batches already exist for this world before generating. Only the first player to reach each act triggers generation - subsequent players use cached content.
+
 **Timing**:
-- **Act 1 scenes**: Generated when adventure starts (before party selection)
-- **Act 2 scenes**: Generated in background during Act 1 Camp
-- **Act 3+ scenes**: Generated during previous act's camp
+- **Act 1 scenes**: Generated when first player starts adventure (before party selection)
+- **Act 2 scenes**: Generated in background during Act 1 Camp (if not already cached)
+- **Act 3+ scenes**: Generated during previous act's camp (if not already cached)
 - **Final act**: Detected dynamically, generates finale scene
 
 **Implementation**:
@@ -1835,9 +2084,16 @@ func (h *AdventureHandler) EnterCamp(c *gin.Context) {
         h.store.UpdatePartyMember(member)
     }
 
-    // 3. Start background generation (async, don't wait)
+    // 3. Check if next act batch already exists for this world (world-scoped)
     nextAct := session.CurrentAct + 1
     go func() {
+        // Check if batch already exists for this world
+        existingBatch, err := h.store.GetSceneBatchByWorld(session.WorldID, nextAct)
+        if err == nil && existingBatch != nil {
+            log.Info("Act batch already exists for world", "world_id", session.WorldID, "act", nextAct)
+            return // Already generated by another player, skip
+        }
+
         // This runs in background while player reads camp event
         batch, err := h.pythonClient.GenerateSceneBatch(ctx, &pb.SceneBatchRequest{
             Quest: session.World.Quest,
@@ -1852,9 +2108,9 @@ func (h *AdventureHandler) EnterCamp(c *gin.Context) {
             return
         }
 
-        // Save to scene_batches table
-        h.store.SaveSceneBatch(session.ID, nextAct, batch)
-        log.Info("Pre-generated act", nextAct, "during camp")
+        // Save to scene_batches table with world_id (shared across all sessions)
+        h.store.SaveSceneBatch(session.WorldID, nextAct, batch)
+        log.Info("Pre-generated act", nextAct, "for world", session.WorldID, "during camp")
     }()
 
     // 4. Return camp event to player immediately (don't block)
@@ -1872,17 +2128,18 @@ func (h *AdventureHandler) EnterCamp(c *gin.Context) {
 func (h *AdventureHandler) AdvanceToNextAct(c *gin.Context) {
     nextAct := session.CurrentAct + 1
 
-    // Check if batch already generated (during camp background)
-    batch, err := h.store.GetSceneBatch(session.ID, nextAct)
+    // Check if batch already exists for this world (world-scoped)
+    batch, err := h.store.GetSceneBatchByWorld(session.WorldID, nextAct)
 
     if err != nil || batch == nil {
-        // Batch not ready yet (slow generation or error)
+        // Batch not ready yet (slow generation, error, or first player)
         // Generate now and wait
         batch, err = h.pythonClient.GenerateSceneBatch(...)
         if err != nil {
             return c.JSON(500, gin.H{"error": "Failed to generate scenes"})
         }
-        h.store.SaveSceneBatch(session.ID, nextAct, batch)
+        // Save with world_id so all future sessions can use it
+        h.store.SaveSceneBatch(session.WorldID, nextAct, batch)
     }
 
     // Proceed with next act
@@ -1893,9 +2150,13 @@ func (h *AdventureHandler) AdvanceToNextAct(c *gin.Context) {
 ```
 
 **User Experience**:
-- **Best case**: Player reads camp event (30-60 seconds), batch generates in background, click "Continue" → instant transition
-- **Worst case**: Generation fails/slow, player waits when clicking "Continue" (same as old approach)
-- **Average case**: By the time player finishes reading camp event and reviewing party, batch is ready
+- **First player** (generating new content):
+  - Player reads camp event (30-60 seconds), batch generates in background, click "Continue" → instant transition
+  - Worst case: Generation fails/slow, player waits when clicking "Continue"
+  - Average case: By the time player finishes reading camp event, batch is ready
+- **Subsequent players** (using cached content):
+  - Click "Continue" → **instant transition** (no generation, loading from database)
+  - Significantly better UX for replays and popular worlds
 
 **Generation Time Estimates**:
 - Camp event: 2-4 seconds (small, 2-4 paragraphs)
@@ -3063,6 +3324,125 @@ func (s *AdventureStore) GetSession(sessionID int64) (*Session, error) {
     // ... implementation
 }
 ```
+
+---
+
+## Design Approach: World-Scoped Scene Batches
+
+### Philosophy
+
+LoreSmith Adventure Mode uses **world-scoped scene generation** (Approach 2), meaning:
+- Scene batches (encounters, challenges, NPCs) are generated **once per world**
+- All players of the same world face the **same encounters**
+- Batches are stored with `world_id` and shared across all sessions
+- First player to play a world triggers generation, subsequent players use cached content
+
+This is in contrast to session-scoped generation (Approach 1), where each player would get unique encounters.
+
+### What Is Static vs. Dynamic
+
+**Static (Shared Across All Players):**
+- ✅ Scene skeletons (core challenges, NPCs, locations)
+- ✅ Beat structure (what challenges appear in each scene)
+- ✅ Outcome branches (all 5 outcomes: critical success, success, partial, failure, critical failure)
+- ✅ Continuity hooks (how scenes connect based on previous results)
+
+**Dynamic (Unique Per Session):**
+- ✅ Companions (generated per player, unique to each session)
+- ✅ Dynamic scene intros (acknowledge your specific party state, previous outcomes)
+- ✅ Camp events (based on your party composition and recent events)
+- ✅ Starting inventory (protagonist-based, but AI-generated)
+- ✅ Dice rolls (same DC, but your roll + modifier determines outcome)
+- ✅ Breakpoint events (deaths, stress - personalized to your session)
+
+### Why This Approach?
+
+#### 1. **Economic Sustainability** (Primary Reason)
+```
+Cost Comparison (at 100 playthroughs):
+- Approach 1 (Session-Scoped): $218.00
+- Approach 2 (World-Scoped): $16.04
+- Savings: $201.96 (93% reduction)
+```
+
+Scene batch generation is the most expensive operation (~$2.04 per session). By generating once and caching, we reduce costs by an order of magnitude.
+
+#### 2. **Consistent Reviews & Ratings**
+- Players can meaningfully rate worlds because they experience the same content
+- Comments can discuss specific encounters, strategies, optimal companions
+- Reviews reflect actual content quality, not RNG luck
+- Community can form around specific worlds with shared experiences
+
+#### 3. **Strong Replayability Remains**
+Even with static encounters, replayability comes from:
+- **Companion variety**: Different skills, flaws, personalities drastically change approach
+- **Party composition**: Solo vs. full party, tank+support vs. all-DPS, etc.
+- **Dice variance**: DC 15 check with +2 modifier vs. +8 modifier feels very different
+- **Build optimization**: Finding optimal companion combos, item usage strategies
+- **Challenge runs**: "Beat world X with solo protagonist", "Pacifist run", etc.
+
+Think: Slay the Spire, Hades, FTL - same encounters, infinite replayability through build variety.
+
+#### 4. **Content Quality Control**
+- Can identify and fix broken encounters based on player feedback
+- Can balance difficulty over time
+- Can improve narratives based on reviews
+- With session-scoped, every session is "ship it and forget it"
+
+#### 5. **Better UX for Subsequent Players**
+- First player: Background generation during camp (same as before)
+- Second+ players: **Instant scene loading** (no generation, just database lookup)
+- Popular worlds become very fast to play after first playthrough
+
+#### 6. **Community Features**
+Enables future features like:
+- "World of the Week" showcases
+- Speedrun leaderboards (everyone faces same encounters, fair competition)
+- Strategy guides and wikis
+- "Hard mode" toggles (same encounters, harder DCs)
+- Achievement systems ("Complete world X without losing a companion")
+
+### Cost Breakdown (World-Scoped)
+
+**One-Time Per World:**
+- 3 acts × $0.68 per batch = **$2.04**
+- Generated progressively during first playthrough
+- Cached permanently for all future sessions
+
+**Per Session (Every Playthrough):**
+- Companions: $0.03
+- Starting inventory: $0.01
+- Dynamic scene intros (9): $0.05
+- Camp events (3): $0.03
+- Breakpoint events: $0.02
+- **Total per session: $0.14**
+
+**Example: World with 50 Playthroughs:**
+- First playthrough: $2.04 + $0.14 = $2.18
+- Next 49 playthroughs: 49 × $0.14 = $6.86
+- **Total: $9.04** (vs. $109.00 with session-scoped)
+
+### Trade-Offs Acknowledged
+
+**What We Lose:**
+- Each playthrough won't have unique encounters
+- Can't say "the AI generated this crazy situation just for me"
+- Second playthrough has less narrative surprise (but tactical variety remains)
+
+**What We Gain:**
+- 93% cost reduction at scale
+- Consistent, rateable content
+- Community building potential
+- Better UX for replays
+- Ability to iterate on content quality
+
+### Future: Optional Dynamic Mode
+
+If desired, we can later add a toggle:
+- **Classic Mode**: Static encounters (default, free)
+- **Dynamic Mode**: Unique generation per session (premium feature, costs tokens)
+
+This allows us to start sustainable and add procedural generation as an optional upgrade.
 
 ---
 
