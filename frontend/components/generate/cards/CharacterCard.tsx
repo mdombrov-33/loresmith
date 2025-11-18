@@ -43,6 +43,21 @@ export default function CharacterCard({
     ? character.details.skills
     : [];
 
+  //* Get image source (supports both R2 URLs and base64 data)
+  const getImageSrc = () => {
+    // Check for R2 URL first (after world creation)
+    if (character.details.image_portrait && typeof character.details.image_portrait === 'string') {
+      return character.details.image_portrait;
+    }
+    // Fallback to base64 data (during generation)
+    if (character.details.image_portrait_base64 && typeof character.details.image_portrait_base64 === 'string') {
+      return `data:image/png;base64,${character.details.image_portrait_base64}`;
+    }
+    return undefined;
+  };
+
+  const imageSrc = getImageSrc();
+
   //* Common card border styling
   const borderClass = isSelected
     ? "border-primary shadow-primary/20 shadow-lg"
@@ -54,7 +69,7 @@ export default function CharacterCard({
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
       <CardImage
-        src={character.details.image_portrait}
+        src={imageSrc}
         alt={character.name}
         objectFit="contain"
         height="h-44"
@@ -94,7 +109,7 @@ export default function CharacterCard({
     >
       <div className="flex-1 overflow-y-auto min-h-0">
         <CardImage
-          src={character.details.image_portrait}
+          src={imageSrc}
           alt={character.name}
           objectFit="contain"
           height="h-48"

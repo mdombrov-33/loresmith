@@ -149,7 +149,7 @@ This hybrid approach enables both thematic exploration ("desert oasis with pyram
 
 ### Character Image Generation (Optional)
 
-LoreSmith can generate AI images for characters (768x768 card + 256x256 portrait). Choose between cloud or local generation:
+LoreSmith can generate AI portrait images for characters (1024x1024). Choose between cloud or local generation:
 
 #### Option A: Cloud Generation with Replicate (PAID, High Quality)
 
@@ -166,7 +166,7 @@ Uses Stable Diffusion XL via Replicate API - professional quality, no local setu
    REPLICATE_API_TOKEN=your_token_here
    ```
 
-**Performance**: ~30-60 seconds per character (generates 2 images)
+**Performance**: ~30-60 seconds per character
 
 #### Option B: Local Generation with Automatic1111 (FREE, Customizable)
 
@@ -247,7 +247,7 @@ cd ~/stable-diffusion-webui
 **Customizing Image Generation**:
 
 Edit `python-service/services/image_generator.py` to tweak:
-- `num_inference_steps`: Higher = better quality, slower (default: 20 for cards, 15 for portraits)
+- `num_inference_steps`: Higher = better quality, slower (default: 20)
 - `cfg_scale`: Prompt adherence strength (default: 7.5)
 - `sampler_name`: Algorithm used (default: "DPM++ 2M Karras")
 - Theme-specific prompts and negative prompts
@@ -318,6 +318,40 @@ To turn off image generation entirely:
 ```env
 ENABLE_IMAGE_GENERATION=false
 ```
+
+### Asset Storage with Cloudflare R2
+
+LoreSmith uses **Cloudflare R2** (S3-compatible object storage) to store generated assets like character portraits. This keeps your database lightweight and provides fast CDN delivery.
+
+**How it works:**
+
+1. **During character generation**: Images are created as base64 strings (no storage yet - world doesn't exist)
+2. **After world creation**: Images are automatically uploaded to R2 and the database stores only the public URL
+3. **On world pages**: Images load directly from Cloudflare's CDN for fast global delivery
+
+**What's stored in R2:**
+- ✅ **Character portraits** (1024x1024)
+- 🔜 **Background music** (planned - theme-specific ambient tracks)
+
+**Setup R2 storage (optional but recommended):**
+
+1. **Create R2 bucket**: [Cloudflare Dashboard](https://dash.cloudflare.com/) → R2 → Create bucket (`loresmith-portraits`)
+2. **Generate API token**: R2 → Manage R2 API Tokens → Create API Token (read/write permissions)
+3. **Enable public access**: Bucket Settings → Public Access → Connect custom domain or use R2.dev subdomain
+
+4. **Configure .env:**
+   ```env
+   # R2 credentials (from Cloudflare dashboard)
+   AWS_ACCESS_KEY_ID=your_access_key_id
+   AWS_SECRET_ACCESS_KEY=your_secret_access_key
+   AWS_ENDPOINT_URL=https://your_account_id.r2.cloudflarestorage.com
+   R2_BUCKET_NAME=loresmith-portraits
+   R2_PUBLIC_URL=https://pub-your_bucket_id.r2.dev
+   ```
+
+**Without R2**: Images still generate but won't persist after world creation. Characters will display during generation preview only.
+
+**Storage pattern**: `portraits/{world_id}/{character_id}_portrait.png`
 
 ### Setup
 

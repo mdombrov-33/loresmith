@@ -15,11 +15,47 @@ export default function CardImage({
   objectFit = "cover",
   height = "h-48"
 }: CardImageProps) {
-  //* Only render if image exists and is a valid path
-  if (!src || src === "None" || !src.startsWith("/")) {
+  //* Only render if image exists and is valid (file path, URL, or data URI)
+  if (!src || src === "None") {
     return null;
   }
 
+  const isDataUri = src.startsWith("data:");
+  const isValidPath = src.startsWith("/");
+  const isUrl = src.startsWith("http://") || src.startsWith("https://");
+
+  if (!isDataUri && !isValidPath && !isUrl) {
+    return null;
+  }
+
+  //* For base64 data URIs, use regular img tag (Next.js Image doesn't support data URIs)
+  if (isDataUri) {
+    return (
+      <div className={`relative ${height} w-full overflow-hidden ${className}`}>
+        {/* Blurred background for contain mode */}
+        {objectFit === "contain" && (
+          <div className="absolute inset-0">
+            <img
+              src={src}
+              alt=""
+              className="h-full w-full object-cover blur-xl opacity-30 scale-110"
+              aria-hidden="true"
+            />
+          </div>
+        )}
+        {/* Main image */}
+        <div className="relative h-full w-full">
+          <img
+            src={src}
+            alt={alt}
+            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover"}`}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  //* For file paths, use Next.js Image for optimization
   return (
     <div className={`relative ${height} w-full overflow-hidden ${className}`}>
       {/* Blurred background for contain mode */}

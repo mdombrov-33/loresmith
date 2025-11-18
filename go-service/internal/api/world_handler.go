@@ -142,6 +142,58 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	// Upload character portraits to R2 with real world_id
+	world, err := h.worldStore.GetWorldById(worldID)
+	if err != nil {
+		h.logger.Printf("WARN: Failed to get world for R2 upload: %v", err)
+	} else if world != nil {
+		h.logger.Printf("INFO: Retrieved world %d with %d lore pieces for R2 upload", worldID, len(world.LorePieces))
+		for _, piece := range world.LorePieces {
+			if piece.Type == "character" {
+				h.logger.Printf("INFO: Checking character piece %s (ID: %d) for base64 image", piece.Name, piece.ID)
+				h.logger.Printf("DEBUG: Details keys: %v", func() []string {
+					keys := make([]string, 0, len(piece.Details))
+					for k := range piece.Details {
+						keys = append(keys, k)
+					}
+					return keys
+				}())
+
+				// Check if character has base64 image to upload
+				if base64Data, ok := piece.Details["image_portrait_base64"].(string); ok && base64Data != "" {
+					h.logger.Printf("INFO: Found base64 portrait for character %s (length: %d)", piece.Name, len(base64Data))
+
+					// Call Python gRPC to upload to R2
+					uploadCtx, uploadCancel := utils.NewGRPCContext(utils.OpUploadImage)
+					uploadResp, err := h.loreClient.UploadImageToR2(uploadCtx, &lorepb.UploadImageRequest{
+						ImageBase64:  base64Data,
+						WorldId:      int64(worldID),
+						CharacterId:  strconv.Itoa(piece.ID),
+						ImageType:    "portrait",
+					})
+					uploadCancel()
+
+					if err != nil {
+						h.logger.Printf("WARN: Failed to upload portrait for %s: %v", piece.Name, err)
+						continue // Don't fail world creation if image upload fails
+					}
+
+					// Update lore piece with R2 URL and remove base64
+					piece.Details["image_portrait"] = uploadResp.ImageUrl
+					delete(piece.Details, "image_portrait_base64")
+
+					if err := h.worldStore.UpdateLorePieceDetails(piece.ID, piece.Details); err != nil {
+						h.logger.Printf("ERROR: Failed to update lore piece with R2 URL: %v", err)
+					} else {
+						h.logger.Printf("INFO: Successfully uploaded and updated portrait for %s: %s", piece.Name, uploadResp.ImageUrl)
+					}
+				} else {
+					h.logger.Printf("WARN: No base64 image found for character %s. Checked: %v", piece.Name, piece.Details["image_portrait_base64"])
+				}
+			}
+		}
+	}
+
 	utils.WriteResponseJSON(w, http.StatusCreated, utils.ResponseEnvelope{"world_id": worldID})
 }
 

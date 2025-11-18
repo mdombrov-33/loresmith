@@ -14,6 +14,7 @@ service LoreService {
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
   rpc GenerateEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
   rpc RerankResults (RerankSearchRequest) returns (RerankSearchResponse);
+  rpc UploadImageToR2 (UploadImageRequest) returns (UploadImageResponse);
 }
 
 message CharactersRequest {
@@ -128,4 +129,15 @@ message RerankSearchRequest {
 
 message RerankSearchResponse {
   repeated WorldResult reranked_worlds = 1;
+}
+
+message UploadImageRequest {
+  string image_base64 = 1;
+  int64 world_id = 2;
+  string character_id = 3;
+  string image_type = 4;
+}
+
+message UploadImageResponse {
+  string image_url = 1;
 }

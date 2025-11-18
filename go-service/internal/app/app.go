@@ -40,7 +40,16 @@ func NewApplication() (*Application, error) {
 
 	logger := log.New((os.Stdout), "", log.Ldate|log.Ltime)
 
-	conn, err := grpc.NewClient("python-service:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// Increase max message size to 20MB to handle base64-encoded images
+	maxMsgSize := 20 * 1024 * 1024 // 20MB
+	conn, err := grpc.NewClient(
+		"python-service:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(maxMsgSize),
+			grpc.MaxCallSendMsgSize(maxMsgSize),
+		),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Python gRPC: %w", err)
 	}

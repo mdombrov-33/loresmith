@@ -2,15 +2,32 @@ import base64
 from pathlib import Path
 import aiohttp
 from PIL import Image
+import boto3
+from botocore.exceptions import ClientError
+import io
 
 from utils.logger import logger
+from config.settings import get_settings
+
+settings = get_settings()
+
+# Initialize R2 client (S3-compatible)
+s3_client = None
+if settings.AWS_ACCESS_KEY_ID and settings.AWS_ENDPOINT_URL:
+    s3_client = boto3.client(
+        's3',
+        endpoint_url=settings.AWS_ENDPOINT_URL,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name='auto'  # R2 uses 'auto' as region
+    )
 
 
 async def save_base64_image(
     base64_data: str, world_id: int, character_id: str, image_type: str
 ) -> str:
     """
-    Save base64-encoded image from Automatic1111 to file.
+    Upload base64-encoded image from Automatic1111 to R2.
 
     Args:
         base64_data: Base64 encoded image data
@@ -19,36 +36,38 @@ async def save_base64_image(
         image_type: "card" or "portrait"
 
     Returns:
-        Local file path where image was saved
+        R2 object key (path in bucket)
     """
-    # Use mounted volume path
-    base_dir = Path("/app/generated")
-    try:
-        base_dir.mkdir(parents=True, exist_ok=True)
-    except (OSError, PermissionError) as e:
-        raise Exception(f"Could not access mounted image directory: {e}")
+    if not s3_client:
+        raise Exception("R2 client not initialized. Check AWS credentials in .env")
 
-    world_dir = base_dir / str(world_id)
-    world_dir.mkdir(parents=True, exist_ok=True)
-
-    # File path
-    filename = f"{character_id}_{image_type}.png"
-    filepath = world_dir / filename
-
-    # Decode and save
+    # Decode image
     image_data = base64.b64decode(base64_data)
-    with open(filepath, "wb") as f:
-        f.write(image_data)
 
-    logger.info(f"Saved image to {filepath}")
-    return str(filepath)
+    # Object key: portraits/{world_id}/{character_id}_portrait.png
+    key = f"portraits/{world_id}/{character_id}_{image_type}.png"
+
+    try:
+        # Upload to R2
+        s3_client.put_object(
+            Bucket=settings.R2_BUCKET_NAME,
+            Key=key,
+            Body=image_data,
+            ContentType='image/png'
+        )
+        logger.info(f"Uploaded image to R2: {key}")
+        return key
+
+    except ClientError as e:
+        logger.error(f"Failed to upload to R2: {e}")
+        raise Exception(f"R2 upload failed: {e}")
 
 
 async def download_and_save_image(
     url: str, world_id: int, character_id: str, image_type: str
 ) -> str:
     """
-    Download image from URL (Replicate) and save to mounted directory.
+    Download image from URL (Replicate) and upload to R2.
 
     Args:
         url: Image URL from Replicate
@@ -57,72 +76,87 @@ async def download_and_save_image(
         image_type: "card" or "portrait"
 
     Returns:
-        Local file path where image was saved
+        R2 object key (path in bucket)
     """
-    # Use mounted volume path
-    base_dir = Path("/app/generated")
-    try:
-        base_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Using image directory: {base_dir}")
-    except (OSError, PermissionError) as e:
-        raise Exception(f"Could not access mounted image directory: {e}")
+    if not s3_client:
+        raise Exception("R2 client not initialized. Check AWS credentials in .env")
 
-    world_dir = base_dir / str(world_id)
-    world_dir.mkdir(parents=True, exist_ok=True)
-
-    filename = f"{character_id}_{image_type}.png"
-    filepath = world_dir / filename
-
+    # Download image
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            if response.status == 200:
-                content = await response.read()
-                with open(filepath, "wb") as f:
-                    f.write(content)
-                logger.info(f"Saved image to {filepath}")
-                return str(filepath)
-            else:
+            if response.status != 200:
                 raise Exception(f"Failed to download image: HTTP {response.status}")
 
+            image_data = await response.read()
 
-async def crop_center_portrait(
-    card_image_path: str, world_id: int, character_id: str
+    # Object key: portraits/{world_id}/{character_id}_portrait.png
+    key = f"portraits/{world_id}/{character_id}_{image_type}.png"
+
+    try:
+        # Upload to R2
+        s3_client.put_object(
+            Bucket=settings.R2_BUCKET_NAME,
+            Key=key,
+            Body=image_data,
+            ContentType='image/png'
+        )
+        logger.info(f"Uploaded image to R2: {key}")
+        return key
+
+    except ClientError as e:
+        logger.error(f"Failed to upload to R2: {e}")
+        raise Exception(f"R2 upload failed: {e}")
+
+
+async def upload_image_to_r2(
+    image_data: bytes, world_id: int, character_id: str, image_type: str
 ) -> str:
     """
-    Crop center 256x256 portrait from card image.
+    Upload image bytes directly to R2.
+
+    Used when uploading images AFTER world creation (with real world_id).
 
     Args:
-        card_image_path: Path to the card image
-        world_id: World ID for organizing files
-        character_id: Character ID for file naming
+        image_data: Raw image bytes
+        world_id: Real world ID from database
+        character_id: Character UUID
+        image_type: "portrait" or "card"
 
     Returns:
-        Local file path where portrait was saved
+        Full R2 public URL
     """
-    base_dir = Path("/app/generated")
-    world_dir = base_dir / str(world_id)
-    world_dir.mkdir(parents=True, exist_ok=True)
+    if not s3_client:
+        raise Exception("R2 client not initialized. Check AWS credentials in .env")
 
-    portrait_filename = f"{character_id}_portrait.png"
-    portrait_path = world_dir / portrait_filename
+    # Object key: portraits/{world_id}/{character_id}_portrait.png
+    key = f"portraits/{world_id}/{character_id}_{image_type}.png"
 
-    # Crop center 256x256
-    with Image.open(card_image_path) as img:
-        width, height = img.size
-        left = (width - 256) // 2
-        top = (height - 256) // 2
-        right = left + 256
-        bottom = top + 256
+    try:
+        # Upload to R2
+        s3_client.put_object(
+            Bucket=settings.R2_BUCKET_NAME,
+            Key=key,
+            Body=image_data,
+            ContentType='image/png'
+        )
+        logger.info(f"Uploaded image to R2: {key}")
 
-        portrait = img.crop((left, top, right, bottom))
-        portrait.save(portrait_path, "PNG")
+        # Return full public URL
+        return f"{settings.R2_PUBLIC_URL}/{key}"
 
-    logger.info(f"Cropped portrait to {portrait_path}")
-    return str(portrait_path)
+    except ClientError as e:
+        logger.error(f"Failed to upload to R2: {e}")
+        raise Exception(f"R2 upload failed: {e}")
 
 
 def build_image_urls(world_id: int, character_id: str) -> dict[str, str | None]:
-    """Build public URL for generated portrait image."""
+    """
+    Build public R2 URL for generated portrait image.
+
+    NOTE: This is called AFTER uploading to R2 with the real world_id.
+    """
+    # Use R2 public URL + object key
+    key = f"portraits/{world_id}/{character_id}_portrait.png"
     return {
-        "image_portrait": f"/generated/{world_id}/{character_id}_portrait.png",
+        "image_portrait": f"{settings.R2_PUBLIC_URL}/{key}",
     }

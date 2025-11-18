@@ -25,10 +25,11 @@ type PartyMember struct {
 	Creativity                int       `json:"creativity"`
 	Influence                 int       `json:"influence"`
 	Perception                int       `json:"perception"`
-	Skills                    string    `json:"skills"`
-	Flaw                      string    `json:"flaw"`
-	Personality               string    `json:"personality"`
-	Appearance                string    `json:"appearance"`
+	Skills                    interface{} `json:"skills"`                      // JSONB array
+	Flaw                      interface{} `json:"flaw"`                        // JSONB object
+	PersonalityTraits         interface{} `json:"personality_traits"`          // JSONB array
+	Appearance                string      `json:"appearance"`
+	ImagePortrait             *string     `json:"image_portrait,omitempty"`    // R2 URL
 	Position                  int       `json:"position"` //* 0 = protagonist, 1-3 = companions
 	CreatedAt                 time.Time `json:"created_at"`
 }
@@ -58,8 +59,8 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 	INSERT INTO party_members(session_id, lore_character_id,
 		is_protagonist, name, description, relationship_to_protagonist, relationship_level,
 		max_hp, current_hp, stress, knowledge, empathy, resilience, creativity,
-		influence, perception, skills, flaw, personality, appearance, position, created_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, NOW())
+		influence, perception, skills, flaw, personality_traits, appearance, image_portrait, position, created_at)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW())
 	RETURNING id
 	`
 	var memberID int
@@ -83,8 +84,9 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 		member.Perception,
 		member.Skills,
 		member.Flaw,
-		member.Personality,
+		member.PersonalityTraits,
 		member.Appearance,
+		member.ImagePortrait,
 		member.Position,
 	).Scan(&memberID)
 
@@ -98,9 +100,9 @@ func (s *PostgresPartyStore) CreatePartyMember(member *PartyMember) (int, error)
 func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, error) {
 	query := `
     SELECT id, session_id, lore_character_id, is_protagonist, name, description,
-           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, knowledge,
            empathy, resilience, creativity, influence, perception, skills, flaw,
-           personality, appearance, position, created_at
+           personality_traits, appearance, image_portrait, position, created_at
     FROM party_members WHERE id = $1
     `
 
@@ -108,6 +110,7 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 	var loreCharID sql.NullInt64    //* For nullable int64
 	var relationship sql.NullString //* For nullable string
 	var relLevel sql.NullInt64      //* For nullable int (relationship_level)
+	var imagePortrait sql.NullString //* For nullable image_portrait
 
 	err := s.db.QueryRow(query, memberID).Scan(
 		&member.ID,
@@ -129,8 +132,9 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 		&member.Perception,
 		&member.Skills,
 		&member.Flaw,
-		&member.Personality,
+		&member.PersonalityTraits,
 		&member.Appearance,
+		&imagePortrait,
 		&member.Position,
 		&member.CreatedAt,
 	)
@@ -155,6 +159,11 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 	} else {
 		member.RelationshipLevel = nil
 	}
+	if imagePortrait.Valid {
+		member.ImagePortrait = &imagePortrait.String
+	} else {
+		member.ImagePortrait = nil
+	}
 
 	return &member, nil
 }
@@ -162,9 +171,9 @@ func (s *PostgresPartyStore) GetPartyMemberByID(memberID int) (*PartyMember, err
 func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember, error) {
 	query := `
     SELECT id, session_id, lore_character_id, is_protagonist, name, description,
-           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, knowledge,
            empathy, resilience, creativity, influence, perception, skills, flaw,
-           personality, appearance, position, created_at
+           personality_traits, appearance, image_portrait, position, created_at
     FROM party_members WHERE session_id = $1
     ORDER BY position ASC
     `
@@ -180,6 +189,7 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 		var loreCharID sql.NullInt64    //* For nullable int64
 		var relationship sql.NullString //* For nullable string
 		var relLevel sql.NullInt64      //* For nullable int (relationship_level)
+		var imagePortrait sql.NullString //* For nullable image_portrait
 
 		err := rows.Scan(
 			&member.ID,
@@ -201,8 +211,9 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 			&member.Perception,
 			&member.Skills,
 			&member.Flaw,
-			&member.Personality,
+			&member.PersonalityTraits,
 			&member.Appearance,
+			&imagePortrait,
 			&member.Position,
 			&member.CreatedAt,
 		)
@@ -226,6 +237,11 @@ func (s *PostgresPartyStore) GetPartyBySessionID(sessionID int) ([]*PartyMember,
 			member.RelationshipLevel = &relLevelInt
 		} else {
 			member.RelationshipLevel = nil
+		}
+		if imagePortrait.Valid {
+			member.ImagePortrait = &imagePortrait.String
+		} else {
+			member.ImagePortrait = nil
 		}
 
 		partyMembers = append(partyMembers, &member)
@@ -290,9 +306,9 @@ func (s *PostgresPartyStore) DeletePartyMember(memberID int) error {
 func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error) {
 	query := `
     SELECT id, session_id, lore_character_id, is_protagonist, name, description,
-           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, lore_mastery,
+           relationship_to_protagonist, relationship_level, max_hp, current_hp, stress, knowledge,
            empathy, resilience, creativity, influence, perception, skills, flaw,
-           personality, appearance, position, created_at
+           personality_traits, appearance, image_portrait, position, created_at
     FROM party_members
     WHERE session_id = $1 AND is_protagonist = true
     `
@@ -300,6 +316,7 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 	var loreCharID sql.NullInt64    //* For nullable int64
 	var relationship sql.NullString //* For nullable string
 	var relLevel sql.NullInt64      //* For nullable int (relationship_level)
+	var imagePortrait sql.NullString //* For nullable image_portrait
 
 	err := s.db.QueryRow(query, sessionID).Scan(
 		&protagonist.ID,
@@ -321,8 +338,9 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 		&protagonist.Perception,
 		&protagonist.Skills,
 		&protagonist.Flaw,
-		&protagonist.Personality,
+		&protagonist.PersonalityTraits,
 		&protagonist.Appearance,
+		&imagePortrait,
 		&protagonist.Position,
 		&protagonist.CreatedAt,
 	)
@@ -340,6 +358,11 @@ func (s *PostgresPartyStore) GetProtagonist(sessionID int) (*PartyMember, error)
 		protagonist.RelationshipToProtagonist = &relationship.String
 	} else {
 		protagonist.RelationshipToProtagonist = nil
+	}
+	if imagePortrait.Valid {
+		protagonist.ImagePortrait = &imagePortrait.String
+	} else {
+		protagonist.ImagePortrait = nil
 	}
 	if relLevel.Valid {
 		relLevelInt := int(relLevel.Int64)

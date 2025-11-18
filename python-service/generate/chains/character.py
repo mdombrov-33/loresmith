@@ -467,8 +467,12 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     }
 
     # Only add image field if it has a valid value (not None)
-    if image_data.get("image_portrait"):
-        details["image_portrait"] = image_data["image_portrait"]
+    if image_data.get("image_portrait_base64"):
+        base64_length = len(image_data["image_portrait_base64"])
+        logger.info(f"Adding portrait base64 to details (length: {base64_length} chars)")
+        details["image_portrait_base64"] = image_data["image_portrait_base64"]
+    else:
+        logger.warning(f"No portrait base64 in image_data: {image_data}")
 
     return LorePiece(
         name=name,

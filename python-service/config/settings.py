@@ -33,6 +33,13 @@ class Settings(BaseSettings):
         "http://host.docker.internal:7860"  # For local Automatic1111 WebUI
     )
 
+    # R2 Storage Settings (S3-compatible)
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_ENDPOINT_URL: str = ""
+    R2_BUCKET_NAME: str = ""
+    R2_PUBLIC_URL: str = ""
+
 
 @lru_cache()
 def get_settings() -> Settings:

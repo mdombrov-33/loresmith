@@ -38,15 +38,13 @@ export function useWorldsLogic() {
 
   const paragraphs = parsedStory?.content?.split("\n\n").filter(Boolean) || [];
 
-  const lorePieces = parsedStory?.pieces
-    ? [
-        parsedStory.pieces.character,
-        parsedStory.pieces.faction,
-        parsedStory.pieces.setting,
-        parsedStory.pieces.event,
-        parsedStory.pieces.relic,
-      ].filter((piece): piece is NonNullable<typeof piece> => piece !== undefined && piece !== null)
-    : [];
+  // Use lore_pieces from database (has R2 URLs) instead of full_story JSON
+  // Sort so character is first
+  const lorePieces = (world?.lore_pieces || []).sort((a, b) => {
+    if (a.type === "character") return -1;
+    if (b.type === "character") return 1;
+    return 0;
+  });
 
   const displayNames: Record<string, string> = {
     character: "Protagonist",

@@ -205,3 +205,21 @@ class RerankSearchResponse(_message.Message):
     RERANKED_WORLDS_FIELD_NUMBER: _ClassVar[int]
     reranked_worlds: _containers.RepeatedCompositeFieldContainer[WorldResult]
     def __init__(self, reranked_worlds: _Optional[_Iterable[_Union[WorldResult, _Mapping]]] = ...) -> None: ...
+
+class UploadImageRequest(_message.Message):
+    __slots__ = ("image_base64", "world_id", "character_id", "image_type")
+    IMAGE_BASE64_FIELD_NUMBER: _ClassVar[int]
+    WORLD_ID_FIELD_NUMBER: _ClassVar[int]
+    CHARACTER_ID_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    image_base64: str
+    world_id: int
+    character_id: str
+    image_type: str
+    def __init__(self, image_base64: _Optional[str] = ..., world_id: _Optional[int] = ..., character_id: _Optional[str] = ..., image_type: _Optional[str] = ...) -> None: ...
+
+class UploadImageResponse(_message.Message):
+    __slots__ = ("image_url",)
+    IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    image_url: str
+    def __init__(self, image_url: _Optional[str] = ...) -> None: ...

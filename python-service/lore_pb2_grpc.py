@@ -79,6 +79,11 @@ class LoreServiceStub(object):
                 request_serializer=lore__pb2.RerankSearchRequest.SerializeToString,
                 response_deserializer=lore__pb2.RerankSearchResponse.FromString,
                 _registered_method=True)
+        self.UploadImageToR2 = channel.unary_unary(
+                '/lore.LoreService/UploadImageToR2',
+                request_serializer=lore__pb2.UploadImageRequest.SerializeToString,
+                response_deserializer=lore__pb2.UploadImageResponse.FromString,
+                _registered_method=True)
 
 
 class LoreServiceServicer(object):
@@ -138,6 +143,12 @@ class LoreServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UploadImageToR2(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_LoreServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -185,6 +196,11 @@ def add_LoreServiceServicer_to_server(servicer, server):
                     servicer.RerankResults,
                     request_deserializer=lore__pb2.RerankSearchRequest.FromString,
                     response_serializer=lore__pb2.RerankSearchResponse.SerializeToString,
+            ),
+            'UploadImageToR2': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadImageToR2,
+                    request_deserializer=lore__pb2.UploadImageRequest.FromString,
+                    response_serializer=lore__pb2.UploadImageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -430,6 +446,33 @@ class LoreService(object):
             '/lore.LoreService/RerankResults',
             lore__pb2.RerankSearchRequest.SerializeToString,
             lore__pb2.RerankSearchResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UploadImageToR2(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/lore.LoreService/UploadImageToR2',
+            lore__pb2.UploadImageRequest.SerializeToString,
+            lore__pb2.UploadImageResponse.FromString,
             options,
             channel_credentials,
             insecure,

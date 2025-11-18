@@ -33,6 +33,16 @@ func NewAdventureHandler(
 	}
 }
 
+// Helper function to extract image_portrait URL from lore piece details
+func getImagePortraitPtr(details map[string]interface{}) *string {
+	if val, ok := details["image_portrait"]; ok {
+		if str, ok := val.(string); ok && str != "" {
+			return &str
+		}
+	}
+	return nil
+}
+
 func (h *AdventureHandler) HandleCheckActiveSession(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
@@ -120,18 +130,12 @@ func (h *AdventureHandler) HandleStartAdventure(w http.ResponseWriter, r *http.R
 		Creativity:                utils.ParseIntFromDetails(protagonistLore.Details, "creativity", 10),
 		Influence:                 utils.ParseIntFromDetails(protagonistLore.Details, "influence", 10),
 		Perception:                utils.ParseIntFromDetails(protagonistLore.Details, "perception", 10),
-		Skills: func() string {
-			if val, ok := protagonistLore.Details["skills"]; ok {
-				if jsonBytes, err := json.Marshal(val); err == nil {
-					return string(jsonBytes)
-				}
-			}
-			return "[]"
-		}(),
-		Flaw:        utils.GetFlawJSONFromDetails(protagonistLore.Details),
-		Personality: utils.GetStringFromDetails(protagonistLore.Details, "personality"),
-		Appearance:  utils.GetStringFromDetails(protagonistLore.Details, "appearance"),
-		Position:    0, //* Protagonist is always position 0
+		Skills:            protagonistLore.Details["skills"],            // JSONB array
+		Flaw:              protagonistLore.Details["flaw"],              // JSONB object
+		PersonalityTraits: protagonistLore.Details["traits"],            // JSONB array
+		Appearance:        utils.GetStringFromDetails(protagonistLore.Details, "appearance"),
+		ImagePortrait:     getImagePortraitPtr(protagonistLore.Details), // R2 URL
+		Position:          0,                                             //* Protagonist is always position 0
 	}
 
 	protagonistID, err := h.partyStore.CreatePartyMember(protagonist)

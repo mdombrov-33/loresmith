@@ -27,7 +27,7 @@ export default function LorePieceDetails({
   sortDetails,
 }: LorePieceDetailsProps) {
   const sortedDetails = sortDetails(piece.details).filter(
-    ([key]) => key !== "image" && key !== "image_portrait"
+    ([key]) => key !== "image" && key !== "image_portrait" && key !== "image_portrait_base64" && key !== "is_protagonist"
   );
 
   const characterImage = (piece.details.image_portrait || piece.details.image) as string | undefined;
@@ -60,8 +60,31 @@ export default function LorePieceDetails({
 
           // Handle flaw specially
           if (key === "flaw") {
-            try {
-              const flaw = typeof value === 'string' ? JSON.parse(value) : value;
+            // Value might be object (from DB) or JSON string (from full_story)
+            let flaw = value;
+            if (typeof value === 'string') {
+              try {
+                flaw = JSON.parse(value);
+              } catch {
+                // Display as string if parsing fails
+                return (
+                  <div
+                    key={key}
+                    className="border-destructive/20 bg-destructive/5 rounded-lg border p-4"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <AlertTriangle className="text-destructive h-4 w-4" />
+                      <span className="text-destructive text-sm font-semibold uppercase tracking-wide">
+                        Flaw
+                      </span>
+                    </div>
+                    <p className="text-destructive/90 text-sm">{String(value)}</p>
+                  </div>
+                );
+              }
+            }
+
+            if (typeof flaw === 'object' && flaw !== null) {
               return (
                 <div
                   key={key}
@@ -78,96 +101,90 @@ export default function LorePieceDetails({
                   </p>
                 </div>
               );
-            } catch {
-              // Fall back to displaying as string if parsing fails
-              return (
-                <div
-                  key={key}
-                  className="border-destructive/20 bg-destructive/5 rounded-lg border p-4"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <AlertTriangle className="text-destructive h-4 w-4" />
-                    <span className="text-destructive text-sm font-semibold uppercase tracking-wide">
-                      Flaw
-                    </span>
-                  </div>
-                  <p className="text-destructive/90 text-sm">{String(value)}</p>
-                </div>
-              );
             }
           }
 
           // Handle traits
           if (key === "traits") {
-            try {
-              const traits = JSON.parse(String(value));
-              if (Array.isArray(traits)) {
-                return (
-                  <div key={key}>
-                    <div className="mb-2 flex items-center gap-2">
-                      {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
-                      <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
-                        {displayNames[key] || key}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <TooltipProvider>
-                        {traits.map((trait: string, idx: number) => {
-                          const TraitIcon = getTraitIcon(trait);
-                          const traitColor = getTraitColor(trait);
-                          const description = getTraitDescription(trait);
-
-                          return (
-                            <Tooltip key={idx}>
-                              <TooltipTrigger>
-                                <Badge variant="outline" className={`${traitColor} gap-1.5`}>
-                                  {TraitIcon && <TraitIcon className="h-3 w-3" />}
-                                  {trait}
-                                </Badge>
-                              </TooltipTrigger>
-                              {description && (
-                                <TooltipContent>
-                                  <p className="max-w-xs">{description}</p>
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
-                          );
-                        })}
-                      </TooltipProvider>
-                    </div>
-                  </div>
-                );
+            // Value might be array (from DB) or JSON string (from full_story)
+            let traits = value;
+            if (typeof value === 'string') {
+              try {
+                traits = JSON.parse(value);
+              } catch {
+                // Fall through to default rendering
               }
-            } catch {
-              // Fall through to default rendering
+            }
+
+            if (Array.isArray(traits)) {
+              return (
+                <div key={key}>
+                  <div className="mb-2 flex items-center gap-2">
+                    {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
+                    <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
+                      {displayNames[key] || key}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <TooltipProvider>
+                      {traits.map((trait: string, idx: number) => {
+                        const TraitIcon = getTraitIcon(trait);
+                        const traitColor = getTraitColor(trait);
+                        const description = getTraitDescription(trait);
+
+                        return (
+                          <Tooltip key={idx}>
+                            <TooltipTrigger>
+                              <Badge variant="outline" className={`${traitColor} gap-1.5`}>
+                                {TraitIcon && <TraitIcon className="h-3 w-3" />}
+                                {trait}
+                              </Badge>
+                            </TooltipTrigger>
+                            {description && (
+                              <TooltipContent>
+                                <p className="max-w-xs">{description}</p>
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        );
+                      })}
+                    </TooltipProvider>
+                  </div>
+                </div>
+              );
             }
           }
 
           // Handle skills
           if (key === "skills") {
-            try {
-              const skills = JSON.parse(String(value));
-              if (Array.isArray(skills)) {
-                return (
-                  <div key={key}>
-                    <div className="mb-2 flex items-center gap-2">
-                      {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
-                      <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
-                        {displayNames[key] || key}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {skills.map((skill: string, idx: number) => (
-                        <Badge key={idx} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                );
+            // Value might be array (from DB) or JSON string (from full_story)
+            let skills = value;
+            if (typeof value === 'string') {
+              try {
+                skills = JSON.parse(value);
+              } catch {
+                // Fall through to default rendering
               }
-            } catch {
-              // Fall through to default rendering
+            }
+
+            if (Array.isArray(skills)) {
+              return (
+                <div key={key}>
+                  <div className="mb-2 flex items-center gap-2">
+                    {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
+                    <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
+                      {displayNames[key] || key}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill: string, idx: number) => (
+                      <Badge key={idx} variant="secondary">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              );
             }
           }
 

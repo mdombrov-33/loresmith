@@ -34,9 +34,9 @@ COMMENT ON COLUMN party_members.image_portrait IS 'Portrait image URL from R2 (S
 -- +goose Down
 -- +goose StatementBegin
 
--- Remove portrait_url
+-- Remove image_portrait
 ALTER TABLE party_members
-DROP COLUMN IF EXISTS portrait_url;
+DROP COLUMN IF EXISTS image_portrait;
 
 -- Revert flaw to TEXT
 ALTER TABLE party_members

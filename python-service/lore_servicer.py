@@ -1,5 +1,6 @@
 import grpc  # type: ignore
 import asyncio
+import base64
 import json
 import lore_pb2  # type: ignore
 import lore_pb2_grpc  # type: ignore
@@ -24,6 +25,7 @@ from services.embedding_client import (
     generate_search_embedding,
     generate_content_embedding,
 )
+from services.image_gen.processor import upload_image_to_r2
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -249,6 +251,51 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_details(f"Reranking failed: {str(e)}")
             return lore_pb2.RerankSearchResponse()
 
+    # * Image Upload Methods
+    async def UploadImageToR2(self, request, context):
+        """Upload base64 image to R2 with real world_id after world creation."""
+        try:
+            if not request.image_base64:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("image_base64 cannot be empty")
+                return lore_pb2.UploadImageResponse()
+
+            if not request.world_id:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("world_id cannot be empty")
+                return lore_pb2.UploadImageResponse()
+
+            if not request.character_id:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("character_id cannot be empty")
+                return lore_pb2.UploadImageResponse()
+
+            # Decode base64 to bytes
+            try:
+                image_data = base64.b64decode(request.image_base64)
+            except Exception as e:
+                logger.error(f"Failed to decode base64: {e}")
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details(f"Invalid base64 data: {e}")
+                return lore_pb2.UploadImageResponse()
+
+            # Upload to R2
+            image_url = await upload_image_to_r2(
+                image_data=image_data,
+                world_id=request.world_id,
+                character_id=request.character_id,
+                image_type=request.image_type or "portrait"
+            )
+
+            logger.info(f"Successfully uploaded image to R2: {image_url}")
+            return lore_pb2.UploadImageResponse(image_url=image_url)
+
+        except Exception as e:
+            logger.error(f"Image upload to R2 failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Image upload failed: {str(e)}")
+            return lore_pb2.UploadImageResponse()
+
     # * Adventure Methods
     # TODO: Add adventure session management methods here
 
@@ -317,10 +364,17 @@ def convert_selected_lore_pieces_to_grpc(selected_pieces):
 
 # * Server Startup
 async def serve():
-    server = grpc.aio.server()
+    # Increase max message size to 20MB to handle base64-encoded images
+    max_msg_size = 20 * 1024 * 1024  # 20MB
+    server = grpc.aio.server(
+        options=[
+            ('grpc.max_send_message_length', max_msg_size),
+            ('grpc.max_receive_message_length', max_msg_size),
+        ]
+    )
     lore_pb2_grpc.add_LoreServiceServicer_to_server(LoreServicer(), server)
     server.add_insecure_port("0.0.0.0:50051")
-    logger.info("gRPC server running on port 50051")
+    logger.info("gRPC server running on port 50051 (max message size: 20MB)")
 
     # * Preload Ollama models to avoid cold start delays
     try:

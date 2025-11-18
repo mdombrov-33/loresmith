@@ -49,6 +49,7 @@ type WorldStore interface {
 	GetProtagonistForWorld(worldID int) (*LorePiece, error)
 	UpdateWorldStatus(worldID int, status string) error
 	UpdateWorldVisibility(worldID int, visibility string) error
+	UpdateLorePieceDetails(pieceID int, details map[string]interface{}) error
 }
 
 type PostgresWorldStore struct {
@@ -108,6 +109,15 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 		return 0, err
 	}
 
+	//* Store lore pieces with their IDs for later R2 upload
+	type savedPiece struct {
+		id          int
+		pieceType   string
+		grpcPiece   *lorepb.LorePiece
+		detailsMap  map[string]interface{}
+	}
+	var savedPieces []savedPiece
+
 	for _, piece := range []struct {
 		pieceType string
 		piece     *lorepb.LorePiece
@@ -143,19 +153,42 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 			}
 
 			detailsJSON, _ := json.Marshal(detailsMap)
-			_, err = tx.Exec(`
+			var pieceID int
+			err = tx.QueryRow(`
 				INSERT INTO lore_pieces (world_id, type, name, description, details, created_at)
 				VALUES ($1, $2, $3, $4, $5, NOW())
-			`, worldID, piece.pieceType, piece.piece.Name, piece.piece.Description, string(detailsJSON))
+				RETURNING id
+			`, worldID, piece.pieceType, piece.piece.Name, piece.piece.Description, string(detailsJSON)).Scan(&pieceID)
 			if err != nil {
 				return 0, err
 			}
+
+			//* Store for R2 upload after commit
+			savedPieces = append(savedPieces, savedPiece{
+				id:         pieceID,
+				pieceType:  piece.pieceType,
+				grpcPiece:  piece.piece,
+				detailsMap: detailsMap,
+			})
 		}
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		return 0, err
+	}
+
+	//* After successful commit, handle R2 uploads for character portraits
+	//* This happens outside the transaction to avoid blocking DB commits on image uploads
+	for _, saved := range savedPieces {
+		if saved.pieceType == "character" {
+			//* Check if character has base64 image to upload
+			if base64Data, ok := saved.detailsMap["image_portrait_base64"].(string); ok && base64Data != "" {
+				//* Note: R2 upload will be handled by the handler after this returns
+				//* We keep the base64 in the database temporarily
+				//* The handler will call UploadImageToR2 and update the lore piece
+			}
+		}
 	}
 
 	return worldID, nil
@@ -512,5 +545,20 @@ func (s *PostgresWorldStore) UpdateWorldVisibility(worldID int, visibility strin
 	WHERE id = $2
 	`
 	_, err := s.db.Exec(query, visibility, worldID)
+	return err
+}
+
+func (s *PostgresWorldStore) UpdateLorePieceDetails(pieceID int, details map[string]interface{}) error {
+	detailsJSON, err := json.Marshal(details)
+	if err != nil {
+		return fmt.Errorf("failed to marshal details: %w", err)
+	}
+
+	query := `
+	UPDATE lore_pieces
+	SET details = $1
+	WHERE id = $2
+	`
+	_, err = s.db.Exec(query, string(detailsJSON), pieceID)
 	return err
 }

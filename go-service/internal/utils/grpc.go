@@ -22,6 +22,7 @@ const (
 	//* Quick operations
 	OpGenerateConsequence OperationType = "generate_consequence" //* 30 seconds - single outcome
 	OpGenerateEmbedding   OperationType = "generate_embedding"   //* 30 seconds - embedding generation
+	OpUploadImage         OperationType = "upload_image"         //* 1 minute - upload to R2
 )
 
 var operationTimeouts = map[OperationType]time.Duration{
@@ -39,6 +40,7 @@ var operationTimeouts = map[OperationType]time.Duration{
 	//* Quick operations
 	OpGenerateConsequence: 30 * time.Second,
 	OpGenerateEmbedding:   3 * time.Minute, //* Increased for Ollama model loading time
+	OpUploadImage:         1 * time.Minute, //* R2 upload timeout
 }
 
 // NewGRPCContext creates a context with appropriate timeout for the operation type.

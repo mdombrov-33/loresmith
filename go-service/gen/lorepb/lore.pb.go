@@ -1205,6 +1205,118 @@ func (x *RerankSearchResponse) GetRerankedWorlds() []*WorldResult {
 	return nil
 }
 
+type UploadImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ImageBase64   string                 `protobuf:"bytes,1,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"`
+	WorldId       int64                  `protobuf:"varint,2,opt,name=world_id,json=worldId,proto3" json:"world_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,3,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	ImageType     string                 `protobuf:"bytes,4,opt,name=image_type,json=imageType,proto3" json:"image_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadImageRequest) Reset() {
+	*x = UploadImageRequest{}
+	mi := &file_lore_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadImageRequest) ProtoMessage() {}
+
+func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadImageRequest.ProtoReflect.Descriptor instead.
+func (*UploadImageRequest) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UploadImageRequest) GetImageBase64() string {
+	if x != nil {
+		return x.ImageBase64
+	}
+	return ""
+}
+
+func (x *UploadImageRequest) GetWorldId() int64 {
+	if x != nil {
+		return x.WorldId
+	}
+	return 0
+}
+
+func (x *UploadImageRequest) GetCharacterId() string {
+	if x != nil {
+		return x.CharacterId
+	}
+	return ""
+}
+
+func (x *UploadImageRequest) GetImageType() string {
+	if x != nil {
+		return x.ImageType
+	}
+	return ""
+}
+
+type UploadImageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ImageUrl      string                 `protobuf:"bytes,1,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadImageResponse) Reset() {
+	*x = UploadImageResponse{}
+	mi := &file_lore_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadImageResponse) ProtoMessage() {}
+
+func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadImageResponse.ProtoReflect.Descriptor instead.
+func (*UploadImageResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *UploadImageResponse) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
 var File_lore_proto protoreflect.FileDescriptor
 
 const file_lore_proto_rawDesc = "" +
@@ -1294,7 +1406,15 @@ const file_lore_proto_rawDesc = "" +
 	"\x06worlds\x18\x02 \x03(\v2\x11.lore.WorldResultR\x06worlds\x12'\n" +
 	"\x0fquery_embedding\x18\x03 \x03(\x02R\x0equeryEmbedding\"R\n" +
 	"\x14RerankSearchResponse\x12:\n" +
-	"\x0freranked_worlds\x18\x01 \x03(\v2\x11.lore.WorldResultR\x0ererankedWorlds2\xde\x04\n" +
+	"\x0freranked_worlds\x18\x01 \x03(\v2\x11.lore.WorldResultR\x0ererankedWorlds\"\x94\x01\n" +
+	"\x12UploadImageRequest\x12!\n" +
+	"\fimage_base64\x18\x01 \x01(\tR\vimageBase64\x12\x19\n" +
+	"\bworld_id\x18\x02 \x01(\x03R\aworldId\x12!\n" +
+	"\fcharacter_id\x18\x03 \x01(\tR\vcharacterId\x12\x1d\n" +
+	"\n" +
+	"image_type\x18\x04 \x01(\tR\timageType\"2\n" +
+	"\x13UploadImageResponse\x12\x1b\n" +
+	"\timage_url\x18\x01 \x01(\tR\bimageUrl2\xa6\x05\n" +
 	"\vLoreService\x12G\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
@@ -1304,7 +1424,8 @@ const file_lore_proto_rawDesc = "" +
 	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
 	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x12D\n" +
 	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponse\x12F\n" +
-	"\rRerankResults\x12\x19.lore.RerankSearchRequest\x1a\x1a.lore.RerankSearchResponseB\fZ\n" +
+	"\rRerankResults\x12\x19.lore.RerankSearchRequest\x1a\x1a.lore.RerankSearchResponse\x12F\n" +
+	"\x0fUploadImageToR2\x12\x18.lore.UploadImageRequest\x1a\x19.lore.UploadImageResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
 var (
@@ -1319,7 +1440,7 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_lore_proto_goTypes = []any{
 	(*CharactersRequest)(nil),    // 0: lore.CharactersRequest
 	(*FactionsRequest)(nil),      // 1: lore.FactionsRequest
@@ -1343,11 +1464,13 @@ var file_lore_proto_goTypes = []any{
 	(*WorldResult)(nil),          // 19: lore.WorldResult
 	(*RerankSearchRequest)(nil),  // 20: lore.RerankSearchRequest
 	(*RerankSearchResponse)(nil), // 21: lore.RerankSearchResponse
-	nil,                          // 22: lore.LorePiece.DetailsEntry
-	nil,                          // 23: lore.FullStory.QuestEntry
+	(*UploadImageRequest)(nil),   // 22: lore.UploadImageRequest
+	(*UploadImageResponse)(nil),  // 23: lore.UploadImageResponse
+	nil,                          // 24: lore.LorePiece.DetailsEntry
+	nil,                          // 25: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	22, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	24, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
@@ -1364,7 +1487,7 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
 	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	23, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	25, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
 	19, // 20: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
@@ -1378,17 +1501,19 @@ var file_lore_proto_depIdxs = []int32{
 	15, // 28: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
 	17, // 29: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
 	20, // 30: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
-	6,  // 31: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 32: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 33: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 34: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 35: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 36: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 37: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	18, // 38: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
-	21, // 39: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
-	31, // [31:40] is the sub-list for method output_type
-	22, // [22:31] is the sub-list for method input_type
+	22, // 31: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
+	6,  // 32: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 33: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 34: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 35: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 36: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 37: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 38: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	18, // 39: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	21, // 40: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
+	23, // 41: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
+	32, // [32:42] is the sub-list for method output_type
+	22, // [22:32] is the sub-list for method input_type
 	22, // [22:22] is the sub-list for extension type_name
 	22, // [22:22] is the sub-list for extension extendee
 	0,  // [0:22] is the sub-list for field type_name
@@ -1405,7 +1530,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
