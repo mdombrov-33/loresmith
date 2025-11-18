@@ -8,10 +8,6 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-purple)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-purple)](https://redis.io/)
 
-<p align="center">
-  <img src="assets/logo/logo.png" alt="LoreSmith Logo" width="400"/>
-</p>
-
 ## What is LoreSmith?
 
 LoreSmith is an **interactive adventure platform** where AI generates rich, thematic worlds and transforms them into playable text-based games. Create characters, explore dynamic settings, and embark on AI-driven adventures with party management, inventory systems, and branching narratives—all powered by advanced language models.
