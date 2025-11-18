@@ -71,7 +71,17 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 	}
 	defer tx.Rollback()
 
-	storyJSON, err := json.Marshal(story)
+	//* Create a version of the story WITHOUT pieces for the full_story column
+	//* Pieces are stored separately in the lore_pieces table to avoid duplication
+	//* and allow updates (like R2 URLs) without modifying the full_story JSON
+	storyForDB := &lorepb.FullStory{
+		Content: story.Content,
+		Theme:   story.Theme,
+		Quest:   story.Quest,
+		Pieces:  nil, // Don't store pieces in full_story - they go in lore_pieces table
+	}
+
+	storyJSON, err := json.Marshal(storyForDB)
 	if err != nil {
 		return 0, err
 	}
