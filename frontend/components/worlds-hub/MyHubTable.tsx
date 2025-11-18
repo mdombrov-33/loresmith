@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAppStore } from "@/stores/appStore";
+import EmptyState from "./states/EmptyState";
 
 interface MyHubTableProps {
   worlds: World[];
@@ -66,17 +67,7 @@ export default function MyHubTable({ worlds, isLoading }: MyHubTableProps) {
   }
 
   if (worlds.length === 0) {
-    return (
-      <div className="border-border bg-card/30 flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-        <Sparkles className="text-muted-foreground mb-4 h-12 w-12" />
-        <h3 className="text-foreground mb-2 text-lg font-semibold">
-          No worlds yet
-        </h3>
-        <p className="text-muted-foreground text-sm">
-          Create your first world to get started!
-        </p>
-      </div>
-    );
+    return <EmptyState scope="my" />;
   }
 
   const handleView = (world: World) => {
