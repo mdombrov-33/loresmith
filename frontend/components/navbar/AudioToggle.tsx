@@ -8,41 +8,55 @@ import { useAppStore } from "@/stores/appStore";
 import { usePathname } from "next/navigation";
 
 const RADIO_START_EPOCH = Date.UTC(2025, 9, 23, 0, 0, 0) / 1000; //* today's date as epoch
+const R2_MUSIC_URL = process.env.NEXT_PUBLIC_R2_MUSIC_URL;
 
 const themePlaylists: Record<string, { url: string; duration: number }[]> = {
   "norse-mythology": [
-    { url: "/audio/norse-mythology/ambient_norse01.mp3", duration: 410 },
-    { url: "/audio/norse-mythology/ambient_norse02.mp3", duration: 357 },
+    {
+      url: `${R2_MUSIC_URL}/norse-mythology/ambient_norse01.mp3`,
+      duration: 410,
+    },
+    {
+      url: `${R2_MUSIC_URL}/norse-mythology/ambient_norse02.mp3`,
+      duration: 357,
+    },
   ],
   fantasy: [
-    { url: "/audio/fantasy/ambient_fantasy01.mp3", duration: 254 },
-    { url: "/audio/fantasy/ambient_fantasy02.mp3", duration: 479 },
+    { url: `${R2_MUSIC_URL}/fantasy/ambient_fantasy01.mp3`, duration: 254 },
+    { url: `${R2_MUSIC_URL}/fantasy/ambient_fantasy02.mp3`, duration: 479 },
   ],
   cyberpunk: [
-    { url: "/audio/cyberpunk/ambient_cyberpunk01.mp3", duration: 244 },
-    { url: "/audio/cyberpunk/ambient_cyberpunk02.mp3", duration: 193 },
+    { url: `${R2_MUSIC_URL}/cyberpunk/ambient_cyberpunk01.mp3`, duration: 244 },
+    { url: `${R2_MUSIC_URL}/cyberpunk/ambient_cyberpunk02.mp3`, duration: 193 },
   ],
   "post-apocalyptic": [
     {
-      url: "/audio/post-apocalyptic/ambient_post-apocalyptic01.mp3",
+      url: `${R2_MUSIC_URL}/post-apocalyptic/ambient_post-apocalyptic01.mp3`,
       duration: 214,
     },
     {
-      url: "/audio/post-apocalyptic/ambient_post-apocalyptic02.mp3",
+      url: `${R2_MUSIC_URL}/post-apocalyptic/ambient_post-apocalyptic02.mp3`,
       duration: 263,
     },
   ],
   steampunk: [
-    { url: "/audio/steampunk/ambient_steampunk01.mp3", duration: 219 },
-    { url: "/audio/steampunk/ambient_steampunk02.mp3", duration: 145 },
+    { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk01.mp3`, duration: 219 },
+    { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk02.mp3`, duration: 145 },
   ],
 };
 
 export function AudioToggle() {
-  const { theme, audioTheme, setAudioTheme, userChangedTheme, setUserChangedTheme } =
-    useAppStore();
+  const {
+    theme,
+    audioTheme,
+    setAudioTheme,
+    userChangedTheme,
+    setUserChangedTheme,
+  } = useAppStore();
   const pathname = usePathname();
-  const [initialAudioTheme, setInitialAudioTheme] = useState<string | null>(null);
+  const [initialAudioTheme, setInitialAudioTheme] = useState<string | null>(
+    null,
+  );
   const hasEnteredHubRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([0.5]);
@@ -127,7 +141,8 @@ export function AudioToggle() {
       return;
     }
 
-    const isThemeChange = prevEffectiveAudioThemeRef.current !== effectiveAudioTheme;
+    const isThemeChange =
+      prevEffectiveAudioThemeRef.current !== effectiveAudioTheme;
     prevEffectiveAudioThemeRef.current = effectiveAudioTheme;
 
     const switchAudio = async () => {

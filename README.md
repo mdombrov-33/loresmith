@@ -152,6 +152,7 @@ LoreSmith can generate AI portrait images for characters (1024x1024). Choose bet
 Uses Stable Diffusion XL via Replicate API - professional quality, no local setup required.
 
 1. **Get API Token**: https://replicate.com/account/api-tokens
+
    - New accounts get $5 free credits (~500-600 images)
    - Pricing: ~$0.008-0.01 per image after free credits
 
@@ -184,6 +185,7 @@ Run Stable Diffusion locally - completely free, full control over models and set
 2. **Download Better Model** (recommended - SDXL-Turbo):
 
    Open a second terminal:
+
    ```bash
    cd ~/stable-diffusion-webui/models/Stable-diffusion/
 
@@ -192,6 +194,7 @@ Run Stable Diffusion locally - completely free, full control over models and set
    ```
 
    Then select it in the Web UI:
+
    - Open http://localhost:7860
    - Top-left dropdown: Select `sd_xl_turbo_1.0_fp16.safetensors`
    - Wait 10-15 seconds for model to load
@@ -204,6 +207,7 @@ Run Stable Diffusion locally - completely free, full control over models and set
    ```
 
 **Performance**:
+
 - SD 1.5 (default): ~20-30 seconds per character, decent quality
 - SDXL-Turbo: ~10-15 seconds per character, very good quality
 
@@ -212,20 +216,25 @@ Run Stable Diffusion locally - completely free, full control over models and set
 Automatic1111 needs to be running when generating characters (unlike Ollama daemon). You have options:
 
 **Option 1: Keep Terminal Open (Simple)**
+
 ```bash
 cd ~/stable-diffusion-webui
 ./webui.sh --api --listen --skip-torch-cuda-test
 ```
+
 Leave this terminal running while using LoreSmith.
 
 **Option 2: Run in Background (Convenient)**
+
 ```bash
 cd ~/stable-diffusion-webui
 nohup ./webui.sh --api --listen --skip-torch-cuda-test > webui.log 2>&1 &
 ```
+
 To stop: `pkill -f webui.sh`
 
 **Option 3: Use tmux/screen (Best for SSH)**
+
 ```bash
 tmux new -s webui
 cd ~/stable-diffusion-webui
@@ -235,6 +244,7 @@ cd ~/stable-diffusion-webui
 ```
 
 **How Model Selection Works**:
+
 - Whatever model is selected in the Web UI dropdown gets used for API calls
 - Our code calls Automatic1111's API with generation parameters (steps, guidance, etc.)
 - UI settings (like denoising strength, etc.) **don't** apply to API calls
@@ -243,12 +253,14 @@ cd ~/stable-diffusion-webui
 **Customizing Image Generation**:
 
 Edit `python-service/services/image_generator.py` to tweak:
+
 - `num_inference_steps`: Higher = better quality, slower (default: 20)
 - `cfg_scale`: Prompt adherence strength (default: 7.5)
 - `sampler_name`: Algorithm used (default: "DPM++ 2M Karras")
 - Theme-specific prompts and negative prompts
 
 **Recommended Models**:
+
 - **SD 1.5** (default): 4GB, fast but dated quality
 - **SDXL-Turbo**: 7GB, best balance of speed/quality for testing
 - **SDXL Base 1.0**: 13GB, highest quality but slower (~60s per character)
@@ -283,6 +295,7 @@ tail -f ~/stable-diffusion-webui/webui.log
 ```
 
 **Important Notes**:
+
 - Automatic1111 **must be running** when generating characters (unlike Ollama)
 - Whatever model is selected in the Web UI dropdown gets used for API calls
 - UI settings (sliders, checkboxes) don't apply to API calls
@@ -290,6 +303,7 @@ tail -f ~/stable-diffusion-webui/webui.log
 - Images saved to `frontend/public/generated/` (gitignored)
 
 **Troubleshooting**:
+
 ```bash
 # Can't connect to Automatic1111
 # → Check it's running with --api flag
@@ -311,6 +325,7 @@ ls frontend/public/generated/0/
 #### Disable Image Generation
 
 To turn off image generation entirely:
+
 ```env
 ENABLE_IMAGE_GENERATION=false
 ```
@@ -326,8 +341,9 @@ LoreSmith uses **Cloudflare R2** (S3-compatible object storage) to store generat
 3. **On world pages**: Images load directly from Cloudflare's CDN for fast global delivery
 
 **What's stored in R2:**
+
 - ✅ **Character portraits** (1024x1024)
-- 🔜 **Background music** (planned - theme-specific ambient tracks)
+- ✅ **Background music** (theme-specific ambient tracks)
 
 **Setup R2 storage (optional but recommended):**
 
@@ -341,8 +357,9 @@ LoreSmith uses **Cloudflare R2** (S3-compatible object storage) to store generat
    AWS_ACCESS_KEY_ID=your_access_key_id
    AWS_SECRET_ACCESS_KEY=your_secret_access_key
    AWS_ENDPOINT_URL=https://your_account_id.r2.cloudflarestorage.com
-   R2_BUCKET_NAME=loresmith-portraits
-   R2_PUBLIC_URL=https://pub-your_bucket_id.r2.dev
+   R2_PORTRAITS_BUCKET_NAME=loresmith-portraits
+   R2_PORTRAITS_PUBLIC_URL=https://pub-your_bucket_id.r2.dev
+   NEXT_PUBLIC_R2_MUSIC_PUBLIC_URL=https://pub-your_bucket_id.r2.dev
    ```
 
 **Without R2**: Images still generate but won't persist after world creation. Characters will display during generation preview only.

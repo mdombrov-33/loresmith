@@ -1,7 +1,7 @@
 from utils.logger import logger
 from config.settings import get_settings
 from .prompt_builder import build_character_prompt
-from ..providers import generate_via_replicate, generate_via_automatic1111
+from .providers import generate_via_replicate, generate_via_automatic1111
 
 settings = get_settings()
 

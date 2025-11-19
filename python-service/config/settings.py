@@ -37,8 +37,8 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_ENDPOINT_URL: str = ""
-    R2_BUCKET_NAME: str = ""
-    R2_PUBLIC_URL: str = ""
+    R2_PORTRAITS_BUCKET_NAME: str = ""
+    R2_PORTRAITS_PUBLIC_URL: str = ""
 
 
 @lru_cache()
