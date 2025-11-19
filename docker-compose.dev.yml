@@ -21,9 +21,6 @@ services:
     env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    volumes:
-      - ./python-service/prompts:/app/prompts
-      - ./frontend/public/generated:/app/generated
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -40,7 +37,7 @@ services:
       - RABBITMQ_DEFAULT_USER=loresmith
       - RABBITMQ_DEFAULT_PASS=loresmith
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,7 +50,7 @@ services:
       - "6379:6379"
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
-      test: redis-cli ping
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
