@@ -1,10 +1,7 @@
 import base64
-from pathlib import Path
 import aiohttp
-from PIL import Image
 import boto3
 from botocore.exceptions import ClientError
-import io
 
 from utils.logger import logger
 from config.settings import get_settings
@@ -15,11 +12,11 @@ settings = get_settings()
 s3_client = None
 if settings.AWS_ACCESS_KEY_ID and settings.AWS_ENDPOINT_URL:
     s3_client = boto3.client(
-        's3',
+        "s3",
         endpoint_url=settings.AWS_ENDPOINT_URL,
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name='auto'  # R2 uses 'auto' as region
+        region_name="auto",  # R2 uses 'auto' as region
     )
 
 
@@ -53,7 +50,7 @@ async def save_base64_image(
             Bucket=settings.R2_BUCKET_NAME,
             Key=key,
             Body=image_data,
-            ContentType='image/png'
+            ContentType="image/png",
         )
         logger.info(f"Uploaded image to R2: {key}")
         return key
@@ -98,7 +95,7 @@ async def download_and_save_image(
             Bucket=settings.R2_BUCKET_NAME,
             Key=key,
             Body=image_data,
-            ContentType='image/png'
+            ContentType="image/png",
         )
         logger.info(f"Uploaded image to R2: {key}")
         return key
@@ -137,7 +134,7 @@ async def upload_image_to_r2(
             Bucket=settings.R2_BUCKET_NAME,
             Key=key,
             Body=image_data,
-            ContentType='image/png'
+            ContentType="image/png",
         )
         logger.info(f"Uploaded image to R2: {key}")
 

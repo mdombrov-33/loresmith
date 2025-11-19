@@ -40,6 +40,8 @@ pytest = "^8.4.2"
 black = "^25.9.0"
 ruff = "^0.13.1"
 isort = ">=7.0.0,<8.0.0"
+types-pika = "^1.2.0b1"
+boto3-stubs = {extras = ["essential"], version = "^1.41.0"}
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -2,7 +2,7 @@
 set -e
 
 echo "Starting RabbitMQ worker in background..."
-python -m services.portraits.worker &
+python -m services.image_gen.portraits.worker &
 WORKER_PID=$!
 
 echo "Starting gRPC server..."

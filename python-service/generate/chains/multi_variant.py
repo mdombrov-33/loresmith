@@ -7,7 +7,7 @@ from generate.chains.faction import generate_faction
 from generate.chains.setting import generate_setting
 from generate.chains.event import generate_event
 from generate.chains.relic import generate_relic
-from services.portraits.operations import publish_portrait_job
+from services.image_gen.portraits.operations import publish_portrait_job
 from utils.logger import logger
 
 
@@ -49,6 +49,7 @@ async def generate_multiple_characters(
             name = character.name
             appearance = character.details.get("appearance")
             traits = character.details.get("traits", [])
+            skills = character.details.get("skills", [])
 
             if uuid and appearance:
                 publish_portrait_job(
@@ -56,7 +57,8 @@ async def generate_multiple_characters(
                     name=name,
                     appearance=appearance,
                     theme=theme,
-                    traits=traits
+                    traits=traits,
+                    skills=skills
                 )
                 logger.info(f"Published portrait job for {name}")
             else:

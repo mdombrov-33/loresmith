@@ -23,15 +23,17 @@ def get_portrait(uuid: str) -> str | None:
         client = get_redis_client()
         key = f"portrait:{uuid}"
         data = client.get(key)
-        if data:
-            return data.decode('utf-8') if isinstance(data, bytes) else data
-        return None
+        if data is None:
+            return None
+        if isinstance(data, bytes):
+            return data.decode('utf-8')
+        return str(data)
     except Exception as e:
         logger.error(f"Failed to get portrait from Redis: {e}")
         return None
 
 
-def publish_portrait_job(uuid: str, name: str, appearance: str, theme: str, traits: list):
+def publish_portrait_job(uuid: str, name: str, appearance: str, theme: str, traits: list, skills: list):
     """Publish a portrait generation job to RabbitMQ."""
     try:
         connection = get_rabbitmq_connection()
@@ -43,7 +45,8 @@ def publish_portrait_job(uuid: str, name: str, appearance: str, theme: str, trai
             "name": name,
             "appearance": appearance,
             "theme": theme,
-            "traits": traits
+            "traits": traits,
+            "skills": skills
         }
 
         channel.basic_publish(

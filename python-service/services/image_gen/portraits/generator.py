@@ -1,7 +1,7 @@
 from utils.logger import logger
 from config.settings import get_settings
 from .prompt_builder import build_character_prompt
-from .providers import generate_via_replicate, generate_via_automatic1111
+from ..providers import generate_via_replicate, generate_via_automatic1111
 
 settings = get_settings()
 
@@ -28,7 +28,7 @@ async def generate_character_images(
         world_id: Ignored for now (will be 0 during generation)
         character_id: Unique identifier for the character
         traits: List of personality traits
-        skills: List of skill names (unused for portrait generation)
+        skills: List of skill names for visual elements
 
     Returns:
         Dict with image_portrait_base64 (or None if disabled/failed)
@@ -40,15 +40,17 @@ async def generate_character_images(
     try:
         logger.info(f"Generating images for {name} using {settings.IMAGE_PROVIDER}")
 
-        # Build optimized prompt (skills not used for portraits)
+        # Build optimized prompt with skills for more distinctive portraits
         prompt, negative_prompt = build_character_prompt(
-            name, appearance, theme, traits
+            name, appearance, theme, traits, skills
         )
 
         if settings.IMAGE_PROVIDER == "replicate":
             return await generate_via_replicate(prompt, negative_prompt, character_id)
         elif settings.IMAGE_PROVIDER == "local":
-            return await generate_via_automatic1111(prompt, negative_prompt, character_id)
+            return await generate_via_automatic1111(
+                prompt, negative_prompt, character_id
+            )
         else:
             logger.warning(f"Unknown image provider: {settings.IMAGE_PROVIDER}")
             return {"image_portrait_base64": None}

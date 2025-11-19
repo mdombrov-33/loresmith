@@ -24,7 +24,7 @@ async def generate_via_replicate(
     """
     Generate portrait image via Replicate and return as base64.
 
-    NEW FLOW: Returns base64 instead of uploading to R2.
+    Returns base64 instead of uploading to R2.
     """
 
     if not REPLICATE_AVAILABLE:
@@ -38,11 +38,10 @@ async def generate_via_replicate(
     try:
         os.environ["REPLICATE_API_TOKEN"] = settings.REPLICATE_API_TOKEN
 
-        # Generate portrait image (1024x1024)
         logger.info("Generating portrait image (1024x1024) via Replicate...")
         portrait_output = await asyncio.to_thread(
             replicate.run,
-            "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", # change later
+            "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",  # change later
             input={
                 "prompt": prompt,
                 "negative_prompt": negative_prompt,
@@ -78,7 +77,7 @@ async def generate_via_replicate(
                     raise Exception(f"Failed to download image: HTTP {response.status}")
 
                 image_bytes = await response.read()
-                image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
         logger.info("Successfully generated portrait via Replicate")
         return {"image_portrait_base64": image_base64}
@@ -96,7 +95,7 @@ async def generate_via_automatic1111(
     """
     Generate portrait image via Automatic1111 and return as base64.
 
-    NEW FLOW: Returns base64 instead of uploading to R2.
+    Returns base64 instead of uploading to R2.
     """
     if not settings.AUTOMATIC1111_URL:
         logger.error("AUTOMATIC1111_URL not set in settings")
@@ -113,10 +112,10 @@ async def generate_via_automatic1111(
             "negative_prompt": negative_prompt,
             "width": 1024,
             "height": 1024,
-            "steps": 20,  
+            "steps": 20,
             "cfg_scale": 7.0,
             "sampler_name": "DPM++ 2M Karras",
-            "seed": -1, 
+            "seed": -1,
             "enable_hr": False,
         }
 
