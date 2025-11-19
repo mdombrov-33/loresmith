@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/mdombrov-33/loresmith/go-service/internal/app"
@@ -11,8 +13,15 @@ import (
 )
 
 func main() {
+	defaultPort := 8080
+	if envPort := os.Getenv("GO_PORT"); envPort != "" {
+		if p, err := strconv.Atoi(envPort); err == nil {
+			defaultPort = p
+		}
+	}
+
 	var port int
-	flag.IntVar(&port, "port", 8080, "Go Service Server Port")
+	flag.IntVar(&port, "port", defaultPort, "Go Service Server Port")
 	flag.Parse()
 
 	app, err := app.NewApplication()
@@ -21,6 +30,7 @@ func main() {
 	}
 
 	defer app.DB.Close()
+	defer app.Redis.Close()
 
 	r := routes.SetupRoutes(app)
 	server := &http.Server{

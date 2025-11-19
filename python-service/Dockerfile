@@ -14,6 +14,8 @@ RUN python -m spacy download en_core_web_sm
 
 COPY . .
 
+RUN chmod +x start.sh
+
 EXPOSE 50051
 
-CMD ["python", "lore_servicer.py"]
+CMD ["./start.sh"]

@@ -17,6 +17,7 @@ import {
   Eye,
   AlertTriangle,
   RotateCw,
+  Loader2,
 } from "lucide-react";
 import FlipCard from "@/components/generate/FlipCard";
 import SelectionEffect from "@/components/generate/SelectionEffect";
@@ -27,6 +28,7 @@ import {
 } from "@/lib/trait-icons";
 import StatItem from "@/components/shared/card/StatItem";
 import CardImage from "@/components/shared/card/CardImage";
+import { useTempPortrait } from "@/hooks/useTempPortrait";
 
 interface CharacterCardProps {
   character: LorePiece;
@@ -43,13 +45,20 @@ export default function CharacterCard({
     ? character.details.skills
     : [];
 
-  //* Get image source (supports both R2 URLs and base64 data)
+  //* Poll for temp portrait if UUID exists (during generation)
+  const tempPortraitBase64 = useTempPortrait(character.details.uuid);
+
+  //* Get image source (supports R2 URLs, temp portraits, and base64 data)
   const getImageSrc = () => {
     // Check for R2 URL first (after world creation)
     if (character.details.image_portrait && typeof character.details.image_portrait === 'string') {
       return character.details.image_portrait;
     }
-    // Fallback to base64 data (during generation)
+    // Check for temp portrait from polling
+    if (tempPortraitBase64) {
+      return `data:image/png;base64,${tempPortraitBase64}`;
+    }
+    // Fallback to base64 data (legacy support)
     if (character.details.image_portrait_base64 && typeof character.details.image_portrait_base64 === 'string') {
       return `data:image/png;base64,${character.details.image_portrait_base64}`;
     }
@@ -57,23 +66,38 @@ export default function CharacterCard({
   };
 
   const imageSrc = getImageSrc();
+  const isLoadingPortrait = character.details.uuid && !tempPortraitBase64 && !character.details.image_portrait;
 
   //* Common card border styling
   const borderClass = isSelected
     ? "border-primary shadow-primary/20 shadow-lg"
     : "border-border";
 
+  //* Portrait loading skeleton
+  const PortraitLoadingSkeleton = ({ height }: { height: string }) => (
+    <div className={`relative ${height} w-full bg-muted/30 animate-pulse flex items-center justify-center`}>
+      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="text-xs font-medium">Generating portrait...</span>
+      </div>
+    </div>
+  );
+
   //* Front side: Basic info
   const frontContent = (
     <div
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
-      <CardImage
-        src={imageSrc}
-        alt={character.name}
-        objectFit="contain"
-        height="h-44"
-      />
+      {isLoadingPortrait ? (
+        <PortraitLoadingSkeleton height="h-44" />
+      ) : (
+        <CardImage
+          src={imageSrc}
+          alt={character.name}
+          objectFit="contain"
+          height="h-44"
+        />
+      )}
 
       <div className="flex flex-col p-4 flex-1 min-h-0">
         {/* Title + Type Badge */}
@@ -108,13 +132,17 @@ export default function CharacterCard({
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
       <div className="flex-1 overflow-y-auto min-h-0">
-        <CardImage
-          src={imageSrc}
-          alt={character.name}
-          objectFit="contain"
-          height="h-48"
-          className="mb-4"
-        />
+        {isLoadingPortrait ? (
+          <PortraitLoadingSkeleton height="h-48" />
+        ) : (
+          <CardImage
+            src={imageSrc}
+            alt={character.name}
+            objectFit="contain"
+            height="h-48"
+            className="mb-4"
+          />
+        )}
         <div className="px-4">
         {/* Title */}
         <div className="mb-3">

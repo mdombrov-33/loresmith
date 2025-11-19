@@ -35,7 +35,6 @@ from generate.traits import (
     get_all_trait_names,
     validate_trait_selection,
 )
-from services.image_gen.generator import generate_character_images
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -423,19 +422,8 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             influence = 10
             perception = 10
 
-        # Generate Character Images
-        # Use UUID to ensure uniqueness and prevent overwrites
+        # Generate temp UUID for portrait job
         character_id = str(uuid.uuid4())
-
-        image_data = await generate_character_images(
-            name=name,
-            appearance=appearance,
-            theme=theme,
-            world_id=0,  # Temp value, images will be in /generated/0/ directory
-            character_id=character_id,
-            traits=traits_list,  # Pass personality traits
-            skills=skills_array,  # Pass skills for visual elements
-        )
 
         # Increment Success Counter
         # All 6 steps completed successfully, track metrics
@@ -452,6 +440,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
 
     details: dict[str, Any] = {
+        "uuid": character_id,  # Temp UUID for portrait lookup
         "traits": traits_list,
         "appearance": appearance,
         "flaw": flaw_data,
@@ -465,14 +454,6 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         "perception": perception,
         "skills": skills_array,
     }
-
-    # Only add image field if it has a valid value (not None)
-    if image_data.get("image_portrait_base64"):
-        base64_length = len(image_data["image_portrait_base64"])
-        logger.info(f"Adding portrait base64 to details (length: {base64_length} chars)")
-        details["image_portrait_base64"] = image_data["image_portrait_base64"]
-    else:
-        logger.warning(f"No portrait base64 in image_data: {image_data}")
 
     return LorePiece(
         name=name,

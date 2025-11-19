@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
@@ -18,14 +20,16 @@ type WorldHandler struct {
 	loreClient     lorepb.LoreServiceClient
 	worldStore     store.WorldStore
 	adventureStore store.AdventureStore
+	portraitStore  *store.PortraitStore
 	logger         *log.Logger
 }
 
-func NewWorldHandler(loreClient lorepb.LoreServiceClient, worldStore store.WorldStore, adventureStore store.AdventureStore, logger *log.Logger) *WorldHandler {
+func NewWorldHandler(loreClient lorepb.LoreServiceClient, worldStore store.WorldStore, adventureStore store.AdventureStore, portraitStore *store.PortraitStore, logger *log.Logger) *WorldHandler {
 	return &WorldHandler{
 		loreClient:     loreClient,
 		worldStore:     worldStore,
 		adventureStore: adventureStore,
+		portraitStore:  portraitStore,
 		logger:         logger,
 	}
 }
@@ -142,7 +146,7 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// Upload character portraits to R2 with real world_id
+	//* Upload character portraits to R2 with real world_id
 	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("WARN: Failed to get world for R2 upload: %v", err)
@@ -150,45 +154,47 @@ func (h *WorldHandler) HandleCreateDraftWorld(w http.ResponseWriter, r *http.Req
 		h.logger.Printf("INFO: Retrieved world %d with %d lore pieces for R2 upload", worldID, len(world.LorePieces))
 		for _, piece := range world.LorePieces {
 			if piece.Type == "character" {
-				h.logger.Printf("INFO: Checking character piece %s (ID: %d) for base64 image", piece.Name, piece.ID)
-				h.logger.Printf("DEBUG: Details keys: %v", func() []string {
-					keys := make([]string, 0, len(piece.Details))
-					for k := range piece.Details {
-						keys = append(keys, k)
-					}
-					return keys
-				}())
+				uuid, ok := piece.Details["uuid"].(string)
+				if !ok || uuid == "" {
+					h.logger.Printf("WARN: Character %s has no UUID, skipping portrait upload", piece.Name)
+					continue
+				}
 
-				// Check if character has base64 image to upload
-				if base64Data, ok := piece.Details["image_portrait_base64"].(string); ok && base64Data != "" {
-					h.logger.Printf("INFO: Found base64 portrait for character %s (length: %d)", piece.Name, len(base64Data))
+				portraitCtx, portraitCancel := context.WithTimeout(context.Background(), 5*time.Second)
+				base64Data, err := h.portraitStore.GetPortrait(portraitCtx, uuid)
+				portraitCancel()
 
-					// Call Python gRPC to upload to R2
-					uploadCtx, uploadCancel := utils.NewGRPCContext(utils.OpUploadImage)
-					uploadResp, err := h.loreClient.UploadImageToR2(uploadCtx, &lorepb.UploadImageRequest{
-						ImageBase64:  base64Data,
-						WorldId:      int64(worldID),
-						CharacterId:  strconv.Itoa(piece.ID),
-						ImageType:    "portrait",
-					})
-					uploadCancel()
+				if err != nil {
+					h.logger.Printf("ERROR: Failed to fetch portrait from Redis for %s (UUID: %s): %v", piece.Name, uuid, err)
+					continue
+				}
 
-					if err != nil {
-						h.logger.Printf("WARN: Failed to upload portrait for %s: %v", piece.Name, err)
-						continue // Don't fail world creation if image upload fails
-					}
+				if base64Data == "" {
+					h.logger.Printf("WARN: Portrait not ready for %s (UUID: %s)", piece.Name, uuid)
+					continue
+				}
 
-					// Update lore piece with R2 URL and remove base64
-					piece.Details["image_portrait"] = uploadResp.ImageUrl
-					delete(piece.Details, "image_portrait_base64")
+				uploadCtx, uploadCancel := utils.NewGRPCContext(utils.OpUploadImage)
+				uploadResp, err := h.loreClient.UploadImageToR2(uploadCtx, &lorepb.UploadImageRequest{
+					ImageBase64: base64Data,
+					WorldId:     int64(worldID),
+					CharacterId: strconv.Itoa(piece.ID),
+					ImageType:   "portrait",
+				})
+				uploadCancel()
 
-					if err := h.worldStore.UpdateLorePieceDetails(piece.ID, piece.Details); err != nil {
-						h.logger.Printf("ERROR: Failed to update lore piece with R2 URL: %v", err)
-					} else {
-						h.logger.Printf("INFO: Successfully uploaded and updated portrait for %s: %s", piece.Name, uploadResp.ImageUrl)
-					}
+				if err != nil {
+					h.logger.Printf("ERROR: Failed to upload portrait for %s: %v", piece.Name, err)
+					continue
+				}
+
+				piece.Details["image_portrait"] = uploadResp.ImageUrl
+				delete(piece.Details, "uuid")
+
+				if err := h.worldStore.UpdateLorePieceDetails(piece.ID, piece.Details); err != nil {
+					h.logger.Printf("ERROR: Failed to update lore piece: %v", err)
 				} else {
-					h.logger.Printf("WARN: No base64 image found for character %s. Checked: %v", piece.Name, piece.Details["image_portrait_base64"])
+					h.logger.Printf("INFO: Uploaded portrait for %s: %s", piece.Name, uploadResp.ImageUrl)
 				}
 			}
 		}
