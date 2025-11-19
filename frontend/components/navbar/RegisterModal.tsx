@@ -8,13 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ActionButton from "@/components/shared/ActionButton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
 import { registerUser, loginUser } from "@/lib/api/auth";
+import { AuthInput } from "./AuthInput";
+import { AuthPasswordInput } from "./AuthPasswordInput";
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -50,11 +50,6 @@ export function RegisterModal({
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
       return;
     }
 
@@ -118,97 +113,53 @@ export function RegisterModal({
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-username"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Username
-                </Label>
-                <Input
-                  id="reg-username"
-                  name="username"
-                  placeholder="Choose a username"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      username: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="username"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-email"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="reg-email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      email: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="email"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-password"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Password
-                </Label>
-                <Input
-                  id="reg-password"
-                  name="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="new-password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="reg-confirm-password"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Confirm Password
-                </Label>
-                <Input
-                  id="reg-confirm-password"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      confirmPassword: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="new-password"
-                />
-              </div>
+              <AuthInput
+                id="reg-username"
+                label="Username"
+                placeholder="Choose a username"
+                value={formData.username}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, username: value }))
+                }
+                autoComplete="username"
+              />
+              <AuthInput
+                id="reg-email"
+                label="Email"
+                placeholder="Enter your email"
+                type="email"
+                value={formData.email}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, email: value }))
+                }
+                autoComplete="email"
+              />
+              <AuthPasswordInput
+                id="reg-password"
+                label="Password"
+                placeholder="Create a password"
+                value={formData.password}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, password: value }))
+                }
+                autoComplete="new-password"
+              />
+              <AuthPasswordInput
+                id="reg-confirm-password"
+                label="Confirm Password"
+                placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, confirmPassword: value }))
+                }
+                error={
+                  formData.confirmPassword &&
+                  formData.password !== formData.confirmPassword
+                    ? "Passwords do not match"
+                    : undefined
+                }
+                autoComplete="new-password"
+              />
               <div className="pt-2">
                 {error && (
                   <div className="text-destructive mb-4 text-sm">{error}</div>

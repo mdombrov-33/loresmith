@@ -8,13 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ActionButton from "@/components/shared/ActionButton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
 import { loginUser } from "@/lib/api/auth";
+import { AuthInput } from "./AuthInput";
+import { AuthPasswordInput } from "./AuthPasswordInput";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -90,51 +90,26 @@ export function LoginModal({
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="username"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  placeholder="Enter your username"
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      username: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="username"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="text-foreground text-sm font-medium"
-                >
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
-                  className="h-11 px-3"
-                  autoComplete="current-password"
-                />
-              </div>
+              <AuthInput
+                id="username"
+                label="Username"
+                placeholder="Enter your username"
+                value={formData.username}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, username: value }))
+                }
+                autoComplete="username"
+              />
+              <AuthPasswordInput
+                id="password"
+                label="Password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, password: value }))
+                }
+                autoComplete="current-password"
+              />
               <div className="pt-2">
                 {error && (
                   <div className="text-destructive mb-4 text-sm">{error}</div>
