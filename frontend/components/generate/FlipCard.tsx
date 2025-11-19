@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface FlipCardProps {
   frontContent: ReactNode;
@@ -14,24 +15,68 @@ export default function FlipCard({
   frontContent,
   backContent,
   className = "",
+  isSelected,
   onClick,
 }: FlipCardProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
   return (
     <div
-      className={`group perspective-1000 h-full w-full cursor-pointer ${className}`}
+      className={cn(
+        "group relative h-full w-full cursor-pointer",
+        "[perspective:2000px]",
+        className
+      )}
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
       onClick={onClick}
     >
-      <div className="transform-style-3d relative h-full w-full transition-transform duration-700 group-hover:rotate-y-180">
+      <div
+        className={cn(
+          "relative h-full w-full",
+          "[transform-style:preserve-3d]",
+          "transition-all duration-700 ease-out",
+          isFlipped
+            ? "[transform:rotateY(180deg)]"
+            : "[transform:rotateY(0deg)]"
+        )}
+      >
         {/* Front Face */}
-        <div className="absolute inset-0 h-full w-full backface-hidden">
+        <div
+          className={cn(
+            "absolute inset-0 h-full w-full",
+            "[transform:rotateY(0deg)] [backface-visibility:hidden]",
+            "transition-all duration-700",
+            isFlipped ? "opacity-0" : "opacity-100"
+          )}
+        >
           {frontContent}
         </div>
 
         {/* Back Face */}
-        <div className="absolute inset-0 h-full w-full rotate-y-180 backface-hidden">
+        <div
+          className={cn(
+            "absolute inset-0 h-full w-full",
+            "[transform:rotateY(180deg)] [backface-visibility:hidden]",
+            "transition-all duration-700",
+            !isFlipped ? "opacity-0" : "opacity-100"
+          )}
+        >
           {backContent}
         </div>
       </div>
+
+      {/* Glow effect on selected cards */}
+      {isSelected && (
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 rounded-xl",
+            "bg-primary/20 blur-xl",
+            "animate-pulse",
+            "-z-10"
+          )}
+        />
+      )}
     </div>
   );
 }
