@@ -293,7 +293,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return lore_pb2.UploadImageResponse()
 
     # * Adventure Methods
-    # TODO: Add adventure session management methods here
+    # TODO: Add adventure session management methods
 
 
 # * Helper Functions
