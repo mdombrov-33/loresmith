@@ -1,6 +1,5 @@
 import json
-from typing import Any
-import re
+from typing import Any, cast
 import uuid
 
 from langchain_core.prompts import PromptTemplate
@@ -18,8 +17,8 @@ from utils.appearance_tracker import (
 )
 from generate.models.lore_piece import LorePiece
 from generate.flaw_templates import (
+    FlawTemplate,
     get_flaw_by_id,
-    format_flaw_for_storage,
     get_random_flaw_ids,
 )
 from services.llm_client import (
@@ -35,6 +34,11 @@ from generate.traits import (
     get_all_trait_names,
     validate_trait_selection,
 )
+from generate.models.structured_llm_output.character_schema import (
+    CharacterTraits,
+    CharacterSkills,
+    CharacterStats,
+)
 
 blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
@@ -48,7 +52,6 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
     """
 
     try:
-        # Load shared theme references
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
 
@@ -58,7 +61,9 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
 
         # Get recently used names to exclude
         excluded_names_list = get_excluded_names(limit=50)
-        excluded_names_str = ", ".join(excluded_names_list) if excluded_names_list else "None"
+        excluded_names_str = (
+            ", ".join(excluded_names_list) if excluded_names_list else "None"
+        )
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
         name_llm = get_llm(max_tokens=50)
@@ -112,7 +117,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Track appearance features to prevent repetition
         add_generated_features(appearance)
 
-        # Generate Backstory (moved before traits so traits can reference backstory)
+        # Generate Backstory
         with open("generate/prompts/character/character_backstory.txt", "r") as f:
             backstory_prompt_text = f.read()
 
@@ -130,110 +135,60 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         backstory = clean_ai_text(backstory_raw)
         logger.info(f"Generated backstory for {name}")
 
-        # Generate Personality Traits (using new trait system)
+        # Generate Personality Traits
         with open("generate/prompts/character/character_traits.txt", "r") as f:
             traits_prompt_text = f.read()
 
         traits_prompt = PromptTemplate.from_template(traits_prompt_text)
-        traits_llm = get_llm(max_tokens=50)
-        traits_chain = traits_prompt | traits_llm | StrOutputParser()
+        traits_llm = get_llm(max_tokens=50).with_structured_output(CharacterTraits)
+        traits_chain = traits_prompt | traits_llm
 
         # Get the formatted trait list for the prompt
         trait_list = get_trait_list_for_prompt()
 
-        traits_raw = await traits_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "appearance": appearance,
-                "backstory": backstory,
-                "trait_list": trait_list,
-            }
-        )
-        traits_text = clean_ai_text(traits_raw)
-
-        # Parse and validate traits
-        personality_traits = []
         try:
-            # Clean up common LLM mistakes - be VERY aggressive
-            logger.debug(f"Raw traits text: {traits_text}")
+            traits_result = cast(
+                CharacterTraits,
+                await traits_chain.ainvoke(
+                    {
+                        "theme": theme,
+                        "theme_references": theme_references,
+                        "name": name,
+                        "appearance": appearance,
+                        "backstory": backstory,
+                        "trait_list": trait_list,
+                    }
+                ),
+            )
+            # LLM returns validated list of trait names directly
+            trait_names = traits_result.traits
 
-            # Remove surrounding quotes
-            traits_text = traits_text.strip('"').strip("'")
-
-            # Remove everything after first period or dash (explanations)
-            if "." in traits_text:
-                traits_text = traits_text.split(".")[0].strip()
-            if " - " in traits_text:
-                traits_text = traits_text.split(" - ")[0].strip()
-
-            # If there's a colon, take everything AFTER the last colon
-            # Handles: "I have selected: Trait1, Trait2, Trait3"
-            if ":" in traits_text:
-                traits_text = traits_text.split(":")[-1].strip()
-
-            # Remove common prefixes (after colon removal)
-            prefixes_to_remove = [
-                "I choose ",
-                "I select ",
-                "I have selected ",
-                "Here are ",
-                "Here's ",
-                "The traits are ",
-                "These traits are ",
-                "Output: ",
-                "Based on ",
-                "For ",
-                "Given ",
-                "The ",
-                "A possible ",
-                "Possible ",
-            ]
-            for prefix in prefixes_to_remove:
-                if traits_text.lower().startswith(prefix.lower()):
-                    traits_text = traits_text[len(prefix) :].strip()
-
-            # Remove surrounding quotes again (in case they were after prefix)
-            traits_text = traits_text.strip('"').strip("'")
-
-            logger.debug(f"Cleaned traits text: {traits_text}")
-
-            # Parse comma-separated trait names
-            trait_names = [t.strip() for t in traits_text.split(",")]
+            # Convert to PersonalityTrait enums
+            personality_traits = []
             all_valid_traits = get_all_trait_names()
 
-            # Convert to PersonalityTrait enum values
             for trait_name in trait_names:
-                # Only take the first word if there's extra text after the trait name
-                first_word = trait_name.split()[0] if trait_name else ""
-
                 if trait_name in all_valid_traits:
                     personality_traits.append(PersonalityTrait(trait_name))
-                elif first_word in all_valid_traits:
-                    # Try first word if full string didn't match
-                    personality_traits.append(PersonalityTrait(first_word))
-                    logger.warning(
-                        f"Extracted trait '{first_word}' from malformed '{trait_name}'"
-                    )
                 else:
                     logger.warning(
-                        f"Invalid trait '{trait_name}' generated, will use fallback"
+                        f"Invalid trait '{trait_name}' from LLM, will use fallback"
                     )
 
             # Validate we have exactly 3 compatible traits
-            if len(personality_traits) != 3:
-                raise ValueError(f"Expected 3 traits, got {len(personality_traits)}")
-
-            if not validate_trait_selection(personality_traits):
-                raise ValueError("Traits contain contradictions")
+            if len(personality_traits) != 3 or not validate_trait_selection(
+                personality_traits
+            ):
+                raise ValueError(f"Invalid trait selection: {trait_names}")
 
             logger.info(
                 f"Generated traits for {name}: {[t.value for t in personality_traits]}"
             )
 
-        except (ValueError, KeyError) as e:
-            logger.warning(f"Failed to parse traits: {e}. Using theme-based fallback.")
+        except Exception as e:
+            logger.warning(
+                f"Structured trait generation failed: {e}. Using theme-based fallback."
+            )
             # Theme-based fallback traits
             theme_fallbacks = {
                 "post-apocalyptic": [
@@ -279,35 +234,28 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             skills_prompt_text = f.read()
 
         skills_prompt = PromptTemplate.from_template(skills_prompt_text)
-        skills_llm = get_llm(max_tokens=70)
-        skills_chain = skills_prompt | skills_llm | StrOutputParser()
-        skills_raw = await skills_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "personality": ", ".join(
-                    traits_list
-                ),  # Pass traits as comma-separated string
-                "appearance": appearance,
-            }
-        )
-        skills_text = clean_ai_text(skills_raw)
+        skills_llm = get_llm(max_tokens=70).with_structured_output(CharacterSkills)
+        skills_chain = skills_prompt | skills_llm
 
-        # Parse comma-separated skill names (no levels)
-        skills_array = []
         try:
-            for skill_item in skills_text.split(","):
-                skill_name = skill_item.strip()
-                if skill_name:  # Skip empty strings
-                    skills_array.append(skill_name)
+            skills_result = cast(
+                CharacterSkills,
+                await skills_chain.ainvoke(
+                    {
+                        "theme": theme,
+                        "theme_references": theme_references,
+                        "name": name,
+                        "personality": ", ".join(traits_list),
+                        "appearance": appearance,
+                    }
+                ),
+            )
+            # LLM returns validated list of skills directly
+            skills_array = skills_result.skills
+            logger.info(f"Generated {len(skills_array)} skills: {skills_array}")
 
-            if len(skills_array) == 0:
-                raise ValueError("No skills parsed")
-
-            logger.info(f"Parsed {len(skills_array)} skills: {skills_array}")
-        except (ValueError, IndexError) as e:
-            logger.warning(f"Failed to parse skills: {e}. Using fallback.")
+        except Exception as e:
+            logger.warning(f"Structured skills generation failed: {e}. Using fallback.")
             # Fallback defaults
             skills_array = [
                 "Basic Training",
@@ -316,7 +264,7 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "Awareness",
             ]
 
-        # Generate Flaw (using template selection)
+        # Generate Flaw
         with open("generate/prompts/character/character_flaw.txt", "r") as f:
             flaw_prompt_text = f.read()
 
@@ -346,15 +294,30 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
         flaw_id_raw = clean_ai_text(flaw_raw)
 
-        # Parse the template ID from LLM response
         flaw_template = get_flaw_by_id(flaw_id_raw)
 
-        # Fallback: if LLM returned invalid ID, pick first from the list
+        # Fallback: if LLM returned invalid ID, try first from the list
         if not flaw_template:
             logger.warning(
                 f"Invalid flaw ID '{flaw_id_raw}' returned. Using fallback from options."
             )
             flaw_template = get_flaw_by_id(flaw_ids[0])
+
+        # If still None, use a hardcoded default flaw (should never happen)
+        if not flaw_template:
+            logger.error("All flaw lookups failed, using hardcoded default")
+            flaw_template = cast(
+                FlawTemplate,
+                {
+                    "id": "default",
+                    "name": "Haunted",
+                    "description": "Haunted by memories of the past",
+                    "trigger": "When confronted with reminders of their past",
+                    "penalty": "Disadvantage on mental resilience checks",
+                    "duration": "Until the scene ends",
+                    "category": "mental",
+                },
+            )
 
         # Store flaw as structured object (adventure mode will use this directly)
         flaw_data = {
@@ -371,47 +334,38 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             stats_prompt_text = f.read()
 
         stats_prompt = PromptTemplate.from_template(stats_prompt_text)
-        stats_llm = get_llm(max_tokens=70)
-        stats_chain = stats_prompt | stats_llm | StrOutputParser()
-        stats_raw = await stats_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "personality": ", ".join(
-                    traits_list
-                ),  # Pass traits as comma-separated string
-                "appearance": appearance,
-                "description": backstory,
-                "skills": json.dumps(skills_array),
-            }
-        )
-        stats_text = clean_ai_text(stats_raw)
+        stats_llm = get_llm(max_tokens=70).with_structured_output(CharacterStats)
+        stats_chain = stats_prompt | stats_llm
 
-        # Parse JSON - extract if LLM added extra text
         try:
-            # Try to find JSON object in the text
-            json_start = stats_text.find("{")
-            json_end = stats_text.rfind("}") + 1
+            stats_result = cast(
+                CharacterStats,
+                await stats_chain.ainvoke(
+                    {
+                        "theme": theme,
+                        "theme_references": theme_references,
+                        "name": name,
+                        "personality": ", ".join(traits_list),
+                        "appearance": appearance,
+                        "description": backstory,
+                        "skills": json.dumps(skills_array),
+                    }
+                ),
+            )
+            # LLM returns validated stats directly
+            health = stats_result.health
+            stress = stats_result.stress
+            knowledge = stats_result.knowledge
+            empathy = stats_result.empathy
+            resilience = stats_result.resilience
+            creativity = stats_result.creativity
+            influence = stats_result.influence
+            perception = stats_result.perception
 
-            if json_start != -1 and json_end > json_start:
-                json_str = stats_text[json_start:json_end]
-                stats_json = json.loads(json_str)
-            else:
-                stats_json = json.loads(stats_text)
+            logger.info(f"Generated stats: health={health}, stress={stress}")
 
-            health = max(50, min(150, stats_json.get("health", 100)))
-            stress = max(0, min(50, stats_json.get("stress", 0)))
-            knowledge = max(8, min(18, stats_json.get("knowledge", 10)))
-            empathy = max(8, min(18, stats_json.get("empathy", 10)))
-            resilience = max(8, min(18, stats_json.get("resilience", 10)))
-            creativity = max(8, min(18, stats_json.get("creativity", 10)))
-            influence = max(8, min(18, stats_json.get("influence", 10)))
-            perception = max(8, min(18, stats_json.get("perception", 10)))
-
-            logger.info(f"Parsed stats from JSON: health={health}, stress={stress}")
-        except (json.JSONDecodeError, ValueError, TypeError) as e:
-            logger.warning(f"Failed to parse stats JSON: {e}. Using defaults.")
+        except Exception as e:
+            logger.warning(f"Structured stats generation failed: {e}. Using defaults.")
             # Fallback defaults
             health = 100
             stress = 0
