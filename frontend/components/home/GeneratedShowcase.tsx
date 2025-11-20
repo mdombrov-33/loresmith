@@ -1,15 +1,63 @@
 "use client";
 
 import { useIntersectionObserver } from "@/hooks/styling/useIntersectionObserver";
-import { Scroll, Users, Zap, Gem, User } from "lucide-react";
+import {
+  Scroll,
+  Users,
+  Zap,
+  Gem,
+  AlertTriangle,
+  BookOpen,
+  Users as UsersIcon,
+  Lightbulb,
+  Eye,
+  Heart,
+  Brain,
+} from "lucide-react";
+import CardImage from "@/components/shared/card/CardImage";
+import GeneratedShowcaseCard from "@/components/home/GeneratedShowcaseCard";
+import { getTraitIcon, getTraitColor } from "@/lib/trait-icons";
 
 export default function GeneratedShowcase() {
   const { elementRef, isVisible } = useIntersectionObserver();
 
+  const portraitUrl = `${process.env.NEXT_PUBLIC_R2_PORTRAITS_URL}/portraits/162/477_portrait.png`;
+
+  const loreCards = [
+    {
+      icon: Zap,
+      label: "Event",
+      title: "The Maelstrom of Eternity",
+      description:
+        "The Last Oracle spoke an ancient incantation, shattering the Star-Eater crystal in the heart of the Celestial Spires. A cataclysmic shockwave ravaged the skies, plunging the land into a perpetual twilight. The balance of the Elements is now skewed, as earthquakes and wildfires erupt with unpredictable ferocity.",
+    },
+    {
+      icon: Users,
+      label: "Faction",
+      title: "Khra'gixx Brotherhood",
+      description:
+        "Members of the Khra'gixx Brotherhood wear tattered robes adorned with intricate fungal growth patterns in dark green and crimson thread, while polished obsidian skulls reflect their reverence for the ancient fungi that symbiotically fuse with their souls.",
+    },
+    {
+      icon: Zap,
+      label: "Setting",
+      title: "Krael's Spirehold",
+      description:
+        "The windswept badlands of Krael's Spirehold writhe under the weight of ancient power, as iridescent crystals embedded in the shattered obsidian are the sole source of mystical energy. The Windcallers, masters of aeromancy, ration access to these precious resources through hereditary rites.",
+    },
+    {
+      icon: Gem,
+      label: "Relic",
+      title: "Korvus Crucible Key",
+      description:
+        "Korvus Crucible Key is a rusty iron key with an oversized head and a worn wooden handle. Its presence seems to draw attention from other people, making them act irrationally or reveal secrets they'd rather keep hidden.",
+    },
+  ];
+
   return (
     <section
       ref={elementRef}
-      className="relative overflow-hidden bg-gradient-to-b from-background via-background/95 to-background py-16"
+      className="from-background via-background/95 to-background relative overflow-hidden bg-gradient-to-b py-16"
     >
       <div className="relative container mx-auto px-4">
         {/* Section header */}
@@ -38,24 +86,163 @@ export default function GeneratedShowcase() {
         >
           <div className="bg-primary/5 border-primary/20 border-b px-8 py-6">
             <h3 className="text-foreground text-3xl font-bold">
-              When Clockwork Dreams Shatter the Frost
+              Beyond the Shattered Spires of Old
             </h3>
             <p className="text-muted-foreground mt-2 text-sm">Fantasy World</p>
           </div>
           <div className="p-8">
             <div className="mb-4 flex items-center gap-2">
               <Scroll className="text-primary h-5 w-5" />
-              <span className="text-primary text-sm font-semibold uppercase tracking-wider">
+              <span className="text-primary text-sm font-semibold tracking-wider uppercase">
                 Your Quest
               </span>
             </div>
             <p className="text-foreground leading-relaxed">
-              Cedric Fells has received a cryptic message from a reclusive
-              clockmaker, hinting at long-lost blueprints for the mechanical
-              heart of the city hidden within an ancient ice cavern, but he
-              must navigate treacherous Wyrmkin-infested tunnels to retrieve
-              them before they fall into the wrong hands.
+              Eira Flynn has stumbled upon an ancient prophecy hidden within the
+              Korvus Crucible Key, foretelling a catastrophic convergence of the
+              Elements that threatens to shatter Krael&apos;s Spirehold. To
+              prevent this disaster, she must decipher the relic&apos;s secrets
+              and reach the fabled Resonant Convergence before it&apos;s too
+              late, but doing so will require navigating treacherous alliances
+              with rival factions and confronting the dark forces manipulating
+              them from the shadows.
             </p>
+          </div>
+        </div>
+
+        {/* Character Cards - Front & Back */}
+        <div
+          className={`mx-auto mb-8 grid max-w-6xl gap-6 transition-all delay-100 duration-700 md:grid-cols-2 ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
+          {/* Character Front */}
+          <div className="bg-card border-border overflow-hidden rounded-xl border-2">
+            <CardImage
+              src={portraitUrl}
+              alt="Eira Flynn"
+              objectFit="contain"
+              height="h-56"
+            />
+            <div className="flex flex-col p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-foreground text-lg font-semibold">
+                  Eira Flynn
+                </h3>
+                <span className="text-accent bg-accent/10 rounded px-2 py-1 text-xs font-semibold uppercase">
+                  Character
+                </span>
+              </div>
+              <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+                People know Eira Flynn for crafting intricate wooden carvings
+                that seem to defy the darkness outside her workshop. What they
+                don&apos;t know: she&apos;s been searching for a rare wood
+                species said to hold the essence of the ancient forest, rumored
+                to have fallen victim to the great shadow that consumed their
+                world.
+              </p>
+            </div>
+          </div>
+
+          {/* Character Back */}
+          <div className="bg-card border-border overflow-hidden rounded-xl border-2">
+            <CardImage
+              src={portraitUrl}
+              alt="Eira Flynn"
+              objectFit="contain"
+              height="h-48"
+              className="mb-4"
+            />
+            <div className="space-y-3 px-4 pb-4">
+              {/* Traits + Health/Stress Row */}
+              <div className="flex items-start justify-between gap-4">
+                {/* Traits */}
+                <div className="flex-1">
+                  <div className="text-accent mb-2 text-xs font-semibold uppercase">
+                    Personality Traits
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {["Brave", "Honorable", "Curious"].map((trait) => {
+                      const TraitIcon = getTraitIcon(trait);
+                      const colorClass = getTraitColor(trait);
+                      return (
+                        <div
+                          key={trait}
+                          className="bg-muted/50 border-border flex items-center gap-1.5 rounded-lg border px-3 py-1.5"
+                        >
+                          <TraitIcon className={`h-4 w-4 ${colorClass}`} />
+                          <span className="text-foreground text-sm font-medium">
+                            {trait}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Health & Stress */}
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-1.5">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    <span className="text-muted-foreground text-xs">Health</span>
+                    <span className="text-foreground text-sm font-bold">125</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Brain className="h-4 w-4 text-blue-500" />
+                    <span className="text-muted-foreground text-xs">Stress</span>
+                    <span className="text-foreground text-sm font-bold">10</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Flaw */}
+              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
+                  <div className="text-xs font-semibold text-red-500 uppercase">
+                    Flaw
+                  </div>
+                </div>
+                <div className="text-sm font-semibold text-red-400">
+                  Survivor&apos;s Guilt
+                </div>
+                <div className="mt-0.5 text-xs text-red-300/70">
+                  Haunted by deaths of fallen comrades
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-4 gap-2 pt-2">
+                <div className="bg-muted/30 flex flex-col items-center gap-1 rounded-lg p-2">
+                  <BookOpen className="h-4 w-4 text-yellow-500" />
+                  <span className="text-muted-foreground text-[10px]">
+                    Knowledge
+                  </span>
+                  <span className="text-foreground text-sm font-bold">16</span>
+                </div>
+                <div className="bg-muted/30 flex flex-col items-center gap-1 rounded-lg p-2">
+                  <Eye className="h-4 w-4 text-indigo-500" />
+                  <span className="text-muted-foreground text-[10px]">
+                    Perception
+                  </span>
+                  <span className="text-foreground text-sm font-bold">15</span>
+                </div>
+                <div className="bg-muted/30 flex flex-col items-center gap-1 rounded-lg p-2">
+                  <UsersIcon className="h-4 w-4 text-pink-500" />
+                  <span className="text-muted-foreground text-[10px]">
+                    Empathy
+                  </span>
+                  <span className="text-foreground text-sm font-bold">14</span>
+                </div>
+                <div className="bg-muted/30 flex flex-col items-center gap-1 rounded-lg p-2">
+                  <Lightbulb className="h-4 w-4 text-orange-500" />
+                  <span className="text-muted-foreground text-[10px]">
+                    Creativity
+                  </span>
+                  <span className="text-foreground text-sm font-bold">13</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -65,118 +252,15 @@ export default function GeneratedShowcase() {
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
-          {/* Protagonist Card */}
-          <div className="border-border bg-card/50 overflow-hidden rounded-2xl border backdrop-blur-sm">
-            <div className="bg-secondary/10 border-secondary/20 flex items-center gap-3 border-b px-6 py-4">
-              <User className="text-secondary h-5 w-5" />
-              <div>
-                <div className="text-secondary text-xs font-semibold uppercase tracking-wider">
-                  Protagonist
-                </div>
-                <div className="text-foreground text-lg font-bold">
-                  Cedric Fells
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                A young clockmaker in his mid-twenties with rugged features and
-                unruly dark brown hair. A worn leather apron and cracked pocket
-                watch tell the story of his craft.
-              </p>
-              <div className="mb-4 space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Knowledge</span>
-                  <span className="text-foreground font-semibold">16</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Perception</span>
-                  <span className="text-foreground font-semibold">17</span>
-                </div>
-              </div>
-              <div className="bg-red-500/10 border-red-500/30 rounded-lg border p-3">
-                <div className="text-red-400 mb-1 text-xs font-semibold uppercase">
-                  Flaw
-                </div>
-                <div className="text-red-300 text-sm font-semibold">
-                  Aquaphobia
-                </div>
-                <div className="text-red-200/70 text-xs">
-                  Terror of deep water or drowning
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Faction Card */}
-          <div className="border-border bg-card/50 overflow-hidden rounded-2xl border backdrop-blur-sm">
-            <div className="bg-primary/10 border-primary/20 flex items-center gap-3 border-b px-6 py-4">
-              <Users className="text-primary h-5 w-5" />
-              <div>
-                <div className="text-primary text-xs font-semibold uppercase tracking-wider">
-                  Faction
-                </div>
-                <div className="text-foreground text-lg font-bold">
-                  Order of the Golden Spire
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Members clothe themselves in intricately embroidered robes that
-                shimmer like burnished copper and gold. They pursue a radical
-                goal of liberating individuals from their memories through
-                systematic recall using the rare hallucinogenic flower
-                "Elysium's Tear".
-              </p>
-            </div>
-          </div>
-
-          {/* Setting Card */}
-          <div className="border-border bg-card/50 overflow-hidden rounded-2xl border backdrop-blur-sm">
-            <div className="bg-accent/10 border-accent/20 flex items-center gap-3 border-b px-6 py-4">
-              <Zap className="text-accent h-5 w-5" />
-              <div>
-                <div className="text-accent text-xs font-semibold uppercase tracking-wider">
-                  Setting
-                </div>
-                <div className="text-foreground text-lg font-bold">
-                  Frostbitten Foothills
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                A treacherous landscape of icy spires and aurora-lit skies,
-                where ancient rituals govern access to winds that fuel trade
-                routes. Tensions simmer between Windcaller clans and merchant
-                guilds over control of rare, gemstone-encrusted wind chimes.
-              </p>
-            </div>
-          </div>
-
-          {/* Relic Card */}
-          <div className="border-border bg-card/50 overflow-hidden rounded-2xl border backdrop-blur-sm">
-            <div className="bg-primary/10 border-primary/20 flex items-center gap-3 border-b px-6 py-4">
-              <Gem className="text-primary h-5 w-5" />
-              <div>
-                <div className="text-primary text-xs font-semibold uppercase tracking-wider">
-                  Relic
-                </div>
-                <div className="text-foreground text-lg font-bold">
-                  Starweaver's Orb
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                A delicate, gemstone-encrusted clockwork sphere the size of an
-                eyeball, its intricate gears rusting to reveal copper threads
-                like veins. Those who gaze into its mirrored surface begin to
-                recall fragments of their own forgotten dreams.
-              </p>
-            </div>
-          </div>
+          {loreCards.map((card) => (
+            <GeneratedShowcaseCard
+              key={card.title}
+              icon={card.icon}
+              label={card.label}
+              title={card.title}
+              description={card.description}
+            />
+          ))}
         </div>
       </div>
     </section>
