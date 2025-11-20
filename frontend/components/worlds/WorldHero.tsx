@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Users, MessageSquare, Sparkles, Activity } from "lucide-react";
+import { Star, Users, MessageSquare, Sparkles, Activity, Loader2 } from "lucide-react";
 import { FullStory, LorePiece } from "@/lib/schemas";
 import RatingDialog from "./RatingDialog";
 
@@ -22,6 +22,7 @@ export default function WorldHero({
   activeSessions,
 }: WorldHeroProps) {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   // TODO: Replace with real data from backend
   const mockRating = 4.5;
@@ -40,11 +41,17 @@ export default function WorldHero({
             {characterImage && (
               <div className="shrink-0">
                 <div className="border-primary/30 relative h-32 w-32 overflow-hidden rounded-xl border-2 shadow-lg">
+                  {imageLoading && (
+                    <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
+                      <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+                    </div>
+                  )}
                   <Image
                     src={characterImage}
                     alt={characterPiece?.name || "Character"}
                     fill
                     className="object-cover"
+                    onLoad={() => setImageLoading(false)}
                   />
                 </div>
               </div>
