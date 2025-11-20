@@ -6,7 +6,7 @@ import ActionButton from "@/components/shared/ActionButton";
 import { ThemeSwitcher } from "@/components/navbar/ThemeSwitcher";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, LogOut, Globe, User } from "lucide-react";
+import { Menu, LogOut, Globe, User, Layers } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 
@@ -100,6 +100,18 @@ export function MobileNav() {
                 <ActionButton
                   variant="ghost"
                   size="sm"
+                  onClick={() => {
+                    router.push("/plans");
+                    setIsOpen(false);
+                  }}
+                  icon={<Layers className="h-4 w-4" />}
+                  className="w-full justify-start"
+                >
+                  Plans
+                </ActionButton>
+                <ActionButton
+                  variant="ghost"
+                  size="sm"
                   onClick={handleLogout}
                   icon={<LogOut className="h-4 w-4" />}
                   className="text-destructive hover:text-destructive w-full justify-start"
@@ -113,6 +125,24 @@ export function MobileNav() {
           {!isAuthenticated && (
             <>
               {showThemeSwitcher && <Separator />}
+
+              {/* Navigation */}
+              <div className="space-y-2">
+                <ActionButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    router.push("/plans");
+                    setIsOpen(false);
+                  }}
+                  icon={<Layers className="h-4 w-4" />}
+                  className="w-full justify-start"
+                >
+                  Plans
+                </ActionButton>
+              </div>
+
+              <Separator />
 
               {/* Auth Actions */}
               <div className="space-y-2">

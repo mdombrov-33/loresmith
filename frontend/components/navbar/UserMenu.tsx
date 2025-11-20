@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/stores/appStore";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, Globe, User, ChevronDown } from "lucide-react";
+import { LogOut, Globe, User, ChevronDown, Layers } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function UserMenu() {
@@ -60,6 +60,10 @@ export function UserMenu() {
         <DropdownMenuItem onClick={handleSearchNavigation}>
           <Globe className="mr-2 h-4 w-4" />
           <span>Worlds Hub</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/plans")}>
+          <Layers className="mr-2 h-4 w-4" />
+          <span>Plans</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>

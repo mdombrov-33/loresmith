@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import ActionButton from "@/components/shared/ActionButton";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
-import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { Sparkles } from "lucide-react";
 import { useParticleAnimation } from "@/hooks/styling/useParticleAnimation";
@@ -35,12 +34,7 @@ export default function Hero() {
   const handleBeginAdventure = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!isAuthenticated) {
       e.preventDefault();
-      toast("Please login to start your adventure", {
-        action: {
-          label: "Login",
-          onClick: () => setIsLoginModalOpen(true),
-        },
-      });
+      setIsLoginModalOpen(true);
     } else {
       router.push(`/generate?theme=${theme}`);
     }
