@@ -8,29 +8,38 @@ from utils.logger import logger
 
 settings = get_settings()
 
+# Global embedding model instance (initialized once on startup)
+_embedding_model = None
+
 
 def get_embedding_model():
     """
-    Get embedding model based on AI provider.
+    Get cached embedding model based on AI provider.
+    Model is initialized once on first call and reused for all subsequent calls.
     - local: Uses Ollama with configurable embedding model (default: nomic-embed-text, 768 dims, free)
     - openrouter: Uses OpenAI embeddings via OpenRouter (default: text-embedding-3-small, 1536 dims, paid)
     """
-    if settings.AI_PROVIDER == "local":
-        logger.info(
-            f"Initializing Ollama embeddings with {settings.LOCAL_EMBEDDING_MODEL} at {settings.OLLAMA_URL}"
-        )
-        return OllamaEmbeddings(
-            model=settings.LOCAL_EMBEDDING_MODEL, base_url=settings.OLLAMA_URL
-        )
-    else:
-        logger.info(
-            f"Initializing OpenAI embeddings (via OpenRouter) with {settings.OPENROUTER_EMBEDDING_MODEL}"
-        )
-        return OpenAIEmbeddings(
-            model=settings.OPENROUTER_EMBEDDING_MODEL,
-            api_key=SecretStr(settings.OPENROUTER_API_KEY),
-            base_url=settings.OPENROUTER_EMBEDDING_BASE_URL,
-        )
+    global _embedding_model
+
+    if _embedding_model is None:
+        if settings.AI_PROVIDER == "local":
+            logger.info(
+                f"Initializing Ollama embeddings with {settings.LOCAL_EMBEDDING_MODEL} at {settings.OLLAMA_URL}"
+            )
+            _embedding_model = OllamaEmbeddings(
+                model=settings.LOCAL_EMBEDDING_MODEL, base_url=settings.OLLAMA_URL
+            )
+        else:
+            logger.info(
+                f"Initializing OpenAI embeddings (via OpenRouter) with {settings.OPENROUTER_EMBEDDING_MODEL}"
+            )
+            _embedding_model = OpenAIEmbeddings(
+                model=settings.OPENROUTER_EMBEDDING_MODEL,
+                api_key=SecretStr(settings.OPENROUTER_API_KEY),
+                base_url=settings.OPENROUTER_EMBEDDING_BASE_URL,
+            )
+
+    return _embedding_model
 
 
 async def generate_search_embedding(query: str) -> list[float]:
