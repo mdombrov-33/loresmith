@@ -25,7 +25,7 @@ from services.embedding_client import (
     generate_search_embedding,
     generate_content_embedding,
 )
-from services.image_gen.processor import upload_image_to_r2
+from services.image_gen.portraits.processor import upload_image_to_r2
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -41,9 +41,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
     ):
         """Generic handler for lore piece generation (characters, factions, etc.)."""
         try:
-            pieces = await generate_func(
-                request.count, request.theme
-            )
+            pieces = await generate_func(request.count, request.theme)
             grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in pieces]
             return response_class(**{response_field_name: grpc_pieces})
         except Exception as e:
@@ -105,9 +103,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
     async def GenerateAll(self, request, context):
         """Generate all lore types in parallel."""
         try:
-            bundle = await generate_lore_variants(
-                request.count, request.theme
-            )
+            bundle = await generate_lore_variants(request.count, request.theme)
             return lore_pb2.AllResponse(  # type: ignore
                 characters=[
                     convert_to_grpc_lore_piece(char) for char in bundle.characters
@@ -284,7 +280,7 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
                 image_data=image_data,
                 world_id=request.world_id,
                 character_id=request.character_id,
-                image_type=request.image_type or "portrait"
+                image_type=request.image_type or "portrait",
             )
 
             logger.info(f"Successfully uploaded image to R2: {image_url}")
@@ -368,8 +364,8 @@ async def serve():
     max_msg_size = 20 * 1024 * 1024  # 20MB
     server = grpc.aio.server(
         options=[
-            ('grpc.max_send_message_length', max_msg_size),
-            ('grpc.max_receive_message_length', max_msg_size),
+            ("grpc.max_send_message_length", max_msg_size),
+            ("grpc.max_receive_message_length", max_msg_size),
         ]
     )
     lore_pb2_grpc.add_LoreServiceServicer_to_server(LoreServicer(), server)

@@ -138,19 +138,26 @@ export default function MyHubTable({ worlds, isLoading }: MyHubTableProps) {
           return (
             <div
               key={world.id}
-              className="border-border bg-card hover:bg-card/80 group flex items-center gap-4 rounded-lg border p-4 transition-all"
+              className="group relative overflow-hidden rounded-lg border border-border bg-card/50 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-lg"
             >
-              {/* Icon */}
-              <div className="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
-                {themeOption?.icon ? (
-                  <themeOption.icon className="h-6 w-6" />
-                ) : (
-                  <Sparkles className="h-6 w-6" />
-                )}
-              </div>
+              {/* Gradient overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-              {/* Content */}
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
+              {/* Bottom glow */}
+              <div className="absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r from-primary/50 to-primary/20 opacity-0 blur-sm transition-all duration-300 group-hover:opacity-100" />
+
+              <div className="relative flex items-center gap-4">
+                {/* Icon */}
+                <div className="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-sm shadow-primary/10 transition-all duration-300 group-hover:bg-primary/20 group-hover:shadow-md group-hover:shadow-primary/20">
+                  {themeOption?.icon ? (
+                    <themeOption.icon className="h-6 w-6" />
+                  ) : (
+                    <Sparkles className="h-6 w-6" />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-foreground truncate font-semibold">
@@ -288,6 +295,7 @@ export default function MyHubTable({ worlds, isLoading }: MyHubTableProps) {
                       </ActionButton>
                     </>
                   )}
+                </div>
                 </div>
               </div>
             </div>
