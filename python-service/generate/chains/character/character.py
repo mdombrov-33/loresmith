@@ -9,12 +9,12 @@ from langfuse import observe
 
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
-from .name_tracker import add_generated_name, get_excluded_names
 from .appearance_tracker import (
     get_random_constraints,
     get_excluded_features,
     add_generated_features,
 )
+from .name_loader import load_names_for_theme
 from generate.models.lore_piece import LorePiece
 from .flaw_templates import (
     FlawTemplate,
@@ -55,15 +55,14 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
 
+        # Load theme-specific names
+        names_data = load_names_for_theme(theme)
+        first_names = names_data["first_names"] if names_data else ""
+        last_names = names_data["last_names"] if names_data else ""
+
         # Generate Name
         with open("generate/prompts/character/character_name.txt", "r") as f:
             name_prompt_text = f.read()
-
-        # Get recently used names to exclude
-        excluded_names_list = get_excluded_names(limit=50)
-        excluded_names_str = (
-            ", ".join(excluded_names_list) if excluded_names_list else "None"
-        )
 
         name_prompt = PromptTemplate.from_template(name_prompt_text)
         name_llm = get_llm(max_tokens=50)
@@ -72,15 +71,13 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             {
                 "theme": theme,
                 "theme_references": theme_references,
+                "first_names": first_names,
+                "last_names": last_names,
                 "blacklist": blacklist_str,
-                "excluded_names": excluded_names_str,
             }
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated character name: {name}")
-
-        # Track this name to prevent immediate reuse
-        add_generated_name(name)
 
         # Generate Appearance with diversity constraints
         with open("generate/prompts/character/character_appearance.txt", "r") as f:

@@ -1,0 +1,324 @@
+Patronymic / Matronymic:
+Arnarson
+Arnadottir
+Bjornsson
+Bjorndottir
+Eiriksson
+Eiriksdottir
+Finnsson
+Finnsdottir
+Geirsson
+Geirsdottir
+Hrafnsson
+Hrafnsdottir
+Ingvarsson
+Ingvarsdottir
+Ketilsson
+Ketilsdottir
+Leifsson
+Leifsdottir
+Sigurdsson
+Sigurdsdottir
+Thorsson
+Thorsdottir
+Ulfrsson
+Ulfrsdottir
+Vidarsson
+Vidarsdottir
+
+Clan / Lineage Names:
+Aesirborn
+Aesirbrand
+Bearclaw
+Berserkskorn
+Blackfjord
+Blodbjorn
+Bloodfen
+Bloodfjord
+Bloodmane
+Bloodraven
+Brimwolf
+Bronzebjorn
+Cloudpeak
+Deepfjord
+Dragonskorn
+Eaglecrest
+Eirbrand
+Eldfjell
+Emberfell
+Emberwolf
+Fangfjord
+Fenwolf
+Feralborn
+Firewolf
+Frostbane
+Frostbjorn
+Frostbound
+Frostclaw
+Frostholm
+Frostmane
+Frostmark
+Frostpeak
+Frostrun
+Frostskorn
+Frostvein
+Glacierborn
+Glacierclaw
+Goldulf
+Grimheim
+Grimskorn
+Hailheart
+Hardfrost
+Havenbjorn
+Helbrand
+Helgrin
+Hrafnspire
+Hrafnheim
+Hrafnskorn
+Huldfrost
+Iceblood
+Icebreaker
+Iceclaw
+Icefell
+Icemark
+Icepeak
+Ironbjorn
+Ironbluff
+Ironcrest
+Ironfell
+Ironfjord
+Ironhand
+Ironheart
+Ironmire
+Ironpine
+Ironvale
+Ironvein
+Ivoryfang
+Jarnbjorn
+Jarnfell
+Jarnfjord
+Jarnheim
+Jarnskorn
+Jotunborn
+Jotunblood
+Jotunvein
+Kaldfell
+Kaldheim
+Kaldmire
+Kaldpeak
+Kaldvein
+Kjolbrand
+Nightbear
+Nightfjord
+Nightfrost
+Nighthelm
+Nightmark
+Nightmane
+Oakenfang
+Oakenfell
+Oakenfjord
+Oakenspine
+Ravenshade
+Ravenshore
+Ravenspine
+Ravenfjord
+Ravenhall
+Ravenmark
+Ravenpeak
+Rimebrand
+Rimeclaw
+Rimefell
+Rimefjord
+Rimeheart
+Rimespine
+Rimskorn
+Runebjorn
+Runeblood
+Runecall
+Runecliff
+Runecrest
+Runefang
+Runefrost
+Runegard
+Runehall
+Runemark
+Runemire
+Runespear
+Runestone
+Runewood
+Shadowbjorn
+Shadowclaw
+Shadowfell
+Shadowfjord
+Shadowhelm
+Shadowmark
+Shadowpine
+Shadowvein
+Shardfrost
+Shardhelm
+Shardskorn
+Skaldfell
+Skaldrun
+Skaldspire
+Skaldvein
+Skeldrheim
+Skeldrvein
+Skelmire
+Sleetmark
+Sleetblade
+Snowbane
+Snowbear
+Snowbjorn
+Snowfell
+Snowfinder
+Snowfrost
+Snowhall
+Snowhelm
+Snowmane
+Snowmark
+Snowpeak
+Snowrun
+Snowshade
+Snowskorn
+Snowvein
+Solbrand
+Solheim
+Solmire
+Solpeak
+Solvein
+Staghelm
+Starbjorn
+Starclaw
+Starfell
+Starfjord
+Starpeak
+Stormborn
+Stormbjorn
+Stormblood
+Stormclaw
+Stormcrest
+Stormfell
+Stormfjord
+Stormheart
+Stormhelm
+Stormmark
+Stormmire
+Stormpine
+Stormriver
+Stormrun
+Stormskorn
+Stormspan
+Stormveil
+Sunfell
+Sunfjord
+Thunderborn
+Thunderbrand
+Thunderbjorn
+Thunderclaw
+Thunderfell
+Thunderfjell
+Thunderhall
+Thunderhelm
+Thundermark
+Thunderrun
+Thundervein
+Valebjorn
+Valeblood
+Valeborn
+Valefang
+Valefell
+Valefrost
+Valehelm
+Valemark
+Valerun
+Vargrborn
+Vargrclaw
+Vargrfell
+Vargrfjord
+Vargrhall
+Vargrmark
+Vargrvein
+Velbrand
+Winterbane
+Winterbear
+Winterbjorn
+Winterborn
+Winterclaw
+Wintercrest
+Winterfell
+Winterfjord
+Winterheart
+Winterhelm
+Wintermark
+Winterpine
+Winterrun
+Wolfsbane
+Wolfclaw
+Wolfcrest
+Wolffell
+Wolffjord
+Wolfgrasp
+Wolfhall
+Wolfheart
+Wolfhelm
+Wolfmark
+Wolfpine
+Wolfscar
+Wolfshade
+Wolfskin
+Wolfvein
+
+Place-based (“of …” style):
+of Aesheim
+of Bifrost
+of Brannheim
+of Drakkarfell
+of Eldurfjord
+of Eldurskog
+of Eldurvegr
+of Fjellgard
+of Frostheim
+of Frostmark
+of Hrafnfjord
+of Hrafnheim
+of Ironhall
+of Isfjord
+of Jarngard
+of Jotunheim
+of Kaldskog
+of Midtfjell
+of Mjollfell
+of Runegard
+of Skarngrim
+of Skeldrfell
+of Skogarheim
+of Stormfell
+of Stormfjord
+of Thorngard
+of Ulfsjord
+of Vintergard
+of Vinterheim
+
+Epithets:
+Bear-Eater
+Blizzard-Walker
+Blade-Singer
+Blood-Drinker
+Bone-Grinder
+Breaker-of-Oaths
+Flame-Born
+Frost-Eater
+Frost-Walker
+Moon-Touched
+Mountain-Walker
+Night-Strider
+Oath-Keeper
+Rime-Singer
+Shadow-Taken
+Shield-Biter
+Skull-Cleaver
+Storm-Sworn
+Thunder-Hand
+War-Singer
+Wolf-Friend
+Wolf-Taken
