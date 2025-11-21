@@ -1,7 +1,7 @@
 "use client";
 
 import Hero from "@/components/home/Hero";
-import ThemeShowcase from "@/components/home/ThemeShowcase";
+import FeaturedWorlds from "@/components/home/FeaturedWorlds";
 import GeneratedShowcase from "@/components/home/GeneratedShowcase";
 import HowItWorks from "@/components/home/HowItWorks";
 import CTA from "@/components/home/CTA";
@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <main className="bg-background min-h-screen">
       <Hero />
-      <ThemeShowcase />
+      <FeaturedWorlds />
       <GeneratedShowcase />
       <HowItWorks />
       <CTA />
