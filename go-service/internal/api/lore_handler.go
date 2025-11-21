@@ -27,14 +27,45 @@ func deserializeDetails(details map[string]string) map[string]any {
 	return result
 }
 
+func mapToLorePiece(m map[string]interface{}) *lorepb.LorePiece {
+	if m == nil {
+		return nil
+	}
+
+	details := make(map[string]string)
+	if d, ok := m["details"].(map[string]interface{}); ok {
+		for k, v := range d {
+			if s, ok := v.(string); ok {
+				details[k] = s
+			} else {
+				jsonBytes, _ := json.Marshal(v)
+				details[k] = string(jsonBytes)
+			}
+		}
+	}
+
+	name, _ := m["name"].(string)
+	description, _ := m["description"].(string)
+	pieceType, _ := m["type"].(string)
+
+	return &lorepb.LorePiece{
+		Name:        name,
+		Description: description,
+		Details:     details,
+		Type:        pieceType,
+	}
+}
+
 type LoreHandler struct {
 	loreClient lorepb.LoreServiceClient
 	logger     *log.Logger
 }
 
 type generateLoreRequest struct {
-	Theme      string
-	Count      int32
+	Theme           string                 `json:"theme"`
+	Count           int32                  `json:"count"`
+	SelectedSetting map[string]interface{} `json:"selectedSetting,omitempty"`
+	SelectedEvent   map[string]interface{} `json:"selectedEvent,omitempty"`
 }
 
 func NewLoreHandler(loreClient lorepb.LoreServiceClient, logger *log.Logger) *LoreHandler {
@@ -190,32 +221,34 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Request) {
-	req := generateLoreRequest{
-		Theme: "post-apocalyptic",
-		Count: 3,
+	var req generateLoreRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request body"})
+		return
 	}
 
-	if theme := r.URL.Query().Get("theme"); theme != "" {
-		req.Theme = theme
+	if req.Theme == "" {
+		req.Theme = "post-apocalyptic"
+	}
+	if req.Count == 0 {
+		req.Count = 3
+	}
+	if req.Count < 1 || req.Count > 10 {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
+		return
 	}
 
-	if countStr := r.URL.Query().Get("count"); countStr != "" {
-		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
-			req.Count = int32(parsed)
-		} else {
-			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
-			return
-		}
-	}
-
-	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
+	if req.SelectedSetting == nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "selectedSetting is required"})
+		return
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 	defer cancel()
 	grpcReq := &lorepb.EventsRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme:           req.Theme,
+		Count:           req.Count,
+		SelectedSetting: mapToLorePiece(req.SelectedSetting),
 	}
 
 	grpcResp, err := h.loreClient.GenerateEvents(ctx, grpcReq)
@@ -239,32 +272,35 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Request) {
-	req := generateLoreRequest{
-		Theme: "post-apocalyptic",
-		Count: 3,
+	var req generateLoreRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request body"})
+		return
 	}
 
-	if theme := r.URL.Query().Get("theme"); theme != "" {
-		req.Theme = theme
+	if req.Theme == "" {
+		req.Theme = "post-apocalyptic"
+	}
+	if req.Count == 0 {
+		req.Count = 3
+	}
+	if req.Count < 1 || req.Count > 10 {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
+		return
 	}
 
-	if countStr := r.URL.Query().Get("count"); countStr != "" {
-		if parsed, err := strconv.Atoi(countStr); err == nil && parsed >= 1 && parsed <= 10 {
-			req.Count = int32(parsed)
-		} else {
-			utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid count (1-10)"})
-			return
-		}
-	}
-
-	if regenerateStr := r.URL.Query().Get("regenerate"); regenerateStr == "true" {
+	if req.SelectedSetting == nil || req.SelectedEvent == nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "selectedSetting and selectedEvent are required"})
+		return
 	}
 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 	defer cancel()
 	grpcReq := &lorepb.RelicsRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme:           req.Theme,
+		Count:           req.Count,
+		SelectedSetting: mapToLorePiece(req.SelectedSetting),
+		SelectedEvent:   mapToLorePiece(req.SelectedEvent),
 	}
 
 	grpcResp, err := h.loreClient.GenerateRelics(ctx, grpcReq)

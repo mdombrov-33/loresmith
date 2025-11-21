@@ -178,11 +178,12 @@ func (x *SettingsRequest) GetCount() int32 {
 }
 
 type EventsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
-	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Theme           string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
+	Count           int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	SelectedSetting *LorePiece             `protobuf:"bytes,3,opt,name=selected_setting,json=selectedSetting,proto3" json:"selected_setting,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *EventsRequest) Reset() {
@@ -229,12 +230,21 @@ func (x *EventsRequest) GetCount() int32 {
 	return 0
 }
 
+func (x *EventsRequest) GetSelectedSetting() *LorePiece {
+	if x != nil {
+		return x.SelectedSetting
+	}
+	return nil
+}
+
 type RelicsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
-	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Theme           string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
+	Count           int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	SelectedSetting *LorePiece             `protobuf:"bytes,3,opt,name=selected_setting,json=selectedSetting,proto3" json:"selected_setting,omitempty"`
+	SelectedEvent   *LorePiece             `protobuf:"bytes,4,opt,name=selected_event,json=selectedEvent,proto3" json:"selected_event,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RelicsRequest) Reset() {
@@ -279,6 +289,20 @@ func (x *RelicsRequest) GetCount() int32 {
 		return x.Count
 	}
 	return 0
+}
+
+func (x *RelicsRequest) GetSelectedSetting() *LorePiece {
+	if x != nil {
+		return x.SelectedSetting
+	}
+	return nil
+}
+
+func (x *RelicsRequest) GetSelectedEvent() *LorePiece {
+	if x != nil {
+		return x.SelectedEvent
+	}
+	return nil
 }
 
 type LorePiece struct {
@@ -1331,13 +1355,16 @@ const file_lore_proto_rawDesc = "" +
 	"\x05count\x18\x02 \x01(\x05R\x05count\"=\n" +
 	"\x0fSettingsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\";\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\"w\n" +
 	"\rEventsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\";\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\x12:\n" +
+	"\x10selected_setting\x18\x03 \x01(\v2\x0f.lore.LorePieceR\x0fselectedSetting\"\xaf\x01\n" +
 	"\rRelicsRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\"\xc9\x01\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\x12:\n" +
+	"\x10selected_setting\x18\x03 \x01(\v2\x0f.lore.LorePieceR\x0fselectedSetting\x126\n" +
+	"\x0eselected_event\x18\x04 \x01(\v2\x0f.lore.LorePieceR\rselectedEvent\"\xc9\x01\n" +
 	"\tLorePiece\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x126\n" +
@@ -1470,53 +1497,56 @@ var file_lore_proto_goTypes = []any{
 	nil,                          // 25: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
-	24, // 0: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
-	5,  // 1: lore.CharactersResponse.characters:type_name -> lore.LorePiece
-	5,  // 2: lore.FactionsResponse.factions:type_name -> lore.LorePiece
-	5,  // 3: lore.SettingsResponse.settings:type_name -> lore.LorePiece
-	5,  // 4: lore.EventsResponse.events:type_name -> lore.LorePiece
-	5,  // 5: lore.RelicsResponse.relics:type_name -> lore.LorePiece
-	5,  // 6: lore.AllResponse.characters:type_name -> lore.LorePiece
-	5,  // 7: lore.AllResponse.factions:type_name -> lore.LorePiece
-	5,  // 8: lore.AllResponse.settings:type_name -> lore.LorePiece
-	5,  // 9: lore.AllResponse.events:type_name -> lore.LorePiece
-	5,  // 10: lore.AllResponse.relics:type_name -> lore.LorePiece
-	5,  // 11: lore.SelectedLorePieces.character:type_name -> lore.LorePiece
-	5,  // 12: lore.SelectedLorePieces.faction:type_name -> lore.LorePiece
-	5,  // 13: lore.SelectedLorePieces.setting:type_name -> lore.LorePiece
-	5,  // 14: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
-	5,  // 15: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
-	13, // 16: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	25, // 17: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
-	13, // 18: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
-	14, // 19: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	19, // 20: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
-	19, // 21: lore.RerankSearchResponse.reranked_worlds:type_name -> lore.WorldResult
-	0,  // 22: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 23: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 24: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 25: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 26: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	11, // 27: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
-	15, // 28: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	17, // 29: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
-	20, // 30: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
-	22, // 31: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
-	6,  // 32: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 33: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 34: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 35: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 36: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 37: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 38: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	18, // 39: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
-	21, // 40: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
-	23, // 41: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
-	32, // [32:42] is the sub-list for method output_type
-	22, // [22:32] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	5,  // 0: lore.EventsRequest.selected_setting:type_name -> lore.LorePiece
+	5,  // 1: lore.RelicsRequest.selected_setting:type_name -> lore.LorePiece
+	5,  // 2: lore.RelicsRequest.selected_event:type_name -> lore.LorePiece
+	24, // 3: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	5,  // 4: lore.CharactersResponse.characters:type_name -> lore.LorePiece
+	5,  // 5: lore.FactionsResponse.factions:type_name -> lore.LorePiece
+	5,  // 6: lore.SettingsResponse.settings:type_name -> lore.LorePiece
+	5,  // 7: lore.EventsResponse.events:type_name -> lore.LorePiece
+	5,  // 8: lore.RelicsResponse.relics:type_name -> lore.LorePiece
+	5,  // 9: lore.AllResponse.characters:type_name -> lore.LorePiece
+	5,  // 10: lore.AllResponse.factions:type_name -> lore.LorePiece
+	5,  // 11: lore.AllResponse.settings:type_name -> lore.LorePiece
+	5,  // 12: lore.AllResponse.events:type_name -> lore.LorePiece
+	5,  // 13: lore.AllResponse.relics:type_name -> lore.LorePiece
+	5,  // 14: lore.SelectedLorePieces.character:type_name -> lore.LorePiece
+	5,  // 15: lore.SelectedLorePieces.faction:type_name -> lore.LorePiece
+	5,  // 16: lore.SelectedLorePieces.setting:type_name -> lore.LorePiece
+	5,  // 17: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
+	5,  // 18: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
+	13, // 19: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
+	25, // 20: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	13, // 21: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
+	14, // 22: lore.FullStoryResponse.story:type_name -> lore.FullStory
+	19, // 23: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
+	19, // 24: lore.RerankSearchResponse.reranked_worlds:type_name -> lore.WorldResult
+	0,  // 25: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 26: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 27: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 28: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 29: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	11, // 30: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	15, // 31: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	17, // 32: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
+	20, // 33: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
+	22, // 34: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
+	6,  // 35: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
+	7,  // 36: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
+	8,  // 37: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
+	9,  // 38: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
+	10, // 39: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
+	12, // 40: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	16, // 41: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	18, // 42: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	21, // 43: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
+	23, // 44: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
+	35, // [35:45] is the sub-list for method output_type
+	25, // [25:35] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
