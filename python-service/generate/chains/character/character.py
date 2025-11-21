@@ -9,14 +9,14 @@ from langfuse import observe
 
 from utils.blacklist import BLACKLIST
 from utils.logger import logger
-from utils.name_tracker import add_generated_name, get_excluded_names
-from utils.appearance_tracker import (
+from .name_tracker import add_generated_name, get_excluded_names
+from .appearance_tracker import (
     get_random_constraints,
     get_excluded_features,
     add_generated_features,
 )
 from generate.models.lore_piece import LorePiece
-from generate.flaw_templates import (
+from .flaw_templates import (
     FlawTemplate,
     get_flaw_by_id,
     get_random_flaw_ids,
@@ -28,7 +28,7 @@ from services.llm_client import (
 )
 from exceptions.generation import CharacterGenerationError
 from utils.format_text import clean_ai_text
-from generate.traits import (
+from .traits import (
     PersonalityTrait,
     get_trait_list_for_prompt,
     get_all_trait_names,

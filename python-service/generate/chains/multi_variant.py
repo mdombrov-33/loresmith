@@ -2,7 +2,7 @@ import asyncio
 
 from generate.models.lore_piece import LorePiece
 from constants.themes import Theme
-from generate.chains.character import generate_character
+from generate.chains.character.character import generate_character
 from generate.chains.faction import generate_faction
 from generate.chains.setting import generate_setting
 from generate.chains.event import generate_event
@@ -58,11 +58,13 @@ async def generate_multiple_characters(
                     appearance=appearance,
                     theme=theme,
                     traits=traits,
-                    skills=skills
+                    skills=skills,
                 )
                 logger.info(f"Published portrait job for {name}")
             else:
-                logger.warning(f"Missing UUID or appearance for {name}, skipping portrait job")
+                logger.warning(
+                    f"Missing UUID or appearance for {name}, skipping portrait job"
+                )
         except Exception as e:
             logger.error(f"Failed to publish portrait job for {character.name}: {e}")
 
@@ -72,30 +74,22 @@ async def generate_multiple_characters(
 async def generate_multiple_factions(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
-    return await generate_multiple_generic(
-        "factions", generate_faction, count, theme
-    )
+    return await generate_multiple_generic("factions", generate_faction, count, theme)
 
 
 async def generate_multiple_settings(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
-    return await generate_multiple_generic(
-        "settings", generate_setting, count, theme
-    )
+    return await generate_multiple_generic("settings", generate_setting, count, theme)
 
 
 async def generate_multiple_events(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
-    return await generate_multiple_generic(
-        "events", generate_event, count, theme
-    )
+    return await generate_multiple_generic("events", generate_event, count, theme)
 
 
 async def generate_multiple_relics(
     count: int = 3, theme: Theme = Theme.post_apocalyptic
 ) -> list[LorePiece]:
-    return await generate_multiple_generic(
-        "relics", generate_relic, count, theme
-    )
+    return await generate_multiple_generic("relics", generate_relic, count, theme)
