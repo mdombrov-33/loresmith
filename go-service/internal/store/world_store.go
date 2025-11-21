@@ -13,21 +13,21 @@ import (
 )
 
 type World struct {
-	ID             int          `json:"id"`
-	UserID         int          `json:"user_id"`
-	UserName       *string      `json:"user_name,omitempty"`
-	Status         string       `json:"status"`
-	Theme          string       `json:"theme"`
-	FullStory      string       `json:"full_story"`
-	LorePieces     []*LorePiece `json:"lore_pieces,omitempty"`
-	SessionID      *int         `json:"session_id,omitempty"`
-	ActiveSessions *int         `json:"active_sessions,omitempty"`
-	PortraitURL    *string      `json:"portrait_url,omitempty"`
-	Visibility     string       `json:"visibility"`
-	CreatedAt      time.Time    `json:"created_at"`
-	UpdatedAt      time.Time    `json:"updated_at"`
-	Relevance      *float64     `json:"relevance,omitempty"`
-	Embedding      []float32    `json:"embedding,omitempty"`
+	ID             int             `json:"id"`
+	UserID         int             `json:"user_id"`
+	UserName       *string         `json:"user_name,omitempty"`
+	Status         string          `json:"status"`
+	Theme          string          `json:"theme"`
+	FullStory      json.RawMessage `json:"full_story"`
+	LorePieces     []*LorePiece    `json:"lore_pieces,omitempty"`
+	SessionID      *int            `json:"session_id,omitempty"`
+	ActiveSessions *int            `json:"active_sessions,omitempty"`
+	PortraitURL    *string         `json:"portrait_url,omitempty"`
+	Visibility     string          `json:"visibility"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+	Relevance      *float64        `json:"relevance,omitempty"`
+	Embedding      []float32       `json:"embedding,omitempty"`
 }
 
 type LorePiece struct {
@@ -105,14 +105,14 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 			VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
 			RETURNING id
 		`, column)
-		args = []interface{}{userID, status, theme, string(storyJSON), vec}
+		args = []interface{}{userID, status, theme, storyJSON, vec}
 	} else {
 		query = `
 			INSERT INTO worlds (user_id, status, theme, full_story, created_at, updated_at)
 			VALUES ($1, $2, $3, $4, NOW(), NOW())
 			RETURNING id
 		`
-		args = []interface{}{userID, status, theme, string(storyJSON)}
+		args = []interface{}{userID, status, theme, storyJSON}
 	}
 
 	err = tx.QueryRow(query, args...).Scan(&worldID)

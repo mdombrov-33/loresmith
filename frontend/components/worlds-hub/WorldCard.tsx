@@ -20,16 +20,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Eye, EyeOff, Star, MessageSquare, Users } from "lucide-react";
+import {
+  HelpCircle,
+  Eye,
+  EyeOff,
+  Star,
+  MessageSquare,
+  Users,
+} from "lucide-react";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { World } from "@/lib/schemas";
-import {
-  useDeleteWorld,
-  useUpdateWorldVisibility,
-} from "@/lib/queries/world";
-import {
-  useDeleteAdventureSession,
-} from "@/lib/queries/adventure";
+import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
+import { useDeleteAdventureSession } from "@/lib/queries/adventure";
 
 interface SearchResultCardProps {
   world: World;
@@ -47,7 +49,7 @@ export default function SearchResultCard({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState<"world" | "session">("world");
 
-  const fullStory = JSON.parse(world.full_story);
+  const fullStory = world.full_story;
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
   const themeBorderColor = themeOption
     ? `border-${themeOption.value}`
@@ -128,7 +130,7 @@ export default function SearchResultCard({
             {world.status.charAt(0).toUpperCase() + world.status.slice(1)}
           </Badge>
         </div>
-        <CardTitle className="line-clamp-2 text-lg transition-colors duration-200 group-hover:text-primary mt-2">
+        <CardTitle className="group-hover:text-primary mt-2 line-clamp-2 text-lg transition-colors duration-200">
           {fullStory.quest?.title || "Untitled World"}
         </CardTitle>
         {world.user_name && (
@@ -142,7 +144,7 @@ export default function SearchResultCard({
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
             {/* Star Rating */}
             <div className="flex items-center gap-1">
-              <Star className="text-amber-400 h-3.5 w-3.5 fill-amber-400" />
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               <span className="text-foreground font-medium">0.0</span>
               <span className="text-muted-foreground">(0)</span>
             </div>
@@ -154,14 +156,16 @@ export default function SearchResultCard({
             </div>
 
             {/* Active Players */}
-            {world.active_sessions !== undefined && world.active_sessions > 0 && (
-              <div className="flex items-center gap-1 text-green-400">
-                <Users className="h-3.5 w-3.5" />
-                <span>
-                  {world.active_sessions} {world.active_sessions === 1 ? "player" : "players"}
-                </span>
-              </div>
-            )}
+            {world.active_sessions !== undefined &&
+              world.active_sessions > 0 && (
+                <div className="flex items-center gap-1 text-green-400">
+                  <Users className="h-3.5 w-3.5" />
+                  <span>
+                    {world.active_sessions}{" "}
+                    {world.active_sessions === 1 ? "player" : "players"}
+                  </span>
+                </div>
+              )}
           </div>
         )}
       </CardHeader>
@@ -182,7 +186,7 @@ export default function SearchResultCard({
           )}
 
           {/* Text content */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
               {fullStory.content || "No description available"}
             </p>

@@ -25,12 +25,8 @@ export default function MyHubActions({ myWorlds }: MyHubActionsProps) {
 
   const lastActiveWorldTitle = lastActiveWorld
     ? (() => {
-        try {
-          const fullStory = JSON.parse(lastActiveWorld.full_story);
-          return fullStory?.quest?.title || "Your Adventure";
-        } catch {
-          return "Your Adventure";
-        }
+        const fullStory = lastActiveWorld.full_story;
+        return fullStory?.quest?.title || "Your Adventure";
       })()
     : null;
 
@@ -84,7 +80,7 @@ export default function MyHubActions({ myWorlds }: MyHubActionsProps) {
           />
           <div className="relative flex items-center justify-between gap-4">
             <div>
-              <div className="text-primary mb-1 text-xs font-semibold uppercase tracking-wider">
+              <div className="text-primary mb-1 text-xs font-semibold tracking-wider uppercase">
                 Continue Your Adventure
               </div>
               <div className="text-foreground text-xl font-bold">

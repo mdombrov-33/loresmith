@@ -29,17 +29,12 @@ export function useWorldsLogic() {
   if (error) {
     displayError = "Failed to load world";
   } else if (world?.full_story) {
-    try {
-      parsedStory = JSON.parse(world.full_story);
-    } catch (e) {
-      displayError = "Failed to parse world story";
-    }
+    //* full_story is JSONB
+    parsedStory = world.full_story as FullStory;
   }
 
   const paragraphs = parsedStory?.content?.split("\n\n").filter(Boolean) || [];
 
-  // Use lore_pieces from database (has R2 URLs) instead of full_story JSON
-  // Sort so character is first
   const lorePieces = (world?.lore_pieces || []).sort((a, b) => {
     if (a.type === "character") return -1;
     if (b.type === "character") return 1;

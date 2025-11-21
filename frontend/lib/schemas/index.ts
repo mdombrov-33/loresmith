@@ -85,7 +85,7 @@ export const worldSchema = z.object({
   user_name: z.string().optional(),
   status: z.string(),
   theme: z.string(),
-  full_story: z.string(),
+  full_story: fullStorySchema,
   lore_pieces: z.array(lorePieceSchema).optional(),
   session_id: z.number().optional(),
   active_sessions: z.number().optional(),

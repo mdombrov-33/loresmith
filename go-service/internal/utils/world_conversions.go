@@ -18,7 +18,7 @@ func ConvertToWorldResults(worlds []*store.World) []*lorepb.WorldResult {
 		results[i] = &lorepb.WorldResult{
 			Title:     strconv.Itoa(world.ID), //* Convert int to string
 			Theme:     world.Theme,
-			FullStory: world.FullStory,
+			FullStory: string(world.FullStory), //* Convert json.RawMessage ([]byte) to string
 			Relevance: relevance,
 			Embedding: world.Embedding,
 		}
