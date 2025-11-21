@@ -31,20 +31,26 @@ class SettingsRequest(_message.Message):
     def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class EventsRequest(_message.Message):
-    __slots__ = ("theme", "count")
+    __slots__ = ("theme", "count", "selected_setting")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SETTING_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
+    selected_setting: LorePiece
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., selected_setting: _Optional[_Union[LorePiece, _Mapping]] = ...) -> None: ...
 
 class RelicsRequest(_message.Message):
-    __slots__ = ("theme", "count")
+    __slots__ = ("theme", "count", "selected_setting", "selected_event")
     THEME_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_SETTING_FIELD_NUMBER: _ClassVar[int]
+    SELECTED_EVENT_FIELD_NUMBER: _ClassVar[int]
     theme: str
     count: int
-    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
+    selected_setting: LorePiece
+    selected_event: LorePiece
+    def __init__(self, theme: _Optional[str] = ..., count: _Optional[int] = ..., selected_setting: _Optional[_Union[LorePiece, _Mapping]] = ..., selected_event: _Optional[_Union[LorePiece, _Mapping]] = ...) -> None: ...
 
 class LorePiece(_message.Message):
     __slots__ = ("name", "description", "details", "type")

@@ -84,12 +84,25 @@ async def generate_multiple_settings(
 
 
 async def generate_multiple_events(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int,
+    theme: Theme,
+    setting: LorePiece
 ) -> list[LorePiece]:
-    return await generate_multiple_generic("events", generate_event, count, theme)
+    events = []
+    for _ in range(count):
+        event = await generate_event(theme, setting=setting)
+        events.append(event)
+    return events
 
 
 async def generate_multiple_relics(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int,
+    theme: Theme,
+    setting: LorePiece,
+    event: LorePiece
 ) -> list[LorePiece]:
-    return await generate_multiple_generic("relics", generate_relic, count, theme)
+    relics = []
+    for _ in range(count):
+        relic = await generate_relic(theme, setting=setting, event=event)
+        relics.append(relic)
+    return relics

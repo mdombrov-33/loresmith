@@ -34,11 +34,14 @@ message SettingsRequest {
 message EventsRequest {
   string theme = 1;
   int32 count = 2;
+  LorePiece selected_setting = 3;
 }
 
 message RelicsRequest {
   string theme = 1;
   int32 count = 2;
+  LorePiece selected_setting = 3;
+  LorePiece selected_event = 4;
 }
 
 message LorePiece {

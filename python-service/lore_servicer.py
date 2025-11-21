@@ -81,24 +81,40 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
         )
 
     async def GenerateEvents(self, request, context):
-        return await self._handle_lore_generation(
-            generate_multiple_events,
-            lore_pb2.EventsResponse,
-            "events",
-            "Event generation failed",
-            request,
-            context,
-        )
+        try:
+            setting = convert_lore_piece(request.selected_setting) if request.HasField("selected_setting") else None
+            if not setting:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("selected_setting is required for event generation")
+                return lore_pb2.EventsResponse()
+
+            events = await generate_multiple_events(request.count, request.theme, setting)
+            grpc_events = [convert_to_grpc_lore_piece(event) for event in events]
+            return lore_pb2.EventsResponse(events=grpc_events)
+        except Exception as e:
+            logger.error(f"Event generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Event generation failed: {str(e)}")
+            return lore_pb2.EventsResponse()
 
     async def GenerateRelics(self, request, context):
-        return await self._handle_lore_generation(
-            generate_multiple_relics,
-            lore_pb2.RelicsResponse,
-            "relics",
-            "Relic generation failed",
-            request,
-            context,
-        )
+        try:
+            setting = convert_lore_piece(request.selected_setting) if request.HasField("selected_setting") else None
+            event = convert_lore_piece(request.selected_event) if request.HasField("selected_event") else None
+
+            if not setting or not event:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("selected_setting and selected_event are required for relic generation")
+                return lore_pb2.RelicsResponse()
+
+            relics = await generate_multiple_relics(request.count, request.theme, setting, event)
+            grpc_relics = [convert_to_grpc_lore_piece(relic) for relic in relics]
+            return lore_pb2.RelicsResponse(relics=grpc_relics)
+        except Exception as e:
+            logger.error(f"Relic generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Relic generation failed: {str(e)}")
+            return lore_pb2.RelicsResponse()
 
     async def GenerateAll(self, request, context):
         """Generate all lore types in parallel."""

@@ -7,24 +7,63 @@ export async function generateLore(
   theme?: string,
   count: number = 3,
   signal?: AbortSignal,
+  selectedLore?: SelectedLore,
 ): Promise<LorePiece[]> {
   const storeTheme = useAppStore.getState().theme;
   const finalTheme = theme || storeTheme;
-  const url = `${API_BASE_URL}/generate/${category}?theme=${finalTheme}&count=${count}`;
 
-  const response = await fetchWithTimeout(url, {
-    method: "GET",
-    headers: await getAuthHeaders(),
-    signal, //* Pass the abort signal from React Query
-  });
+  if (category === "events" || category === "relics") {
+    const url = `${API_BASE_URL}/generate/${category}`;
+    const body: any = {
+      theme: finalTheme,
+      count,
+    };
 
-  if (!response.ok) {
-    throw new Error(`Failed to generate ${category}: ${response.statusText}`);
+    if (category === "events") {
+      if (!selectedLore?.setting) {
+        throw new Error("Setting must be selected before generating events");
+      }
+      body.selectedSetting = selectedLore.setting;
+    }
+
+    if (category === "relics") {
+      if (!selectedLore?.setting || !selectedLore?.event) {
+        throw new Error("Setting and Event must be selected before generating relics");
+      }
+      body.selectedSetting = selectedLore.setting;
+      body.selectedEvent = selectedLore.event;
+    }
+
+    const response = await fetchWithTimeout(url, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to generate ${category}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data[category] || data;
+  } else {
+    const url = `${API_BASE_URL}/generate/${category}?theme=${finalTheme}&count=${count}`;
+
+    const response = await fetchWithTimeout(url, {
+      method: "GET",
+      headers: await getAuthHeaders(),
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to generate ${category}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const result = data[category] || data;
+    return result;
   }
-
-  const data = await response.json();
-  const result = data[category] || data;
-  return result;
 }
 
 export async function generateFullStory(

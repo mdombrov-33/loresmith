@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLore, generateFullStory, generateDraft } from "@/lib/api/generation";
 import { SelectedLore } from "@/lib/schemas";
 import { queryKeys } from "./keys";
+import { useAppStore } from "@/stores/appStore";
 
 export function useGenerateLore(
   category: "characters" | "factions" | "settings" | "events" | "relics",
@@ -9,15 +10,17 @@ export function useGenerateLore(
   count: number = 3,
   enabled: boolean = false,
 ) {
+  const selectedLore = useAppStore((state) => state.selectedLore);
+
   return useQuery({
     queryKey: queryKeys.lore(category, theme, count),
-    queryFn: ({ signal }) => generateLore(category, theme, count, signal), //* Pass abort signal
+    queryFn: ({ signal }) => generateLore(category, theme, count, signal, selectedLore),
     enabled,
-    staleTime: Infinity, // Never mark data as stale
-    gcTime: 0, // Don't cache aborted/failed requests
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnReconnect: false, // Don't refetch on network reconnect
-    retry: false, // Don't retry failed requests automatically
+    staleTime: Infinity,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
   });
 }
 

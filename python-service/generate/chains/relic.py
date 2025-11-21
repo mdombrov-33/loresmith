@@ -1,5 +1,3 @@
-from typing import Union
-
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -20,16 +18,22 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
 @observe()
-async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
-    """
-    Generate a relic/artifact by prompting for:
-    name, description, and history.
-    Theme controls the genre/world setting.
-    """
+async def generate_relic(
+    theme: str = "post-apocalyptic",
+    setting: LorePiece | None = None,
+    event: LorePiece | None = None,
+) -> LorePiece:
     try:
-        # Load shared theme references
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
+
+        lore_context = ""
+        if setting and event:
+            lore_context = f"This relic is connected to:\nLocation: {setting.name} - {setting.description}\nEvent: {event.name} - {event.description}\n\nNaturally reference this location and/or event in the relic's description."
+        elif setting:
+            lore_context = f"This relic is found at:\nLocation: {setting.name} - {setting.description}\n\nNaturally reference this location in the relic's description."
+        elif event:
+            lore_context = f"This relic is connected to:\nEvent: {event.name} - {event.description}\n\nNaturally reference this event in the relic's description."
 
         # Generate Name
         with open("generate/prompts/relic/relic_name.txt", "r") as f:
@@ -39,7 +43,11 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
         name_raw = await name_chain.ainvoke(
-            {"theme": theme, "theme_references": theme_references, "blacklist": blacklist_str}
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "blacklist": blacklist_str,
+            }
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated relic name: {name}")
@@ -52,7 +60,12 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
         description_llm = get_llm(max_tokens=150)
         description_chain = description_prompt | description_llm | StrOutputParser()
         description_raw = await description_chain.ainvoke(
-            {"theme": theme, "theme_references": theme_references, "name": name}
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "name": name,
+                "lore_context": lore_context,
+            }
         )
         description = clean_ai_text(description_raw)
         logger.info(f"Generated description for {name}")
@@ -86,7 +99,7 @@ async def generate_relic(theme: str = "post-apocalyptic") -> LorePiece:
             f"Failed to generate relic for theme {theme}: {str(e)}"
         )
 
-    details: dict[str, Union[str, str]] = {"history": history}
+    details: dict[str, str | str] = {"history": history}
 
     return LorePiece(
         name=name,
