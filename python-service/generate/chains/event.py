@@ -1,9 +1,15 @@
+from typing import cast
+
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from langfuse import observe
 
 from generate.models.lore_piece import LorePiece
+from generate.models.structured_llm_output.event_schema import (
+    EventDescription,
+    EventImpact,
+)
 from services.llm_client import (
     get_llm,
     increment_success_counter,
@@ -51,17 +57,20 @@ async def generate_event(
             description_prompt_text = f.read()
 
         description_prompt = PromptTemplate.from_template(description_prompt_text)
-        description_llm = get_llm(max_tokens=200)
-        description_chain = description_prompt | description_llm | StrOutputParser()
-        description_raw = await description_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "setting_context": setting_context,
-            }
+        description_llm = get_llm(max_tokens=200).with_structured_output(EventDescription)
+        description_chain = description_prompt | description_llm
+        description_result = cast(
+            EventDescription,
+            await description_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "setting_context": setting_context,
+                }
+            )
         )
-        description = clean_ai_text(description_raw)
+        description = description_result.description
         logger.info(f"Generated description for {name}")
 
         # Generate Impact
@@ -69,17 +78,20 @@ async def generate_event(
             impact_prompt_text = f.read()
 
         impact_prompt = PromptTemplate.from_template(impact_prompt_text)
-        impact_llm = get_llm(max_tokens=150)
-        impact_chain = impact_prompt | impact_llm | StrOutputParser()
-        impact_raw = await impact_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "description": description,
-            }
+        impact_llm = get_llm(max_tokens=150).with_structured_output(EventImpact)
+        impact_chain = impact_prompt | impact_llm
+        impact_result = cast(
+            EventImpact,
+            await impact_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "description": description,
+                }
+            )
         )
-        impact = clean_ai_text(impact_raw)
+        impact = impact_result.impact
         logger.info(f"Generated impact for {name}")
 
         increment_success_counter()

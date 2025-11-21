@@ -1,8 +1,3 @@
-"""
-Pydantic schemas for structured character generation.
-Forces LLM to return valid structured data - no manual parsing needed.
-"""
-
 from pydantic import BaseModel, Field
 
 

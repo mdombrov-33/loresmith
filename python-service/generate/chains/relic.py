@@ -1,9 +1,15 @@
+from typing import cast
+
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from langfuse import observe
 
 from generate.models.lore_piece import LorePiece
+from generate.models.structured_llm_output.relic_schema import (
+    RelicDescription,
+    RelicHistory,
+)
 from services.llm_client import (
     get_llm,
     increment_success_counter,
@@ -57,17 +63,20 @@ async def generate_relic(
             description_prompt_text = f.read()
 
         description_prompt = PromptTemplate.from_template(description_prompt_text)
-        description_llm = get_llm(max_tokens=150)
-        description_chain = description_prompt | description_llm | StrOutputParser()
-        description_raw = await description_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "lore_context": lore_context,
-            }
+        description_llm = get_llm(max_tokens=150).with_structured_output(RelicDescription)
+        description_chain = description_prompt | description_llm
+        description_result = cast(
+            RelicDescription,
+            await description_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "lore_context": lore_context,
+                }
+            )
         )
-        description = clean_ai_text(description_raw)
+        description = description_result.description
         logger.info(f"Generated description for {name}")
 
         # Generate History
@@ -75,17 +84,20 @@ async def generate_relic(
             history_prompt_text = f.read()
 
         history_prompt = PromptTemplate.from_template(history_prompt_text)
-        history_llm = get_llm(max_tokens=150)
-        history_chain = history_prompt | history_llm | StrOutputParser()
-        history_raw = await history_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "description": description,
-            }
+        history_llm = get_llm(max_tokens=150).with_structured_output(RelicHistory)
+        history_chain = history_prompt | history_llm
+        history_result = cast(
+            RelicHistory,
+            await history_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "description": description,
+                }
+            )
         )
-        history = clean_ai_text(history_raw)
+        history = history_result.history
         logger.info(f"Generated history for {name}")
 
         increment_success_counter()

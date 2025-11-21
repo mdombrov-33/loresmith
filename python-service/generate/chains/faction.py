@@ -1,4 +1,4 @@
-from typing import Union
+from typing import cast
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -6,6 +6,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langfuse import observe
 
 from generate.models.lore_piece import LorePiece
+from generate.models.structured_llm_output.faction_schema import (
+    FactionIdeology,
+    FactionAppearance,
+    FactionSummary,
+)
 from services.llm_client import (
     get_llm,
     increment_success_counter,
@@ -39,7 +44,11 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         name_llm = get_llm(max_tokens=50)
         name_chain = name_prompt | name_llm | StrOutputParser()
         name_raw = await name_chain.ainvoke(
-            {"theme": theme, "theme_references": theme_references, "blacklist": blacklist_str}
+            {
+                "theme": theme,
+                "theme_references": theme_references,
+                "blacklist": blacklist_str,
+            }
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated faction name: {name}")
@@ -49,10 +58,15 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
             ideology_prompt_text = f.read()
 
         ideology_prompt = PromptTemplate.from_template(ideology_prompt_text)
-        ideology_llm = get_llm(max_tokens=100)
-        ideology_chain = ideology_prompt | ideology_llm | StrOutputParser()
-        ideology_raw = await ideology_chain.ainvoke({"theme": theme, "theme_references": theme_references, "name": name})
-        ideology = clean_ai_text(ideology_raw)
+        ideology_llm = get_llm(max_tokens=100).with_structured_output(FactionIdeology)
+        ideology_chain = ideology_prompt | ideology_llm
+        ideology_result = cast(
+            FactionIdeology,
+            await ideology_chain.ainvoke(
+                {"theme": theme, "theme_references": theme_references, "name": name}
+            ),
+        )
+        ideology = ideology_result.ideology
         logger.info(f"Generated ideology for {name}")
 
         # Generate Appearance
@@ -60,17 +74,22 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
             appearance_prompt_text = f.read()
 
         appearance_prompt = PromptTemplate.from_template(appearance_prompt_text)
-        appearance_llm = get_llm(max_tokens=150)
-        appearance_chain = appearance_prompt | appearance_llm | StrOutputParser()
-        appearance_raw = await appearance_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "ideology": ideology,
-            }
+        appearance_llm = get_llm(max_tokens=150).with_structured_output(
+            FactionAppearance
         )
-        appearance = clean_ai_text(appearance_raw)
+        appearance_chain = appearance_prompt | appearance_llm
+        appearance_result = cast(
+            FactionAppearance,
+            await appearance_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "ideology": ideology,
+                }
+            ),
+        )
+        appearance = appearance_result.appearance
         logger.info(f"Generated appearance for {name}")
 
         # Generate Summary
@@ -78,18 +97,21 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
             summary_prompt_text = f.read()
 
         summary_prompt = PromptTemplate.from_template(summary_prompt_text)
-        summary_llm = get_llm(max_tokens=200)
-        summary_chain = summary_prompt | summary_llm | StrOutputParser()
-        summary_raw = await summary_chain.ainvoke(
-            {
-                "theme": theme,
-                "theme_references": theme_references,
-                "name": name,
-                "ideology": ideology,
-                "appearance": appearance,
-            }
+        summary_llm = get_llm(max_tokens=200).with_structured_output(FactionSummary)
+        summary_chain = summary_prompt | summary_llm
+        summary_result = cast(
+            FactionSummary,
+            await summary_chain.ainvoke(
+                {
+                    "theme": theme,
+                    "theme_references": theme_references,
+                    "name": name,
+                    "ideology": ideology,
+                    "appearance": appearance,
+                }
+            ),
         )
-        summary = clean_ai_text(summary_raw)
+        summary = summary_result.summary
         logger.info(f"Generated summary for {name}")
 
         increment_success_counter()
@@ -103,7 +125,7 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
             f"Failed to generate faction for theme {theme}: {str(e)}"
         )
 
-    details: dict[str, Union[str, str]] = {
+    details: dict[str, str] = {
         "ideology": ideology,
         "appearance": appearance,
     }
