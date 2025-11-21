@@ -123,6 +123,7 @@ export default function GeneratedShowcase() {
               alt="Eira Flynn"
               objectFit="contain"
               height="h-56"
+              priority={true}
             />
             <div className="flex flex-col p-4">
               <div className="mb-2 flex items-center justify-between">
@@ -152,6 +153,7 @@ export default function GeneratedShowcase() {
               objectFit="contain"
               height="h-48"
               className="mb-4"
+              priority={true}
             />
             <div className="space-y-3 px-4 pb-4">
               {/* Traits + Health/Stress Row */}

@@ -6,6 +6,7 @@ interface CardImageProps {
   className?: string;
   objectFit?: "cover" | "contain";
   height?: string;
+  priority?: boolean;
 }
 
 export default function CardImage({
@@ -13,7 +14,8 @@ export default function CardImage({
   alt,
   className = "",
   objectFit = "cover",
-  height = "h-48"
+  height = "h-48",
+  priority = false
 }: CardImageProps) {
   //* Only render if image exists and is valid (file path, URL, or data URI)
   if (!src || src === "None") {
@@ -55,7 +57,34 @@ export default function CardImage({
     );
   }
 
-  //* For file paths, use Next.js Image for optimization
+  //* For priority images (homepage), use regular img to avoid lazy load issues
+  if (priority) {
+    return (
+      <div className={`relative ${height} w-full overflow-hidden ${className}`}>
+        {/* Blurred background for contain mode */}
+        {objectFit === "contain" && (
+          <div className="absolute inset-0">
+            <img
+              src={src}
+              alt=""
+              className="h-full w-full object-cover blur-xl opacity-30 scale-110"
+              aria-hidden="true"
+            />
+          </div>
+        )}
+        {/* Main image */}
+        <div className="relative h-full w-full">
+          <img
+            src={src}
+            alt={alt}
+            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover"}`}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  //* For non-priority, use Next.js Image for optimization
   return (
     <div className={`relative ${height} w-full overflow-hidden ${className}`}>
       {/* Blurred background for contain mode */}

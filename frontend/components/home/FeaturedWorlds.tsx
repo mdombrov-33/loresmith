@@ -83,6 +83,7 @@ export default function FeaturedWorlds() {
                           alt={character?.name || "World character"}
                           objectFit="contain"
                           height="h-64"
+                          priority={true}
                         />
                         {/* Gradient overlay - scales with image */}
                         <div className="from-card/95 via-card/40 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent" />
