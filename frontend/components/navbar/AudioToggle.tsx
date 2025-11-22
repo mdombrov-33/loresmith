@@ -83,30 +83,23 @@ export function AudioToggle() {
         const progress = Math.min(elapsed / duration, 1);
         audio.volume = startVolume + (targetVolume - startVolume) * progress;
 
-        if (progress < 1) {
-          requestAnimationFrame(fade);
-        } else {
-          resolve();
-        }
+        if (progress < 1) requestAnimationFrame(fade);
+        else resolve();
       };
 
       fade();
     });
   };
-  // Use visual theme for world pages, otherwise use audioTheme
+
   const effectiveAudioTheme = useMemo(() => {
     if (pathname.startsWith("/worlds/")) {
-      // Extract theme from URL path
       const pathSegments = pathname.split("/");
       return pathSegments[2] || audioTheme;
     } else if (pathname.startsWith("/adventure/")) {
-      // For adventure pages, use the current theme (should be set by the page)
       return theme;
     } else if (pathname === "/worlds-hub") {
-      // Keep the theme from when they entered the hub
       return initialAudioTheme || audioTheme;
     } else {
-      // Home or other pages - use current audioTheme
       return audioTheme;
     }
   }, [pathname, theme, audioTheme, initialAudioTheme]);
@@ -123,7 +116,6 @@ export function AudioToggle() {
     }
   }, [pathname, audioTheme]);
 
-  // Sync audioTheme when not on hub
   useEffect(() => {
     if (pathname !== "/worlds-hub") {
       setAudioTheme(effectiveAudioTheme);
@@ -139,14 +131,30 @@ export function AudioToggle() {
     [playlist],
   );
 
-  useEffect(() => {
-    if (!audioRef.current) return;
+  // Helper to calculate current track
+  const getCurrentTrack = () => {
+    const now = Math.floor(Date.now() / 1000);
+    const elapsed = (now - RADIO_START_EPOCH) % totalDuration;
 
-    if (playlist.length === 0) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-      return;
+    let cumulative = 0;
+    let currentIndex = 0;
+    let seekTime = 0;
+
+    for (let i = 0; i < playlist.length; i++) {
+      const track = playlist[i];
+      if (elapsed < cumulative + track.duration) {
+        currentIndex = i;
+        seekTime = elapsed - cumulative;
+        break;
+      }
+      cumulative += track.duration;
     }
+
+    return { currentIndex, seekTime };
+  };
+
+  useEffect(() => {
+    if (!audioRef.current || playlist.length === 0) return;
 
     const isThemeChange =
       prevEffectiveAudioThemeRef.current !== effectiveAudioTheme;
@@ -154,28 +162,11 @@ export function AudioToggle() {
 
     const switchAudio = async () => {
       const audio = audioRef.current!;
-
       if (isPlaying && isThemeChange) {
         await fadeAudio(0, 500);
       }
 
-      const now = Math.floor(Date.now() / 1000);
-      const elapsed = (now - RADIO_START_EPOCH) % totalDuration;
-
-      let cumulative = 0;
-      let currentIndex = 0;
-      let seekTime = 0;
-
-      for (let i = 0; i < playlist.length; i++) {
-        const track = playlist[i];
-        if (elapsed < cumulative + track.duration) {
-          currentIndex = i;
-          seekTime = elapsed - cumulative;
-          break;
-        }
-        cumulative += track.duration;
-      }
-
+      const { currentIndex, seekTime } = getCurrentTrack();
       audio.src = playlist[currentIndex].url;
       audio.currentTime = seekTime;
 
@@ -190,30 +181,23 @@ export function AudioToggle() {
 
     switchAudio();
 
-    const handleEnded = () => {
-      const now = Math.floor(Date.now() / 1000);
-      const elapsed = (now - RADIO_START_EPOCH) % totalDuration;
+    const handleEnded = async () => {
+      if (!audioRef.current) return;
 
-      let cumulative = 0;
-      let currentIndex = 0;
-      let seekTime = 0;
+      const delayBetweenTracks = 500; // 500ms delay between tracks
+      await fadeAudio(0, 200); // fade out
 
-      for (let i = 0; i < playlist.length; i++) {
-        const track = playlist[i];
-        if (elapsed < cumulative + track.duration) {
-          currentIndex = i;
-          seekTime = elapsed - cumulative;
-          break;
+      setTimeout(async () => {
+        const { currentIndex, seekTime } = getCurrentTrack();
+        const audio = audioRef.current!;
+        audio.src = playlist[currentIndex].url;
+        audio.currentTime = seekTime;
+
+        if (isPlaying) {
+          audio.play().catch(() => {});
+          await fadeAudio(volumeRef.current, 200); // fade in
         }
-        cumulative += track.duration;
-      }
-
-      const audio = audioRef.current!;
-      audio.src = playlist[currentIndex].url;
-      audio.currentTime = seekTime;
-      if (isPlaying) {
-        audio.play().catch(() => {});
-      }
+      }, delayBetweenTracks);
     };
 
     const audioElement = audioRef.current;
@@ -262,7 +246,7 @@ export function AudioToggle() {
             <VolumeX className="h-4 w-4" />
           )
         }
-      ></ActionButton>
+      />
       {isPlaying && (
         <Slider
           value={volume}
