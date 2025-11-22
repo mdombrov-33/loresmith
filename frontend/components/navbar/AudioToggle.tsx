@@ -20,6 +20,10 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
       url: `${R2_MUSIC_URL}/norse-mythology/ambient_norse02.mp3`,
       duration: 357,
     },
+    {
+      url: `${R2_MUSIC_URL}/norse-mythology/ambient_norse03.mp3`,
+      duration: 159,
+    },
   ],
   fantasy: [
     { url: `${R2_MUSIC_URL}/fantasy/ambient_fantasy01.mp3`, duration: 254 },
@@ -28,6 +32,7 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
   cyberpunk: [
     { url: `${R2_MUSIC_URL}/cyberpunk/ambient_cyberpunk01.mp3`, duration: 244 },
     { url: `${R2_MUSIC_URL}/cyberpunk/ambient_cyberpunk02.mp3`, duration: 193 },
+    { url: `${R2_MUSIC_URL}/cyberpunk/ambient_cyberpunk03.mp3`, duration: 118 },
   ],
   "post-apocalyptic": [
     {
@@ -42,6 +47,8 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
   steampunk: [
     { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk01.mp3`, duration: 219 },
     { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk02.mp3`, duration: 145 },
+    { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk03.mp3`, duration: 218 },
+    { url: `${R2_MUSIC_URL}/steampunk/ambient_steampunk04.mp3`, duration: 190 },
   ],
 };
 
