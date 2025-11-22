@@ -13,3 +13,5 @@ Examples:
 - Defeat the Shadow Prophet
 
 Respond only with the quest title, no quotes or other text.
+
+Example: Beyond the Frayed Edge of Fate, not "Beyond the Frayed Edge of Fate".

@@ -4,7 +4,7 @@
 
 You are a skilled storyteller creating the opening chapter of a {theme} narrative.
 
-Weave these elements into a compelling story opening (8-10 sentences, 200-250 words, 2 paragraphs):
+Weave these elements into a compelling story opening (6-8 sentences, 150-200 words, 2 paragraphs):
 
 Character: {character_name}
 {character_description}
@@ -27,13 +27,13 @@ Relic: {relic_name}
 {relic_details}
 
 STRUCTURE:
-Paragraph 1 (4-5 sentences): Open with atmosphere and character in their world
+Paragraph 1 (2-3 sentences): Open with atmosphere and character in their world
 - Use ONE of the 5 opening styles below
 - Establish the world's current mood and state
 - Show the character's personality through actions/reactions
 - Mention specific details from the lore organically (don't list them)
 
-Paragraph 2 (4-5 sentences): Deepen the world and character's situation
+Paragraph 2 (3-5 sentences): Deepen the world and character's situation
 - Weave in the current tensions (faction conflicts, event aftermath, relic mysteries)
 - Show what forces are at play in this world
 - Let the character exist in this complex situation naturally
@@ -57,7 +57,7 @@ OPTION 5 - Faction/World-first: "{faction_name} [their action/state]. {character
 Example: "The Magisters are burning libraries again. Kaito's already inside the last one, downloading everything."
 
 CRITICAL RULES:
-- 200-250 words total, 8-10 sentences, 2 paragraphs
+- 150-200 words total, 6-8 sentences, 2 paragraphs
 - Show character personality through actions, not descriptions
 - Weave all lore elements naturally - no single element should dominate
 - Mention specific details organically
@@ -72,4 +72,4 @@ BANNED PHRASES:
 - "his/her thoughts drifted", "readied himself/herself", "finds themselves", "came to realize"
 - "little did they know", "what they didn't know", "meanwhile", "beckoned"
 
-Output: Plain text, 2 paragraphs, 200-250 words, no quotes/markdown.
+Output: Plain text, 2 paragraphs, 150-200 words, no quotes/markdown.
