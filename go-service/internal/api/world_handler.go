@@ -216,6 +216,8 @@ func (h *WorldHandler) HandleGetWorldById(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	currentUser := middleware.GetUser(r)
+
 	world, err := h.worldStore.GetWorldById(worldID)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get world: %v", err)
@@ -235,6 +237,14 @@ func (h *WorldHandler) HandleGetWorldById(w http.ResponseWriter, r *http.Request
 		} else {
 			world.ActiveSessions = &count
 		}
+	}
+
+	//* Get user's rating for this world
+	userRating, err := h.worldStore.GetUserRating(worldID, int(currentUser.ID))
+	if err != nil {
+		h.logger.Printf("WARNING: Failed to get user rating for world %d: %v", worldID, err)
+	} else if userRating != nil {
+		world.UserRating = userRating
 	}
 
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"world": world})

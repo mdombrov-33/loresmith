@@ -189,8 +189,8 @@ export default function ExpandableWorldCards({
                       </Badge>
                       {/* Social metadata */}
                       <div className="flex items-center gap-1 text-xs">
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                        <span className="font-medium">0.0</span>
+                        <Star className={`h-3 w-3 ${active.rating && active.rating > 0 ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+                        <span className="font-medium">{active.rating && active.rating > 0 ? active.rating.toFixed(1) : "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <MessageSquare className="h-3 w-3" />
@@ -325,8 +325,8 @@ export default function ExpandableWorldCards({
                     {/* Social metadata preview */}
                     <div className="flex items-center gap-3 text-xs">
                       <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                        <span className="font-medium">0.0</span>
+                        <Star className={`h-3 w-3 ${world.rating && world.rating > 0 ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+                        <span className="font-medium">{world.rating && world.rating > 0 ? world.rating.toFixed(1) : "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <MessageSquare className="h-3 w-3" />
@@ -422,8 +422,8 @@ export default function ExpandableWorldCards({
                   {/* Social metadata preview */}
                   <div className="mt-2 flex items-center gap-3 text-xs">
                     <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span className="font-medium">0.0</span>
+                      <Star className={`h-3 w-3 ${world.rating && world.rating > 0 ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+                      <span className="font-medium">{world.rating && world.rating > 0 ? world.rating.toFixed(1) : "N/A"}</span>
                     </div>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <MessageSquare className="h-3 w-3" />

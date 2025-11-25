@@ -221,6 +221,16 @@ func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 		return nil, err
 	}
 
+	//* Get rating data
+	avgRating, ratingCount, err := s.GetWorldRating(worldID)
+	if err != nil {
+		return nil, err
+	}
+	if avgRating != nil && ratingCount != nil {
+		world.Rating = avgRating
+		world.RatingCount = ratingCount
+	}
+
 	rows, err := s.db.Query(`
         SELECT id, world_id, type, name, description, details, created_at
         FROM lore_pieces WHERE world_id = $1

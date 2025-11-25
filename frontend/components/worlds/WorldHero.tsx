@@ -77,10 +77,7 @@ export default function WorldHero({
 
                 {/* Rating Display */}
                 {rating !== undefined && rating !== null && ratingCount !== undefined && ratingCount > 0 ? (
-                  <button
-                    onClick={() => setRatingDialogOpen(true)}
-                    className="hover:bg-accent flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
-                  >
+                  <div className="flex items-center gap-1.5 px-2 py-1">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -96,12 +93,9 @@ export default function WorldHero({
                     <span className="text-foreground text-sm font-medium">
                       {rating.toFixed(1)} ({ratingCount})
                     </span>
-                  </button>
+                  </div>
                 ) : (
-                  <button
-                    onClick={() => setRatingDialogOpen(true)}
-                    className="hover:bg-accent flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
-                  >
+                  <div className="flex items-center gap-1.5 px-2 py-1">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -111,7 +105,7 @@ export default function WorldHero({
                       ))}
                     </div>
                     <span className="text-muted-foreground text-sm">No ratings yet</span>
-                  </button>
+                  </div>
                 )}
               </div>
 
