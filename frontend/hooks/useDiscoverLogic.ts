@@ -64,7 +64,7 @@ export function useDiscoverLogic() {
     status: "published",
     limit: 6,
     offset: 0,
-    // TODO: Add sort by rating DESC when backend supports it
+    sort: "rating_desc",
   });
 
   // Fetch trending worlds (most active)
@@ -76,7 +76,7 @@ export function useDiscoverLogic() {
     status: "published",
     limit: 6,
     offset: 0,
-    // TODO: Add sort by active_sessions DESC when backend supports it
+    sort: "active_sessions_desc",
   });
 
   // Fetch recently created worlds
@@ -88,7 +88,7 @@ export function useDiscoverLogic() {
     status: "published",
     limit: 6,
     offset: 0,
-    // TODO: Add sort by created_at DESC when backend supports it
+    sort: "created_at_desc",
   });
 
   // Fetch all worlds with filters

@@ -24,6 +24,7 @@ export async function getWorlds(filters?: {
   limit?: number;
   offset?: number;
   search?: string;
+  sort?: string;
 }): Promise<{ worlds: World[]; total: number }> {
   let url: URL;
   if (filters?.search) {
@@ -41,6 +42,7 @@ export async function getWorlds(filters?: {
       if (filters.scope) url.searchParams.set("scope", filters.scope);
       if (filters.theme) url.searchParams.set("theme", filters.theme);
       if (filters.status) url.searchParams.set("status", filters.status);
+      if (filters.sort) url.searchParams.set("sort", filters.sort);
       if (filters.limit)
         url.searchParams.set("limit", filters.limit.toString());
       if (filters.offset)
@@ -93,4 +95,31 @@ export async function updateWorldVisibility(
         `Failed to update world visibility: ${response.statusText}`,
     );
   }
+}
+
+export async function rateWorld(
+  worldId: number,
+  rating: number,
+): Promise<{ avg_rating: number; rating_count: number; user_rating: number }> {
+  const url = `${API_BASE_URL}/worlds/${worldId}/rate`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "PATCH",
+    headers: await getAuthHeaders(),
+    body: JSON.stringify({ rating }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error || `Failed to rate world: ${response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  return {
+    avg_rating: data.avg_rating,
+    rating_count: data.rating_count,
+    user_rating: data.user_rating,
+  };
 }

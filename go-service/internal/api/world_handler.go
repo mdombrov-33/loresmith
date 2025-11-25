@@ -433,6 +433,7 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 	var userID *int
 	var theme *string
 	var status *string
+	var sortBy *string
 	var scope string
 	var limit int = 6
 	var offset int = 0
@@ -459,6 +460,9 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 	if statusStr := query.Get("status"); statusStr != "" && statusStr != "all" {
 		status = &statusStr
 	}
+	if sortByStr := query.Get("sort"); sortByStr != "" {
+		sortBy = &sortByStr
+	}
 
 	if limitStr := query.Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
@@ -473,7 +477,7 @@ func (h *WorldHandler) HandleGetWorldsByFilters(w http.ResponseWriter, r *http.R
 
 	includeUserName := scope == "global"
 
-	worlds, total, err := h.worldStore.GetWorldsByFilters(userID, theme, status, includeUserName, currentUserID, limit, offset)
+	worlds, total, err := h.worldStore.GetWorldsByFilters(userID, theme, status, includeUserName, currentUserID, limit, offset, sortBy)
 	if err != nil {
 		h.logger.Printf("ERROR: failed to get worlds: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to get worlds"})
@@ -581,4 +585,69 @@ func (h *WorldHandler) HandleUpdateWorldVisibility(w http.ResponseWriter, r *htt
 	}
 
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true, "visibility": req.Visibility})
+}
+
+func (h *WorldHandler) HandleRateWorld(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch {
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
+		return
+	}
+
+	worldIDStr := chi.URLParam(r, "id")
+	worldID, err := strconv.Atoi(worldIDStr)
+	if err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
+		return
+	}
+
+	var req struct {
+		Rating int `json:"rating"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
+		return
+	}
+
+	if req.Rating < 1 || req.Rating > 5 {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "rating must be between 1 and 5"})
+		return
+	}
+
+	currentUser := middleware.GetUser(r)
+	currentUserID := int(currentUser.ID)
+
+	//* Verify world exists
+	world, err := h.worldStore.GetWorldById(worldID)
+	if err != nil {
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "world not found"})
+		return
+	}
+
+	//* Only allow rating published worlds
+	if world.Visibility != "published" {
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "can only rate published worlds"})
+		return
+	}
+
+	err = h.worldStore.RateWorld(currentUserID, worldID, req.Rating)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to rate world: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to rate world"})
+		return
+	}
+
+	//* Get updated rating info
+	avgRating, ratingCount, err := h.worldStore.GetWorldRating(worldID)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to get updated rating: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "rating saved but failed to retrieve updated rating"})
+		return
+	}
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+		"success":      true,
+		"user_rating":  req.Rating,
+		"avg_rating":   avgRating,
+		"rating_count": ratingCount,
+	})
 }

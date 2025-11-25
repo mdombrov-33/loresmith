@@ -13,6 +13,10 @@ interface WorldHeroProps {
   theme: string;
   characterPiece?: LorePiece;
   activeSessions?: number;
+  worldId: number;
+  rating?: number;
+  userRating?: number;
+  ratingCount?: number;
 }
 
 export default function WorldHero({
@@ -20,13 +24,15 @@ export default function WorldHero({
   theme,
   characterPiece,
   activeSessions,
+  worldId,
+  rating,
+  userRating,
+  ratingCount,
 }: WorldHeroProps) {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
   // TODO: Replace with real data from backend
-  const mockRating = 4.5;
-  const mockRatingCount = 12;
   const mockPlayCount = 34;
   const mockCommentCount = 8;
 
@@ -70,26 +76,43 @@ export default function WorldHero({
                 </Badge>
 
                 {/* Rating Display */}
-                <button
-                  onClick={() => setRatingDialogOpen(true)}
-                  className="hover:bg-accent flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
-                >
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(mockRating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-foreground text-sm font-medium">
-                    {mockRating} ({mockRatingCount})
-                  </span>
-                </button>
+                {rating !== undefined && rating !== null && ratingCount !== undefined && ratingCount > 0 ? (
+                  <button
+                    onClick={() => setRatingDialogOpen(true)}
+                    className="hover:bg-accent flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${
+                            i < Math.floor(rating)
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-foreground text-sm font-medium">
+                      {rating.toFixed(1)} ({ratingCount})
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setRatingDialogOpen(true)}
+                    className="hover:bg-accent flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="text-muted-foreground h-4 w-4"
+                        />
+                      ))}
+                    </div>
+                    <span className="text-muted-foreground text-sm">No ratings yet</span>
+                  </button>
+                )}
               </div>
 
               {/* Stats */}
@@ -127,7 +150,12 @@ export default function WorldHero({
         </div>
       </header>
 
-      <RatingDialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen} />
+      <RatingDialog
+        open={ratingDialogOpen}
+        onOpenChange={setRatingDialogOpen}
+        worldId={worldId}
+        initialRating={userRating}
+      />
     </>
   );
 }

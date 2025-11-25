@@ -21,6 +21,12 @@ export default function AppNavbar() {
   const router = useRouter();
   const { user, logout } = useAppStore();
 
+  //* Hide Create button on these pages
+  const hideCreateButton = pathname?.startsWith("/generate") ||
+                          pathname?.startsWith("/select-theme") ||
+                          pathname?.startsWith("/worlds/") ||
+                          pathname?.startsWith("/adventure/");
+
   const navLinks = [
     {
       title: "My Worlds",
@@ -81,12 +87,14 @@ export default function AppNavbar() {
         {/* Right: Create + Notifications + User */}
         <div className="flex items-center gap-4">
           {/* Create Button */}
-          <Link href="/generate">
-            <PrimaryButton className="hidden sm:flex px-4 py-2">
-              <Sparkles className="mr-2 h-4 w-4" />
-              <span className="text-sm font-medium">Create</span>
-            </PrimaryButton>
-          </Link>
+          {!hideCreateButton && (
+            <Link href="/select-theme">
+              <PrimaryButton className="hidden sm:flex px-4 py-2">
+                <Sparkles className="mr-2 h-4 w-4" />
+                <span className="text-sm font-medium">Create</span>
+              </PrimaryButton>
+            </Link>
+          )}
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">

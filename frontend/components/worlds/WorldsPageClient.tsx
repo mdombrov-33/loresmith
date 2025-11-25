@@ -40,6 +40,10 @@ export default function WorldsPageClient() {
           theme={actualTheme}
           characterPiece={characterPiece}
           activeSessions={world?.active_sessions}
+          worldId={worldId}
+          rating={world?.rating}
+          userRating={world?.user_rating}
+          ratingCount={world?.rating_count}
         />
         <WorldTabbedContent
           parsedStory={parsedStory}

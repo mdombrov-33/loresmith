@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,28 +11,46 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
+import { useRateWorld } from "@/lib/queries/world";
+import { toast } from "sonner";
 
 interface RatingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  worldId: number;
+  initialRating?: number;
 }
 
-export default function RatingDialog({ open, onOpenChange }: RatingDialogProps) {
+export default function RatingDialog({ open, onOpenChange, worldId, initialRating }: RatingDialogProps) {
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [selectedRating, setSelectedRating] = useState(0);
+  const [selectedRating, setSelectedRating] = useState(initialRating || 0);
+  const { mutate: rateWorld, isPending } = useRateWorld();
+
+  useEffect(() => {
+    setSelectedRating(initialRating || 0);
+  }, [initialRating]);
 
   const handleSubmit = () => {
     if (selectedRating > 0) {
-      // TODO: API call to submit rating
-      onOpenChange(false);
-      setSelectedRating(0);
-      setHoveredRating(0);
+      rateWorld(
+        { worldId, rating: selectedRating },
+        {
+          onSuccess: () => {
+            toast.success("Rating submitted successfully!");
+            onOpenChange(false);
+            setHoveredRating(0);
+          },
+          onError: (error) => {
+            toast.error(error.message || "Failed to submit rating");
+          },
+        }
+      );
     }
   };
 
   const handleCancel = () => {
     onOpenChange(false);
-    setSelectedRating(0);
+    setSelectedRating(initialRating || 0);
     setHoveredRating(0);
   };
 
@@ -55,6 +73,7 @@ export default function RatingDialog({ open, onOpenChange }: RatingDialogProps) 
                 onMouseLeave={() => setHoveredRating(0)}
                 onClick={() => setSelectedRating(rating)}
                 className="transition-transform hover:scale-110"
+                disabled={isPending}
               >
                 <Star
                   className={`h-12 w-12 transition-colors ${
@@ -75,15 +94,15 @@ export default function RatingDialog({ open, onOpenChange }: RatingDialogProps) 
         </div>
 
         <DialogFooter className="flex-row gap-2 sm:justify-between">
-          <Button variant="outline" onClick={handleCancel} className="flex-1">
+          <Button variant="outline" onClick={handleCancel} className="flex-1" disabled={isPending}>
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={selectedRating === 0}
+            disabled={selectedRating === 0 || isPending}
             className="flex-1"
           >
-            Submit Rating
+            {isPending ? "Submitting..." : "Submit Rating"}
           </Button>
         </DialogFooter>
       </DialogContent>

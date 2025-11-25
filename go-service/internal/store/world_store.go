@@ -24,6 +24,9 @@ type World struct {
 	ActiveSessions *int            `json:"active_sessions,omitempty"`
 	PortraitURL    *string         `json:"portrait_url,omitempty"`
 	Visibility     string          `json:"visibility"`
+	Rating         *float64        `json:"rating,omitempty"`
+	UserRating     *int            `json:"user_rating,omitempty"`
+	RatingCount    *int            `json:"rating_count,omitempty"`
 	CreatedAt      time.Time       `json:"created_at"`
 	UpdatedAt      time.Time       `json:"updated_at"`
 	Relevance      *float64        `json:"relevance,omitempty"`
@@ -44,13 +47,16 @@ type WorldStore interface {
 	CreateWorld(userID int, theme string, story *lorepb.FullStory, status string) (int, error)
 	CreateWorldWithEmbedding(userID int, theme string, story *lorepb.FullStory, status string, embedding []float32) (int, error)
 	GetWorldById(worldID int) (*World, error)
-	GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, currentUserID int, limit int, offset int) ([]*World, int, error)
+	GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, currentUserID int, limit int, offset int, sortBy *string) ([]*World, int, error)
 	SearchWorldsByEmbedding(embedding []float32, userID *int, theme *string, status *string, includeUserName bool, currentUserID int, limit int, offset int) ([]*World, int, error)
 	DeleteWorldById(worldID int) error
 	GetProtagonistForWorld(worldID int) (*LorePiece, error)
 	UpdateWorldStatus(worldID int, status string) error
 	UpdateWorldVisibility(worldID int, visibility string) error
 	UpdateLorePieceDetails(pieceID int, details map[string]interface{}) error
+	RateWorld(userID int, worldID int, rating int) error
+	GetWorldRating(worldID int) (*float64, *int, error)
+	GetUserRating(userID int, worldID int) (*int, error)
 }
 
 type PostgresWorldStore struct {
@@ -245,7 +251,7 @@ func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 	return &world, nil
 }
 
-func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, currentUserID int, limit int, offset int) ([]*World, int, error) {
+func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, status *string, includeUserName bool, currentUserID int, limit int, offset int, sortBy *string) ([]*World, int, error) {
 	var query string
 	var countQuery string
 	args := []interface{}{}
@@ -260,7 +266,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                 WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
                 ORDER BY created_at DESC LIMIT 1) as session_id,
                w.visibility, w.created_at, w.updated_at,
-               lp.details->>'image_portrait' as portrait_url
+               lp.details->>'image_portrait' as portrait_url,
+               w.rating,
+               (SELECT COUNT(DISTINCT user_id) FROM adventure_sessions
+                WHERE world_id = w.id AND status IN ('initializing', 'active')) as active_sessions_count
         FROM worlds w
         JOIN users u ON w.user_id = u.id
         LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
@@ -277,7 +286,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                 WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
                 ORDER BY created_at DESC LIMIT 1) as session_id,
                w.visibility, w.created_at, w.updated_at,
-               lp.details->>'image_portrait' as portrait_url
+               lp.details->>'image_portrait' as portrait_url,
+               w.rating,
+               (SELECT COUNT(DISTINCT user_id) FROM adventure_sessions
+                WHERE world_id = w.id AND status IN ('initializing', 'active')) as active_sessions_count
         FROM worlds w
         LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
         WHERE 1=1`, currentUserID)
@@ -330,7 +342,22 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		countQuery += ` AND visibility = 'published'`
 	}
 
-	query += ` ORDER BY w.created_at DESC LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
+	//* Dynamic sorting
+	orderByClause := ` ORDER BY w.created_at DESC` // default
+	if sortBy != nil {
+		switch *sortBy {
+		case "rating_desc":
+			orderByClause = ` ORDER BY w.rating DESC NULLS LAST, w.created_at DESC`
+		case "active_sessions_desc":
+			orderByClause = ` ORDER BY active_sessions_count DESC, w.created_at DESC`
+		case "created_at_desc":
+			orderByClause = ` ORDER BY w.created_at DESC`
+		default:
+			orderByClause = ` ORDER BY w.created_at DESC`
+		}
+	}
+
+	query += orderByClause + ` LIMIT $` + strconv.Itoa(argCount+1) + ` OFFSET $` + strconv.Itoa(argCount+2)
 	args = append(args, limit, offset)
 
 	rows, err := s.db.Query(query, args...)
@@ -344,7 +371,9 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		var world World
 		var sessionID sql.NullInt64
 		var portraitURL sql.NullString
-		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt, &portraitURL)
+		var rating sql.NullFloat64
+		var activeSessions sql.NullInt64
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt, &portraitURL, &rating, &activeSessions)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -354,6 +383,14 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		}
 		if portraitURL.Valid && portraitURL.String != "" {
 			world.PortraitURL = &portraitURL.String
+		}
+		if rating.Valid {
+			ratingFloat := rating.Float64
+			world.Rating = &ratingFloat
+		}
+		if activeSessions.Valid {
+			activeSessionsInt := int(activeSessions.Int64)
+			world.ActiveSessions = &activeSessionsInt
 		}
 		worlds = append(worlds, &world)
 	}
@@ -589,4 +626,88 @@ func (s *PostgresWorldStore) UpdateLorePieceDetails(pieceID int, details map[str
 	`
 	_, err = s.db.Exec(query, string(detailsJSON), pieceID)
 	return err
+}
+
+func (s *PostgresWorldStore) RateWorld(userID int, worldID int, rating int) error {
+	//* Start a transaction to ensure consistency
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to start transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	//* Upsert user rating
+	upsertQuery := `
+	INSERT INTO world_ratings (user_id, world_id, rating, created_at, updated_at)
+	VALUES ($1, $2, $3, NOW(), NOW())
+	ON CONFLICT (user_id, world_id)
+	DO UPDATE SET rating = $3, updated_at = NOW()
+	`
+	_, err = tx.Exec(upsertQuery, userID, worldID, rating)
+	if err != nil {
+		return fmt.Errorf("failed to upsert rating: %w", err)
+	}
+
+	//* Recalculate and update world average rating
+	updateWorldQuery := `
+	UPDATE worlds
+	SET rating = (
+		SELECT AVG(rating)::DECIMAL(3,2)
+		FROM world_ratings
+		WHERE world_id = $1
+	),
+	updated_at = NOW()
+	WHERE id = $1
+	`
+	_, err = tx.Exec(updateWorldQuery, worldID)
+	if err != nil {
+		return fmt.Errorf("failed to update world rating: %w", err)
+	}
+
+	return tx.Commit()
+}
+
+func (s *PostgresWorldStore) GetWorldRating(worldID int) (*float64, *int, error) {
+	query := `
+	SELECT
+		AVG(rating)::DECIMAL(3,2) as avg_rating,
+		COUNT(*)::INTEGER as rating_count
+	FROM world_ratings
+	WHERE world_id = $1
+	`
+	var avgRating sql.NullFloat64
+	var ratingCount int
+
+	err := s.db.QueryRow(query, worldID).Scan(&avgRating, &ratingCount)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil, nil
+		}
+		return nil, nil, fmt.Errorf("failed to get world rating: %w", err)
+	}
+
+	if !avgRating.Valid || ratingCount == 0 {
+		return nil, nil, nil
+	}
+
+	avgRatingFloat := avgRating.Float64
+	return &avgRatingFloat, &ratingCount, nil
+}
+
+func (s *PostgresWorldStore) GetUserRating(userID int, worldID int) (*int, error) {
+	query := `
+	SELECT rating
+	FROM world_ratings
+	WHERE user_id = $1 AND world_id = $2
+	`
+	var rating int
+	err := s.db.QueryRow(query, userID, worldID).Scan(&rating)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get user rating: %w", err)
+	}
+
+	return &rating, nil
 }

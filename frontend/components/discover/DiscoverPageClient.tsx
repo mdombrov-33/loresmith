@@ -64,15 +64,17 @@ export default function DiscoverPageClient() {
           </>
         )}
 
-        {/* Search Bar */}
-        <DiscoverSearch
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSearch={handleSearch}
-        />
-
         {/* News Feed */}
         {!activeSearchQuery && <NewsFeed />}
+
+        {/* Search Bar */}
+        <div className="my-12">
+          <DiscoverSearch
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSearch={handleSearch}
+          />
+        </div>
 
         {/* Highest Rated Section */}
         {!activeSearchQuery && (

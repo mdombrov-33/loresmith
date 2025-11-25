@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getWorld, getWorlds, deleteWorld, updateWorldVisibility } from "@/lib/api/world";
+import { getWorld, getWorlds, deleteWorld, updateWorldVisibility, rateWorld } from "@/lib/api/world";
 import { queryKeys } from "./keys";
 
 export function useWorld(worldId: number) {
@@ -18,6 +18,7 @@ export function useWorlds(filters?: {
   limit?: number;
   offset?: number;
   search?: string;
+  sort?: string;
 }) {
   //* For search queries, fetch all results and paginate locally to avoid re-running search
   const isSearchQuery = filters?.search && filters.search.trim();
@@ -63,6 +64,19 @@ export function useUpdateWorldVisibility() {
       updateWorldVisibility(worldId, visibility),
     onSuccess: (_, { worldId }) => {
       //* Invalidate world and worlds queries to refresh
+      queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
+    },
+  });
+}
+
+export function useRateWorld() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ worldId, rating }: { worldId: number; rating: number }) =>
+      rateWorld(worldId, rating),
+    onSuccess: (_, { worldId }) => {
+      //* Invalidate world and worlds queries to refresh rating
       queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
       queryClient.invalidateQueries({ queryKey: ["worlds"] });
     },

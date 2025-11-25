@@ -9,7 +9,21 @@ import { World } from "@/lib/schemas";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import { Badge } from "@/components/ui/badge";
 import { PrimaryButton } from "@/components/shared/buttons";
-import { Star, MessageSquare, Users, Eye, HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, MessageSquare, Users, Eye, HelpCircle, Trash2, EyeOff, X as XIcon } from "lucide-react";
+import { useAppStore } from "@/stores/appStore";
+import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogPortal,
+  DialogOverlay,
+} from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -20,16 +34,22 @@ import {
 interface ExpandableWorldCardsProps {
   worlds: World[];
   viewMode?: "grid" | "row";
+  showAuthor?: boolean;
 }
 
 export default function ExpandableWorldCards({
   worlds,
   viewMode = "grid",
+  showAuthor = true,
 }: ExpandableWorldCardsProps) {
   const [active, setActive] = useState<World | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { user } = useAppStore();
+  const deleteWorldMutation = useDeleteWorld();
+  const updateVisibilityMutation = useUpdateWorldVisibility();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -53,6 +73,41 @@ export default function ExpandableWorldCards({
   const handleViewWorld = (world: World) => {
     router.push(`/worlds/${world.theme}/${world.id}`);
   };
+
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (active) {
+      deleteWorldMutation.mutate(active.id, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setActive(null);
+        },
+      });
+    }
+  };
+
+  const handleToggleVisibility = () => {
+    if (active) {
+      const newVisibility = active.visibility === "private" ? "published" : "private";
+      updateVisibilityMutation.mutate(
+        {
+          worldId: active.id,
+          visibility: newVisibility,
+        },
+        {
+          onSuccess: () => {
+            //* Update active state immediately for UI feedback
+            setActive({ ...active, visibility: newVisibility });
+          },
+        }
+      );
+    }
+  };
+
+  const isOwner = active && user && active.user_id === user.id;
 
   const getThemeOption = (theme: string) =>
     THEME_OPTIONS.find((t) => t.value === theme);
@@ -118,12 +173,14 @@ export default function ExpandableWorldCards({
                     >
                       {active.full_story.quest?.title || "Untitled World"}
                     </motion.h3>
-                    <motion.p
-                      layoutId={`description-${active.id}-${id}`}
-                      className="text-sm text-muted-foreground"
-                    >
-                      by {active.user_name || "Unknown"}
-                    </motion.p>
+                    {showAuthor && (
+                      <motion.p
+                        layoutId={`description-${active.id}-${id}`}
+                        className="text-sm text-muted-foreground"
+                      >
+                        by {active.user_name || "Unknown"}
+                      </motion.p>
+                    )}
 
                     {/* Badges */}
                     <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -154,7 +211,41 @@ export default function ExpandableWorldCards({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    className="flex gap-2"
                   >
+                    {isOwner && (
+                      <>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleToggleVisibility}
+                                disabled={updateVisibilityMutation.isPending}
+                              >
+                                {active.visibility === "published" ? (
+                                  <Eye className="h-4 w-4" />
+                                ) : (
+                                  <EyeOff className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {active.visibility === "published" ? "Make Private" : "Publish"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleDeleteClick}
+                          disabled={deleteWorldMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                     <PrimaryButton
                       onClick={() => handleViewWorld(active)}
                       className="text-sm"
@@ -223,12 +314,14 @@ export default function ExpandableWorldCards({
                     >
                       {world.full_story.quest?.title || "Untitled World"}
                     </motion.h3>
-                    <motion.p
-                      layoutId={`description-${world.id}-${id}`}
-                      className="text-center text-sm text-muted-foreground md:text-left"
-                    >
-                      by {world.user_name || "Unknown"}
-                    </motion.p>
+                    {showAuthor && (
+                      <motion.p
+                        layoutId={`description-${world.id}-${id}`}
+                        className="text-center text-sm text-muted-foreground md:text-left"
+                      >
+                        by {world.user_name || "Unknown"}
+                      </motion.p>
+                    )}
                     {/* Social metadata preview */}
                     <div className="flex items-center gap-3 text-xs">
                       <div className="flex items-center gap-1">
@@ -312,12 +405,14 @@ export default function ExpandableWorldCards({
                   >
                     {world.full_story.quest?.title || "Untitled World"}
                   </motion.h3>
-                  <motion.p
-                    layoutId={`description-${world.id}-${id}`}
-                    className="text-center text-sm text-muted-foreground md:text-left"
-                  >
-                    by {world.user_name || "Unknown"}
-                  </motion.p>
+                  {showAuthor && (
+                    <motion.p
+                      layoutId={`description-${world.id}-${id}`}
+                      className="text-center text-sm text-muted-foreground md:text-left"
+                    >
+                      by {world.user_name || "Unknown"}
+                    </motion.p>
+                  )}
 
                   {/* Theme badge */}
                   <Badge variant="outline" className="mt-1">
@@ -372,6 +467,42 @@ export default function ExpandableWorldCards({
           );
         })}
       </ul>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogPortal>
+          <DialogOverlay className="z-[150]" />
+          <DialogPrimitive.Content className="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-[200] grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Delete World</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete &quot;{active?.full_story.quest?.title || "this world"}&quot;?
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={deleteWorldMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={deleteWorldMutation.isPending}
+              >
+                {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+              </Button>
+            </DialogFooter>
+            <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
+              <XIcon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      </Dialog>
     </>
   );
 }

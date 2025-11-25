@@ -1,15 +1,23 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import GenerateHeader from "@/components/generate/GenerateHeader";
 import ActionButton from "@/components/shared/ActionButton";
 import { getThemeFont } from "@/constants/game-themes";
+import { useAppStore } from "@/stores/appStore";
 
 export default function ModeSelectionClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const theme = searchParams.get("theme") || "fantasy";
   const themeFont = getThemeFont(theme);
+  const { setAppStage, setTheme } = useAppStore();
+
+  useEffect(() => {
+    setAppStage("generating");
+    setTheme(theme);
+  }, [setAppStage, setTheme, theme]);
 
   const handleSelectRandom = () => {
     router.push(`/generate/random?theme=${theme}`);
