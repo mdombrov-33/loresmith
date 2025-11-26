@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useWorlds } from "@/lib/queries/world";
 import { useAppStore } from "@/stores/appStore";
+import { scrollToElement } from "@/lib/utils";
 
 export function useDiscoverLogic() {
   const { setAppStage } = useAppStore();
@@ -33,6 +34,10 @@ export function useDiscoverLogic() {
     if (searchQuery.trim()) {
       setActiveSearchQuery(searchQuery.trim());
       setCurrentPage(1);
+      // Scroll to catalog section to show search results
+      setTimeout(() => {
+        scrollToElement("catalog-section", 100);
+      }, 100);
     }
   };
 

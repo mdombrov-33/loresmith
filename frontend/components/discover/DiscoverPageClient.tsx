@@ -143,7 +143,7 @@ export default function DiscoverPageClient() {
         </div>
 
         {/* All Worlds Grid */}
-        <div className="py-6">
+        <div id="catalog-section" className="py-6">
           <h2 className="mb-6 text-2xl font-bold">
             {activeSearchQuery ? "Search Results" : "Complete Catalog"}
           </h2>
