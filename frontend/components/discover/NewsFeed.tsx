@@ -42,55 +42,55 @@ const newsItems = [
 
 export default function NewsFeed() {
   return (
-    <section className="py-12">
-      <div className="mb-8 flex items-center justify-between">
+    <section className="h-[350px] overflow-hidden rounded-xl bg-card/50 p-4">
+      <div className="mb-3 flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Latest News</h2>
-          <p className="text-muted-foreground">
-            Stay updated with the latest from LoreSmith
+          <h2 className="text-lg font-bold">Latest News</h2>
+          <p className="text-[10px] text-muted-foreground">
+            Stay updated with the latest
           </p>
         </div>
-        <button className="group flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+        <button className="group flex items-center gap-1 text-xs font-medium text-primary hover:underline">
           View All
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
         </button>
       </div>
 
-      {/* Horizontal Scroll */}
-      <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20">
+      {/* Vertical Scroll */}
+      <div className="flex h-[calc(100%-3.5rem)] flex-col gap-2.5 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20">
         {newsItems.map((news) => (
           <Card
             key={news.id}
-            className="group min-w-[350px] cursor-pointer overflow-hidden transition-all hover:shadow-xl"
+            className="group shrink-0 cursor-pointer overflow-hidden transition-all hover:shadow-md"
           >
-            {/* Image */}
-            <div className="relative h-48 w-full overflow-hidden">
-              <Image
-                fill
-                src={news.image}
-                alt={news.title}
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                  {news.category}
-                </span>
+            <div className="flex gap-3 p-3">
+              {/* Image */}
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
+                <Image
+                  fill
+                  src={news.image}
+                  alt={news.title}
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                />
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                <span>{new Date(news.date).toLocaleDateString()}</span>
+              {/* Content */}
+              <div className="flex flex-1 flex-col justify-center overflow-hidden">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                    {news.category}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {new Date(news.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <h3 className="mb-0.5 text-sm font-bold line-clamp-2 group-hover:text-primary">
+                  {news.title}
+                </h3>
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {news.excerpt}
+                </p>
               </div>
-              <h3 className="mb-2 text-lg font-bold line-clamp-2 group-hover:text-primary">
-                {news.title}
-              </h3>
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {news.excerpt}
-              </p>
             </div>
           </Card>
         ))}

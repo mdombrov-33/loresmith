@@ -51,21 +51,24 @@ export default function DiscoverPageClient() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
-        {/* Featured World Hero */}
+        {/* Hero + News Section - Side by Side */}
         {!activeSearchQuery && (
-          <>
-            {isFeaturedLoading ? (
-              <div className="mb-12 h-[500px] animate-pulse rounded-3xl bg-card" />
-            ) : (
-              <div className="mb-12">
+          <div className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Featured World Hero - 2/3 width on large screens */}
+            <div className="lg:col-span-2">
+              {isFeaturedLoading ? (
+                <div className="h-[350px] animate-pulse rounded-3xl bg-card" />
+              ) : (
                 <FeaturedWorldHero world={featuredWorld} />
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </div>
 
-        {/* News Feed */}
-        {!activeSearchQuery && <NewsFeed />}
+            {/* News Feed - 1/3 width on large screens, vertical compact layout */}
+            <div className="lg:col-span-1">
+              <NewsFeed />
+            </div>
+          </div>
+        )}
 
         {/* Search Bar */}
         <div className="my-12">
@@ -76,46 +79,45 @@ export default function DiscoverPageClient() {
           />
         </div>
 
-        {/* Highest Rated Section */}
+        {/* Three Sections in Compact Grid */}
         {!activeSearchQuery && (
-          <>
-            {isHighestRatedLoading ? (
-              <div className="py-12">
-                <GlobalLoading
-                  message="Loading highest rated worlds..."
-                  fullScreen={false}
-                />
-              </div>
-            ) : (
-              <HighestRatedWorlds worlds={highestRatedWorlds} />
-            )}
-          </>
-        )}
+          <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Highest Rated Section */}
+            <div>
+              {isHighestRatedLoading ? (
+                <div className="py-8">
+                  <GlobalLoading
+                    message="Loading highest rated..."
+                    fullScreen={false}
+                  />
+                </div>
+              ) : (
+                <HighestRatedWorlds worlds={highestRatedWorlds} />
+              )}
+            </div>
 
-        {/* Trending Section */}
-        {!activeSearchQuery && (
-          <>
-            {isTrendingLoading ? (
-              <div className="py-12">
-                <GlobalLoading message="Loading trending worlds..." fullScreen={false} />
-              </div>
-            ) : (
-              <TrendingWorlds worlds={trendingWorlds} />
-            )}
-          </>
-        )}
+            {/* Trending Section */}
+            <div>
+              {isTrendingLoading ? (
+                <div className="py-8">
+                  <GlobalLoading message="Loading trending..." fullScreen={false} />
+                </div>
+              ) : (
+                <TrendingWorlds worlds={trendingWorlds} />
+              )}
+            </div>
 
-        {/* Recently Created Section */}
-        {!activeSearchQuery && (
-          <>
-            {isRecentLoading ? (
-              <div className="py-12">
-                <GlobalLoading message="Loading recent worlds..." fullScreen={false} />
-              </div>
-            ) : (
-              <RecentWorlds worlds={recentWorlds} />
-            )}
-          </>
+            {/* Recently Created Section */}
+            <div>
+              {isRecentLoading ? (
+                <div className="py-8">
+                  <GlobalLoading message="Loading recent..." fullScreen={false} />
+                </div>
+              ) : (
+                <RecentWorlds worlds={recentWorlds} />
+              )}
+            </div>
+          </div>
         )}
 
         {/* Divider */}

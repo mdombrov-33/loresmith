@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Sparkles, Users, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { THEME_OPTIONS } from "@/constants/game-themes";
+import { Spotlight } from "@/components/ui/spotlight";
 
 interface FeaturedWorldHeroProps {
   world?: World;
@@ -18,7 +19,11 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
   if (!world) {
     // Placeholder when no world
     return (
-      <section className="relative h-[500px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-background to-secondary/20">
+      <section className="relative h-[350px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-background to-secondary/20">
+        <Spotlight
+          className="-top-40 left-0 md:-top-20 md:left-40"
+          fill="white"
+        />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <Sparkles className="mx-auto mb-4 h-16 w-16 text-primary" />
@@ -35,7 +40,13 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
 
   return (
-    <section className="relative h-[500px] w-full overflow-hidden rounded-3xl">
+    <section className="relative h-[350px] w-full overflow-hidden rounded-3xl">
+      {/* Spotlight Effect */}
+      <Spotlight
+        className="-top-40 left-0 md:-top-20 md:left-40"
+        fill="white"
+      />
+
       {/* Background Image with Overlay */}
       {world.portrait_url && (
         <>
@@ -44,7 +55,7 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
               fill
               src={world.portrait_url}
               alt={world.full_story.quest?.title || "Featured world"}
-              className="object-cover object-center"
+              className="object-cover object-top"
               priority
             />
           </div>
@@ -72,12 +83,12 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
           )}
 
           {/* Title */}
-          <h1 className="mb-4 text-5xl font-bold leading-tight text-white md:text-6xl">
+          <h1 className="mb-3 text-3xl font-bold leading-tight text-white md:text-4xl">
             {world.full_story.quest?.title || "Untitled World"}
           </h1>
 
           {/* Description */}
-          <p className="mb-6 line-clamp-3 text-lg text-white/80">
+          <p className="mb-4 line-clamp-2 text-base text-white/80">
             {world.full_story.content || "No description available"}
           </p>
 

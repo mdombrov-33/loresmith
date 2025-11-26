@@ -60,7 +60,7 @@ export function useDiscoverLogic() {
     isLoading: isHighestRatedLoading,
   } = useWorlds({
     scope: "global",
-    limit: 6,
+    limit: 3,
     offset: 0,
     sort: "rating_desc",
   });
@@ -71,7 +71,7 @@ export function useDiscoverLogic() {
     isLoading: isTrendingLoading,
   } = useWorlds({
     scope: "global",
-    limit: 6,
+    limit: 3,
     offset: 0,
     sort: "active_sessions_desc",
   });
@@ -82,7 +82,7 @@ export function useDiscoverLogic() {
     isLoading: isRecentLoading,
   } = useWorlds({
     scope: "global",
-    limit: 6,
+    limit: 3,
     offset: 0,
     sort: "created_at_desc",
   });
