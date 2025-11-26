@@ -1,59 +1,72 @@
-import { footerSections, socialLinks } from "@/constants/footer-links";
+import { footerLinks } from "@/constants/footer-links";
 import Logo from "@/components/shared/Logo";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Github, Youtube, Twitter, MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-border bg-card mt-20 border-t">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-card-foreground mb-4 text-lg font-bold">
-                {section.title}
-              </h3>
-              <ul className="text-muted-foreground space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="hover:text-primary transition"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+    <footer className="border-t mt-20">
+      <div className="container mx-auto">
+        <div className="py-12 flex flex-col sm:flex-row items-start justify-between gap-x-8 gap-y-10 px-4 xl:px-0">
+          <div>
+            <Logo size="sm" />
 
-        {/* Footer Bottom */}
-        <div className="border-border mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
-          <Logo size="sm" />
-
-          {/* Social Icons */}
-          <div className="flex items-center gap-4">
-            {socialLinks.map((social) => (
-              <a
-                key={social.name}
-                href={social.href}
-                className="text-muted-foreground hover:text-primary transition"
-                aria-label={social.name}
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d={social.icon} />
-                </svg>
-              </a>
-            ))}
+            <ul className="mt-6 flex items-center gap-4 flex-wrap">
+              {footerLinks.map(({ title, href }) => (
+                <li key={title}>
+                  <Link
+                    href={href}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <p className="text-muted-foreground text-sm">
-            © 2025 LoreSmith. Craft your destiny.
-          </p>
+          {/* Subscribe Newsletter */}
+          <div className="max-w-xs w-full">
+            <h6 className="font-medium">Stay up to date</h6>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Get notified about new worlds and features
+            </p>
+            <form className="mt-4 flex items-center gap-2">
+              <Input type="email" placeholder="Enter your email" />
+              <Button type="submit">Subscribe</Button>
+            </form>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="py-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-x-2 gap-y-5 px-4 xl:px-0">
+          {/* Copyright */}
+          <span className="text-muted-foreground text-sm">
+            © {new Date().getFullYear()} LoreSmith. Craft your destiny.
+          </span>
+
+          <div className="flex items-center gap-5 text-muted-foreground">
+            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+              <MessageSquare className="h-5 w-5" />
+              <span className="sr-only">Discord</span>
+            </Link>
+            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+              <Youtube className="h-5 w-5" />
+              <span className="sr-only">YouTube</span>
+            </Link>
+            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+              <Github className="h-5 w-5" />
+              <span className="sr-only">GitHub</span>
+            </Link>
+            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+              <Twitter className="h-5 w-5" />
+              <span className="sr-only">Twitter</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
