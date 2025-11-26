@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { Sparkles, Users, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { Spotlight } from "@/components/ui/spotlight";
 
 interface FeaturedWorldHeroProps {
   world?: World;
@@ -20,10 +19,6 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
     // Placeholder when no world
     return (
       <section className="relative h-[350px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-background to-secondary/20">
-        <Spotlight
-          className="-top-40 left-0 md:-top-20 md:left-40"
-          fill="white"
-        />
         <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
           {/* Featured Badge - Top */}
           <div className="flex items-center gap-2">
@@ -53,12 +48,6 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
 
   return (
     <section className="relative h-[350px] w-full overflow-hidden rounded-3xl">
-      {/* Spotlight Effect */}
-      <Spotlight
-        className="-top-40 left-0 md:-top-20 md:left-40"
-        fill="white"
-      />
-
       {/* Background Image with Overlay */}
       {world.portrait_url && (
         <>
