@@ -153,12 +153,12 @@ export default function ExpandableWorldCards({
             >
               <motion.div layoutId={`image-${active.id}-${id}`}>
                 {active.portrait_url && (
-                  <div className="relative h-80 w-full lg:h-80">
+                  <div className="relative h-80 w-full overflow-hidden lg:h-80 sm:rounded-tl-lg sm:rounded-tr-lg">
                     <Image
                       fill
                       src={active.portrait_url}
                       alt={active.full_story.quest?.title || "World portrait"}
-                      className="object-cover object-top sm:rounded-tl-lg sm:rounded-tr-lg"
+                      className="scale-95 object-cover object-top"
                     />
                   </div>
                 )}
@@ -293,39 +293,39 @@ export default function ExpandableWorldCards({
                 layoutId={`card-${world.id}-${id}`}
                 key={`card-${world.id}-${id}`}
                 onClick={() => setActive(world)}
-                className="flex cursor-pointer flex-col items-center justify-between rounded-xl p-4 transition-colors hover:bg-muted/50 md:flex-row"
+                className="flex cursor-pointer flex-col justify-between rounded-xl p-3 transition-colors hover:bg-muted/50 md:flex-row md:items-center md:p-4"
               >
-                <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="flex flex-row items-center gap-3 md:gap-4">
                   <motion.div layoutId={`image-${world.id}-${id}`}>
                     {world.portrait_url && (
-                      <div className="relative h-20 w-20 flex-shrink-0">
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg md:h-20 md:w-20">
                         <Image
                           fill
                           src={world.portrait_url}
                           alt={world.full_story.quest?.title || "World portrait"}
-                          className="rounded-lg object-cover object-top"
+                          className="scale-95 object-cover object-top"
                           sizes="80px"
                         />
                       </div>
                     )}
                   </motion.div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-1 flex-col gap-1 md:gap-2">
                     <motion.h3
                       layoutId={`title-${world.id}-${id}`}
-                      className="text-center font-medium text-foreground md:text-left"
+                      className="text-left text-sm font-medium text-foreground md:text-base"
                     >
                       {world.full_story.quest?.title || "Untitled World"}
                     </motion.h3>
                     {showAuthor && (
                       <motion.p
                         layoutId={`description-${world.id}-${id}`}
-                        className="text-center text-sm text-muted-foreground md:text-left"
+                        className="text-left text-xs text-muted-foreground"
                       >
                         by {world.user_name || "Unknown"}
                       </motion.p>
                     )}
                     {/* Social metadata preview */}
-                    <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-2 text-xs md:gap-3">
                       <div className="flex items-center gap-1">
                         <Star className={`h-3 w-3 ${world.rating && world.rating > 0 ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
                         <span className="font-medium">{world.rating && world.rating > 0 ? world.rating.toFixed(1) : "N/A"}</span>
@@ -345,7 +345,7 @@ export default function ExpandableWorldCards({
 
                     {/* Relevance Match Indicator */}
                     {world.relevance && (
-                      <div className="mt-2 flex items-center gap-1">
+                      <div className="mt-1 flex items-center gap-1">
                         <span
                           className={`text-xs font-medium ${getMatchLabel(world.relevance).color}`}
                         >
@@ -370,7 +370,7 @@ export default function ExpandableWorldCards({
                 </div>
                 <motion.button
                   layoutId={`button-${world.id}-${id}`}
-                  className="mt-4 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 md:mt-0"
+                  className="mt-2 hidden rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 md:mt-0 md:block"
                 >
                   View
                 </motion.button>
@@ -389,12 +389,12 @@ export default function ExpandableWorldCards({
               <div className="flex w-full flex-col gap-4">
                 <motion.div layoutId={`image-${world.id}-${id}`}>
                   {world.portrait_url && (
-                    <div className="relative aspect-[4/3] w-full">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
                       <Image
                         fill
                         src={world.portrait_url}
                         alt={world.full_story.quest?.title || "World portrait"}
-                        className="rounded-lg object-cover object-top"
+                        className="scale-95 object-cover object-top"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                     </div>
