@@ -2,7 +2,7 @@
 
 import ExpandableWorldCards from "./ExpandableWorldCards";
 import { World } from "@/lib/schemas";
-import { Flame } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 interface TrendingWorldsProps {
   worlds: World[];
@@ -14,7 +14,7 @@ export default function TrendingWorlds({ worlds }: TrendingWorldsProps) {
   return (
     <section className="rounded-xl bg-card/30 p-4 md:p-6">
       <div className="mb-3 flex items-center gap-2 md:mb-4">
-        <Flame className="h-4 w-4 text-orange-500 md:h-5 md:w-5" />
+        <TrendingUp className="h-4 w-4 text-green-500 md:h-5 md:w-5" />
         <div>
           <h2 className="text-sm font-bold md:text-lg">Trending Now</h2>
           <p className="hidden text-xs text-muted-foreground md:block">
