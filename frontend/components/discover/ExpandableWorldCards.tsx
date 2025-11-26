@@ -153,12 +153,12 @@ export default function ExpandableWorldCards({
             >
               <motion.div layoutId={`image-${active.id}-${id}`}>
                 {active.portrait_url && (
-                  <div className="relative h-80 w-full overflow-hidden bg-muted/20 lg:h-80 sm:rounded-tl-lg sm:rounded-tr-lg">
+                  <div className="relative h-80 w-full overflow-hidden lg:h-80 sm:rounded-tl-lg sm:rounded-tr-lg">
                     <Image
                       fill
                       src={active.portrait_url}
                       alt={active.full_story.quest?.title || "World portrait"}
-                      className="object-contain"
+                      className="object-cover object-[50%_20%]"
                     />
                   </div>
                 )}
@@ -303,7 +303,7 @@ export default function ExpandableWorldCards({
                           fill
                           src={world.portrait_url}
                           alt={world.full_story.quest?.title || "World portrait"}
-                          className="object-cover object-top"
+                          className="object-cover object-[50%_20%]"
                           sizes="80px"
                         />
                       </div>
@@ -389,12 +389,12 @@ export default function ExpandableWorldCards({
               <div className="flex w-full flex-col gap-4">
                 <motion.div layoutId={`image-${world.id}-${id}`}>
                   {world.portrait_url && (
-                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted/20">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
                       <Image
                         fill
                         src={world.portrait_url}
                         alt={world.full_story.quest?.title || "World portrait"}
-                        className="object-contain"
+                        className="object-cover object-[50%_20%]"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                     </div>
