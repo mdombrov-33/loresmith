@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
 	"golang.org/x/oauth2"
@@ -172,7 +173,8 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		Name:     "token",
 		Value:    tokenString,
 		Path:     "/",
-		MaxAge:   259200, //* 3 days
+		Domain:   "localhost", //* Allow cookie across ports
+		MaxAge:   259200,      //* 3 days
 		HttpOnly: true,
 		Secure:   false, //TODO: Set to true in production
 		SameSite: http.SameSiteLaxMode,
@@ -197,6 +199,7 @@ func (h *UserHandler) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) 
 		Name:     "oauth_state",
 		Value:    state,
 		Path:     "/",
+		Domain:   "localhost",
 		MaxAge:   600, //* 10 minutes
 		HttpOnly: true,
 		Secure:   false, //TODO: Set to true in production
@@ -235,6 +238,7 @@ func (h *UserHandler) HandleGoogleCallback(w http.ResponseWriter, r *http.Reques
 		Name:     "oauth_state",
 		Value:    "",
 		Path:     "/",
+		Domain:   "localhost",
 		MaxAge:   -1,
 		HttpOnly: true,
 	})
@@ -312,7 +316,8 @@ func (h *UserHandler) HandleGoogleCallback(w http.ResponseWriter, r *http.Reques
 		Name:     "token",
 		Value:    tokenString,
 		Path:     "/",
-		MaxAge:   259200, //* 3 days
+		Domain:   "localhost", //* Allow cookie across ports
+		MaxAge:   259200,      //* 3 days
 		HttpOnly: true,
 		Secure:   false, //TODO: Set to true in production
 		SameSite: http.SameSiteLaxMode,
@@ -328,6 +333,7 @@ func (h *UserHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		Name:     "token",
 		Value:    "",
 		Path:     "/",
+		Domain:   "localhost",
 		MaxAge:   -1, //* Delete cookie
 		HttpOnly: true,
 		Secure:   false, //TODO: Set to true in production
@@ -335,4 +341,21 @@ func (h *UserHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	})
 
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"message": "logged out successfully"})
+}
+
+func (h *UserHandler) HandleGetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	//* Get user from context (set by auth middleware)
+	user, ok := r.Context().Value(middleware.UserContextKey).(*store.User)
+	if !ok || user == nil {
+		utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "unauthorized"})
+		return
+	}
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+		"user": map[string]interface{}{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
 }

@@ -1,4 +1,4 @@
-import { RegisterRequest, LoginRequest, AuthResponse, RegisterResponse } from "@/lib/schemas";
+import { RegisterRequest, LoginRequest, AuthResponse, RegisterResponse, User } from "@/lib/schemas";
 import { API_BASE_URL, fetchWithTimeout } from "./base";
 
 export async function registerUser(
@@ -43,4 +43,23 @@ export async function loginUser(request: LoginRequest): Promise<AuthResponse> {
 
   const data = await response.json();
   return data;
+}
+
+export async function getCurrentUser(): Promise<{ user: User } | null> {
+  const url = `${API_BASE_URL}/auth/me`;
+
+  try {
+    const response = await fetchWithTimeout(url, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return null;
+  }
 }

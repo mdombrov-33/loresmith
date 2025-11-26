@@ -14,11 +14,13 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import CardImage from "@/components/shared/card/CardImage";
 import { getTraitIcon, getTraitColor } from "@/lib/trait-icons";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/api/auth";
 
 export default function Home() {
   const {
     setAppStage,
     user,
+    login,
     isLoginModalOpen,
     setIsLoginModalOpen,
     isRegisterModalOpen,
@@ -30,6 +32,20 @@ export default function Home() {
   useEffect(() => {
     setAppStage("home");
   }, [setAppStage]);
+
+  //* Fetch current user on mount if not already logged in
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!user) {
+        const data = await getCurrentUser();
+        if (data?.user) {
+          login(data.user);
+        }
+      }
+    };
+
+    fetchUser();
+  }, [user, login]);
 
   const handleStartCreating = () => {
     if (isAuthenticated) {

@@ -26,6 +26,9 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Group(func(r chi.Router) {
 		r.Use(app.Middleware.Authenticate)
 
+		//* Auth routes
+		r.Get("/auth/me", app.UserHandler.HandleGetCurrentUser)
+
 		//* Lore generation routes
 		r.Get("/generate/characters", app.LoreHandler.HandleGenerateCharacters)
 		r.Get("/generate/settings", app.LoreHandler.HandleGenerateSettings)
