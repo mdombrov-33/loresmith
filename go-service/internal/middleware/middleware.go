@@ -35,20 +35,29 @@ func GetUser(r *http.Request) *store.User {
 func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Authorization")
-		authHeader := r.Header.Get("Authorization")
 
-		if authHeader == "" {
-			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "missing authorization header"})
-			return
+		var token string
+
+		//* Try to get token from cookie first
+		cookie, err := r.Cookie("token")
+		if err == nil && cookie.Value != "" {
+			token = cookie.Value
+		} else {
+			//* Fall back to Authorization header
+			authHeader := r.Header.Get("Authorization")
+			if authHeader == "" {
+				utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "missing authorization"})
+				return
+			}
+
+			headerParts := strings.Split(authHeader, " ")
+			if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+				utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid authentication header"})
+				return
+			}
+			token = headerParts[1]
 		}
 
-		headerParts := strings.Split(authHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-			utils.WriteResponseJSON(w, http.StatusUnauthorized, utils.ResponseEnvelope{"error": "invalid authentication header"})
-			return
-		}
-
-		token := headerParts[1]
 		claims := &jwt.MapClaims{}
 		parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) { return []byte(os.Getenv("JWT_SECRET")), nil })
 		if err != nil || !parsedToken.Valid {

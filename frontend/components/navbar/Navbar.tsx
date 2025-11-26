@@ -16,7 +16,6 @@ import ActionButton from "@/components/shared/ActionButton";
 export default function Navbar() {
   const {
     user,
-    token,
     appStage,
     isLoginModalOpen,
     setIsLoginModalOpen,
@@ -25,12 +24,12 @@ export default function Navbar() {
     theme,
   } = useAppStore();
   const { data: session } = useSession();
-  const isAuthenticated = !!session || (!!user && !!token);
+  const isAuthenticated = !!session || !!user;
   const showThemeSwitcher = appStage === "home";
 
   useEffect(() => {
-    if (session?.token && session?.backendUser) {
-      useAppStore.getState().login(session.token, session.backendUser);
+    if (session?.backendUser) {
+      useAppStore.getState().login(session.backendUser);
     }
   }, [session]);
 

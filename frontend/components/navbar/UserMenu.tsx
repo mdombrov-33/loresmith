@@ -16,16 +16,24 @@ import { useRouter } from "next/navigation";
 
 export function UserMenu() {
   const router = useRouter();
-  const { user, token, logout, theme } = useAppStore();
+  const { user, logout, theme } = useAppStore();
   const { data: session } = useSession();
-  const isAuthenticated = !!session || (!!user && !!token);
+  const isAuthenticated = !!session || !!user;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (session) {
       signOut();
     } else {
+      //* Call backend to clear HTTP-only cookie
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
       logout();
-      document.cookie = "auth=; path=/; max-age=0";
       router.push(`/?theme=${theme}`);
     }
   };

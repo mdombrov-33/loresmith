@@ -13,7 +13,8 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Cookie"},
+		ExposedHeaders:   []string{"Set-Cookie"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
@@ -57,6 +58,7 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Get("/health", app.HealthCheck)
 	r.Post("/register", app.UserHandler.HandleRegisterUser)
 	r.Post("/login", app.UserHandler.HandleLoginUser)
+	r.Post("/logout", app.UserHandler.HandleLogout)
 	r.Post("/auth/google", app.UserHandler.HandleGoogleAuth)
 	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait)
 	return r

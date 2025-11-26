@@ -17,7 +17,6 @@ interface AppState {
 
   //* Auth
   user: User | null;
-  token: string | null;
 
   //* App Stage
   appStage: AppStage;
@@ -41,7 +40,7 @@ interface AppState {
   setTheme: (theme: string) => void;
   setAudioTheme: (audioTheme: string) => void;
   setUserChangedTheme: (changed: boolean) => void;
-  login: (token: string, user: User) => void;
+  login: (user: User) => void;
   logout: () => void;
   setAppStage: (stage: AppStage) => void;
   setSelectedLore: (selectedLore: SelectedLore) => void;
@@ -63,7 +62,6 @@ export const useAppStore = create<AppState>((set) => ({
   audioTheme: "fantasy", //* Default audio theme
   userChangedTheme: false,
   user: null,
-  token: null,
   appStage: "home",
   selectedLore: {},
   searchScope: "my",
@@ -78,9 +76,9 @@ export const useAppStore = create<AppState>((set) => ({
   setAudioTheme: (audioTheme: string) => set({ audioTheme }), //* For manual override
   setUserChangedTheme: (changed: boolean) => set({ userChangedTheme: changed }),
 
-  login: (token: string, user: User) => set({ token, user }),
+  login: (user: User) => set({ user }),
 
-  logout: () => set({ token: null, user: null, selectedLore: {} }),
+  logout: () => set({ user: null, selectedLore: {} }),
 
   setAppStage: (appStage: AppStage) => set({ appStage }),
 
@@ -104,7 +102,6 @@ useAppStore.subscribe((state) => {
     theme: state.theme,
     audioTheme: state.audioTheme,
     user: state.user,
-    token: state.token,
     selectedLore: state.selectedLore,
     searchScope: state.searchScope,
     searchTheme: state.searchTheme,

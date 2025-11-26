@@ -1,15 +1,10 @@
-import { useAppStore } from "@/stores/appStore";
-import { getSession } from "next-auth/react";
-
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const REQUEST_TIMEOUT = 300000; //* 300 seconds (5 minutes) - Image generation can take 2-3 minutes
 
 export async function getAuthHeaders() {
-  const session = await getSession();
-  const token = session?.token || useAppStore.getState().token;
   return {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
@@ -33,6 +28,7 @@ export async function fetchWithTimeout(
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
+      credentials: "include", //* Include cookies for HTTP-only auth
     });
     clearTimeout(timeoutId);
     return response;

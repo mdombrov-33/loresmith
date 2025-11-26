@@ -156,6 +156,17 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//* Set token as HTTP-only cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Path:     "/",
+		MaxAge:   259200, //* 3 days
+		HttpOnly: true,
+		Secure:   false, //TODO: Set to true in production
+		SameSite: http.SameSiteLaxMode,
+	})
+
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"token": tokenString,
 		"user": map[string]interface{}{
@@ -217,6 +228,17 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//* Set token as HTTP-only cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Path:     "/",
+		MaxAge:   259200, //* 3 days
+		HttpOnly: true,
+		Secure:   false, //TODO: Set to true in production
+		SameSite: http.SameSiteLaxMode,
+	})
+
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
 		"token": tokenString,
 		"user": map[string]interface{}{
@@ -225,4 +247,19 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 			"email":    user.Email,
 		},
 	})
+}
+
+func (h *UserHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	//* Clear the token cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1, //* Delete cookie
+		HttpOnly: true,
+		Secure:   false, //TODO: Set to true in production
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"message": "logged out successfully"})
 }

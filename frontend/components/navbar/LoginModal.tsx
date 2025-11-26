@@ -50,10 +50,7 @@ export function LoginModal({
         password: formData.password,
       });
 
-      login(response.token, response.user);
-
-      //TODO: nuke this approach later and set httpOnly cookie from backend
-      document.cookie = "auth=true; path=/; max-age=2592000"; //* 30 days
+      login(response.user);
 
       onClose();
       setFormData({ username: "", password: "" });
