@@ -182,7 +182,7 @@ export default function ExpandableWorldCards({
                       </motion.p>
                     )}
 
-                    {/* Badges */}
+                    {/* Badges and Actions Row */}
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <Badge variant="outline">
                         {getThemeOption(active.theme)?.label || active.theme}
@@ -203,57 +203,59 @@ export default function ExpandableWorldCards({
                             <span>{active.active_sessions}</span>
                           </div>
                         )}
+                      {/* Spacer to push View button all the way right */}
+                      <div className="flex-1" />
+                      {/* View Button */}
+                      <PrimaryButton
+                        onClick={() => handleViewWorld(active)}
+                        className="text-sm"
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View
+                      </PrimaryButton>
                     </div>
                   </div>
 
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex gap-2"
-                  >
-                    {isOwner && (
-                      <>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleToggleVisibility}
-                                disabled={updateVisibilityMutation.isPending}
-                              >
-                                {active.visibility === "published" ? (
-                                  <Eye className="h-4 w-4" />
-                                ) : (
-                                  <EyeOff className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {active.visibility === "published" ? "Make Private" : "Publish"}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={handleDeleteClick}
-                          disabled={deleteWorldMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    <PrimaryButton
-                      onClick={() => handleViewWorld(active)}
-                      className="text-sm"
+                  {/* Owner Actions - Top Right */}
+                  {isOwner && (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex gap-2"
                     >
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
-                    </PrimaryButton>
-                  </motion.div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleToggleVisibility}
+                              disabled={updateVisibilityMutation.isPending}
+                            >
+                              {active.visibility === "published" ? (
+                                <Eye className="h-4 w-4" />
+                              ) : (
+                                <EyeOff className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {active.visibility === "published" ? "Make Private" : "Publish"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleDeleteClick}
+                        disabled={deleteWorldMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  )}
                 </div>
                 <div className="relative px-4 pt-4">
                   <motion.div
@@ -291,7 +293,7 @@ export default function ExpandableWorldCards({
                 layoutId={`card-${world.id}-${id}`}
                 key={`card-${world.id}-${id}`}
                 onClick={() => setActive(world)}
-                className="flex cursor-pointer flex-col items-center justify-between rounded-xl p-4 hover:bg-accent md:flex-row"
+                className="flex cursor-pointer flex-col items-center justify-between rounded-xl p-4 transition-colors hover:bg-muted/50 md:flex-row"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center">
                   <motion.div layoutId={`image-${world.id}-${id}`}>
@@ -382,7 +384,7 @@ export default function ExpandableWorldCards({
               layoutId={`card-${world.id}-${id}`}
               key={world.id}
               onClick={() => setActive(world)}
-              className="flex cursor-pointer flex-col rounded-xl p-4 hover:bg-accent"
+              className="flex cursor-pointer flex-col rounded-xl p-4 transition-colors hover:bg-muted/50"
             >
               <div className="flex w-full flex-col gap-4">
                 <motion.div layoutId={`image-${world.id}-${id}`}>

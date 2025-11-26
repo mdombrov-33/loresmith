@@ -24,14 +24,26 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
           className="-top-40 left-0 md:-top-20 md:left-40"
           fill="white"
         />
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
+          {/* Featured Badge - Top */}
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Featured World
+            </span>
+          </div>
+
+          {/* Center Content */}
           <div className="text-center">
-            <Sparkles className="mx-auto mb-4 h-16 w-16 text-primary" />
-            <h2 className="text-4xl font-bold">Featured World Coming Soon</h2>
-            <p className="mt-2 text-muted-foreground">
+            <Sparkles className="mx-auto mb-4 h-12 w-12 text-primary" />
+            <h2 className="text-3xl font-bold">Coming Soon</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
               Check back for our handpicked world of the week
             </p>
           </div>
+
+          {/* Bottom spacer for balance */}
+          <div />
         </div>
       </section>
     );
@@ -65,45 +77,46 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex h-full flex-col justify-end p-8 md:p-12">
-        <div className="max-w-2xl">
-          {/* Featured Badge */}
-          <div className="mb-4 flex items-center gap-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-              Featured World
-            </span>
-          </div>
+      <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
+        {/* Featured Badge - Top */}
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+            Featured World
+          </span>
+        </div>
 
+        {/* Bottom Content */}
+        <div className="max-w-2xl">
           {/* Theme Badge */}
           {themeOption && (
-            <Badge variant="outline" className="mb-4 border-white/20 bg-white/10">
+            <Badge variant="outline" className="mb-3 border-white/20 bg-white/10">
               {themeOption.label}
             </Badge>
           )}
 
           {/* Title */}
-          <h1 className="mb-3 text-3xl font-bold leading-tight text-white md:text-4xl">
+          <h1 className="mb-2 text-3xl font-bold leading-tight text-white md:text-4xl">
             {world.full_story.quest?.title || "Untitled World"}
           </h1>
 
           {/* Description */}
-          <p className="mb-4 line-clamp-2 text-base text-white/80">
+          <p className="mb-3 line-clamp-2 text-sm text-white/80 md:text-base">
             {world.full_story.content || "No description available"}
           </p>
 
           {/* Meta Info */}
-          <div className="mb-6 flex items-center gap-6 text-sm text-white/60">
-            <div className="flex items-center gap-2">
+          <div className="mb-4 flex flex-wrap items-center gap-4 text-xs text-white/60">
+            <div className="flex items-center gap-1">
               <span>by {world.user_name || "Unknown"}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
               <span>0.0 Rating</span>
             </div>
             {world.active_sessions !== undefined && world.active_sessions > 0 && (
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-green-400" />
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3 text-green-400" />
                 <span className="text-green-400">
                   {world.active_sessions} Active
                 </span>
@@ -114,7 +127,7 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
           {/* CTA */}
           <PrimaryButton
             onClick={() => router.push(`/worlds/${world.theme}/${world.id}`)}
-            className="text-base"
+            className="text-sm md:text-base"
           >
             Explore This World
           </PrimaryButton>
