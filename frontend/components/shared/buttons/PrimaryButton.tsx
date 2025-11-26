@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 export function PrimaryButton({
   children,
   className,
-  background = "linear-gradient(135deg, oklch(0.65 0.20 290), oklch(0.55 0.18 290))",
-  shimmerColor = "oklch(0.85 0.22 290)",
+  background = "linear-gradient(135deg, var(--primary), oklch(from var(--primary) calc(l - 0.1) c h))",
+  shimmerColor = "oklch(from var(--primary) calc(l + 0.2) c h)",
   ...props
 }: ShimmerButtonProps) {
   return (
