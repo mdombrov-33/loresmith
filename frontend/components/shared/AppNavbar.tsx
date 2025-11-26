@@ -45,7 +45,18 @@ export default function AppNavbar() {
     },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    //* Clear backend cookie
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+
+    //* Clear zustand state
     logout();
     router.push("/");
   };

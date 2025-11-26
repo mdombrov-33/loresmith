@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 )
@@ -18,4 +20,10 @@ func WriteResponseJSON(w http.ResponseWriter, status int, data ResponseEnvelope)
 	w.WriteHeader(status)
 	w.Write(js)
 	return nil
+}
+
+func GenerateRandomString(length int) string {
+	bytes := make([]byte, length)
+	rand.Read(bytes)
+	return base64.URLEncoding.EncodeToString(bytes)[:length]
 }

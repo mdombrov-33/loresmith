@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { THEME_OPTIONS } from "@/constants/game-themes";
 import BackButton from "@/components/shared/BackButton";
-import { useSession } from "next-auth/react";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { LoginModal } from "@/components/navbar/LoginModal";
 import { RegisterModal } from "@/components/navbar/RegisterModal";
@@ -19,14 +18,12 @@ export default function SelectThemePage() {
     setTheme,
     setAppStage,
     user,
-    token,
     setIsLoginModalOpen,
     isLoginModalOpen,
     isRegisterModalOpen,
     setIsRegisterModalOpen,
   } = useAppStore();
-  const { data: session } = useSession();
-  const isAuthenticated = !!session || (!!user && !!token);
+  const isAuthenticated = !!user;
 
   // Set app stage
   useEffect(() => {

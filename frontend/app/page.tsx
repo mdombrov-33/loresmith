@@ -2,7 +2,6 @@
 
 import { useAppStore } from "@/stores/appStore";
 import { useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/shared/Logo";
 import { PrimaryButton, SecondaryButton } from "@/components/shared/buttons";
@@ -20,15 +19,13 @@ export default function Home() {
   const {
     setAppStage,
     user,
-    token,
     isLoginModalOpen,
     setIsLoginModalOpen,
     isRegisterModalOpen,
     setIsRegisterModalOpen,
   } = useAppStore();
-  const { data: session } = useSession();
   const router = useRouter();
-  const isAuthenticated = !!session || (!!user && !!token);
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     setAppStage("home");

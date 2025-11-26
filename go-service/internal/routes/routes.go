@@ -59,7 +59,8 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Post("/register", app.UserHandler.HandleRegisterUser)
 	r.Post("/login", app.UserHandler.HandleLoginUser)
 	r.Post("/logout", app.UserHandler.HandleLogout)
-	r.Post("/auth/google", app.UserHandler.HandleGoogleAuth)
+	r.Get("/auth/google", app.UserHandler.HandleGoogleLogin)
+	r.Get("/auth/google/callback", app.UserHandler.HandleGoogleCallback)
 	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait)
 	return r
 }

@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import ActionButton from "@/components/shared/ActionButton";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
-import { useSession } from "next-auth/react";
 
 interface PlanTier {
   name: string;
@@ -76,9 +75,8 @@ export default function PlansPage() {
   const [isAnnual, setIsAnnual] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const router = useRouter();
-  const { user, token, setIsLoginModalOpen, setAppStage } = useAppStore();
-  const { data: session } = useSession();
-  const isAuthenticated = !!session || (!!user && !!token);
+  const { user, setIsLoginModalOpen, setAppStage } = useAppStore();
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     setAppStage("plans");

@@ -97,7 +97,7 @@ export function AudioToggle() {
       return pathSegments[2] || audioTheme;
     } else if (pathname.startsWith("/adventure/")) {
       return theme;
-    } else if (pathname === "/worlds-hub") {
+    } else if (pathname === "/my-worlds" || pathname === "/discover") {
       return initialAudioTheme || audioTheme;
     } else {
       return audioTheme;
@@ -107,17 +107,19 @@ export function AudioToggle() {
   const prevEffectiveAudioThemeRef = useRef(effectiveAudioTheme);
 
   useEffect(() => {
-    if (pathname === "/worlds-hub" && !hasEnteredHubRef.current) {
+    const isHubPage = pathname === "/my-worlds" || pathname === "/discover";
+    if (isHubPage && !hasEnteredHubRef.current) {
       hasEnteredHubRef.current = true;
       setInitialAudioTheme(audioTheme);
-    } else if (pathname !== "/worlds-hub") {
+    } else if (!isHubPage) {
       hasEnteredHubRef.current = false;
       setInitialAudioTheme(null);
     }
   }, [pathname, audioTheme]);
 
   useEffect(() => {
-    if (pathname !== "/worlds-hub") {
+    const isHubPage = pathname === "/my-worlds" || pathname === "/discover";
+    if (!isHubPage) {
       setAudioTheme(effectiveAudioTheme);
     }
   }, [effectiveAudioTheme, pathname, setAudioTheme]);

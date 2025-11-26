@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
@@ -12,11 +13,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 type UserHandler struct {
-	userStore store.UserStore
-	logger    *log.Logger
+	userStore    store.UserStore
+	logger       *log.Logger
+	oauth2Config *oauth2.Config
 }
 
 type registerUserRequest struct {
@@ -30,16 +34,23 @@ type loginUserRequest struct {
 	Password string `json:"password"`
 }
 
-type googleAuthRequest struct {
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	ProviderID string `json:"provider_id"`
-}
-
 func NewUserHandler(userStore store.UserStore, logger *log.Logger) *UserHandler {
+	oauth2Config := &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: google.Endpoint,
+	}
+
 	return &UserHandler{
-		userStore: userStore,
-		logger:    logger}
+		userStore:    userStore,
+		logger:       logger,
+		oauth2Config: oauth2Config,
+	}
 }
 
 func (h *UserHandler) validateRegisterRequest(req *registerUserRequest) error {
@@ -177,54 +188,122 @@ func (h *UserHandler) HandleLoginUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
-	var req googleAuthRequest
+func (h *UserHandler) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	//* Generate state token for CSRF protection
+	state := utils.GenerateRandomString(32)
+
+	//* Store state in cookie to verify in callback
+	http.SetCookie(w, &http.Cookie{
+		Name:     "oauth_state",
+		Value:    state,
+		Path:     "/",
+		MaxAge:   600, //* 10 minutes
+		HttpOnly: true,
+		Secure:   false, //TODO: Set to true in production
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	//* Redirect to Google OAuth
+	url := h.oauth2Config.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func (h *UserHandler) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	secret := os.Getenv("JWT_SECRET")
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	//* Verify state token
+	stateCookie, err := r.Cookie("oauth_state")
 	if err != nil {
-		h.logger.Printf("ERROR: decoding google auth request: %v", err)
-		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request payload"})
+		h.logger.Printf("ERROR: missing state cookie: %v", err)
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
-	if req.Email == "" || req.ProviderID == "" {
-		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "email and provider_id are required"})
+	state := r.URL.Query().Get("state")
+	if state != stateCookie.Value {
+		h.logger.Printf("ERROR: state mismatch")
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
-	user, err := h.userStore.GetUserByEmailAndProvider(req.Email, "google")
+	//* Clear state cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "oauth_state",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+
+	//* Exchange code for token
+	code := r.URL.Query().Get("code")
+	token, err := h.oauth2Config.Exchange(context.Background(), code)
+	if err != nil {
+		h.logger.Printf("ERROR: exchanging code for token: %v", err)
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
+		return
+	}
+
+	//* Get user info from Google
+	client := h.oauth2Config.Client(context.Background(), token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	if err != nil {
+		h.logger.Printf("ERROR: getting user info: %v", err)
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
+		return
+	}
+	defer resp.Body.Close()
+
+	var googleUser struct {
+		ID    string `json:"id"`
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&googleUser); err != nil {
+		h.logger.Printf("ERROR: decoding user info: %v", err)
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
+		return
+	}
+
+	//* Find or create user
+	user, err := h.userStore.GetUserByEmailAndProvider(googleUser.Email, "google")
 	if err != nil {
 		h.logger.Printf("ERROR: fetching user by email and provider: %v", err)
-		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
 	if user == nil {
 		user = &store.User{
-			Username:   req.Name,
-			Email:      req.Email,
+			Username:   googleUser.Name,
+			Email:      googleUser.Email,
 			Provider:   "google",
-			ProviderID: req.ProviderID,
+			ProviderID: googleUser.ID,
 		}
 		err = h.userStore.CreateUser(user)
 		if err != nil {
 			h.logger.Printf("ERROR: creating google user: %v", err)
-			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+			http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
 			return
 		}
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	//* Generate JWT
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":  user.ID,
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Hour * 72).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := jwtToken.SignedString([]byte(secret))
 	if err != nil {
 		h.logger.Printf("ERROR: signing token: %v", err)
-		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		http.Redirect(w, r, frontendURL+"/?error=auth_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -239,14 +318,8 @@ func (h *UserHandler) HandleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
-		"token": tokenString,
-		"user": map[string]interface{}{
-			"id":       user.ID,
-			"username": user.Username,
-			"email":    user.Email,
-		},
-	})
+	//* Redirect to discover page
+	http.Redirect(w, r, frontendURL+"/discover", http.StatusTemporaryRedirect)
 }
 
 func (h *UserHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {

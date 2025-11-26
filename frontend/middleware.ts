@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
-  const authCookie = request.cookies.get("auth");
+  //* Check if user has the auth token cookie
+  const tokenCookie = request.cookies.get("token");
 
-  if (token || authCookie?.value === "true") {
+  if (tokenCookie?.value) {
     return NextResponse.next();
   }
 
@@ -14,5 +13,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/generate/:path*", "/worlds-hub", "/worlds/:path*", "/plans"],
+  matcher: [
+    "/discover",
+    "/my-worlds",
+    "/select-theme",
+    "/generate/:path*",
+    "/worlds/:path*",
+    "/plans",
+  ],
 };

@@ -10,7 +10,6 @@ import {
 import ActionButton from "@/components/shared/ActionButton";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
-import { signIn } from "next-auth/react";
 import { useAppStore } from "@/stores/appStore";
 import { registerUser, loginUser } from "@/lib/api/auth";
 import { AuthInput } from "./AuthInput";
@@ -89,13 +88,8 @@ export function RegisterModal({
     handleRegister();
   };
 
-  const handleGoogleAuth = async () => {
-    try {
-      await signIn("google", { callbackUrl: "/" });
-    } catch (error) {
-      console.error(error);
-      setError("Google sign-in failed");
-    }
+  const handleGoogleAuth = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
   };
 
   return (
