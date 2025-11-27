@@ -14,8 +14,6 @@ LoreSmith is an **interactive adventure platform** where AI generates rich, them
 
 ## Screenshots
 
-### Home Page
-
 ### Discover Worlds Page
 
 ![Discover](assets/screenshots//discover.png)
