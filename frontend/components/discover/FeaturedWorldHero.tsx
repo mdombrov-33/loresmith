@@ -104,7 +104,7 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
             </div>
             <div className="flex items-center gap-1">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              <span>0.0 Rating</span>
+              <span>{world.rating?.toFixed(1)}</span>
             </div>
             {world.active_sessions !== undefined &&
               world.active_sessions > 0 && (
