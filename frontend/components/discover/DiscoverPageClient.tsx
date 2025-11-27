@@ -70,15 +70,6 @@ export default function DiscoverPageClient() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="my-12">
-          <DiscoverSearch
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onSearch={handleSearch}
-          />
-        </div>
-
         {/* Three Sections in Compact Grid - FIXED: Remove flex wrappers */}
         <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Highest Rated Section */}
@@ -110,6 +101,15 @@ export default function DiscoverPageClient() {
           ) : (
             <TrendingWorlds worlds={trendingWorlds} />
           )}
+        </div>
+
+        {/* Search Bar */}
+        <div className="my-12">
+          <DiscoverSearch
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSearch={handleSearch}
+          />
         </div>
 
         {/* Divider */}
