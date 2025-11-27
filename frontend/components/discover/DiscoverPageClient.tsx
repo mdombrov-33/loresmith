@@ -58,7 +58,7 @@ export default function DiscoverPageClient() {
           {/* Featured World Hero - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             {isFeaturedLoading ? (
-              <div className="bg-card h-[350px] animate-pulse rounded-3xl" />
+              <div className="bg-card h-[500px] animate-pulse rounded-3xl" />
             ) : (
               <FeaturedWorldHero world={featuredWorld} />
             )}
