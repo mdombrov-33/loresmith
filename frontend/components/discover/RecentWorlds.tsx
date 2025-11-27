@@ -12,12 +12,12 @@ export default function RecentWorlds({ worlds }: RecentWorldsProps) {
   if (worlds.length === 0) return null;
 
   return (
-    <section className="rounded-xl bg-card/30 p-4 md:p-6">
+    <section className="bg-card/30 h-full rounded-xl p-4 md:p-6">
       <div className="mb-3 flex items-center gap-2 md:mb-4">
         <Clock className="h-4 w-4 text-blue-500 md:h-5 md:w-5" />
         <div>
           <h2 className="text-sm font-bold md:text-lg">Recently Created</h2>
-          <p className="hidden text-xs text-muted-foreground md:block">
+          <p className="text-muted-foreground hidden text-xs md:block">
             Fresh worlds added
           </p>
         </div>

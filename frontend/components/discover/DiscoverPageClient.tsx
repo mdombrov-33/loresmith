@@ -79,46 +79,37 @@ export default function DiscoverPageClient() {
           />
         </div>
 
-        {/* Three Sections in Compact Grid */}
+        {/* Three Sections in Compact Grid - FIXED: Remove flex wrappers */}
         <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Highest Rated Section */}
-          <div>
-            {isHighestRatedLoading ? (
-              <div className="py-8">
-                <GlobalLoading
-                  message="Loading highest rated..."
-                  fullScreen={false}
-                />
-              </div>
-            ) : (
-              <HighestRatedWorlds worlds={highestRatedWorlds} />
-            )}
-          </div>
+          {isHighestRatedLoading ? (
+            <div className="py-8">
+              <GlobalLoading
+                message="Loading highest rated..."
+                fullScreen={false}
+              />
+            </div>
+          ) : (
+            <HighestRatedWorlds worlds={highestRatedWorlds} />
+          )}
+
+          {/* Recent Section */}
+          {isRecentLoading ? (
+            <div className="py-8">
+              <GlobalLoading message="Loading recent..." fullScreen={false} />
+            </div>
+          ) : (
+            <RecentWorlds worlds={recentWorlds} />
+          )}
 
           {/* Trending Section */}
-          <div>
-            {isTrendingLoading ? (
-              <div className="py-8">
-                <GlobalLoading
-                  message="Loading trending..."
-                  fullScreen={false}
-                />
-              </div>
-            ) : (
-              <TrendingWorlds worlds={trendingWorlds} />
-            )}
-          </div>
-
-          {/* Recently Created Section */}
-          <div>
-            {isRecentLoading ? (
-              <div className="py-8">
-                <GlobalLoading message="Loading recent..." fullScreen={false} />
-              </div>
-            ) : (
-              <RecentWorlds worlds={recentWorlds} />
-            )}
-          </div>
+          {isTrendingLoading ? (
+            <div className="py-8">
+              <GlobalLoading message="Loading trending..." fullScreen={false} />
+            </div>
+          ) : (
+            <TrendingWorlds worlds={trendingWorlds} />
+          )}
         </div>
 
         {/* Divider */}
