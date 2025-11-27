@@ -368,12 +368,6 @@ export default function ExpandableWorldCards({
                     )}
                   </div>
                 </div>
-                <motion.button
-                  layoutId={`button-${world.id}-${id}`}
-                  className="mt-2 hidden rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 md:mt-0 md:block"
-                >
-                  View
-                </motion.button>
               </motion.div>
             );
           }

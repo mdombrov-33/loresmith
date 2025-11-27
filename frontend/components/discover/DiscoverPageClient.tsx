@@ -24,7 +24,9 @@ export default function DiscoverPageClient() {
   const {
     selectedTheme,
     selectedStatus,
+    selectedSort,
     setSelectedStatus,
+    setSelectedSort,
     searchQuery,
     activeSearchQuery,
     setSearchQuery,
@@ -135,8 +137,10 @@ export default function DiscoverPageClient() {
           <DiscoverFilters
             selectedTheme={selectedTheme}
             selectedStatus={selectedStatus}
+            selectedSort={selectedSort}
             onThemeChange={handleThemeChange}
             onStatusChange={setSelectedStatus}
+            onSortChange={setSelectedSort}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />

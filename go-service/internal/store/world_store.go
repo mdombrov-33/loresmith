@@ -358,10 +358,16 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		switch *sortBy {
 		case "rating_desc":
 			orderByClause = ` ORDER BY w.rating DESC NULLS LAST, w.created_at DESC`
+		case "rating_asc":
+			orderByClause = ` ORDER BY w.rating ASC NULLS LAST, w.created_at DESC`
 		case "active_sessions_desc":
 			orderByClause = ` ORDER BY active_sessions_count DESC, w.created_at DESC`
+		case "active_sessions_asc":
+			orderByClause = ` ORDER BY active_sessions_count ASC, w.created_at DESC`
 		case "created_at_desc":
 			orderByClause = ` ORDER BY w.created_at DESC`
+		case "created_at_asc":
+			orderByClause = ` ORDER BY w.created_at ASC`
 		default:
 			orderByClause = ` ORDER BY w.created_at DESC`
 		}

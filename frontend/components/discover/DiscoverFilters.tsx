@@ -8,15 +8,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { THEME_OPTIONS } from "@/constants/game-themes";
-import { STATUS_OPTIONS } from "@/constants/hub-filters";
+import { STATUS_OPTIONS, SORT_OPTIONS } from "@/constants/hub-filters";
 import { LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DiscoverFiltersProps {
   selectedTheme: string;
   selectedStatus: string;
+  selectedSort: string;
   onThemeChange: (theme: string) => void;
   onStatusChange: (status: string) => void;
+  onSortChange: (sort: string) => void;
   viewMode: "grid" | "row";
   onViewModeChange: (mode: "grid" | "row") => void;
 }
@@ -24,8 +26,10 @@ interface DiscoverFiltersProps {
 export default function DiscoverFilters({
   selectedTheme,
   selectedStatus,
+  selectedSort,
   onThemeChange,
   onStatusChange,
+  onSortChange,
   viewMode,
   onViewModeChange,
 }: DiscoverFiltersProps) {
@@ -68,18 +72,22 @@ export default function DiscoverFilters({
           </SelectContent>
         </Select>
 
-        {/* Rating Filter - Placeholder */}
-        <Select disabled>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Rating (Coming Soon)" />
+        {/* Sort By */}
+        <Select
+          value={selectedSort || "default"}
+          onValueChange={(val) => onSortChange(val === "default" ? "" : val)}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Sort by" />
           </SelectTrigger>
-        </Select>
-
-        {/* Active Players Filter - Placeholder */}
-        <Select disabled>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Active Players (Soon)" />
-          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Default Order</SelectItem>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
 

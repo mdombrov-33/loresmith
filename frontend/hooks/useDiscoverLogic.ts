@@ -7,6 +7,7 @@ export function useDiscoverLogic() {
   const { setAppStage } = useAppStore();
   const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedSort, setSelectedSort] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeSearchQuery, setActiveSearchQuery] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
@@ -20,7 +21,7 @@ export function useDiscoverLogic() {
   useEffect(() => {
     setCurrentPage(1);
     setActiveSearchQuery("");
-  }, [selectedTheme, selectedStatus]);
+  }, [selectedTheme, selectedStatus, selectedSort]);
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
@@ -28,6 +29,10 @@ export function useDiscoverLogic() {
 
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSelectedSort(sort);
   };
 
   const handleSearch = () => {
@@ -101,6 +106,7 @@ export function useDiscoverLogic() {
     scope: "global",
     theme: selectedTheme || undefined,
     status: selectedStatus || undefined,
+    sort: selectedSort || undefined,
     limit: pageSize,
     offset: (currentPage - 1) * pageSize,
     search: activeSearchQuery || undefined,
@@ -111,7 +117,9 @@ export function useDiscoverLogic() {
   return {
     selectedTheme,
     selectedStatus,
+    selectedSort,
     setSelectedStatus: handleStatusChange,
+    setSelectedSort: handleSortChange,
     searchQuery,
     activeSearchQuery,
     setSearchQuery: handleSearchChange,
