@@ -16,14 +16,15 @@ LoreSmith is an **interactive adventure platform** where AI generates rich, them
 
 ### Home Page
 
-![Home Page](assets/screenshots/home.png)
-_Welcome screen with theme selection and navigation(post-apocalypse theme)_
+### Discover Worlds Page
 
-![Home Page](assets/screenshots/home2.png)
-_Welcome screen with theme selection and navigation(cyberpunk theme)_
+![Discover](assets/screenshots//discover.png)
+_Discover page view_
 
-![Home Page](assets/screenshots/home3.png)
-_Welcome screen with theme selection and navigation(norse mythology theme)_
+### My Worlds Page
+
+![My-Worlds-Page](assets/screenshots/my-worlds.png)
+\_My Worlds page view\_\_
 
 ### Lore Generation Cards(Front)
 
