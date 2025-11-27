@@ -24,7 +24,7 @@ _Discover page view_
 ### My Worlds Page
 
 ![My-Worlds-Page](assets/screenshots/my-worlds.png)
-\_My Worlds page view\_\_
+_My Worlds page view_
 
 ### Lore Generation Cards(Front)
 
