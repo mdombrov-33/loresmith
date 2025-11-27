@@ -214,9 +214,11 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 	var world World
 	err := s.db.QueryRow(`
-        SELECT id, user_id, status, theme, full_story, visibility, created_at, updated_at
-        FROM worlds WHERE id = $1
-    `, worldID).Scan(&world.ID, &world.UserID, &world.Status, &world.Theme, &world.FullStory, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
+        SELECT w.id, w.user_id, u.username, w.status, w.theme, w.full_story, w.visibility, w.created_at, w.updated_at
+        FROM worlds w
+        LEFT JOIN users u ON w.user_id = u.id
+        WHERE w.id = $1
+    `, worldID).Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
