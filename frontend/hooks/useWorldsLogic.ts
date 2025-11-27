@@ -1,91 +1,184 @@
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
-import { useWorld } from "@/lib/queries/world";
-import { FullStory } from "@/lib/schemas";
+import { useState, useEffect } from "react";
+import { useWorlds } from "@/lib/queries/world";
 import { useAppStore } from "@/stores/appStore";
+import { scrollToElement } from "@/lib/utils";
 
-export function useWorldsLogic() {
-  const params = useParams();
-  const worldId = parseInt(params.id as string, 10);
-  const actualTheme = params.theme as string;
-  const { setTheme, setAudioTheme, setAppStage } = useAppStore();
+interface ScopeFilters {
+  theme: string;
+  status: string;
+  sort: string;
+}
 
-  const { data: world, isLoading, error } = useWorld(worldId);
+interface UseWorldsLogicProps {
+  scope: "my" | "global";
+  appStage?: "discover" | "my-worlds";
+}
+
+export function useWorldsLogic({
+  scope,
+  appStage = "discover",
+}: UseWorldsLogicProps) {
+  const { setAppStage } = useAppStore();
+
+  //* Scope-specific filters
+  const [filters, setFilters] = useState<Record<"my" | "global", ScopeFilters>>(
+    {
+      my: { theme: "", status: "", sort: "" },
+      global: { theme: "", status: "", sort: "" },
+    },
+  );
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
+  const currentFilters = filters[scope];
 
   useEffect(() => {
-    setAppStage("story");
-  }, [setAppStage]);
+    setAppStage(appStage);
+  }, [setAppStage, appStage]);
 
   useEffect(() => {
-    if (actualTheme) {
-      setTheme(actualTheme);
-      setAudioTheme(actualTheme);
+    setCurrentPage(1);
+    setActiveSearchQuery("");
+  }, [currentFilters]);
+
+  //* Page-agnostic filter handlers(my/global)
+  const handleThemeChange = (theme: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [scope]: { ...prev[scope], theme },
+    }));
+  };
+
+  const handleStatusChange = (status: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [scope]: { ...prev[scope], status },
+    }));
+  };
+
+  const handleSortChange = (sort: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [scope]: { ...prev[scope], sort },
+    }));
+  };
+
+  //* Handle search on discover page
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setActiveSearchQuery(searchQuery.trim());
+      setCurrentPage(1);
+      //* Scroll to catalog section to show search results
+      setTimeout(() => {
+        scrollToElement("catalog-section", 100);
+      }, 100);
     }
-  }, [actualTheme, setTheme, setAudioTheme]);
+  };
 
-  let parsedStory: FullStory | null = null;
-  let displayError: string | null = null;
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
 
-  if (error) {
-    displayError = "Failed to load world";
-  } else if (world?.full_story) {
-    //* full_story is JSONB
-    parsedStory = world.full_story as FullStory;
-  }
+  const handleViewModeChange = (mode: "grid" | "row") => {
+    setViewMode(mode);
+  };
 
-  const paragraphs = parsedStory?.content?.split("\n\n").filter(Boolean) || [];
-
-  const lorePieces = (world?.lore_pieces || []).sort((a, b) => {
-    if (a.type === "character") return -1;
-    if (b.type === "character") return 1;
-    return 0;
+  //* Fetch featured world (only used on discover page)
+  const {
+    data: { worlds: featuredWorlds = [] } = {},
+    isLoading: isFeaturedLoading,
+  } = useWorlds({
+    scope: "global",
+    limit: 1,
+    offset: 0,
   });
 
-  const displayNames: Record<string, string> = {
-    character: "Protagonist",
-    faction: "Faction",
-    setting: "Setting",
-    event: "Event",
-    relic: "Relic",
-  };
+  //* Fetch highest rated worlds (only used on discover page)
+  const {
+    data: { worlds: highestRatedWorldsList = [] } = {},
+    isLoading: isHighestRatedLoading,
+  } = useWorlds({
+    scope: "global",
+    limit: 3,
+    offset: 0,
+    sort: "rating_desc",
+  });
 
-  const sortDetails = (details: Record<string, unknown>) => {
-    const order = [
-      "traits",
-      "appearance",
-      "flaw",
-      "skills",
-      "ideology",
-      "description",
-      "geography",
-      "climate",
-      "culture",
-      "conflict",
-      "power",
-      "origin",
-      "abilities",
-    ];
+  //* Fetch trending worlds (only used on discover page)
+  const {
+    data: { worlds: trendingWorldsList = [] } = {},
+    isLoading: isTrendingLoading,
+  } = useWorlds({
+    scope: "global",
+    limit: 3,
+    offset: 0,
+    sort: "active_sessions_desc",
+  });
 
-    return Object.entries(details).sort((a, b) => {
-      const indexA = order.indexOf(a[0]);
-      const indexB = order.indexOf(b[0]);
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
-  };
+  //* Fetch recently created worlds (only used on discover page)
+  const {
+    data: { worlds: recentWorldsList = [] } = {},
+    isLoading: isRecentLoading,
+  } = useWorlds({
+    scope: "global",
+    limit: 3,
+    offset: 0,
+    sort: "created_at_desc",
+  });
+
+  //* Return empty arrays for non-global scopes to avoid showing discover-specific data
+  const featuredWorld = scope === "global" ? featuredWorlds[0] : undefined;
+  const highestRatedWorlds = scope === "global" ? highestRatedWorldsList : [];
+  const trendingWorlds = scope === "global" ? trendingWorldsList : [];
+  const recentWorlds = scope === "global" ? recentWorldsList : [];
+
+  //* Fetch all worlds with filters (main query for current scope)
+  const {
+    data: { worlds: allWorlds = [], total = 0 } = {},
+    isLoading: isAllWorldsLoading,
+    error,
+  } = useWorlds({
+    scope,
+    theme: currentFilters.theme || undefined,
+    status: currentFilters.status || undefined,
+    sort: currentFilters.sort || undefined,
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
+    search: activeSearchQuery || undefined,
+  });
+
+  const totalPages = Math.ceil(total / pageSize);
 
   return {
-    isLoading,
-    displayError,
-    parsedStory: parsedStory!,
-    paragraphs,
-    lorePieces,
-    displayNames,
-    sortDetails,
-    actualTheme,
-    worldId,
-    world,
+    selectedTheme: currentFilters.theme,
+    selectedStatus: currentFilters.status,
+    selectedSort: currentFilters.sort,
+    handleThemeChange,
+    handleStatusChange,
+    handleSortChange,
+    searchQuery,
+    activeSearchQuery,
+    setSearchQuery: handleSearchChange,
+    handleSearch,
+    viewMode,
+    setViewMode: handleViewModeChange,
+    featuredWorld,
+    isFeaturedLoading,
+    highestRatedWorlds,
+    isHighestRatedLoading,
+    trendingWorlds,
+    isTrendingLoading,
+    recentWorlds,
+    isRecentLoading,
+    allWorlds,
+    isAllWorldsLoading,
+    error,
+    currentPage,
+    setCurrentPage,
+    totalPages,
   };
 }

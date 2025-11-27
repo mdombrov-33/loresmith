@@ -1,6 +1,6 @@
 "use client";
 
-import { useDiscoverLogic } from "@/hooks/useDiscoverLogic";
+import { useWorldsLogic } from "@/hooks/useWorldsLogic";
 import FeaturedWorldHero from "./FeaturedWorldHero";
 import NewsFeed from "./NewsFeed";
 import DiscoverSearch from "./DiscoverSearch";
@@ -25,8 +25,8 @@ export default function DiscoverPageClient() {
     selectedTheme,
     selectedStatus,
     selectedSort,
-    setSelectedStatus,
-    setSelectedSort,
+    handleStatusChange,
+    handleSortChange,
     searchQuery,
     activeSearchQuery,
     setSearchQuery,
@@ -48,17 +48,17 @@ export default function DiscoverPageClient() {
     currentPage,
     setCurrentPage,
     totalPages,
-  } = useDiscoverLogic();
+  } = useWorldsLogic({ scope: "global", appStage: "discover" });
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-6">
         {/* Hero + News Section - Side by Side */}
         <div className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Featured World Hero - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             {isFeaturedLoading ? (
-              <div className="h-[350px] animate-pulse rounded-3xl bg-card" />
+              <div className="bg-card h-[350px] animate-pulse rounded-3xl" />
             ) : (
               <FeaturedWorldHero world={featuredWorld} />
             )}
@@ -99,7 +99,10 @@ export default function DiscoverPageClient() {
           <div>
             {isTrendingLoading ? (
               <div className="py-8">
-                <GlobalLoading message="Loading trending..." fullScreen={false} />
+                <GlobalLoading
+                  message="Loading trending..."
+                  fullScreen={false}
+                />
               </div>
             ) : (
               <TrendingWorlds worlds={trendingWorlds} />
@@ -122,10 +125,10 @@ export default function DiscoverPageClient() {
         <div className="my-16">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="border-border w-full border-t"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-background px-6 text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              <span className="bg-background text-muted-foreground px-6 text-sm font-medium tracking-wider uppercase">
                 Browse All Worlds
               </span>
             </div>
@@ -139,8 +142,8 @@ export default function DiscoverPageClient() {
             selectedStatus={selectedStatus}
             selectedSort={selectedSort}
             onThemeChange={handleThemeChange}
-            onStatusChange={setSelectedStatus}
-            onSortChange={setSelectedSort}
+            onStatusChange={handleStatusChange}
+            onSortChange={handleSortChange}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
@@ -161,7 +164,9 @@ export default function DiscoverPageClient() {
                   Error loading worlds
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  {error instanceof Error ? error.message : "Something went wrong"}
+                  {error instanceof Error
+                    ? error.message
+                    : "Something went wrong"}
                 </p>
               </div>
             </div>
@@ -175,7 +180,9 @@ export default function DiscoverPageClient() {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
                         className={
                           currentPage === 1
                             ? "pointer-events-none opacity-50"
@@ -186,7 +193,8 @@ export default function DiscoverPageClient() {
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       if (totalPages <= 5) return i + 1;
                       if (currentPage <= 3) return i + 1;
-                      if (currentPage >= totalPages - 2) return totalPages - 4 + i;
+                      if (currentPage >= totalPages - 2)
+                        return totalPages - 4 + i;
                       return currentPage - 2 + i;
                     }).map((page) => (
                       <PaginationItem key={page}>

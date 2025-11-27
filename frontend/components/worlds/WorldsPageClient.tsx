@@ -1,6 +1,6 @@
 "use client";
 
-import { useWorldsLogic } from "@/hooks/useWorldsLogic";
+import { useWorldIdLogic } from "@/hooks/useWorldIdLogic";
 import WorldLoading from "@/components/worlds/WorldLoading";
 import WorldError from "@/components/worlds/WorldError";
 import WorldHero from "@/components/worlds/WorldHero";
@@ -19,7 +19,7 @@ export default function WorldsPageClient() {
     actualTheme,
     worldId,
     world,
-  } = useWorldsLogic();
+  } = useWorldIdLogic();
 
   if (isLoading) {
     return <WorldLoading />;
@@ -30,7 +30,9 @@ export default function WorldsPageClient() {
   }
 
   //* Extract character piece for hero portrait
-  const characterPiece = lorePieces?.find((piece) => piece?.type === "character");
+  const characterPiece = lorePieces?.find(
+    (piece) => piece?.type === "character",
+  );
 
   return (
     <main className="bg-background min-h-screen pb-20">

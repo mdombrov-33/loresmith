@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppStore } from "@/stores/appStore";
-import { useEffect, useState } from "react";
+import { useWorldsLogic } from "@/hooks/useWorldsLogic";
+import { useState } from "react";
 import { useWorlds } from "@/lib/queries/world";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Globe, BookOpen } from "lucide-react";
@@ -10,32 +10,29 @@ import DiscoverFilters from "@/components/discover/DiscoverFilters";
 import GlobalLoading from "@/components/shared/LoadingStates/GlobalLoading";
 
 export default function MyWorlds() {
-  const { setAppStage, user } = useAppStore();
   const [activeTab, setActiveTab] = useState("my-worlds");
-  const [selectedTheme, setSelectedTheme] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "row">("grid");
 
-  useEffect(() => {
-    setAppStage("hub");
-  }, [setAppStage]);
-
-  //* Fetch my worlds
-  const { data: myWorldsData, isLoading: myWorldsLoading } = useWorlds({
-    scope: "my",
-    theme: selectedTheme || undefined,
-    status: selectedStatus || undefined,
-    limit: 50,
-  });
+  // Use unified hook for my-worlds scope
+  const {
+    selectedTheme,
+    selectedStatus,
+    selectedSort,
+    handleThemeChange,
+    handleStatusChange,
+    handleSortChange,
+    viewMode,
+    setViewMode,
+    allWorlds: myWorlds,
+    isAllWorldsLoading: myWorldsLoading,
+  } = useWorldsLogic({ scope: "my", appStage: "my-worlds" });
 
   //* Fetch playing worlds (worlds I'm in adventures for)
   const { data: playingWorldsData, isLoading: playingWorldsLoading } =
     useWorlds({
-      scope: "my", //* The backend handles showing worlds where user has active sessions
+      scope: "my",
       limit: 50,
     });
 
-  const myWorlds = myWorldsData?.worlds || [];
   const playingWorlds = playingWorldsData?.worlds || [];
 
   //* Filter playing worlds to only those with active sessions
@@ -73,12 +70,13 @@ export default function MyWorlds() {
             <DiscoverFilters
               selectedTheme={selectedTheme}
               selectedStatus={selectedStatus}
-              onThemeChange={setSelectedTheme}
-              onStatusChange={setSelectedStatus}
+              onThemeChange={handleThemeChange}
+              onStatusChange={handleStatusChange}
+              selectedSort={selectedSort}
+              onSortChange={handleSortChange}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-            />
-
+            />{" "}
             {/* Worlds Grid */}
             {myWorldsLoading ? (
               <GlobalLoading
@@ -97,7 +95,11 @@ export default function MyWorlds() {
                 </p>
               </div>
             ) : (
-              <ExpandableWorldCards worlds={myWorlds} viewMode={viewMode} showAuthor={false} />
+              <ExpandableWorldCards
+                worlds={myWorlds}
+                viewMode={viewMode}
+                showAuthor={false}
+              />
             )}
           </TabsContent>
 
