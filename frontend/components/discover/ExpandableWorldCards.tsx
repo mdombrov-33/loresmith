@@ -68,7 +68,12 @@ export default function ExpandableWorldCards({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [active]);
 
-  useOutsideClick(ref, () => setActive(null));
+  useOutsideClick(ref, () => {
+    //* Don't close card if delete dialog is open
+    if (!isDeleteDialogOpen) {
+      setActive(null);
+    }
+  });
 
   const handleViewWorld = (world: World) => {
     router.push(`/worlds/${world.theme}/${world.id}`);
