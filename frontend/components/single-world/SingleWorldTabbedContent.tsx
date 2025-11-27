@@ -21,20 +21,32 @@ export default function SingleWorldTabbedContent({
 }: SingleWorldTabbedContentProps) {
   return (
     <Tabs defaultValue="quest" className="mb-8">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="quest" className="gap-2">
+      <TabsList className="h-auto rounded-none border-b bg-transparent p-0">
+        <TabsTrigger
+          value="quest"
+          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+        >
           <BookOpen className="h-4 w-4" />
           <span className="hidden sm:inline">Quest</span>
         </TabsTrigger>
-        <TabsTrigger value="story" className="gap-2">
+        <TabsTrigger
+          value="story"
+          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+        >
           <Sparkles className="h-4 w-4" />
           <span className="hidden sm:inline">Story</span>
         </TabsTrigger>
-        <TabsTrigger value="lore" className="gap-2">
+        <TabsTrigger
+          value="lore"
+          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+        >
           <Scroll className="h-4 w-4" />
           <span className="hidden sm:inline">Lore</span>
         </TabsTrigger>
-        <TabsTrigger value="comments" className="gap-2">
+        <TabsTrigger
+          value="comments"
+          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+        >
           <MessageSquare className="h-4 w-4" />
           <span className="hidden sm:inline">Comments</span>
         </TabsTrigger>

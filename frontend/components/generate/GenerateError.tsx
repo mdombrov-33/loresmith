@@ -1,4 +1,4 @@
-import SharedActionButton from "@/components/shared/ActionButton";
+import SharedActionButton from "@/components/shared/buttons/ActionButton";
 
 interface GenerateErrorProps {
   error: string | null;

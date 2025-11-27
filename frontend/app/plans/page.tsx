@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 
@@ -95,7 +95,7 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-background">
+    <div className="bg-background relative min-h-screen w-full">
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -120,22 +120,22 @@ export default function PlansPage() {
                 className={cn(
                   "group relative h-full cursor-pointer overflow-hidden border-2 transition-all duration-300",
                   selectedPlan === plan.name
-                    ? "border-primary shadow-2xl shadow-primary/40 -translate-y-2"
+                    ? "border-primary shadow-primary/40 -translate-y-2 shadow-2xl"
                     : plan.highlight
-                      ? "border-primary/50 shadow-lg shadow-primary/20 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/30"
-                      : "border-border hover:-translate-y-2 hover:border-primary/50 hover:shadow-xl"
+                      ? "border-primary/50 shadow-primary/20 hover:shadow-primary/30 shadow-lg hover:-translate-y-2 hover:shadow-2xl"
+                      : "border-border hover:border-primary/50 hover:-translate-y-2 hover:shadow-xl",
                 )}
                 onClick={() => setSelectedPlan(plan.name)}
               >
                 {plan.highlight && (
-                  <div className="bg-primary absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-semibold text-white">
+                  <div className="bg-primary absolute top-4 right-4 rounded-full px-3 py-1 text-xs font-semibold text-white">
                     Popular
                   </div>
                 )}
 
                 {/* Glow effect for selected */}
                 {selectedPlan === plan.name && (
-                  <div className="absolute inset-0 -z-10 bg-primary/20 blur-2xl" />
+                  <div className="bg-primary/20 absolute inset-0 -z-10 blur-2xl" />
                 )}
 
                 <CardContent className="flex h-full flex-col p-8">
@@ -186,7 +186,11 @@ export default function PlansPage() {
                     }}
                     className="w-full"
                   >
-                    {plan.name === "Free" ? "Current Plan" : selectedPlan === plan.name ? "Selected" : "Select Plan"}
+                    {plan.name === "Free"
+                      ? "Current Plan"
+                      : selectedPlan === plan.name
+                        ? "Selected"
+                        : "Select Plan"}
                   </ActionButton>
                 </CardContent>
               </Card>
@@ -199,8 +203,8 @@ export default function PlansPage() {
           <Label
             htmlFor="billing-toggle"
             className={cn(
-              "text-sm font-medium transition-colors cursor-pointer",
-              !isAnnual ? "text-foreground" : "text-muted-foreground"
+              "cursor-pointer text-sm font-medium transition-colors",
+              !isAnnual ? "text-foreground" : "text-muted-foreground",
             )}
           >
             Monthly
@@ -213,8 +217,8 @@ export default function PlansPage() {
           <Label
             htmlFor="billing-toggle"
             className={cn(
-              "text-sm font-medium transition-colors cursor-pointer",
-              isAnnual ? "text-foreground" : "text-muted-foreground"
+              "cursor-pointer text-sm font-medium transition-colors",
+              isAnnual ? "text-foreground" : "text-muted-foreground",
             )}
           >
             Annual

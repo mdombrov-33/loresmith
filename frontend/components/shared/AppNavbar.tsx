@@ -24,7 +24,6 @@ export default function AppNavbar() {
   //* Hide Create button on these pages
   const hideCreateButton = pathname?.startsWith("/generate") ||
                           pathname?.startsWith("/select-theme") ||
-                          pathname?.startsWith("/worlds/") ||
                           pathname?.startsWith("/adventure/");
 
   const navLinks = [

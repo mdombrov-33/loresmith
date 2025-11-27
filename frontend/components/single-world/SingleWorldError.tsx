@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { useAppStore } from "@/stores/appStore";
 
 interface SingleWorldErrorProps {

@@ -61,10 +61,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`flex min-h-screen flex-col ${fjallaOne.variable} ${oswald.variable} ${inter.variable} ${cinzel.variable} ${jetbrainsMono.variable}`}
+        className={`min-h-screen ${fjallaOne.variable} ${oswald.variable} ${inter.variable} ${cinzel.variable} ${jetbrainsMono.variable}`}
       >
         <ThemeWrapper>
-          <div className="flex-1">{children}</div>
+          {children}
           <Footer />
         </ThemeWrapper>
         <Toaster theme="dark" />

@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import GenerateHeader from "@/components/generate/GenerateHeader";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { getThemeFont } from "@/constants/game-themes";
 import { useAppStore } from "@/stores/appStore";
 

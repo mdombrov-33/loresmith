@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { Separator } from "@/components/ui/separator";
 import { FcGoogle } from "react-icons/fc";
 import { useAppStore } from "@/stores/appStore";

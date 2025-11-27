@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { Slider } from "@/components/ui/slider";
 import { useAppStore } from "@/stores/appStore";
 import { usePathname } from "next/navigation";

@@ -8,7 +8,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { LoginModal } from "@/components/navbar/LoginModal";
 import { RegisterModal } from "@/components/navbar/RegisterModal";
 import { useEffect, useState } from "react";
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 
 export default function SelectThemePage() {
   const router = useRouter();
@@ -55,7 +55,12 @@ export default function SelectThemePage() {
 
   // Auto-navigate to generate after login ONLY if user clicked Continue
   useEffect(() => {
-    if (isAuthenticated && hasClickedContinue && selectedThemeParam && selectedThemeParam !== "default") {
+    if (
+      isAuthenticated &&
+      hasClickedContinue &&
+      selectedThemeParam &&
+      selectedThemeParam !== "default"
+    ) {
       // Small delay to ensure state is updated
       const timer = setTimeout(() => {
         setTheme(selectedThemeParam);
@@ -63,12 +68,18 @@ export default function SelectThemePage() {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isAuthenticated, hasClickedContinue, selectedThemeParam, router, setTheme]);
+  }, [
+    isAuthenticated,
+    hasClickedContinue,
+    selectedThemeParam,
+    router,
+    setTheme,
+  ]);
 
   return (
     <main className="bg-background min-h-screen">
       {/* Header */}
-      <div className="border-b bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 w-full backdrop-blur">
+      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 w-full border-b backdrop-blur">
         <div className="container mx-auto flex h-16 items-center gap-4 px-4">
           <BackButton href="/my-worlds" />
         </div>
@@ -79,11 +90,12 @@ export default function SelectThemePage() {
         <div className="mx-auto max-w-4xl">
           {/* Heading */}
           <div className="mb-12 text-center">
-            <h1 className="from-foreground to-foreground/80 mb-4 bg-gradient-to-br bg-clip-text text-4xl font-bold leading-tight tracking-tight text-transparent md:text-5xl">
+            <h1 className="from-foreground to-foreground/80 mb-4 bg-gradient-to-br bg-clip-text text-4xl leading-tight font-bold tracking-tight text-transparent md:text-5xl">
               Choose Your World
             </h1>
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed">
-              Select a theme to begin your adventure. Each theme offers unique worlds, stories, and experiences.
+              Select a theme to begin your adventure. Each theme offers unique
+              worlds, stories, and experiences.
             </p>
           </div>
 
@@ -98,8 +110,8 @@ export default function SelectThemePage() {
                   onClick={() => handleThemeSelect(theme.value)}
                   className={`group relative overflow-hidden rounded-xl border p-6 text-left transition-all ${
                     isSelected
-                      ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                      : "border-border bg-card hover:border-primary hover:shadow-lg hover:shadow-primary/10"
+                      ? "border-primary bg-primary/10 shadow-primary/20 shadow-lg"
+                      : "border-border bg-card hover:border-primary hover:shadow-primary/10 hover:shadow-lg"
                   }`}
                 >
                   {/* Hover gradient overlay */}
@@ -109,19 +121,25 @@ export default function SelectThemePage() {
 
                   {/* Selected indicator */}
                   {isSelected && (
-                    <div className="absolute top-4 right-4 rounded-full bg-primary p-1">
-                      <Check className="h-4 w-4 text-primary-foreground" />
+                    <div className="bg-primary absolute top-4 right-4 rounded-full p-1">
+                      <Check className="text-primary-foreground h-4 w-4" />
                     </div>
                   )}
 
                   {/* Content */}
                   <div className="relative z-10">
-                    <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg transition-colors ${
-                      isSelected ? "bg-primary/20" : "bg-primary/10 group-hover:bg-primary/20"
-                    }`}>
+                    <div
+                      className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg transition-colors ${
+                        isSelected
+                          ? "bg-primary/20"
+                          : "bg-primary/10 group-hover:bg-primary/20"
+                      }`}
+                    >
                       <Icon className="text-primary h-6 w-6" />
                     </div>
-                    <h3 className="text-foreground mb-2 text-xl font-semibold">{theme.label}</h3>
+                    <h3 className="text-foreground mb-2 text-xl font-semibold">
+                      {theme.label}
+                    </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {theme.value === "fantasy" &&
                         "Epic quests, magical realms, and legendary heroes await in this classic fantasy setting."}
@@ -138,7 +156,7 @@ export default function SelectThemePage() {
 
                   {/* Arrow indicator (only on hover for unselected) */}
                   {!isSelected && (
-                    <div className="text-primary absolute bottom-4 right-4 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="text-primary absolute right-4 bottom-4 opacity-0 transition-opacity group-hover:opacity-100">
                       <Sparkles className="h-5 w-5" />
                     </div>
                   )}
@@ -183,4 +201,3 @@ export default function SelectThemePage() {
     </main>
   );
 }
-

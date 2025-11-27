@@ -1,4 +1,4 @@
-import ActionButton from "@/components/shared/ActionButton";
+import ActionButton from "@/components/shared/buttons/ActionButton";
 import { ArrowRight, Sparkles, RotateCw } from "lucide-react";
 
 interface GenerateActionsProps {

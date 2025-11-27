@@ -5,7 +5,7 @@ import SingleWorldLoading from "@/components/single-world/SingleWorldLoading";
 import SingleWorldError from "@/components/single-world/SingleWorldError";
 import SingleWorldHero from "@/components/single-world/SingleWorldHero";
 import SingleWorldTabbedContent from "@/components/single-world/SingleWorldTabbedContent";
-import SingleWorldActions from "@/components/single-world/SingleWorldActions";
+import SingleWorldMetadata from "@/components/single-world/SingleWorldMetadata";
 
 export default function SingleWorldPageClient() {
   const {
@@ -34,26 +34,42 @@ export default function SingleWorldPageClient() {
   );
 
   return (
-    <main className="bg-background min-h-screen pb-20">
-      <div className="container mx-auto px-4 py-8">
+    <main className="bg-background pb-20">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
         <SingleWorldHero
           parsedStory={parsedStory}
           theme={actualTheme}
           characterPiece={characterPiece}
-          activeSessions={world?.active_sessions}
           worldId={worldId}
-          rating={world?.rating}
-          userRating={world?.user_rating}
-          ratingCount={world?.rating_count}
+          world={world}
         />
-        <SingleWorldTabbedContent
-          parsedStory={parsedStory}
-          paragraphs={paragraphs}
-          lorePieces={lorePieces}
-          displayNames={displayNames}
-        />
+
+        {/* Two-column layout: Tabs left, Metadata sidebar right */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Left: Tabbed Content (2/3 width on desktop) */}
+          <div className="lg:col-span-2">
+            <SingleWorldTabbedContent
+              parsedStory={parsedStory}
+              paragraphs={paragraphs}
+              lorePieces={lorePieces}
+              displayNames={displayNames}
+            />
+          </div>
+
+          {/* Right: Metadata Sidebar (1/3 width on desktop) */}
+          <div className="lg:col-span-1">
+            <SingleWorldMetadata
+              world={world}
+              theme={actualTheme}
+              activeSessions={world?.active_sessions}
+              rating={world?.rating}
+              userRating={world?.user_rating}
+              ratingCount={world?.rating_count}
+              worldId={worldId}
+            />
+          </div>
+        </div>
       </div>
-      <SingleWorldActions theme={actualTheme} worldId={worldId} />
     </main>
   );
 }
