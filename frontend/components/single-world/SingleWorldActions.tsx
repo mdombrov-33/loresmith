@@ -5,18 +5,25 @@ import ActionButton from "@/components/shared/ActionButton";
 import { ActionLoading } from "@/components/shared/LoadingStates";
 import { Compass, Wand2, Eye, Home, ChevronRight, Play } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
-import { useStartAdventure, useCheckActiveSession } from "@/lib/queries/adventure";
+import {
+  useStartAdventure,
+  useCheckActiveSession,
+} from "@/lib/queries/adventure";
 
-interface WorldActionsProps {
+interface SingleWorldActionsProps {
   theme: string;
   worldId: number;
 }
 
-export default function WorldActions({ theme, worldId }: WorldActionsProps) {
+export default function SingleWorldActions({
+  theme,
+  worldId,
+}: SingleWorldActionsProps) {
   const router = useRouter();
   const { theme: currentTheme } = useAppStore();
   const startAdventureMutation = useStartAdventure();
-  const { data: sessionCheck, isLoading: isCheckingSession } = useCheckActiveSession(worldId);
+  const { data: sessionCheck, isLoading: isCheckingSession } =
+    useCheckActiveSession(worldId);
 
   const handleCreateNewStory = () => {
     router.push(`/generate?theme=${theme}`);
@@ -52,8 +59,14 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
     <>
       {startAdventureMutation.isPending && (
         <ActionLoading
-          title={hasActiveSession ? "Resuming Adventure" : "Initializing Adventure"}
-          description={hasActiveSession ? "Loading your journey..." : "Preparing your journey..."}
+          title={
+            hasActiveSession ? "Resuming Adventure" : "Initializing Adventure"
+          }
+          description={
+            hasActiveSession
+              ? "Loading your journey..."
+              : "Preparing your journey..."
+          }
         />
       )}
       <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-border/50 sticky bottom-0 z-20 border-t py-6 backdrop-blur-sm">
@@ -69,51 +82,55 @@ export default function WorldActions({ theme, worldId }: WorldActionsProps) {
               {hasActiveSession ? (
                 <>
                   <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  {startAdventureMutation.isPending ? "Resuming..." : "Resume Your Adventure"}
+                  {startAdventureMutation.isPending
+                    ? "Resuming..."
+                    : "Resume Your Adventure"}
                   <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </>
               ) : (
                 <>
                   <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
-                  {startAdventureMutation.isPending ? "Starting..." : "Begin Your Adventure"}
+                  {startAdventureMutation.isPending
+                    ? "Starting..."
+                    : "Begin Your Adventure"}
                   <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </ActionButton>
 
-          {/* Secondary Actions */}
-          <div className="flex flex-wrap justify-center gap-3">
-            <ActionButton
-              variant="outline"
-              size="sm"
-              onClick={() => handleCreateNewStory()}
-              className="gap-2 transition-all hover:scale-105"
-            >
-              <Wand2 className="h-4 w-4" />
-              Create New Story
-            </ActionButton>
-            <ActionButton
-              variant="outline"
-              size="sm"
-              onClick={() => handleExploreWorlds()}
-              className="gap-2 transition-all hover:scale-105"
-            >
-              <Eye className="h-4 w-4" />
-              Explore Worlds
-            </ActionButton>
-            <ActionButton
-              variant="outline"
-              size="sm"
-              onClick={() => handleReturnHome()}
-              className="gap-2 transition-all hover:scale-105"
-            >
-              <Home className="h-4 w-4" />
-              Return Home
-            </ActionButton>
+            {/* Secondary Actions */}
+            <div className="flex flex-wrap justify-center gap-3">
+              <ActionButton
+                variant="outline"
+                size="sm"
+                onClick={() => handleCreateNewStory()}
+                className="gap-2 transition-all hover:scale-105"
+              >
+                <Wand2 className="h-4 w-4" />
+                Create New Story
+              </ActionButton>
+              <ActionButton
+                variant="outline"
+                size="sm"
+                onClick={() => handleExploreWorlds()}
+                className="gap-2 transition-all hover:scale-105"
+              >
+                <Eye className="h-4 w-4" />
+                Explore Worlds
+              </ActionButton>
+              <ActionButton
+                variant="outline"
+                size="sm"
+                onClick={() => handleReturnHome()}
+                className="gap-2 transition-all hover:scale-105"
+              >
+                <Home className="h-4 w-4" />
+                Return Home
+              </ActionButton>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
     </>
   );
 }

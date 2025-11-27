@@ -1,13 +1,13 @@
 "use client";
 
 import { useWorldIdLogic } from "@/hooks/useWorldIdLogic";
-import WorldLoading from "@/components/worlds/WorldLoading";
-import WorldError from "@/components/worlds/WorldError";
-import WorldHero from "@/components/worlds/WorldHero";
-import WorldTabbedContent from "@/components/worlds/WorldTabbedContent";
-import WorldActions from "@/components/worlds/WorldActions";
+import SingleWorldLoading from "@/components/single-world/SingleWorldLoading";
+import SingleWorldError from "@/components/single-world/SingleWorldError";
+import SingleWorldHero from "@/components/single-world/SingleWorldHero";
+import SingleWorldTabbedContent from "@/components/single-world/SingleWorldTabbedContent";
+import SingleWorldActions from "@/components/single-world/SingleWorldActions";
 
-export default function WorldsPageClient() {
+export default function SingleWorldPageClient() {
   const {
     isLoading,
     displayError,
@@ -15,18 +15,17 @@ export default function WorldsPageClient() {
     paragraphs,
     lorePieces,
     displayNames,
-    sortDetails,
     actualTheme,
     worldId,
     world,
   } = useWorldIdLogic();
 
   if (isLoading) {
-    return <WorldLoading />;
+    return <SingleWorldLoading />;
   }
 
   if (displayError) {
-    return <WorldError error={displayError} />;
+    return <SingleWorldError error={displayError} />;
   }
 
   //* Extract character piece for hero portrait
@@ -37,7 +36,7 @@ export default function WorldsPageClient() {
   return (
     <main className="bg-background min-h-screen pb-20">
       <div className="container mx-auto px-4 py-8">
-        <WorldHero
+        <SingleWorldHero
           parsedStory={parsedStory}
           theme={actualTheme}
           characterPiece={characterPiece}
@@ -47,15 +46,14 @@ export default function WorldsPageClient() {
           userRating={world?.user_rating}
           ratingCount={world?.rating_count}
         />
-        <WorldTabbedContent
+        <SingleWorldTabbedContent
           parsedStory={parsedStory}
           paragraphs={paragraphs}
           lorePieces={lorePieces}
           displayNames={displayNames}
-          sortDetails={sortDetails}
         />
       </div>
-      <WorldActions theme={actualTheme} worldId={worldId} />
+      <SingleWorldActions theme={actualTheme} worldId={worldId} />
     </main>
   );
 }

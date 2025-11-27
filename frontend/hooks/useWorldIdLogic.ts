@@ -49,33 +49,6 @@ export function useWorldIdLogic() {
     relic: "Relic",
   };
 
-  const sortDetails = (details: Record<string, unknown>) => {
-    const order = [
-      "traits",
-      "appearance",
-      "flaw",
-      "skills",
-      "ideology",
-      "description",
-      "geography",
-      "climate",
-      "culture",
-      "conflict",
-      "power",
-      "origin",
-      "abilities",
-    ];
-
-    return Object.entries(details).sort((a, b) => {
-      const indexA = order.indexOf(a[0]);
-      const indexB = order.indexOf(b[0]);
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
-  };
-
   return {
     isLoading,
     displayError,
@@ -83,7 +56,6 @@ export function useWorldIdLogic() {
     paragraphs,
     lorePieces,
     displayNames,
-    sortDetails,
     actualTheme,
     worldId,
     world,

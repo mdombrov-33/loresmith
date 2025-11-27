@@ -3,24 +3,22 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Scroll, MessageSquare, Sparkles } from "lucide-react";
 import { FullStory, LorePiece } from "@/lib/schemas";
-import WorldLoreAccordion from "./WorldLoreAccordion";
-import WorldComments from "./WorldComments";
+import WorldLoreAccordion from "./SingleWorldLoreAccordion";
+import WorldComments from "./SingleWorldComments";
 
-interface WorldTabbedContentProps {
+interface SingleWorldTabbedContentProps {
   parsedStory: FullStory;
   paragraphs: string[];
   lorePieces: LorePiece[];
   displayNames: Record<string, string>;
-  sortDetails: (details: Record<string, unknown>) => [string, unknown][];
 }
 
-export default function WorldTabbedContent({
+export default function SingleWorldTabbedContent({
   parsedStory,
   paragraphs,
   lorePieces,
   displayNames,
-  sortDetails,
-}: WorldTabbedContentProps) {
+}: SingleWorldTabbedContentProps) {
   return (
     <Tabs defaultValue="quest" className="mb-8">
       <TabsList className="grid w-full grid-cols-4">
@@ -45,17 +43,22 @@ export default function WorldTabbedContent({
       {/* Quest Tab */}
       <TabsContent value="quest" className="mt-6">
         <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
-          <div className="flex items-start gap-3 mb-4">
+          <div className="mb-4 flex items-start gap-3">
             <div className="border-primary/30 bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
               <BookOpen className="text-primary h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-foreground text-xl font-semibold">Your Quest</h2>
-              <p className="text-muted-foreground text-sm">The objective of your adventure</p>
+              <h2 className="text-foreground text-xl font-semibold">
+                Your Quest
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                The objective of your adventure
+              </p>
             </div>
           </div>
           <p className="text-foreground leading-relaxed">
-            {parsedStory.quest?.description || "No quest description available."}
+            {parsedStory.quest?.description ||
+              "No quest description available."}
           </p>
         </div>
       </TabsContent>
@@ -63,13 +66,17 @@ export default function WorldTabbedContent({
       {/* Story Tab */}
       <TabsContent value="story" className="mt-6">
         <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
-          <div className="flex items-start gap-3 mb-4">
+          <div className="mb-4 flex items-start gap-3">
             <div className="border-primary/30 bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
               <Sparkles className="text-primary h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-foreground text-xl font-semibold">The Chronicle</h2>
-              <p className="text-muted-foreground text-sm">The full narrative of this world</p>
+              <h2 className="text-foreground text-xl font-semibold">
+                The Chronicle
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                The full narrative of this world
+              </p>
             </div>
           </div>
           <div className="text-foreground space-y-4 leading-relaxed">
@@ -87,7 +94,6 @@ export default function WorldTabbedContent({
         <WorldLoreAccordion
           lorePieces={lorePieces}
           displayNames={displayNames}
-          sortDetails={sortDetails}
         />
       </TabsContent>
 

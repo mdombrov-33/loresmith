@@ -9,19 +9,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { LorePiece } from "@/lib/schemas";
 import { loreIcons } from "@/constants/lore";
-import LorePieceDetails from "./LorePieceDetails";
+import LorePieceDetails from "./SingleWorldLoreDetails";
 
-interface WorldLoreAccordionProps {
+interface SingleWorldLoreAccordionProps {
   lorePieces: LorePiece[];
   displayNames: Record<string, string>;
-  sortDetails: (details: Record<string, unknown>) => [string, unknown][];
 }
 
-export default function WorldLoreAccordion({
+export default function SingleWorldLoreAccordion({
   lorePieces,
   displayNames,
-  sortDetails,
-}: WorldLoreAccordionProps) {
+}: SingleWorldLoreAccordionProps) {
   return (
     <Accordion type="multiple" className="space-y-3">
       {lorePieces?.map((piece, index) => {
@@ -40,7 +38,9 @@ export default function WorldLoreAccordion({
                   {Icon && <Icon className="text-primary h-5 w-5" />}
                 </div>
                 <div className="flex flex-col items-start gap-1.5 text-left">
-                  <span className="text-foreground text-base font-semibold">{piece.name}</span>
+                  <span className="text-foreground text-base font-semibold">
+                    {piece.name}
+                  </span>
                   <Badge variant="outline" className="text-xs">
                     {displayNames[piece.type] || piece.type}
                   </Badge>
@@ -48,11 +48,7 @@ export default function WorldLoreAccordion({
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
-              <LorePieceDetails
-                piece={piece}
-                displayNames={displayNames}
-                sortDetails={sortDetails}
-              />
+              <LorePieceDetails piece={piece} displayNames={displayNames} />
             </AccordionContent>
           </AccordionItem>
         );

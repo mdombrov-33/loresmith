@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActionButton from "@/components/shared/ActionButton";
 import { useAppStore } from "@/stores/appStore";
 
-interface WorldErrorProps {
+interface SingleWorldErrorProps {
   error: string;
 }
 
-export default function WorldError({ error }: WorldErrorProps) {
+export default function SingleWorldError({ error }: SingleWorldErrorProps) {
   const router = useRouter();
   const { theme } = useAppStore();
 

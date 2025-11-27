@@ -14,14 +14,14 @@ import { Star } from "lucide-react";
 import { useRateWorld } from "@/lib/queries/world";
 import { toast } from "sonner";
 
-interface RatingDialogProps {
+interface SingleWorldRatingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   worldId: number;
   initialRating?: number;
 }
 
-export default function RatingDialog({ open, onOpenChange, worldId, initialRating }: RatingDialogProps) {
+export default function SingleWorldRatingDialog({ open, onOpenChange, worldId, initialRating }: SingleWorldRatingDialogProps) {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [selectedRating, setSelectedRating] = useState(initialRating || 0);
   const { mutate: rateWorld, isPending } = useRateWorld();

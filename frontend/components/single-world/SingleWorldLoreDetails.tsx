@@ -15,22 +15,45 @@ import {
   getTraitDescription,
 } from "@/lib/trait-icons";
 
-interface LorePieceDetailsProps {
+interface SingleWorldLoreDetailsProps {
   piece: LorePiece;
   displayNames: Record<string, string>;
-  sortDetails: (details: Record<string, unknown>) => [string, unknown][];
 }
 
-export default function LorePieceDetails({
+export default function SingleWorldLoreDetails({
   piece,
   displayNames,
-  sortDetails,
-}: LorePieceDetailsProps) {
-  const sortedDetails = sortDetails(piece.details).filter(
-    ([key]) => key !== "image" && key !== "image_portrait" && key !== "image_portrait_base64" && key !== "is_protagonist"
-  );
+}: SingleWorldLoreDetailsProps) {
+  const characterImage = (piece.details.image_portrait ||
+    piece.details.image) as string | undefined;
 
-  const characterImage = (piece.details.image_portrait || piece.details.image) as string | undefined;
+  const characterPieceSortOrder = [
+    "description",
+    "appearance",
+    "traits",
+    "skills",
+    "flaw",
+    "health",
+    "stress",
+  ];
+
+  const ignore = ["is_protagonist", "image_portrait"];
+
+  const sortedDetails = Object.entries(piece.details)
+    .filter(([key]) => !ignore.includes(key))
+    .sort(([keyA], [keyB]) => {
+      const indexA = characterPieceSortOrder.indexOf(keyA);
+      const indexB = characterPieceSortOrder.indexOf(keyB);
+
+      const inA = indexA !== -1;
+      const inB = indexB !== -1;
+
+      if (inA && inB) return indexA - indexB;
+      if (inA) return -1;
+      if (inB) return 1;
+
+      return keyA.localeCompare(keyB);
+    });
 
   return (
     <div className="space-y-6 pt-4">
@@ -62,7 +85,7 @@ export default function LorePieceDetails({
           if (key === "flaw") {
             // Value might be object (from DB) or JSON string (from full_story)
             let flaw = value;
-            if (typeof value === 'string') {
+            if (typeof value === "string") {
               try {
                 flaw = JSON.parse(value);
               } catch {
@@ -74,17 +97,19 @@ export default function LorePieceDetails({
                   >
                     <div className="mb-2 flex items-center gap-2">
                       <AlertTriangle className="text-destructive h-4 w-4" />
-                      <span className="text-destructive text-sm font-semibold uppercase tracking-wide">
+                      <span className="text-destructive text-sm font-semibold tracking-wide uppercase">
                         Flaw
                       </span>
                     </div>
-                    <p className="text-destructive/90 text-sm">{String(value)}</p>
+                    <p className="text-destructive/90 text-sm">
+                      {String(value)}
+                    </p>
                   </div>
                 );
               }
             }
 
-            if (typeof flaw === 'object' && flaw !== null) {
+            if (typeof flaw === "object" && flaw !== null) {
               return (
                 <div
                   key={key}
@@ -108,7 +133,7 @@ export default function LorePieceDetails({
           if (key === "traits") {
             // Value might be array (from DB) or JSON string (from full_story)
             let traits = value;
-            if (typeof value === 'string') {
+            if (typeof value === "string") {
               try {
                 traits = JSON.parse(value);
               } catch {
@@ -121,7 +146,7 @@ export default function LorePieceDetails({
                 <div key={key}>
                   <div className="mb-2 flex items-center gap-2">
                     {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
-                    <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
+                    <span className="text-foreground text-sm font-semibold tracking-wide uppercase">
                       {displayNames[key] || key}
                     </span>
                   </div>
@@ -135,7 +160,10 @@ export default function LorePieceDetails({
                         return (
                           <Tooltip key={idx}>
                             <TooltipTrigger>
-                              <Badge variant="outline" className={`${traitColor} gap-1.5`}>
+                              <Badge
+                                variant="outline"
+                                className={`${traitColor} gap-1.5`}
+                              >
                                 {TraitIcon && <TraitIcon className="h-3 w-3" />}
                                 {trait}
                               </Badge>
@@ -159,7 +187,7 @@ export default function LorePieceDetails({
           if (key === "skills") {
             // Value might be array (from DB) or JSON string (from full_story)
             let skills = value;
-            if (typeof value === 'string') {
+            if (typeof value === "string") {
               try {
                 skills = JSON.parse(value);
               } catch {
@@ -172,7 +200,7 @@ export default function LorePieceDetails({
                 <div key={key}>
                   <div className="mb-2 flex items-center gap-2">
                     {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
-                    <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
+                    <span className="text-foreground text-sm font-semibold tracking-wide uppercase">
                       {displayNames[key] || key}
                     </span>
                   </div>
@@ -193,11 +221,13 @@ export default function LorePieceDetails({
             <div key={key}>
               <div className="mb-2 flex items-center gap-2">
                 {AttrIcon && <AttrIcon className={`h-4 w-4 ${color}`} />}
-                <span className="text-foreground text-sm font-semibold uppercase tracking-wide">
+                <span className="text-foreground text-sm font-semibold tracking-wide uppercase">
                   {displayNames[key] || key}
                 </span>
               </div>
-              <p className="text-muted-foreground text-sm leading-relaxed">{String(value)}</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {String(value)}
+              </p>
             </div>
           );
         })}

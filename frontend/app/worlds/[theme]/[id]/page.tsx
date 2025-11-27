@@ -1,4 +1,4 @@
-import WorldsPageClient from "@/components/worlds/WorldsPageClient";
+import WorldsPageClient from "@/components/single-world/SingleWorldPageClient";
 
 export default function WorldPage() {
   return <WorldsPageClient />;

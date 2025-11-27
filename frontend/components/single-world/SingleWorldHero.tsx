@@ -4,11 +4,18 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Users, MessageSquare, Sparkles, Activity, Loader2 } from "lucide-react";
+import {
+  Star,
+  Users,
+  MessageSquare,
+  Sparkles,
+  Activity,
+  Loader2,
+} from "lucide-react";
 import { FullStory, LorePiece } from "@/lib/schemas";
-import RatingDialog from "./RatingDialog";
+import RatingDialog from "./SingleWorldRatingDialog";
 
-interface WorldHeroProps {
+interface SingleWorldHeroProps {
   parsedStory: FullStory;
   theme: string;
   characterPiece?: LorePiece;
@@ -19,7 +26,7 @@ interface WorldHeroProps {
   ratingCount?: number;
 }
 
-export default function WorldHero({
+export default function SingleWorldHero({
   parsedStory,
   theme,
   characterPiece,
@@ -28,7 +35,7 @@ export default function WorldHero({
   rating,
   userRating,
   ratingCount,
-}: WorldHeroProps) {
+}: SingleWorldHeroProps) {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -36,7 +43,8 @@ export default function WorldHero({
   const mockPlayCount = 34;
   const mockCommentCount = 8;
 
-  const characterImage = (characterPiece?.details?.image_portrait || characterPiece?.details?.image) as string | undefined;
+  const characterImage = (characterPiece?.details?.image_portrait ||
+    characterPiece?.details?.image) as string | undefined;
 
   return (
     <>
@@ -64,7 +72,7 @@ export default function WorldHero({
             )}
 
             {/* Quest Info */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="from-foreground to-foreground/80 mb-3 bg-gradient-to-br bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
                 {parsedStory.quest?.title}
               </h1>
@@ -72,11 +80,15 @@ export default function WorldHero({
               <div className="mb-4 flex flex-wrap items-center gap-3">
                 <Badge variant="secondary" className="gap-1.5">
                   <Sparkles className="h-3.5 w-3.5" />
-                  {theme.charAt(0).toUpperCase() + theme.slice(1).replace("-", " ")}
+                  {theme.charAt(0).toUpperCase() +
+                    theme.slice(1).replace("-", " ")}
                 </Badge>
 
                 {/* Rating Display */}
-                {rating !== undefined && rating !== null && ratingCount !== undefined && ratingCount > 0 ? (
+                {rating !== undefined &&
+                rating !== null &&
+                ratingCount !== undefined &&
+                ratingCount > 0 ? (
                   <div className="flex items-center gap-1.5 px-2 py-1">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
@@ -104,7 +116,9 @@ export default function WorldHero({
                         />
                       ))}
                     </div>
-                    <span className="text-muted-foreground text-sm">No ratings yet</span>
+                    <span className="text-muted-foreground text-sm">
+                      No ratings yet
+                    </span>
                   </div>
                 )}
               </div>
@@ -113,8 +127,9 @@ export default function WorldHero({
               <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
                   <Activity className="h-4 w-4 text-green-500" />
-                  <span className="text-green-500 font-medium">
-                    {activeSessions ?? 0} {activeSessions === 1 ? "player" : "players"}
+                  <span className="font-medium text-green-500">
+                    {activeSessions ?? 0}{" "}
+                    {activeSessions === 1 ? "player" : "players"}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
