@@ -15,7 +15,6 @@ import {
   Clock,
   Compass,
   Play,
-  ChevronRight,
 } from "lucide-react";
 import { World } from "@/lib/schemas";
 import RatingDialog from "./SingleWorldRatingDialog";
@@ -102,8 +101,7 @@ export default function SingleWorldMetadata({
 
       <div className="space-y-4">
         {/* Primary CTA - Begin Adventure */}
-        <ActionButton
-          size="lg"
+        <PrimaryButton
           onClick={handleBeginAdventure}
           disabled={startAdventureMutation.isPending || isCheckingSession}
           className="group hover:shadow-primary/25 h-14 w-full gap-3 px-8 text-xl shadow-lg transition-all hover:scale-105 hover:shadow-xl"
@@ -117,10 +115,9 @@ export default function SingleWorldMetadata({
             <>
               <Compass className="h-5 w-5 transition-transform group-hover:rotate-12" />
               Begin Adventure
-              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </>
           )}
-        </ActionButton>
+        </PrimaryButton>
 
         {/* Metadata Sidebar */}
         <div className="border-border bg-card sticky top-4 rounded-xl border p-6 shadow-sm">
@@ -244,13 +241,13 @@ export default function SingleWorldMetadata({
 
             {/* Rate Button */}
             <div className="border-border mt-4 border-t pt-4">
-              <PrimaryButton
+              <ActionButton
                 onClick={() => setRatingDialogOpen(true)}
                 className="w-full gap-2"
               >
                 <Star className="h-4 w-4" />
                 Rate World
-              </PrimaryButton>
+              </ActionButton>
             </div>
           </div>
         </div>
