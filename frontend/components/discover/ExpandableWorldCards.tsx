@@ -165,8 +165,8 @@ export default function ExpandableWorldCards({
               </motion.div>
 
               <div>
-                <div className="flex items-start justify-between p-4">
-                  <div className="flex-1">
+                <div className="flex items-start justify-between gap-4 p-4">
+                  <div className="flex-1 min-w-0">
                     <motion.h3
                       layoutId={`title-${active.id}-${id}`}
                       className="text-base font-bold text-foreground"
@@ -182,7 +182,7 @@ export default function ExpandableWorldCards({
                       </motion.p>
                     )}
 
-                    {/* Badges and Actions Row */}
+                    {/* Badges and Metadata Row */}
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <Badge variant="outline">
                         {getThemeOption(active.theme)?.label || active.theme}
@@ -203,59 +203,61 @@ export default function ExpandableWorldCards({
                             <span>{active.active_sessions}</span>
                           </div>
                         )}
-                      {/* Spacer to push View button all the way right */}
-                      <div className="flex-1" />
-                      {/* View Button */}
-                      <PrimaryButton
-                        onClick={() => handleViewWorld(active)}
-                        className="text-sm"
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </PrimaryButton>
                     </div>
                   </div>
 
-                  {/* Owner Actions - Top Right */}
-                  {isOwner && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex gap-2"
-                    >
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleToggleVisibility}
-                              disabled={updateVisibilityMutation.isPending}
-                            >
-                              {active.visibility === "published" ? (
-                                <Eye className="h-4 w-4" />
-                              ) : (
-                                <EyeOff className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {active.visibility === "published" ? "Make Private" : "Publish"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleDeleteClick}
-                        disabled={deleteWorldMutation.isPending}
+                  {/* Right Side Actions Column */}
+                  <div className="flex flex-col items-end gap-2">
+                    {/* Owner Actions */}
+                    {isOwner && (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex gap-2"
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </motion.div>
-                  )}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleToggleVisibility}
+                                disabled={updateVisibilityMutation.isPending}
+                              >
+                                {active.visibility === "published" ? (
+                                  <Eye className="h-4 w-4" />
+                                ) : (
+                                  <EyeOff className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {active.visibility === "published" ? "Make Private" : "Publish"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleDeleteClick}
+                          disabled={deleteWorldMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    )}
+
+                    {/* View Button - always on right side */}
+                    <PrimaryButton
+                      onClick={() => handleViewWorld(active)}
+                      className="text-sm"
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </PrimaryButton>
+                  </div>
                 </div>
                 <div className="relative px-4 pt-4">
                   <motion.div
