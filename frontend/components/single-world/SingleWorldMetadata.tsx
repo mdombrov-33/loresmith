@@ -104,7 +104,7 @@ export default function SingleWorldMetadata({
         <PrimaryButton
           onClick={handleBeginAdventure}
           disabled={startAdventureMutation.isPending || isCheckingSession}
-          className="group hover:shadow-primary/25 h-14 w-full gap-3 px-8 text-xl shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+          className="group hover:shadow-primary/25 h-14 w-full gap-3 px-8 text-lg shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
         >
           {hasActiveSession ? (
             <>
@@ -121,7 +121,7 @@ export default function SingleWorldMetadata({
 
         {/* Metadata Sidebar */}
         <div className="border-border bg-card sticky top-4 rounded-xl border p-6 shadow-sm">
-          <h3 className="text-foreground mb-4 text-lg font-semibold">
+          <h3 className="font-heading text-foreground mb-4 text-lg font-semibold">
             Details
           </h3>
 

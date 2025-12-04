@@ -20,32 +20,32 @@ export default function SingleWorldTabbedContent({
   displayNames,
 }: SingleWorldTabbedContentProps) {
   return (
-    <Tabs defaultValue="quest" className="mb-8">
-      <TabsList className="h-auto rounded-none border-b bg-transparent p-0">
+    <Tabs defaultValue="quest" className="w-full">
+      <TabsList className="border-primary/20 h-auto rounded-none border-b bg-transparent p-0">
         <TabsTrigger
           value="quest"
-          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+          className="data-[state=active]:after:bg-primary relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
         >
           <BookOpen className="h-4 w-4" />
           <span className="hidden sm:inline">Quest</span>
         </TabsTrigger>
         <TabsTrigger
           value="story"
-          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+          className="data-[state=active]:after:bg-primary relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
         >
           <Sparkles className="h-4 w-4" />
           <span className="hidden sm:inline">Story</span>
         </TabsTrigger>
         <TabsTrigger
           value="lore"
-          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+          className="data-[state=active]:after:bg-primary relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
         >
           <Scroll className="h-4 w-4" />
           <span className="hidden sm:inline">Lore</span>
         </TabsTrigger>
         <TabsTrigger
           value="comments"
-          className="relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary"
+          className="data-[state=active]:after:bg-primary relative gap-2 rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
         >
           <MessageSquare className="h-4 w-4" />
           <span className="hidden sm:inline">Comments</span>
@@ -54,7 +54,7 @@ export default function SingleWorldTabbedContent({
 
       {/* Quest Tab */}
       <TabsContent value="quest" className="mt-6">
-        <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
+        <div className="border-border/50 bg-card/50 rounded-lg border p-6 shadow-sm backdrop-blur-sm">
           <div className="mb-4 flex items-start gap-3">
             <div className="border-primary/30 bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
               <BookOpen className="text-primary h-5 w-5" />
@@ -77,7 +77,7 @@ export default function SingleWorldTabbedContent({
 
       {/* Story Tab */}
       <TabsContent value="story" className="mt-6">
-        <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
+        <div className="border-border/50 bg-card/50 rounded-lg border p-6 shadow-sm backdrop-blur-sm">
           <div className="mb-4 flex items-start gap-3">
             <div className="border-primary/30 bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
               <Sparkles className="text-primary h-5 w-5" />

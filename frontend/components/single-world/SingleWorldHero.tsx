@@ -4,12 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  Loader2,
-  Trash2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Loader2, Trash2, Eye, EyeOff } from "lucide-react";
 import { FullStory, LorePiece, World } from "@/lib/schemas";
 import { useAppStore } from "@/stores/appStore";
 import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
@@ -38,9 +33,7 @@ interface SingleWorldHeroProps {
 
 export default function SingleWorldHero({
   parsedStory,
-  theme,
   characterPiece,
-  worldId,
   world,
 }: SingleWorldHeroProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -72,7 +65,8 @@ export default function SingleWorldHero({
 
   const handleToggleVisibility = () => {
     if (world) {
-      const newVisibility = world.visibility === "private" ? "published" : "private";
+      const newVisibility =
+        world.visibility === "private" ? "published" : "private";
       updateVisibilityMutation.mutate({
         worldId: world.id,
         visibility: newVisibility,
@@ -82,26 +76,39 @@ export default function SingleWorldHero({
 
   return (
     <>
-      <div className="mb-6">
-        {/* Large Centered Portrait with Title Overlay */}
-        <div className="relative mx-auto w-full max-w-xl">
+      <div className="mb-10">
+        {/* Cinematic Hero - Letterbox Style */}
+        <div className="relative mx-auto w-full max-w-6xl">
           {characterImage && (
-            <div className="border-primary/30 relative aspect-square w-full overflow-hidden rounded-2xl border-2 shadow-2xl">
+            <div className="hero-animate border-primary/20 relative aspect-[21/9] overflow-hidden rounded-xl border-2 shadow-2xl">
               {imageLoading && (
                 <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
                   <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
                 </div>
               )}
-              <Image
-                src={characterImage}
-                alt={characterPiece?.name || "Character"}
-                fill
-                className="object-cover"
-                onLoad={() => setImageLoading(false)}
-              />
-              {/* Title Overlay at Bottom */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6">
-                <h1 className="text-3xl font-bold text-white md:text-4xl">
+
+              {/* Background gradient */}
+              <div className="from-background via-background/95 to-muted/90 absolute inset-0 bg-gradient-to-r" />
+
+              {/* Portrait on left side */}
+              <div className="absolute top-0 bottom-0 left-0 w-1/2">
+                <Image
+                  src={characterImage}
+                  alt={characterPiece?.name || "Character"}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  onLoad={() => setImageLoading(false)}
+                />
+                <div className="to-background absolute inset-0 bg-gradient-to-r from-transparent" />
+              </div>
+
+              {/* Cinematic vignette */}
+              <div className="cinematic-vignette" />
+
+              {/* Title on right side */}
+              <div className="absolute inset-y-0 right-0 flex w-1/2 items-center px-8 md:px-12">
+                <h1 className="font-heading text-foreground text-3xl font-bold md:text-4xl lg:text-5xl">
                   {parsedStory.quest?.title}
                 </h1>
               </div>
@@ -109,15 +116,17 @@ export default function SingleWorldHero({
           )}
 
           {!characterImage && (
-            <h1 className="from-foreground to-foreground/80 mb-4 bg-gradient-to-br bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl">
-              {parsedStory.quest?.title}
-            </h1>
+            <div className="hero-animate mx-auto max-w-4xl py-8">
+              <h1 className="from-foreground to-foreground/70 font-heading bg-gradient-to-br bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl lg:text-5xl">
+                {parsedStory.quest?.title}
+              </h1>
+            </div>
           )}
         </div>
 
-        {/* Secondary Actions */}
+        {/* Owner actions */}
         {isOwner && (
-          <div className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-2">
+          <div className="mx-auto mt-6 flex max-w-6xl flex-wrap items-center justify-start gap-3 px-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -126,22 +135,25 @@ export default function SingleWorldHero({
                     size="sm"
                     onClick={handleToggleVisibility}
                     disabled={updateVisibilityMutation.isPending}
+                    className="gap-2"
                   >
                     {world?.visibility === "published" ? (
                       <>
-                        <Eye className="mr-2 h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                         Public
                       </>
                     ) : (
                       <>
-                        <EyeOff className="mr-2 h-4 w-4" />
+                        <EyeOff className="h-4 w-4" />
                         Private
                       </>
                     )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {world?.visibility === "published" ? "Make Private" : "Publish"}
+                  {world?.visibility === "published"
+                    ? "Make Private"
+                    : "Publish"}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -150,8 +162,9 @@ export default function SingleWorldHero({
               size="sm"
               onClick={handleDeleteClick}
               disabled={deleteWorldMutation.isPending}
+              className="gap-2"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="h-4 w-4" />
               Delete
             </Button>
           </div>
@@ -164,8 +177,9 @@ export default function SingleWorldHero({
           <DialogHeader>
             <DialogTitle>Delete World</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{parsedStory.quest?.title || "this world"}&quot;?
-              This action cannot be undone.
+              Are you sure you want to delete &quot;
+              {parsedStory.quest?.title || "this world"}&quot;? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
