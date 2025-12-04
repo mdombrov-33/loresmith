@@ -76,6 +76,12 @@ export default function ExpandableWorldCards({
   });
 
   const handleViewWorld = (world: World) => {
+    // IMPORTANT: Reset body overflow before navigating away!
+    // When the card is expanded, we set overflow="hidden" to prevent background scroll.
+    // If we navigate before cleanup happens, the new page inherits the locked scroll state.
+    // This causes the "no scrollbar after navigation" bug - only fixed by page reload.
+    document.body.style.overflow = "auto";
+    setActive(null);
     router.push(`/worlds/${world.theme}/${world.id}`);
   };
 
@@ -147,7 +153,10 @@ export default function ExpandableWorldCards({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.05 } }}
               className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white lg:hidden"
-              onClick={() => setActive(null)}
+              onClick={() => {
+                document.body.style.overflow = "auto";
+                setActive(null);
+              }}
             >
               <CloseIcon />
             </motion.button>
