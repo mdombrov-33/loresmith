@@ -12,7 +12,7 @@ import {
   Sparkles,
   Activity,
   Calendar,
-  Clock,
+  // Clock,
   Compass,
   Play,
 } from "lucide-react";
@@ -229,7 +229,7 @@ export default function SingleWorldMetadata({
             </div>
 
             {/* Updated */}
-            <div>
+            {/* <div>
               <div className="text-muted-foreground mb-1 flex items-center gap-2 text-xs">
                 <Clock className="h-3.5 w-3.5" />
                 <span>Updated</span>
@@ -237,7 +237,7 @@ export default function SingleWorldMetadata({
               <div className="text-foreground text-sm font-medium">
                 {formatDate(world?.updated_at)}
               </div>
-            </div>
+            </div> */}
 
             {/* Rate Button */}
             <div className="border-border mt-4 border-t pt-4">
