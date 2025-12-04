@@ -9,8 +9,7 @@ import HighestRatedWorlds from "./HighestRatedWorlds";
 import TrendingWorlds from "./TrendingWorlds";
 import RecentWorlds from "./RecentWorlds";
 import AllWorldsGrid from "./AllWorldsGrid";
-import LoadingState from "./LoadingState";
-import GlobalLoading from "@/components/shared/LoadingStates/GlobalLoading";
+import { FeaturedWorldSkeleton, SectionCardsSkeleton, WorldGridSkeleton } from "./LoadingSkeletons";
 import {
   Pagination,
   PaginationContent,
@@ -58,7 +57,7 @@ export default function DiscoverPageClient() {
           {/* Featured World Hero - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             {isFeaturedLoading ? (
-              <div className="bg-card h-[500px] animate-pulse rounded-3xl" />
+              <FeaturedWorldSkeleton />
             ) : (
               <FeaturedWorldHero world={featuredWorld} />
             )}
@@ -74,30 +73,33 @@ export default function DiscoverPageClient() {
         <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Highest Rated Section */}
           {isHighestRatedLoading ? (
-            <div className="py-8">
-              <GlobalLoading
-                message="Loading highest rated..."
-                fullScreen={false}
-              />
-            </div>
+            <SectionCardsSkeleton
+              icon="trophy"
+              title="Highest Rated"
+              subtitle="Top rated by community"
+            />
           ) : (
             <HighestRatedWorlds worlds={highestRatedWorlds} />
           )}
 
           {/* Recent Section */}
           {isRecentLoading ? (
-            <div className="py-8">
-              <GlobalLoading message="Loading recent..." fullScreen={false} />
-            </div>
+            <SectionCardsSkeleton
+              icon="clock"
+              title="Recent Worlds"
+              subtitle="Newly created adventures"
+            />
           ) : (
             <RecentWorlds worlds={recentWorlds} />
           )}
 
           {/* Trending Section */}
           {isTrendingLoading ? (
-            <div className="py-8">
-              <GlobalLoading message="Loading trending..." fullScreen={false} />
-            </div>
+            <SectionCardsSkeleton
+              icon="trending"
+              title="Trending"
+              subtitle="Popular right now"
+            />
           ) : (
             <TrendingWorlds worlds={trendingWorlds} />
           )}
@@ -147,7 +149,7 @@ export default function DiscoverPageClient() {
           </h2>
 
           {isAllWorldsLoading ? (
-            <LoadingState />
+            <WorldGridSkeleton viewMode={viewMode} />
           ) : error ? (
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
