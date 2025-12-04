@@ -29,7 +29,7 @@ export default function MyWorlds() {
   //* Fetch playing worlds (worlds I'm in adventures for)
   const { data: playingWorldsData, isLoading: playingWorldsLoading } =
     useWorlds({
-      scope: "my",
+      scope: "global",
       limit: 50,
     });
 
@@ -124,7 +124,7 @@ export default function MyWorlds() {
               <ExpandableWorldCards
                 worlds={activePlayingWorlds}
                 viewMode="grid"
-                showAuthor={false}
+                showAuthor="conditional"
               />
             )}
           </TabsContent>

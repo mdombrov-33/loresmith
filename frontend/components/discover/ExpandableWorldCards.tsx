@@ -34,7 +34,7 @@ import {
 interface ExpandableWorldCardsProps {
   worlds: World[];
   viewMode?: "grid" | "row";
-  showAuthor?: boolean;
+  showAuthor?: boolean | "conditional"; // true = always show, false = never show, "conditional" = show only if not owner
 }
 
 export default function ExpandableWorldCards({
@@ -178,7 +178,7 @@ export default function ExpandableWorldCards({
                     >
                       {active.full_story.quest?.title || "Untitled World"}
                     </motion.h3>
-                    {showAuthor && (
+                    {((showAuthor === true) || (showAuthor === "conditional" && active.user_id !== user?.id)) && (
                       <motion.p
                         layoutId={`description-${active.id}-${id}`}
                         className="text-sm text-muted-foreground"
@@ -323,7 +323,7 @@ export default function ExpandableWorldCards({
                     >
                       {world.full_story.quest?.title || "Untitled World"}
                     </motion.h3>
-                    {showAuthor && (
+                    {((showAuthor === true) || (showAuthor === "conditional" && world.user_id !== user?.id)) && (
                       <motion.p
                         layoutId={`description-${world.id}-${id}`}
                         className="text-left text-xs text-muted-foreground"
@@ -408,7 +408,7 @@ export default function ExpandableWorldCards({
                   >
                     {world.full_story.quest?.title || "Untitled World"}
                   </motion.h3>
-                  {showAuthor && (
+                  {((showAuthor === true) || (showAuthor === "conditional" && world.user_id !== user?.id)) && (
                     <motion.p
                       layoutId={`description-${world.id}-${id}`}
                       className="text-center text-sm text-muted-foreground md:text-left"
