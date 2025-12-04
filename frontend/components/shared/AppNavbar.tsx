@@ -7,6 +7,7 @@ import Logo from "@/components/shared/Logo";
 import { PrimaryButton } from "@/components/shared/buttons";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/appStore";
+import { AudioToggle } from "@/components/navbar/AudioToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,11 @@ export default function AppNavbar() {
 
   //* Hide Create button on these pages
   const hideCreateButton = pathname?.startsWith("/generate") ||
+                          pathname?.startsWith("/select-theme") ||
+                          pathname?.startsWith("/adventure/");
+
+  //* Show Audio Toggle only on these pages
+  const showAudioToggle = pathname?.startsWith("/generate") ||
                           pathname?.startsWith("/select-theme") ||
                           pathname?.startsWith("/adventure/");
 
@@ -94,7 +100,7 @@ export default function AppNavbar() {
           </nav>
         </div>
 
-        {/* Right: Create + Notifications + User */}
+        {/* Right: Create + Audio + Notifications + User */}
         <div className="flex items-center gap-4">
           {/* Create Button */}
           {!hideCreateButton && (
@@ -105,6 +111,9 @@ export default function AppNavbar() {
               </PrimaryButton>
             </Link>
           )}
+
+          {/* Audio Toggle */}
+          {showAudioToggle && <AudioToggle />}
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">

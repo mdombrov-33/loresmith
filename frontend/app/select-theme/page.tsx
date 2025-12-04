@@ -15,14 +15,23 @@ export default function SelectThemePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedThemeParam = searchParams.get("theme");
-  const { setTheme, setAppStage } = useAppStore();
+  const { setTheme, setAudioTheme, setAppStage } = useAppStore();
 
-  // Set app stage
+  // Set app stage and default to fantasy
   useEffect(() => {
     setAppStage("home");
-  }, [setAppStage]);
+    // Auto-select fantasy if no theme is selected
+    if (!selectedThemeParam) {
+      setAudioTheme("fantasy"); // Set audio to fantasy immediately
+      router.replace("/select-theme?theme=fantasy", { scroll: false });
+    } else {
+      // Sync audio with selected theme on page load
+      setAudioTheme(selectedThemeParam);
+    }
+  }, [setAppStage, selectedThemeParam, router, setAudioTheme]);
 
   const handleThemeSelect = (themeValue: string) => {
+    setAudioTheme(themeValue); // Change music immediately
     router.push(`/select-theme?theme=${themeValue}`, { scroll: false });
   };
 

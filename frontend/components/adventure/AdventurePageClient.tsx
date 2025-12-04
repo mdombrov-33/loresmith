@@ -8,7 +8,7 @@ import { useAppStore } from "@/stores/appStore";
 export default function AdventurePageClient() {
   const params = useParams();
   const sessionId = parseInt(params.session_id as string, 10);
-  const { setTheme, setAudioTheme } = useAppStore();
+  const { setTheme, setAudioTheme, setAppStage } = useAppStore();
 
   // TODO Phase 1: Implement adventure page with theme syncing
   // Steps:
@@ -21,12 +21,13 @@ export default function AdventurePageClient() {
 
   // Placeholder - will be replaced in Phase 1
   useEffect(() => {
+    setAppStage("adventure");
     // When Phase 1 is implemented:
     // if (world?.theme) {
     //   setTheme(world.theme);
     //   setAudioTheme(world.theme);
     // }
-  }, [sessionId, setTheme, setAudioTheme]);
+  }, [sessionId, setTheme, setAudioTheme, setAppStage]);
 
   return (
     <main className="bg-background flex min-h-screen items-center justify-center">
