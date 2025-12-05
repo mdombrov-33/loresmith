@@ -34,6 +34,11 @@ _Interactive cards for generating world elements (characters, factions, settings
 ![Generation Cards](assets/screenshots/cards-back.png)
 _Interactive cards for generating world elements (characters, factions, settings, etc.)_
 
+### Theme Selection Page
+
+![Theme Selection](assets/screenshots/theme-selection.png)
+_Theme selection screen_
+
 ### Full Story View
 
 ![Full Story](assets/screenshots/fullstory.png)
