@@ -37,8 +37,18 @@ export default function MyWorlds() {
   // Filter to only worlds created by the current user
   const myWorlds = myWorldsData.filter((world) => world.user_id === user?.id);
 
-  //* Fetch playing worlds (worlds I'm in adventures for)
-  const { data: playingWorldsData, isLoading: playingWorldsLoading } =
+  //* Fetch playing worlds from "my" scope (including private worlds with sessions)
+  const { data: myPlayingWorldsData, isLoading: myPlayingWorldsLoading } =
+    useWorlds({
+      scope: "my",
+      theme: playingTheme || undefined,
+      status: playingStatus || undefined,
+      sort: playingSort || undefined,
+      limit: 50,
+    });
+
+  //* Fetch playing worlds from "global" scope (other people's worlds with sessions)
+  const { data: globalPlayingWorldsData, isLoading: globalPlayingWorldsLoading } =
     useWorlds({
       scope: "global",
       theme: playingTheme || undefined,
@@ -47,10 +57,19 @@ export default function MyWorlds() {
       limit: 50,
     });
 
-  const playingWorlds = playingWorldsData?.worlds || [];
+  const myPlayingWorlds = myPlayingWorldsData?.worlds || [];
+  const globalPlayingWorlds = globalPlayingWorldsData?.worlds || [];
 
-  //* Filter playing worlds to only those with active sessions
-  const activePlayingWorlds = playingWorlds.filter((world) => world.session_id);
+  //* Combine both, deduplicate by world ID, and filter to only those with active sessions
+  const worldMap = new Map();
+  [...myPlayingWorlds, ...globalPlayingWorlds].forEach((world) => {
+    if (world.session_id && !worldMap.has(world.id)) {
+      worldMap.set(world.id, world);
+    }
+  });
+  const activePlayingWorlds = Array.from(worldMap.values());
+
+  const playingWorldsLoading = myPlayingWorldsLoading || globalPlayingWorldsLoading;
 
   return (
     <main className="bg-background min-h-screen">
