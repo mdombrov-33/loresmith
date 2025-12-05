@@ -9,7 +9,7 @@ import { THEMES } from "@/constants/game-themes";
 
 function ThemeSyncronizer() {
   const { theme: storeTheme } = useAppStore();
-  const { setTheme: setNextTheme } = useTheme();
+  const { setTheme: setNextTheme, theme: currentTheme } = useTheme();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const selectedThemeParam = searchParams.get("theme");
@@ -25,20 +25,24 @@ function ThemeSyncronizer() {
     //* Check if current path should use custom theme
     const shouldUseCustomTheme = customThemePaths.some(path => pathname?.startsWith(path));
 
+    let targetTheme: string;
+
     //* Special case: select-theme page with theme parameter (preview)
     if (pathname === "/select-theme" && selectedThemeParam) {
-      setNextTheme(selectedThemeParam);
-      return;
-    }
-
-    if (shouldUseCustomTheme && storeTheme) {
+      targetTheme = selectedThemeParam;
+    } else if (shouldUseCustomTheme && storeTheme) {
       //* Use selected theme for generation/worlds/adventure flows
-      setNextTheme(storeTheme);
+      targetTheme = storeTheme;
     } else {
       //* Use default base theme for navigation pages (my-worlds, discover, plans, home, etc.)
-      setNextTheme("default");
+      targetTheme = "default";
     }
-  }, [storeTheme, setNextTheme, selectedThemeParam, pathname]);
+
+    //* Only update if the theme actually changed
+    if (currentTheme !== targetTheme) {
+      setNextTheme(targetTheme);
+    }
+  }, [storeTheme, setNextTheme, selectedThemeParam, pathname, currentTheme]);
 
   return null;
 }
@@ -59,7 +63,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         THEMES.STEAMPUNK,
       ]}
       enableSystem={false}
-      disableTransitionOnChange={false}
+      disableTransitionOnChange={true}
     >
       {isHydrated && <ThemeSyncronizer />}
       {children}

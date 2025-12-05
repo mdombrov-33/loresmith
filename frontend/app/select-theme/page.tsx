@@ -17,11 +17,10 @@ export default function SelectThemePage() {
   const selectedThemeParam = searchParams.get("theme") || "fantasy"; // Default to fantasy
   const { setTheme, setAudioTheme, setAppStage } = useAppStore();
 
-  // Set app stage and sync audio
+  // Set app stage on mount
   useEffect(() => {
     setAppStage("home");
-    setAudioTheme(selectedThemeParam);
-  }, [setAppStage, setAudioTheme, selectedThemeParam]);
+  }, [setAppStage]);
 
   const handleThemeSelect = (themeValue: string) => {
     setAudioTheme(themeValue); // Change music immediately
