@@ -8,9 +8,11 @@ import { Sparkles, Globe, BookOpen } from "lucide-react";
 import ExpandableWorldCards from "@/components/discover/ExpandableWorldCards";
 import DiscoverFilters from "@/components/discover/DiscoverFilters";
 import { WorldGridSkeleton } from "@/components/discover/LoadingSkeletons";
+import { useAppStore } from "@/stores/appStore";
 
 export default function MyWorlds() {
   const [activeTab, setActiveTab] = useState("my-worlds");
+  const { user } = useAppStore();
 
   // Use unified hook for my-worlds scope
   const {
@@ -22,9 +24,12 @@ export default function MyWorlds() {
     handleSortChange,
     viewMode,
     setViewMode,
-    allWorlds: myWorlds,
+    allWorlds: myWorldsData,
     isAllWorldsLoading: myWorldsLoading,
   } = useWorldsLogic({ scope: "my", appStage: "my-worlds" });
+
+  // Filter to only worlds created by the current user
+  const myWorlds = myWorldsData.filter((world) => world.user_id === user?.id);
 
   //* Fetch playing worlds (worlds I'm in adventures for)
   const { data: playingWorldsData, isLoading: playingWorldsLoading } =
