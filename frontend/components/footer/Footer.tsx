@@ -8,13 +8,13 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t mt-20">
+    <footer className="border-t">
       <div className="container mx-auto">
-        <div className="py-12 flex flex-col sm:flex-row items-start justify-between gap-x-8 gap-y-10 px-4 xl:px-0">
+        <div className="flex flex-col items-start justify-between gap-x-8 gap-y-10 px-4 py-12 sm:flex-row xl:px-0">
           <div>
             <Logo size="sm" />
 
-            <ul className="mt-6 flex items-center gap-4 flex-wrap">
+            <ul className="mt-6 flex flex-wrap items-center gap-4">
               {footerLinks.map(({ title, href }) => (
                 <li key={title}>
                   <Link
@@ -29,9 +29,9 @@ export default function Footer() {
           </div>
 
           {/* Subscribe Newsletter */}
-          <div className="max-w-xs w-full">
+          <div className="w-full max-w-xs">
             <h6 className="font-medium">Stay up to date</h6>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-2 text-sm">
               Get notified about new worlds and features
             </p>
             <form className="mt-4 flex items-center gap-2">
@@ -43,26 +43,42 @@ export default function Footer() {
 
         <Separator />
 
-        <div className="py-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-x-2 gap-y-5 px-4 xl:px-0">
+        <div className="flex flex-col-reverse items-center justify-between gap-x-2 gap-y-5 px-4 py-8 sm:flex-row xl:px-0">
           {/* Copyright */}
           <span className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} LoreSmith. Craft your destiny.
           </span>
 
-          <div className="flex items-center gap-5 text-muted-foreground">
-            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+          <div className="text-muted-foreground flex items-center gap-5">
+            <Link
+              href="#"
+              target="_blank"
+              className="hover:text-foreground transition-colors"
+            >
               <MessageSquare className="h-5 w-5" />
               <span className="sr-only">Discord</span>
             </Link>
-            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              target="_blank"
+              className="hover:text-foreground transition-colors"
+            >
               <Youtube className="h-5 w-5" />
               <span className="sr-only">YouTube</span>
             </Link>
-            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              target="_blank"
+              className="hover:text-foreground transition-colors"
+            >
               <Github className="h-5 w-5" />
               <span className="sr-only">GitHub</span>
             </Link>
-            <Link href="#" target="_blank" className="hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              target="_blank"
+              className="hover:text-foreground transition-colors"
+            >
               <Twitter className="h-5 w-5" />
               <span className="sr-only">Twitter</span>
             </Link>
