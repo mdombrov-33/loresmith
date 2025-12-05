@@ -27,8 +27,9 @@ export function useDeleteAdventureSession() {
   return useMutation({
     mutationFn: (sessionId: number) => deleteAdventureSession(sessionId),
     onSuccess: () => {
-      //* Invalidate worlds query to refresh the list
+      //* Invalidate all worlds and session queries to refresh
       queryClient.invalidateQueries({ queryKey: ["worlds"] });
+      queryClient.invalidateQueries({ queryKey: ["activeSession"] });
     },
   });
 }

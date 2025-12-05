@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Star, MessageSquare, Users, Eye, HelpCircle, Trash2, EyeOff, X as XIcon } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
+import { useDeleteAdventureSession } from "@/lib/queries/adventure";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ export default function ExpandableWorldCards({
   const router = useRouter();
   const { user } = useAppStore();
   const deleteWorldMutation = useDeleteWorld();
+  const deleteSessionMutation = useDeleteAdventureSession();
   const updateVisibilityMutation = useUpdateWorldVisibility();
 
   useEffect(() => {
@@ -90,7 +92,18 @@ export default function ExpandableWorldCards({
   };
 
   const handleConfirmDelete = () => {
-    if (active) {
+    if (!active) return;
+
+    // If user has an active session, delete the session instead of the world
+    if (active.session_id) {
+      deleteSessionMutation.mutate(active.session_id, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setActive(null);
+        },
+      });
+    } else {
+      // No active session, delete the world
       deleteWorldMutation.mutate(active.id, {
         onSuccess: () => {
           setIsDeleteDialogOpen(false);
@@ -119,6 +132,7 @@ export default function ExpandableWorldCards({
   };
 
   const isOwner = active && user && active.user_id === user.id;
+  const hasSession = active && active.session_id;
 
   const getThemeOption = (theme: string) =>
     THEME_OPTIONS.find((t) => t.value === theme);
@@ -222,8 +236,8 @@ export default function ExpandableWorldCards({
 
                   {/* Right Side Actions Column */}
                   <div className="flex flex-col items-end gap-2">
-                    {/* Owner Actions */}
-                    {isOwner && (
+                    {/* Owner/Session Actions */}
+                    {(isOwner || hasSession) && (
                       <motion.div
                         layout
                         initial={{ opacity: 0 }}
@@ -231,32 +245,36 @@ export default function ExpandableWorldCards({
                         exit={{ opacity: 0 }}
                         className="flex gap-2"
                       >
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleToggleVisibility}
-                                disabled={updateVisibilityMutation.isPending}
-                              >
-                                {active.visibility === "published" ? (
-                                  <Eye className="h-4 w-4" />
-                                ) : (
-                                  <EyeOff className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {active.visibility === "published" ? "Make Private" : "Publish"}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        {/* Visibility toggle - only for owners */}
+                        {isOwner && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleToggleVisibility}
+                                  disabled={updateVisibilityMutation.isPending}
+                                >
+                                  {active.visibility === "published" ? (
+                                    <Eye className="h-4 w-4" />
+                                  ) : (
+                                    <EyeOff className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {active.visibility === "published" ? "Make Private" : "Publish"}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                        {/* Delete button - for owners (delete world) or sessions (end adventure) */}
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={handleDeleteClick}
-                          disabled={deleteWorldMutation.isPending}
+                          disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -486,26 +504,34 @@ export default function ExpandableWorldCards({
           <DialogOverlay className="z-[150]" />
           <DialogPrimitive.Content className="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-[200] grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Delete World</DialogTitle>
+              <DialogTitle>{active?.session_id ? "End Adventure" : "Delete World"}</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete &quot;{active?.full_story.quest?.title || "this world"}&quot;?
-                This action cannot be undone.
+                {active?.session_id ? (
+                  <>
+                    Are you sure you want to end your adventure session in &quot;{active?.full_story.quest?.title || "this world"}&quot;?
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to delete &quot;{active?.full_story.quest?.title || "this world"}&quot;?
+                    This action cannot be undone.
+                  </>
+                )}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button
                 variant="outline"
                 onClick={() => setIsDeleteDialogOpen(false)}
-                disabled={deleteWorldMutation.isPending}
+                disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleConfirmDelete}
-                disabled={deleteWorldMutation.isPending}
+                disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
               >
-                {deleteWorldMutation.isPending ? "Deleting..." : "Delete"}
+                {(deleteWorldMutation.isPending || deleteSessionMutation.isPending) ? "Deleting..." : (active?.session_id ? "End Adventure" : "Delete World")}
               </Button>
             </DialogFooter>
             <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">

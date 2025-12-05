@@ -37,7 +37,7 @@ export default function MyWorlds() {
   // Filter to only worlds created by the current user
   const myWorlds = myWorldsData.filter((world) => world.user_id === user?.id);
 
-  //* Fetch playing worlds from "my" scope (including private worlds with sessions)
+  //* Fetch playing worlds from "my" scope (includes private worlds with sessions, but no usernames)
   const { data: myPlayingWorldsData, isLoading: myPlayingWorldsLoading } =
     useWorlds({
       scope: "my",
@@ -47,7 +47,7 @@ export default function MyWorlds() {
       limit: 50,
     });
 
-  //* Fetch playing worlds from "global" scope (other people's worlds with sessions)
+  //* Fetch playing worlds from "global" scope (published worlds with sessions + usernames)
   const { data: globalPlayingWorldsData, isLoading: globalPlayingWorldsLoading } =
     useWorlds({
       scope: "global",
@@ -60,10 +60,17 @@ export default function MyWorlds() {
   const myPlayingWorlds = myPlayingWorldsData?.worlds || [];
   const globalPlayingWorlds = globalPlayingWorldsData?.worlds || [];
 
-  //* Combine both, deduplicate by world ID, and filter to only those with active sessions
+  //* Combine both, preferring "global" version (has usernames) over "my" version
   const worldMap = new Map();
-  [...myPlayingWorlds, ...globalPlayingWorlds].forEach((world) => {
-    if (world.session_id && !worldMap.has(world.id)) {
+  // Add "my" worlds first (no usernames)
+  myPlayingWorlds.forEach((world) => {
+    if (world.session_id) {
+      worldMap.set(world.id, world);
+    }
+  });
+  // Overwrite with "global" worlds (has usernames) if they exist
+  globalPlayingWorlds.forEach((world) => {
+    if (world.session_id) {
       worldMap.set(world.id, world);
     }
   });
