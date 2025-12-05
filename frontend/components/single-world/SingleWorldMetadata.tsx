@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { PrimaryButton } from "@/components/shared/buttons";
@@ -22,7 +22,6 @@ import {
   useStartAdventure,
   useCheckActiveSession,
 } from "@/lib/queries/adventure";
-import { ActionLoading } from "@/components/shared/LoadingStates";
 
 interface SingleWorldMetadataProps {
   world?: World;
@@ -32,6 +31,7 @@ interface SingleWorldMetadataProps {
   userRating?: number;
   ratingCount?: number;
   worldId: number;
+  onAdventureStarting?: (isStarting: boolean) => void;
 }
 
 export default function SingleWorldMetadata({
@@ -42,12 +42,18 @@ export default function SingleWorldMetadata({
   userRating,
   ratingCount,
   worldId,
+  onAdventureStarting,
 }: SingleWorldMetadataProps) {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const router = useRouter();
   const startAdventureMutation = useStartAdventure();
   const { data: sessionCheck, isLoading: isCheckingSession } =
     useCheckActiveSession(worldId);
+
+  // Notify parent about loading state
+  useEffect(() => {
+    onAdventureStarting?.(startAdventureMutation.isPending);
+  }, [startAdventureMutation.isPending, onAdventureStarting]);
 
   const handleBeginAdventure = async () => {
     try {
@@ -86,19 +92,6 @@ export default function SingleWorldMetadata({
 
   return (
     <>
-      {startAdventureMutation.isPending && (
-        <ActionLoading
-          title={
-            hasActiveSession ? "Resuming Adventure" : "Initializing Adventure"
-          }
-          description={
-            hasActiveSession
-              ? "Loading your journey..."
-              : "Preparing your journey..."
-          }
-        />
-      )}
-
       <div className="space-y-4">
         {/* Primary CTA - Begin Adventure */}
         <PrimaryButton

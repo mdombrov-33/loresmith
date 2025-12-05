@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { useWorldIdLogic } from "@/hooks/useWorldIdLogic";
 import SingleWorldLoading from "@/components/single-world/SingleWorldLoading";
 import SingleWorldError from "@/components/single-world/SingleWorldError";
 import SingleWorldHero from "@/components/single-world/SingleWorldHero";
 import SingleWorldTabbedContent from "@/components/single-world/SingleWorldTabbedContent";
 import SingleWorldMetadata from "@/components/single-world/SingleWorldMetadata";
+import { ActionLoading } from "@/components/shared/LoadingStates";
 
 export default function SingleWorldPageClient() {
+  const [isStartingAdventure, setIsStartingAdventure] = useState(false);
+
   const {
     isLoading,
     displayError,
@@ -26,6 +30,15 @@ export default function SingleWorldPageClient() {
 
   if (displayError) {
     return <SingleWorldError error={displayError} />;
+  }
+
+  if (isStartingAdventure) {
+    return (
+      <ActionLoading
+        title="Initializing Adventure"
+        description="Preparing your journey..."
+      />
+    );
   }
 
   //* Extract character piece for hero portrait
@@ -69,6 +82,7 @@ export default function SingleWorldPageClient() {
                 userRating={world?.user_rating}
                 ratingCount={world?.rating_count}
                 worldId={worldId}
+                onAdventureStarting={setIsStartingAdventure}
               />
             </div>
           </div>
