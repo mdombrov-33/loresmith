@@ -14,21 +14,14 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 export default function SelectThemePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedThemeParam = searchParams.get("theme");
+  const selectedThemeParam = searchParams.get("theme") || "fantasy"; // Default to fantasy
   const { setTheme, setAudioTheme, setAppStage } = useAppStore();
 
-  // Set app stage and default to fantasy
+  // Set app stage and sync audio
   useEffect(() => {
     setAppStage("home");
-    // Auto-select fantasy if no theme is selected
-    if (!selectedThemeParam) {
-      setAudioTheme("fantasy"); // Set audio to fantasy immediately
-      router.replace("/select-theme?theme=fantasy", { scroll: false });
-    } else {
-      // Sync audio with selected theme on page load
-      setAudioTheme(selectedThemeParam);
-    }
-  }, [setAppStage, selectedThemeParam, router, setAudioTheme]);
+    setAudioTheme(selectedThemeParam);
+  }, [setAppStage, setAudioTheme, selectedThemeParam]);
 
   const handleThemeSelect = (themeValue: string) => {
     setAudioTheme(themeValue); // Change music immediately
@@ -175,106 +168,87 @@ export default function SelectThemePage() {
 
       {/* RIGHT SIDE - Immersive Preview */}
       <main className="relative flex-1 overflow-hidden">
-        {selectedThemeParam ? (
-          <>
-            {/* Background Image */}
-            <div className="absolute inset-0">
-              <Image
-                src={`/images/backgrounds/${selectedThemeParam === "post-apocalyptic" ? "post-apocalypse" : selectedThemeParam}.png`}
-                alt={selectedTheme?.label || "Theme background"}
-                fill
-                className="object-cover transition-opacity duration-500"
-                priority
-              />
-            </div>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src={`/images/backgrounds/${selectedThemeParam === "post-apocalyptic" ? "post-apocalypse" : selectedThemeParam}.png`}
+            alt={selectedTheme?.label || "Theme background"}
+            fill
+            className="object-cover transition-opacity duration-500"
+            priority
+          />
+        </div>
 
-            {/* Particles Overlay */}
-            <div className="absolute inset-0 z-10">{ParticlesComponent}</div>
+        {/* Particles Overlay */}
+        <div className="absolute inset-0 z-10">{ParticlesComponent}</div>
 
-            {/* Dark overlay for readability */}
-            <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
 
-            {/* Spotlight effect */}
-            <Spotlight
-              className="-top-40 left-0 md:-top-20 md:left-60"
-              fill="white"
-            />
+        {/* Spotlight effect */}
+        <Spotlight
+          className="-top-40 left-0 md:-top-20 md:left-60"
+          fill="white"
+        />
 
-            {/* Content - Description Panel (Centered) */}
-            <div className="absolute inset-0 z-40 flex items-center justify-center p-8 md:p-12">
-              <div className="w-full max-w-2xl">
-                {/* Glass morphism card */}
-                <div className="border-primary/20 bg-card/90 relative overflow-hidden rounded-2xl border p-8 shadow-2xl backdrop-blur-xl">
-                  {/* Top gradient accent */}
-                  <div className="via-primary/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
+        {/* Content - Description Panel (Centered) */}
+        <div className="absolute inset-0 z-40 flex items-center justify-center p-8 md:p-12">
+          <div className="w-full max-w-2xl">
+            {/* Glass morphism card */}
+            <div className="border-primary/20 bg-card/90 relative overflow-hidden rounded-2xl border p-8 shadow-2xl backdrop-blur-xl">
+              {/* Top gradient accent */}
+              <div className="via-primary/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
 
-                  {/* Content */}
-                  <div className="relative z-10">
-                    {/* Theme name with sparkle */}
-                    <div className="mb-4 flex items-center gap-3">
-                      <Sparkles className="text-primary h-6 w-6" />
-                      <h2 className="font-heading text-foreground text-4xl font-bold md:text-5xl">
-                        {selectedTheme?.label}
-                      </h2>
-                    </div>
+              {/* Content */}
+              <div className="relative z-10">
+                {/* Theme name with sparkle */}
+                <div className="mb-4 flex items-center gap-3">
+                  <Sparkles className="text-primary h-6 w-6" />
+                  <h2 className="font-heading text-foreground text-4xl font-bold md:text-5xl">
+                    {selectedTheme?.label}
+                  </h2>
+                </div>
 
-                    {/* Description */}
-                    <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
-                      {themeDescriptions[selectedThemeParam]?.description}
-                    </p>
+                {/* Description */}
+                <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
+                  {themeDescriptions[selectedThemeParam]?.description}
+                </p>
 
-                    {/* Features */}
-                    <div className="mb-8 flex justify-center">
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                        {themeDescriptions[selectedThemeParam]?.features.map(
-                          (feature, idx) => (
-                            <div
-                              key={idx}
-                              className="text-foreground/80 flex items-center gap-2 text-sm"
-                            >
-                              <div className="bg-primary h-1.5 w-1.5 flex-shrink-0 rounded-full" />
-                              <span>{feature}</span>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Continue Button */}
-                    <div className="flex justify-center">
-                      <ShimmerButton
-                        onClick={handleContinue}
-                        className="h-12 px-8 text-base font-semibold"
-                        shimmerColor="hsl(var(--primary))"
-                        background="hsl(var(--primary))"
-                      >
-                        <span className="flex items-center gap-2">
-                          Continue to Generation
-                          <ArrowRight className="h-5 w-5" />
-                        </span>
-                      </ShimmerButton>
-                    </div>
+                {/* Features */}
+                <div className="mb-8 flex justify-center">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                    {themeDescriptions[selectedThemeParam]?.features.map(
+                      (feature, idx) => (
+                        <div
+                          key={idx}
+                          className="text-foreground/80 flex items-center gap-2 text-sm"
+                        >
+                          <div className="bg-primary h-1.5 w-1.5 flex-shrink-0 rounded-full" />
+                          <span>{feature}</span>
+                        </div>
+                      ),
+                    )}
                   </div>
+                </div>
+
+                {/* Continue Button */}
+                <div className="flex justify-center">
+                  <ShimmerButton
+                    onClick={handleContinue}
+                    className="h-12 px-8 text-base font-semibold"
+                    shimmerColor="hsl(var(--primary))"
+                    background="hsl(var(--primary))"
+                  >
+                    <span className="flex items-center gap-2">
+                      Continue to Generation
+                      <ArrowRight className="h-5 w-5" />
+                    </span>
+                  </ShimmerButton>
                 </div>
               </div>
             </div>
-          </>
-        ) : (
-          /* No theme selected state */
-          <div className="flex h-full items-center justify-center p-8">
-            <div className="text-center">
-              <div className="border-primary/30 mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed">
-                <Sparkles className="text-primary/50 h-10 w-10" />
-              </div>
-              <h2 className="font-heading text-foreground mb-2 text-2xl font-bold">
-                Select a Theme
-              </h2>
-              <p className="text-muted-foreground">
-                Choose a world from the sidebar to begin
-              </p>
-            </div>
           </div>
-        )}
+        </div>
       </main>
     </main>
   );

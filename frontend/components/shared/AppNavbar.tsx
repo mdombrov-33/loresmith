@@ -115,7 +115,7 @@ export default function AppNavbar() {
         <div className="flex items-center gap-4">
           {/* Create Button */}
           {!hideCreateButton && (
-            <Link href="/select-theme">
+            <Link href="/select-theme?theme=fantasy">
               <PrimaryButton className="hidden px-4 py-2 sm:flex">
                 <Sparkles className="mr-2 h-4 w-4" />
                 <span className="text-sm font-medium">Create</span>
