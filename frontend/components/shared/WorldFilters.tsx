@@ -78,14 +78,13 @@ export default function WorldFilters({
 
         {/* Sort By */}
         <Select
-          value={selectedSort || "default"}
-          onValueChange={(val) => onSortChange(val === "default" ? "" : val)}
+          value={selectedSort || "created_at_desc"}
+          onValueChange={onSortChange}
         >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="default">Default Order</SelectItem>
             {SORT_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}

@@ -17,7 +17,7 @@ export default function MyWorlds() {
   // Filters for Playing tab
   const [playingTheme, setPlayingTheme] = useState("");
   const [playingStatus, setPlayingStatus] = useState("");
-  const [playingSort, setPlayingSort] = useState("");
+  const [playingSort, setPlayingSort] = useState("created_at_desc");
   const [playingViewMode, setPlayingViewMode] = useState<"grid" | "row">("grid");
 
   // Use unified hook for my-worlds scope

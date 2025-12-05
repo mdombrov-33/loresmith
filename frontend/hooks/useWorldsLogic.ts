@@ -23,8 +23,8 @@ export function useWorldsLogic({
   //* Scope-specific filters
   const [filters, setFilters] = useState<Record<"my" | "global", ScopeFilters>>(
     {
-      my: { theme: "", status: "", sort: "" },
-      global: { theme: "", status: "", sort: "" },
+      my: { theme: "", status: "", sort: "created_at_desc" },
+      global: { theme: "", status: "", sort: "created_at_desc" },
     },
   );
 
