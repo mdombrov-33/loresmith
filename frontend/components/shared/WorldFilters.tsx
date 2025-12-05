@@ -12,7 +12,7 @@ import { STATUS_OPTIONS, SORT_OPTIONS } from "@/constants/hub-filters";
 import { LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface DiscoverFiltersProps {
+interface WorldFiltersProps {
   selectedTheme: string;
   selectedStatus: string;
   selectedSort: string;
@@ -21,9 +21,10 @@ interface DiscoverFiltersProps {
   onSortChange: (sort: string) => void;
   viewMode: "grid" | "row";
   onViewModeChange: (mode: "grid" | "row") => void;
+  showStatusFilter?: boolean; // Optional: hide status filter for Playing tab
 }
 
-export default function DiscoverFilters({
+export default function WorldFilters({
   selectedTheme,
   selectedStatus,
   selectedSort,
@@ -32,7 +33,8 @@ export default function DiscoverFilters({
   onSortChange,
   viewMode,
   onViewModeChange,
-}: DiscoverFiltersProps) {
+  showStatusFilter = true, // Default to true
+}: WorldFiltersProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -54,23 +56,25 @@ export default function DiscoverFilters({
           </SelectContent>
         </Select>
 
-        {/* Status Filter */}
-        <Select
-          value={selectedStatus || "all"}
-          onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {STATUS_OPTIONS.map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {status.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Status Filter - Only show if enabled */}
+        {showStatusFilter && (
+          <Select
+            value={selectedStatus || "all"}
+            onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {STATUS_OPTIONS.map((status) => (
+                <SelectItem key={status.value} value={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         {/* Sort By */}
         <Select

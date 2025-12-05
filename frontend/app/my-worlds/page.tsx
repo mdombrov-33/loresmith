@@ -6,13 +6,19 @@ import { useWorlds } from "@/lib/queries/world";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Globe, BookOpen } from "lucide-react";
 import ExpandableWorldCards from "@/components/discover/ExpandableWorldCards";
-import DiscoverFilters from "@/components/discover/DiscoverFilters";
+import WorldFilters from "@/components/shared/WorldFilters";
 import { WorldGridSkeleton } from "@/components/discover/LoadingSkeletons";
 import { useAppStore } from "@/stores/appStore";
 
 export default function MyWorlds() {
   const [activeTab, setActiveTab] = useState("my-worlds");
   const { user } = useAppStore();
+
+  // Filters for Playing tab
+  const [playingTheme, setPlayingTheme] = useState("");
+  const [playingStatus, setPlayingStatus] = useState("");
+  const [playingSort, setPlayingSort] = useState("");
+  const [playingViewMode, setPlayingViewMode] = useState<"grid" | "row">("grid");
 
   // Use unified hook for my-worlds scope
   const {
@@ -35,6 +41,9 @@ export default function MyWorlds() {
   const { data: playingWorldsData, isLoading: playingWorldsLoading } =
     useWorlds({
       scope: "global",
+      theme: playingTheme || undefined,
+      status: playingStatus || undefined,
+      sort: playingSort || undefined,
       limit: 50,
     });
 
@@ -72,7 +81,7 @@ export default function MyWorlds() {
           {/* My Worlds Tab */}
           <TabsContent value="my-worlds" className="space-y-6">
             {/* Filters */}
-            <DiscoverFilters
+            <WorldFilters
               selectedTheme={selectedTheme}
               selectedStatus={selectedStatus}
               onThemeChange={handleThemeChange}
@@ -107,8 +116,21 @@ export default function MyWorlds() {
 
           {/* Playing Tab */}
           <TabsContent value="playing" className="space-y-6">
+            {/* Filters */}
+            <WorldFilters
+              selectedTheme={playingTheme}
+              selectedStatus={playingStatus}
+              onThemeChange={setPlayingTheme}
+              onStatusChange={setPlayingStatus}
+              selectedSort={playingSort}
+              onSortChange={setPlayingSort}
+              viewMode={playingViewMode}
+              onViewModeChange={setPlayingViewMode}
+              showStatusFilter={false}
+            />
+            {/* Worlds Grid */}
             {playingWorldsLoading ? (
-              <WorldGridSkeleton viewMode="grid" />
+              <WorldGridSkeleton viewMode={playingViewMode} />
             ) : activePlayingWorlds.length === 0 ? (
               <div className="border-border bg-card/50 flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-2xl border p-12">
                 <BookOpen className="text-muted-foreground h-16 w-16" />
@@ -122,7 +144,7 @@ export default function MyWorlds() {
             ) : (
               <ExpandableWorldCards
                 worlds={activePlayingWorlds}
-                viewMode="grid"
+                viewMode={playingViewMode}
                 showAuthor="conditional"
               />
             )}

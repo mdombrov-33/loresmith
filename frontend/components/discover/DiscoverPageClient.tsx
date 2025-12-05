@@ -4,7 +4,7 @@ import { useWorldsLogic } from "@/hooks/useWorldsLogic";
 import FeaturedWorldHero from "./FeaturedWorldHero";
 import NewsFeed from "./NewsFeed";
 import DiscoverSearch from "./DiscoverSearch";
-import DiscoverFilters from "./DiscoverFilters";
+import WorldFilters from "@/components/shared/WorldFilters";
 import HighestRatedWorlds from "./HighestRatedWorlds";
 import TrendingWorlds from "./TrendingWorlds";
 import RecentWorlds from "./RecentWorlds";
@@ -130,7 +130,7 @@ export default function DiscoverPageClient() {
 
         {/* Filters */}
         <div className="py-6">
-          <DiscoverFilters
+          <WorldFilters
             selectedTheme={selectedTheme}
             selectedStatus={selectedStatus}
             selectedSort={selectedSort}
