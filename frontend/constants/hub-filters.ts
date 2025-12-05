@@ -5,8 +5,8 @@ export const STATUS_OPTIONS = [
 ];
 
 export const SORT_OPTIONS = [
-  { value: "created_at_desc", label: "Newest First" },
-  { value: "created_at_asc", label: "Oldest First" },
+  { value: "created_at_desc", label: "Newest" },
+  { value: "created_at_asc", label: "Oldest" },
   { value: "rating_desc", label: "Highest Rated" },
   { value: "rating_asc", label: "Lowest Rated" },
   { value: "active_sessions_desc", label: "Most Active" },
