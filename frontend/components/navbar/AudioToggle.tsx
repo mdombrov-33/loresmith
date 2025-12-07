@@ -191,13 +191,15 @@ export function AudioToggle() {
     if (!audioRef.current || !currentTrack) return;
 
     const audio = audioRef.current;
+    const wasPlaying = !audio.paused;
+
     audio.src = currentTrack.url;
     audio.currentTime = 0;
 
-    if (isPlaying) {
+    if (wasPlaying) {
       audio.play().catch(() => {});
     }
-  }, [currentTrackIndex, currentTrack, isPlaying]);
+  }, [currentTrackIndex, currentTrack]);
 
   // Handle track ended
   useEffect(() => {
