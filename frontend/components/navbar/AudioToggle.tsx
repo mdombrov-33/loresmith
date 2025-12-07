@@ -190,15 +190,13 @@ export function AudioToggle() {
     if (!audioRef.current || !currentTrack) return;
 
     const audio = audioRef.current;
-    const wasPlaying = !audio.paused;
-
     audio.src = currentTrack.url;
     audio.currentTime = 0;
 
-    if (wasPlaying) {
+    if (isPlaying) {
       audio.play().catch(() => {});
     }
-  }, [currentTrackIndex, currentTrack]);
+  }, [currentTrackIndex, currentTrack, isPlaying]);
 
   // Handle track ended
   useEffect(() => {
