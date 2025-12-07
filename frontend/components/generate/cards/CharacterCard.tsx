@@ -89,13 +89,13 @@ export default function CharacterCard({
       className={`bg-card flex h-full flex-col rounded-xl border-2 transition-all ${borderClass}`}
     >
       {isLoadingPortrait ? (
-        <PortraitLoadingSkeleton height="h-44" />
+        <PortraitLoadingSkeleton height="h-48" />
       ) : (
         <CardImage
           src={imageSrc}
           alt={character.name}
           objectFit="contain"
-          height="h-44"
+          height="h-48"
         />
       )}
 

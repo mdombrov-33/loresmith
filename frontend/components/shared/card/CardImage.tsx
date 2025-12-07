@@ -50,7 +50,7 @@ export default function CardImage({
           <img
             src={src}
             alt={alt}
-            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover"}`}
+            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover object-top"}`}
           />
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function CardImage({
           <img
             src={src}
             alt={alt}
-            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover"}`}
+            className={`h-full w-full ${objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover object-top"}`}
           />
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function CardImage({
           src={src}
           alt={alt}
           fill
-          className={objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover"}
+          className={objectFit === "contain" ? "object-contain drop-shadow-2xl" : "object-cover object-top"}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
