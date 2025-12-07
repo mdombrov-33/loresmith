@@ -10,7 +10,6 @@ import {
   Volume2,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import { useAppStore } from "@/stores/appStore";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
@@ -384,7 +383,7 @@ export function AudioToggle() {
               <h5 className="text-muted-foreground text-xs font-semibold">
                 Playlist
               </h5>
-              <div className="max-h-32 space-y-1 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 [&::-webkit-scrollbar-thumb]:rounded-full">
+              <div className="[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 max-h-32 space-y-1 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {playlist.map((track, index) => (
                   <button
                     key={index}
