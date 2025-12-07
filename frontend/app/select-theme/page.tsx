@@ -15,16 +15,14 @@ export default function SelectThemePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedThemeParam = searchParams.get("theme") || "fantasy"; // Default to fantasy
-  const { setTheme, setAudioTheme, setAppStage } = useAppStore();
+  const { setTheme, setAppStage } = useAppStore();
 
-  // Set app stage and sync audio on mount/theme change
+  // Set app stage on mount
   useEffect(() => {
     setAppStage("home");
-    setAudioTheme(selectedThemeParam);
-  }, [setAppStage, setAudioTheme, selectedThemeParam]);
+  }, [setAppStage]);
 
   const handleThemeSelect = (themeValue: string) => {
-    setAudioTheme(themeValue); // Change music immediately
     router.push(`/select-theme?theme=${themeValue}`, { scroll: false });
   };
 

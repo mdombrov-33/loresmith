@@ -6,6 +6,7 @@ import ActionButton from "@/components/shared/buttons/ActionButton";
 import { Slider } from "@/components/ui/slider";
 import { useAppStore } from "@/stores/appStore";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 
 const RADIO_START_EPOCH = Date.UTC(2025, 9, 23, 0, 0, 0) / 1000; //* today's date as epoch
 const R2_MUSIC_URL = process.env.NEXT_PUBLIC_R2_MUSIC_URL;
@@ -53,13 +54,8 @@ const themePlaylists: Record<string, { url: string; duration: number }[]> = {
 };
 
 export function AudioToggle() {
-  const {
-    theme,
-    audioTheme,
-    setAudioTheme,
-    userChangedTheme,
-    setUserChangedTheme,
-  } = useAppStore();
+  const { theme: visualTheme } = useTheme();
+  const { userChangedTheme, setUserChangedTheme } = useAppStore();
   const pathname = usePathname();
   const [initialAudioTheme, setInitialAudioTheme] = useState<string | null>(
     null,
@@ -92,17 +88,13 @@ export function AudioToggle() {
   };
 
   const effectiveAudioTheme = useMemo(() => {
-    if (pathname.startsWith("/worlds/")) {
-      const pathSegments = pathname.split("/");
-      return pathSegments[2] || audioTheme;
-    } else if (pathname.startsWith("/adventure/")) {
-      return theme;
-    } else if (pathname === "/my-worlds" || pathname === "/discover") {
-      return initialAudioTheme || audioTheme;
+    const isHubPage = pathname === "/my-worlds" || pathname === "/discover";
+    if (isHubPage) {
+      return initialAudioTheme || visualTheme || "fantasy";
     } else {
-      return audioTheme;
+      return visualTheme || "fantasy";
     }
-  }, [pathname, theme, audioTheme, initialAudioTheme]);
+  }, [pathname, visualTheme, initialAudioTheme]);
 
   const prevEffectiveAudioThemeRef = useRef(effectiveAudioTheme);
 
@@ -110,19 +102,12 @@ export function AudioToggle() {
     const isHubPage = pathname === "/my-worlds" || pathname === "/discover";
     if (isHubPage && !hasEnteredHubRef.current) {
       hasEnteredHubRef.current = true;
-      setInitialAudioTheme(audioTheme);
+      setInitialAudioTheme(visualTheme || "fantasy");
     } else if (!isHubPage) {
       hasEnteredHubRef.current = false;
       setInitialAudioTheme(null);
     }
-  }, [pathname, audioTheme]);
-
-  useEffect(() => {
-    const isHubPage = pathname === "/my-worlds" || pathname === "/discover";
-    if (!isHubPage) {
-      setAudioTheme(effectiveAudioTheme);
-    }
-  }, [effectiveAudioTheme, pathname, setAudioTheme]);
+  }, [pathname, visualTheme]);
 
   const playlist = useMemo(
     () => themePlaylists[effectiveAudioTheme] || [],
