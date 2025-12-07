@@ -10,7 +10,7 @@ import { THEME_OPTIONS } from "@/constants/game-themes";
 import { Badge } from "@/components/ui/badge";
 import { PrimaryButton } from "@/components/shared/buttons";
 import { Button } from "@/components/ui/button";
-import { Star, MessageSquare, Users, Eye, HelpCircle, Trash2, EyeOff, X as XIcon } from "lucide-react";
+import { Star, MessageSquare, Users, Eye, HelpCircle, Trash2, EyeOff, X as XIcon, BookOpen } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
 import { useDeleteAdventureSession } from "@/lib/queries/adventure";
@@ -286,7 +286,7 @@ export default function ExpandableWorldCards({
                       onClick={() => handleViewWorld(active)}
                       className="text-sm"
                     >
-                      <Eye className="mr-2 h-4 w-4" />
+                      <BookOpen className="mr-2 h-4 w-4" />
                       View
                     </PrimaryButton>
                   </div>
