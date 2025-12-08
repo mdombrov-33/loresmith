@@ -5,6 +5,7 @@ interface GenerateActionsProps {
   hasSelection: boolean;
   isLoading: boolean;
   isLastStage: boolean;
+  hasError: boolean;
   onRegenerate: () => void;
   onNext: () => void;
 }
@@ -13,9 +14,13 @@ export default function GenerateActions({
   hasSelection,
   isLoading,
   isLastStage,
+  hasError,
   onRegenerate,
   onNext,
 }: GenerateActionsProps) {
+  // Don't show actions if there's an error (retry button is in error component)
+  if (hasError) return null;
+
   return (
     <section className="mt-8 flex items-center justify-between gap-4">
       <ActionButton

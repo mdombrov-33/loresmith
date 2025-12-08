@@ -10,6 +10,7 @@ import (
 func SetupRoutes(app *app.Application) *chi.Mux {
 	r := chi.NewRouter()
 
+	//TODO: change for prod later
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
@@ -55,6 +56,10 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Post("/adventure/{session_id}/progress", app.AdventureHandler.HandleUpdateSessionProgress)
 		r.Post("/adventure/{session_id}/party/update", app.AdventureHandler.HandleUpdatePartyStats)
 		r.Delete("/adventure/{session_id}", app.AdventureHandler.HandleDeleteSession)
+
+		//* Job routes
+		r.Post("/jobs", app.JobHandler.CreateJob)
+		r.Get("/jobs/{id}", app.JobHandler.GetJob)
 	})
 
 	//* Public routes
@@ -64,6 +69,6 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Post("/logout", app.UserHandler.HandleLogout)
 	r.Get("/auth/google", app.UserHandler.HandleGoogleLogin)
 	r.Get("/auth/google/callback", app.UserHandler.HandleGoogleCallback)
-	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait)
+	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait) //TODO: move it to Job routes and make connection by user id?
 	return r
 }

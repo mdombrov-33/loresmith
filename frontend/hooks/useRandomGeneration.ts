@@ -34,6 +34,7 @@ export function useRandomGeneration() {
     isLoading,
     refetch,
     error: queryError,
+    job: loreJob,
   } = useGenerateLore(
     stageConfig.category as
       | "characters"
@@ -49,6 +50,20 @@ export function useRandomGeneration() {
   const generateDraftMutation = useGenerateDraft();
 
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState(0);
+
+  //* Update error state from query errors
+  useEffect(() => {
+    if (queryError) {
+      setError(queryError.message);
+    }
+  }, [queryError]);
+
+  //* Clear error when new job starts loading
+  useEffect(() => {
+    if (isLoading) {
+      setError(null);
+    }
+  }, [isLoading]);
 
   //* Cycle through loading messages during full story generation
   useEffect(() => {
@@ -82,13 +97,18 @@ export function useRandomGeneration() {
 
   //* Update generated options when data changes
   useEffect(() => {
-    if (loreData) {
-      setGeneratedOptions(loreData);
-      setSelectedIndex(null);
+    if (loreData && !isLoading) {
+      // Only reset selection if we have NEW options (not just an update to existing data)
+      setGeneratedOptions((prev) => {
+        const isNewData = prev.length === 0 || prev.length !== loreData.length || prev[0]?.name !== loreData[0]?.name;
+        if (isNewData) {
+          setSelectedIndex(null);
+        }
+        return loreData;
+      });
       setError(null);
-    } else {
     }
-  }, [loreData]);
+  }, [loreData, isLoading]);
 
   const handleSelectCard = (index: number) => {
     setSelectedIndex(selectedIndex === index ? null : index);
@@ -97,6 +117,7 @@ export function useRandomGeneration() {
   const handleRegenerate = () => {
     setGeneratedOptions([]); //* Clear cards immediately
     setSelectedIndex(null); //* Clear selection
+    setError(null); //* Clear error
     refetch(); //* Trigger new generation
   };
 
@@ -157,5 +178,6 @@ export function useRandomGeneration() {
     handleRegenerate,
     handleNext,
     refetch,
+    loreJob,
   };
 }

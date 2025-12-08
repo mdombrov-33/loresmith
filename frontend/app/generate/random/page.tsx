@@ -7,7 +7,6 @@ import GenerateLoading from "@/components/generate/GenerateLoading";
 import GenerateError from "@/components/generate/GenerateError";
 import GenerateGrid from "@/components/generate/GenerateGrid";
 import GenerateActions from "@/components/generate/GenerateActions";
-import GenerateEmpty from "@/components/generate/GenerateEmpty";
 import GenerateOverlay from "@/components/generate/GenerateOverlay";
 import StageProgress from "@/components/generate/StageProgress";
 import StageTransition from "@/components/generate/StageTransition";
@@ -30,6 +29,7 @@ export default function RandomGeneratePage() {
     handleRegenerate,
     handleNext,
     refetch,
+    loreJob,
   } = useRandomGeneration();
 
   return (
@@ -42,27 +42,31 @@ export default function RandomGeneratePage() {
       <GenerateLoading
         isLoading={isLoading}
         category={stageConfig.category}
+        job={loreJob}
       />
-      <GenerateError error={error} onRefetch={refetch} />
-      <StageTransition stageKey={stageConfig.category}>
-        <GenerateGrid
-          generatedOptions={generatedOptions}
-          selectedIndex={selectedIndex}
-          stage={stageConfig.category}
-          onSelectCard={handleSelectCard}
-        />
-      </StageTransition>
+      <GenerateError error={error} isLoading={isLoading} onRefetch={refetch} />
+      {!isLoading && (
+        <StageTransition stageKey={stageConfig.category}>
+          <GenerateGrid
+            generatedOptions={generatedOptions}
+            selectedIndex={selectedIndex}
+            stage={stageConfig.category}
+            onSelectCard={handleSelectCard}
+          />
+        </StageTransition>
+      )}
       <GenerateActions
         hasSelection={selectedIndex !== null}
         isLoading={isLoading || generateDraftMutation.isPending}
         isLastStage={stageConfig.category === "relics"}
+        hasError={!!error}
         onRegenerate={handleRegenerate}
         onNext={handleNext}
       />
-      <GenerateEmpty show={!isLoading && generatedOptions.length === 0} />
       <GenerateOverlay
         isPending={generateDraftMutation.isPending}
         currentMessage={currentLoadingMessage}
+        job={generateDraftMutation.job}
       />
     </main>
   );

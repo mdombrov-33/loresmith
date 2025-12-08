@@ -11,6 +11,7 @@ import (
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
+	"github.com/mdombrov-33/loresmith/go-service/internal/jobs"
 	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/migrations"
@@ -26,6 +27,7 @@ type Application struct {
 	WorldHandler     *api.WorldHandler
 	AdventureHandler *api.AdventureHandler
 	PortraitHandler  *api.PortraitHandler
+	JobHandler       *api.JobHandler
 	LoreClient       lorepb.LoreServiceClient
 	Middleware       middleware.UserMiddleware
 	DB               *sql.DB
@@ -104,12 +106,18 @@ func NewApplication() (*Application, error) {
 	partyStore := store.NewPostgresPartyStore(pgDB)
 	portraitStore := store.NewPortraitStore(redisClient)
 
+	//* Job System
+	jobStore := jobs.NewStore(redisClient)
+	executor := jobs.NewGRPCExecutor(loreClient, jobStore, worldStore, portraitStore, logger)
+	jobManager := jobs.NewManager(jobStore, executor)
+
 	//* Handlers
 	userHandler := api.NewUserHandler(userStore, logger)
 	worldHandler := api.NewWorldHandler(loreClient, worldStore, adventureStore, portraitStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
 	adventureHandler := api.NewAdventureHandler(adventureStore, partyStore, worldStore, logger)
 	portraitHandler := api.NewPortraitHandler(portraitStore, logger)
+	jobHandler := api.NewJobHandler(jobManager)
 	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
 
 	app := &Application{
@@ -119,6 +127,7 @@ func NewApplication() (*Application, error) {
 		WorldHandler:     worldHandler,
 		AdventureHandler: adventureHandler,
 		PortraitHandler:  portraitHandler,
+		JobHandler:       jobHandler,
 		UserHandler:      userHandler,
 		Middleware:       middlewareHandler,
 		DB:               pgDB,
