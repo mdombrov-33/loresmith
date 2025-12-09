@@ -35,11 +35,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LoreServiceClient interface {
-	GenerateCharacters(ctx context.Context, in *CharactersRequest, opts ...grpc.CallOption) (*CharactersResponse, error)
-	GenerateFactions(ctx context.Context, in *FactionsRequest, opts ...grpc.CallOption) (*FactionsResponse, error)
-	GenerateSettings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error)
-	GenerateEvents(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (*EventsResponse, error)
-	GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (*RelicsResponse, error)
+	GenerateCharacters(ctx context.Context, in *CharactersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[CharactersStreamResponse], error)
+	GenerateFactions(ctx context.Context, in *FactionsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FactionsStreamResponse], error)
+	GenerateSettings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[SettingsStreamResponse], error)
+	GenerateEvents(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventsStreamResponse], error)
+	GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RelicsStreamResponse], error)
 	GenerateAll(ctx context.Context, in *AllRequest, opts ...grpc.CallOption) (*AllResponse, error)
 	GenerateFullStory(ctx context.Context, in *FullStoryRequest, opts ...grpc.CallOption) (*FullStoryResponse, error)
 	GenerateEmbedding(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error)
@@ -55,55 +55,100 @@ func NewLoreServiceClient(cc grpc.ClientConnInterface) LoreServiceClient {
 	return &loreServiceClient{cc}
 }
 
-func (c *loreServiceClient) GenerateCharacters(ctx context.Context, in *CharactersRequest, opts ...grpc.CallOption) (*CharactersResponse, error) {
+func (c *loreServiceClient) GenerateCharacters(ctx context.Context, in *CharactersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[CharactersStreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CharactersResponse)
-	err := c.cc.Invoke(ctx, LoreService_GenerateCharacters_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &LoreService_ServiceDesc.Streams[0], LoreService_GenerateCharacters_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[CharactersRequest, CharactersStreamResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-func (c *loreServiceClient) GenerateFactions(ctx context.Context, in *FactionsRequest, opts ...grpc.CallOption) (*FactionsResponse, error) {
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateCharactersClient = grpc.ServerStreamingClient[CharactersStreamResponse]
+
+func (c *loreServiceClient) GenerateFactions(ctx context.Context, in *FactionsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FactionsStreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(FactionsResponse)
-	err := c.cc.Invoke(ctx, LoreService_GenerateFactions_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &LoreService_ServiceDesc.Streams[1], LoreService_GenerateFactions_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[FactionsRequest, FactionsStreamResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-func (c *loreServiceClient) GenerateSettings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error) {
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateFactionsClient = grpc.ServerStreamingClient[FactionsStreamResponse]
+
+func (c *loreServiceClient) GenerateSettings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[SettingsStreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SettingsResponse)
-	err := c.cc.Invoke(ctx, LoreService_GenerateSettings_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &LoreService_ServiceDesc.Streams[2], LoreService_GenerateSettings_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[SettingsRequest, SettingsStreamResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-func (c *loreServiceClient) GenerateEvents(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (*EventsResponse, error) {
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateSettingsClient = grpc.ServerStreamingClient[SettingsStreamResponse]
+
+func (c *loreServiceClient) GenerateEvents(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventsStreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(EventsResponse)
-	err := c.cc.Invoke(ctx, LoreService_GenerateEvents_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &LoreService_ServiceDesc.Streams[3], LoreService_GenerateEvents_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[EventsRequest, EventsStreamResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-func (c *loreServiceClient) GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (*RelicsResponse, error) {
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateEventsClient = grpc.ServerStreamingClient[EventsStreamResponse]
+
+func (c *loreServiceClient) GenerateRelics(ctx context.Context, in *RelicsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RelicsStreamResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RelicsResponse)
-	err := c.cc.Invoke(ctx, LoreService_GenerateRelics_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &LoreService_ServiceDesc.Streams[4], LoreService_GenerateRelics_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[RelicsRequest, RelicsStreamResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateRelicsClient = grpc.ServerStreamingClient[RelicsStreamResponse]
 
 func (c *loreServiceClient) GenerateAll(ctx context.Context, in *AllRequest, opts ...grpc.CallOption) (*AllResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -159,11 +204,11 @@ func (c *loreServiceClient) UploadImageToR2(ctx context.Context, in *UploadImage
 // All implementations must embed UnimplementedLoreServiceServer
 // for forward compatibility.
 type LoreServiceServer interface {
-	GenerateCharacters(context.Context, *CharactersRequest) (*CharactersResponse, error)
-	GenerateFactions(context.Context, *FactionsRequest) (*FactionsResponse, error)
-	GenerateSettings(context.Context, *SettingsRequest) (*SettingsResponse, error)
-	GenerateEvents(context.Context, *EventsRequest) (*EventsResponse, error)
-	GenerateRelics(context.Context, *RelicsRequest) (*RelicsResponse, error)
+	GenerateCharacters(*CharactersRequest, grpc.ServerStreamingServer[CharactersStreamResponse]) error
+	GenerateFactions(*FactionsRequest, grpc.ServerStreamingServer[FactionsStreamResponse]) error
+	GenerateSettings(*SettingsRequest, grpc.ServerStreamingServer[SettingsStreamResponse]) error
+	GenerateEvents(*EventsRequest, grpc.ServerStreamingServer[EventsStreamResponse]) error
+	GenerateRelics(*RelicsRequest, grpc.ServerStreamingServer[RelicsStreamResponse]) error
 	GenerateAll(context.Context, *AllRequest) (*AllResponse, error)
 	GenerateFullStory(context.Context, *FullStoryRequest) (*FullStoryResponse, error)
 	GenerateEmbedding(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error)
@@ -179,20 +224,20 @@ type LoreServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedLoreServiceServer struct{}
 
-func (UnimplementedLoreServiceServer) GenerateCharacters(context.Context, *CharactersRequest) (*CharactersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateCharacters not implemented")
+func (UnimplementedLoreServiceServer) GenerateCharacters(*CharactersRequest, grpc.ServerStreamingServer[CharactersStreamResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateCharacters not implemented")
 }
-func (UnimplementedLoreServiceServer) GenerateFactions(context.Context, *FactionsRequest) (*FactionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateFactions not implemented")
+func (UnimplementedLoreServiceServer) GenerateFactions(*FactionsRequest, grpc.ServerStreamingServer[FactionsStreamResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateFactions not implemented")
 }
-func (UnimplementedLoreServiceServer) GenerateSettings(context.Context, *SettingsRequest) (*SettingsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateSettings not implemented")
+func (UnimplementedLoreServiceServer) GenerateSettings(*SettingsRequest, grpc.ServerStreamingServer[SettingsStreamResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateSettings not implemented")
 }
-func (UnimplementedLoreServiceServer) GenerateEvents(context.Context, *EventsRequest) (*EventsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateEvents not implemented")
+func (UnimplementedLoreServiceServer) GenerateEvents(*EventsRequest, grpc.ServerStreamingServer[EventsStreamResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateEvents not implemented")
 }
-func (UnimplementedLoreServiceServer) GenerateRelics(context.Context, *RelicsRequest) (*RelicsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateRelics not implemented")
+func (UnimplementedLoreServiceServer) GenerateRelics(*RelicsRequest, grpc.ServerStreamingServer[RelicsStreamResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GenerateRelics not implemented")
 }
 func (UnimplementedLoreServiceServer) GenerateAll(context.Context, *AllRequest) (*AllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateAll not implemented")
@@ -230,95 +275,60 @@ func RegisterLoreServiceServer(s grpc.ServiceRegistrar, srv LoreServiceServer) {
 	s.RegisterService(&LoreService_ServiceDesc, srv)
 }
 
-func _LoreService_GenerateCharacters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CharactersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _LoreService_GenerateCharacters_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(CharactersRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LoreServiceServer).GenerateCharacters(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LoreService_GenerateCharacters_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoreServiceServer).GenerateCharacters(ctx, req.(*CharactersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LoreServiceServer).GenerateCharacters(m, &grpc.GenericServerStream[CharactersRequest, CharactersStreamResponse]{ServerStream: stream})
 }
 
-func _LoreService_GenerateFactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FactionsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateCharactersServer = grpc.ServerStreamingServer[CharactersStreamResponse]
+
+func _LoreService_GenerateFactions_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(FactionsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LoreServiceServer).GenerateFactions(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LoreService_GenerateFactions_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoreServiceServer).GenerateFactions(ctx, req.(*FactionsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LoreServiceServer).GenerateFactions(m, &grpc.GenericServerStream[FactionsRequest, FactionsStreamResponse]{ServerStream: stream})
 }
 
-func _LoreService_GenerateSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SettingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateFactionsServer = grpc.ServerStreamingServer[FactionsStreamResponse]
+
+func _LoreService_GenerateSettings_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(SettingsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LoreServiceServer).GenerateSettings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LoreService_GenerateSettings_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoreServiceServer).GenerateSettings(ctx, req.(*SettingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LoreServiceServer).GenerateSettings(m, &grpc.GenericServerStream[SettingsRequest, SettingsStreamResponse]{ServerStream: stream})
 }
 
-func _LoreService_GenerateEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EventsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateSettingsServer = grpc.ServerStreamingServer[SettingsStreamResponse]
+
+func _LoreService_GenerateEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(EventsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LoreServiceServer).GenerateEvents(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LoreService_GenerateEvents_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoreServiceServer).GenerateEvents(ctx, req.(*EventsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LoreServiceServer).GenerateEvents(m, &grpc.GenericServerStream[EventsRequest, EventsStreamResponse]{ServerStream: stream})
 }
 
-func _LoreService_GenerateRelics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RelicsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateEventsServer = grpc.ServerStreamingServer[EventsStreamResponse]
+
+func _LoreService_GenerateRelics_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RelicsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LoreServiceServer).GenerateRelics(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LoreService_GenerateRelics_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoreServiceServer).GenerateRelics(ctx, req.(*RelicsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LoreServiceServer).GenerateRelics(m, &grpc.GenericServerStream[RelicsRequest, RelicsStreamResponse]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type LoreService_GenerateRelicsServer = grpc.ServerStreamingServer[RelicsStreamResponse]
 
 func _LoreService_GenerateAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AllRequest)
@@ -418,26 +428,6 @@ var LoreService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*LoreServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GenerateCharacters",
-			Handler:    _LoreService_GenerateCharacters_Handler,
-		},
-		{
-			MethodName: "GenerateFactions",
-			Handler:    _LoreService_GenerateFactions_Handler,
-		},
-		{
-			MethodName: "GenerateSettings",
-			Handler:    _LoreService_GenerateSettings_Handler,
-		},
-		{
-			MethodName: "GenerateEvents",
-			Handler:    _LoreService_GenerateEvents_Handler,
-		},
-		{
-			MethodName: "GenerateRelics",
-			Handler:    _LoreService_GenerateRelics_Handler,
-		},
-		{
 			MethodName: "GenerateAll",
 			Handler:    _LoreService_GenerateAll_Handler,
 		},
@@ -458,6 +448,32 @@ var LoreService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _LoreService_UploadImageToR2_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GenerateCharacters",
+			Handler:       _LoreService_GenerateCharacters_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GenerateFactions",
+			Handler:       _LoreService_GenerateFactions_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GenerateSettings",
+			Handler:       _LoreService_GenerateSettings_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GenerateEvents",
+			Handler:       _LoreService_GenerateEvents_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GenerateRelics",
+			Handler:       _LoreService_GenerateRelics_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "lore.proto",
 }

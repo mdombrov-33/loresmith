@@ -27,13 +27,20 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
 @observe()
-async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
+async def generate_setting(theme: str = "post-apocalyptic", progress_callback=None) -> LorePiece:
     """
     Generate a comprehensive setting by prompting for:
     name, landscape, culture, history, economy, and summary.
     Theme controls the genre/world setting.
+
+    Args:
+        theme: Theme for generation
+        progress_callback: Optional async callback(step, total_steps, message) for progress tracking
     """
     try:
+        total_steps = 6  # name, landscape, culture, history, economy, summary
+        current_step = 0
+
         # Load shared theme references
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
@@ -51,6 +58,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         name = clean_ai_text(name_raw)
         logger.info(f"Generated setting name: {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated names...")
+
         # Generate Landscape
         with open("generate/prompts/setting/setting_landscape.txt", "r") as f:
             landscape_prompt_text = f.read()
@@ -64,6 +75,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         )
         landscape = landscape_result.landscape
         logger.info(f"Generated landscape for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated landscapes...")
 
         # Generate Culture
         with open("generate/prompts/setting/setting_culture.txt", "r") as f:
@@ -86,6 +101,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         culture = culture_result.culture
         logger.info(f"Generated culture for {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated cultures...")
+
         # Generate History
         with open("generate/prompts/setting/setting_history.txt", "r") as f:
             history_prompt_text = f.read()
@@ -107,6 +126,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         )
         history = history_result.history
         logger.info(f"Generated history for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated histories...")
 
         # Generate Economy
         with open("generate/prompts/setting/setting_economy.txt", "r") as f:
@@ -131,6 +154,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         economy = economy_result.economy
         logger.info(f"Generated economy for {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated economies...")
+
         # Generate Summary
         with open("generate/prompts/setting/setting_summary.txt", "r") as f:
             summary_prompt_text = f.read()
@@ -154,6 +181,10 @@ async def generate_setting(theme: str = "post-apocalyptic") -> LorePiece:
         )
         summary = summary_result.summary
         logger.info(f"Generated summary for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated summaries...")
 
         increment_success_counter()
         logger.info(f"Successfully generated setting: {name}")

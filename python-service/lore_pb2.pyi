@@ -101,6 +101,54 @@ class RelicsResponse(_message.Message):
     relics: _containers.RepeatedCompositeFieldContainer[LorePiece]
     def __init__(self, relics: _Optional[_Iterable[_Union[LorePiece, _Mapping]]] = ...) -> None: ...
 
+class GenerationProgress(_message.Message):
+    __slots__ = ("progress", "message")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    progress: int
+    message: str
+    def __init__(self, progress: _Optional[int] = ..., message: _Optional[str] = ...) -> None: ...
+
+class CharactersStreamResponse(_message.Message):
+    __slots__ = ("progress", "final")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    progress: GenerationProgress
+    final: CharactersResponse
+    def __init__(self, progress: _Optional[_Union[GenerationProgress, _Mapping]] = ..., final: _Optional[_Union[CharactersResponse, _Mapping]] = ...) -> None: ...
+
+class FactionsStreamResponse(_message.Message):
+    __slots__ = ("progress", "final")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    progress: GenerationProgress
+    final: FactionsResponse
+    def __init__(self, progress: _Optional[_Union[GenerationProgress, _Mapping]] = ..., final: _Optional[_Union[FactionsResponse, _Mapping]] = ...) -> None: ...
+
+class SettingsStreamResponse(_message.Message):
+    __slots__ = ("progress", "final")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    progress: GenerationProgress
+    final: SettingsResponse
+    def __init__(self, progress: _Optional[_Union[GenerationProgress, _Mapping]] = ..., final: _Optional[_Union[SettingsResponse, _Mapping]] = ...) -> None: ...
+
+class EventsStreamResponse(_message.Message):
+    __slots__ = ("progress", "final")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    progress: GenerationProgress
+    final: EventsResponse
+    def __init__(self, progress: _Optional[_Union[GenerationProgress, _Mapping]] = ..., final: _Optional[_Union[EventsResponse, _Mapping]] = ...) -> None: ...
+
+class RelicsStreamResponse(_message.Message):
+    __slots__ = ("progress", "final")
+    PROGRESS_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    progress: GenerationProgress
+    final: RelicsResponse
+    def __init__(self, progress: _Optional[_Union[GenerationProgress, _Mapping]] = ..., final: _Optional[_Union[RelicsResponse, _Mapping]] = ...) -> None: ...
+
 class AllRequest(_message.Message):
     __slots__ = ("theme", "count")
     THEME_FIELD_NUMBER: _ClassVar[int]

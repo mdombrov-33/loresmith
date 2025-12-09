@@ -44,14 +44,21 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
 @observe()
-async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
+async def generate_character(theme: str = "post-apocalyptic", progress_callback=None) -> LorePiece:
     """
     Generate a character by prompting for:
     name, personality traits, appearance traits, backstory, skills, and stats.
     The generation is adapted to the provided theme.
+
+    Args:
+        theme: Theme for generation
+        progress_callback: Optional async callback(step, total_steps, message) for progress tracking
     """
 
     try:
+        total_steps = 6  # name, appearance, backstory, traits, skills, stats
+        current_step = 0
+
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
 
@@ -78,6 +85,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
         name = clean_ai_text(name_raw)
         logger.info(f"Generated character name: {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated names...")
 
         # Generate Appearance with diversity constraints
         with open("generate/prompts/character/character_appearance.txt", "r") as f:
@@ -114,6 +125,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Track appearance features to prevent repetition
         add_generated_features(appearance)
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated appearances...")
+
         # Generate Backstory
         with open("generate/prompts/character/character_backstory.txt", "r") as f:
             backstory_prompt_text = f.read()
@@ -131,6 +146,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         )
         backstory = clean_ai_text(backstory_raw)
         logger.info(f"Generated backstory for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated backstories...")
 
         # Generate Personality Traits
         with open("generate/prompts/character/character_traits.txt", "r") as f:
@@ -226,6 +245,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
         # Convert traits to list of strings for storage
         traits_list = [trait.value for trait in personality_traits]
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated traits...")
+
         # Generate Skills
         with open("generate/prompts/character/character_skills.txt", "r") as f:
             skills_prompt_text = f.read()
@@ -260,6 +283,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
                 "Survival",
                 "Awareness",
             ]
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated skills...")
 
         # Generate Flaw
         with open("generate/prompts/character/character_flaw.txt", "r") as f:
@@ -372,6 +399,10 @@ async def generate_character(theme: str = "post-apocalyptic") -> LorePiece:
             creativity = 10
             influence = 10
             perception = 10
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated stats...")
 
         # Generate temp UUID for portrait job
         character_id = str(uuid.uuid4())

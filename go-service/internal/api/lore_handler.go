@@ -98,19 +98,44 @@ func (h *LoreHandler) HandleGenerateCharacters(w http.ResponseWriter, r *http.Re
 	defer cancel()
 
 	grpcReq := &lorepb.CharactersRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme: req.Theme,
+		Count: req.Count,
 	}
 
-	grpcResp, err := h.loreClient.GenerateCharacters(ctx, grpcReq)
+	stream, err := h.loreClient.GenerateCharacters(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating characters failed: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate characters"})
 		return
 	}
 
-	characters := make([]map[string]any, len(grpcResp.Characters))
-	for i, piece := range grpcResp.Characters {
+	// Receive messages from stream until we get the final result
+	var finalResponse *lorepb.CharactersResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			h.logger.Printf("ERROR: stream receive failed: %v", err)
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate characters"})
+			return
+		}
+
+		// Extract final result when received
+		if resp, ok := msg.Response.(*lorepb.CharactersStreamResponse_Final); ok {
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		h.logger.Printf("ERROR: no final response received from stream")
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate characters"})
+		return
+	}
+
+	characters := make([]map[string]any, len(finalResponse.Characters))
+	for i, piece := range finalResponse.Characters {
 		characters[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -147,19 +172,44 @@ func (h *LoreHandler) HandleGenerateFactions(w http.ResponseWriter, r *http.Requ
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 	defer cancel()
 	grpcReq := &lorepb.FactionsRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme: req.Theme,
+		Count: req.Count,
 	}
 
-	grpcResp, err := h.loreClient.GenerateFactions(ctx, grpcReq)
+	stream, err := h.loreClient.GenerateFactions(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating factions failed: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate factions"})
 		return
 	}
 
-	factions := make([]map[string]any, len(grpcResp.Factions))
-	for i, piece := range grpcResp.Factions {
+	// Receive messages from stream until we get the final result
+	var finalResponse *lorepb.FactionsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			h.logger.Printf("ERROR: stream receive failed: %v", err)
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate factions"})
+			return
+		}
+
+		// Extract final result when received
+		if resp, ok := msg.Response.(*lorepb.FactionsStreamResponse_Final); ok {
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		h.logger.Printf("ERROR: no final response received from stream")
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate factions"})
+		return
+	}
+
+	factions := make([]map[string]any, len(finalResponse.Factions))
+	for i, piece := range finalResponse.Factions {
 		factions[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -196,19 +246,44 @@ func (h *LoreHandler) HandleGenerateSettings(w http.ResponseWriter, r *http.Requ
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 	defer cancel()
 	grpcReq := &lorepb.SettingsRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme: req.Theme,
+		Count: req.Count,
 	}
 
-	grpcResp, err := h.loreClient.GenerateSettings(ctx, grpcReq)
+	stream, err := h.loreClient.GenerateSettings(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating settings failed: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate settings"})
 		return
 	}
 
-	settings := make([]map[string]any, len(grpcResp.Settings))
-	for i, piece := range grpcResp.Settings {
+	// Receive messages from stream until we get the final result
+	var finalResponse *lorepb.SettingsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			h.logger.Printf("ERROR: stream receive failed: %v", err)
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate settings"})
+			return
+		}
+
+		// Extract final result when received
+		if resp, ok := msg.Response.(*lorepb.SettingsStreamResponse_Final); ok {
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		h.logger.Printf("ERROR: no final response received from stream")
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate settings"})
+		return
+	}
+
+	settings := make([]map[string]any, len(finalResponse.Settings))
+	for i, piece := range finalResponse.Settings {
 		settings[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -251,15 +326,40 @@ func (h *LoreHandler) HandleGenerateEvents(w http.ResponseWriter, r *http.Reques
 		SelectedSetting: mapToLorePiece(req.SelectedSetting),
 	}
 
-	grpcResp, err := h.loreClient.GenerateEvents(ctx, grpcReq)
+	stream, err := h.loreClient.GenerateEvents(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating events failed: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate events"})
 		return
 	}
 
-	events := make([]map[string]any, len(grpcResp.Events))
-	for i, piece := range grpcResp.Events {
+	// Receive messages from stream until we get the final result
+	var finalResponse *lorepb.EventsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			h.logger.Printf("ERROR: stream receive failed: %v", err)
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate events"})
+			return
+		}
+
+		// Extract final result when received
+		if resp, ok := msg.Response.(*lorepb.EventsStreamResponse_Final); ok {
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		h.logger.Printf("ERROR: no final response received from stream")
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate events"})
+		return
+	}
+
+	events := make([]map[string]any, len(finalResponse.Events))
+	for i, piece := range finalResponse.Events {
 		events[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -303,15 +403,40 @@ func (h *LoreHandler) HandleGenerateRelics(w http.ResponseWriter, r *http.Reques
 		SelectedEvent:   mapToLorePiece(req.SelectedEvent),
 	}
 
-	grpcResp, err := h.loreClient.GenerateRelics(ctx, grpcReq)
+	stream, err := h.loreClient.GenerateRelics(ctx, grpcReq)
 	if err != nil {
 		h.logger.Printf("ERROR: gRPC call for generating relics failed: %v", err)
 		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate relics"})
 		return
 	}
 
-	relics := make([]map[string]any, len(grpcResp.Relics))
-	for i, piece := range grpcResp.Relics {
+	// Receive messages from stream until we get the final result
+	var finalResponse *lorepb.RelicsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			h.logger.Printf("ERROR: stream receive failed: %v", err)
+			utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate relics"})
+			return
+		}
+
+		// Extract final result when received
+		if resp, ok := msg.Response.(*lorepb.RelicsStreamResponse_Final); ok {
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		h.logger.Printf("ERROR: no final response received from stream")
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to generate relics"})
+		return
+	}
+
+	relics := make([]map[string]any, len(finalResponse.Relics))
+	for i, piece := range finalResponse.Relics {
 		relics[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -348,8 +473,8 @@ func (h *LoreHandler) HandleGenerateAll(w http.ResponseWriter, r *http.Request) 
 	ctx, cancel := utils.NewGRPCContext(utils.OpGenerateLore)
 	defer cancel()
 	grpcReq := &lorepb.AllRequest{
-		Theme:      req.Theme,
-		Count:      req.Count,
+		Theme: req.Theme,
+		Count: req.Count,
 	}
 
 	grpcResp, err := h.loreClient.GenerateAll(ctx, grpcReq)

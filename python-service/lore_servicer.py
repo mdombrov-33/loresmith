@@ -51,53 +51,283 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             return response_class()
 
     async def GenerateCharacters(self, request, context):
-        return await self._handle_lore_generation(
-            generate_multiple_characters,
-            lore_pb2.CharactersResponse,
-            "characters",
-            "Character generation failed",
-            request,
-            context,
-        )
+        """Generate characters with streaming progress updates."""
+        try:
+            # Yield: Starting generation
+            yield lore_pb2.CharactersStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=20,
+                    message="Generating characters..."
+                )
+            )
+
+            # Create queue for progress updates
+            progress_queue = asyncio.Queue()
+            generation_complete = asyncio.Event()
+
+            # Create callback to send progress updates to queue
+            async def progress_callback(progress, message):
+                await progress_queue.put((progress, message))
+
+            # Start generation in background task
+            async def generate():
+                try:
+                    result = await generate_multiple_characters(
+                        request.count,
+                        request.theme,
+                        progress_callback=progress_callback
+                    )
+                    return result
+                finally:
+                    generation_complete.set()
+
+            generation_task = asyncio.create_task(generate())
+
+            # Consume progress updates from queue and yield them
+            while not generation_complete.is_set() or not progress_queue.empty():
+                try:
+                    progress, message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    yield lore_pb2.CharactersStreamResponse(
+                        progress=lore_pb2.GenerationProgress(
+                            progress=progress,
+                            message=message
+                        )
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+            # Wait for generation to complete and get result
+            characters = await generation_task
+
+            # Yield: Generation complete
+            yield lore_pb2.CharactersStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=90,
+                    message="Finalizing characters..."
+                )
+            )
+
+            # Convert to gRPC and send final result
+            grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in characters]
+            yield lore_pb2.CharactersStreamResponse(
+                final=lore_pb2.CharactersResponse(characters=grpc_pieces)
+            )
+
+        except Exception as e:
+            logger.error(f"Character generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Character generation failed: {str(e)}")
 
     async def GenerateFactions(self, request, context):
-        return await self._handle_lore_generation(
-            generate_multiple_factions,
-            lore_pb2.FactionsResponse,
-            "factions",
-            "Faction generation failed",
-            request,
-            context,
-        )
+        """Generate factions with streaming progress updates."""
+        try:
+            # Yield: Starting generation
+            yield lore_pb2.FactionsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=20,
+                    message="Generating factions..."
+                )
+            )
+
+            # Create queue for progress updates
+            progress_queue = asyncio.Queue()
+            generation_complete = asyncio.Event()
+
+            # Create callback to send progress updates to queue
+            async def progress_callback(progress, message):
+                await progress_queue.put((progress, message))
+
+            # Start generation in background task
+            async def generate():
+                try:
+                    result = await generate_multiple_factions(
+                        request.count,
+                        request.theme,
+                        progress_callback=progress_callback
+                    )
+                    return result
+                finally:
+                    generation_complete.set()
+
+            generation_task = asyncio.create_task(generate())
+
+            # Consume progress updates from queue and yield them
+            while not generation_complete.is_set() or not progress_queue.empty():
+                try:
+                    progress, message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    yield lore_pb2.FactionsStreamResponse(
+                        progress=lore_pb2.GenerationProgress(
+                            progress=progress,
+                            message=message
+                        )
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+            # Wait for generation to complete and get result
+            factions = await generation_task
+
+            # Yield: Generation complete
+            yield lore_pb2.FactionsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=90,
+                    message="Finalizing factions..."
+                )
+            )
+
+            grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in factions]
+            yield lore_pb2.FactionsStreamResponse(
+                final=lore_pb2.FactionsResponse(factions=grpc_pieces)
+            )
+
+        except Exception as e:
+            logger.error(f"Faction generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Faction generation failed: {str(e)}")
 
     async def GenerateSettings(self, request, context):
-        return await self._handle_lore_generation(
-            generate_multiple_settings,
-            lore_pb2.SettingsResponse,
-            "settings",
-            "Setting generation failed",
-            request,
-            context,
-        )
+        """Generate settings with streaming progress updates."""
+        try:
+            # Yield: Starting generation
+            yield lore_pb2.SettingsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=20,
+                    message="Generating settings..."
+                )
+            )
+
+            # Create queue for progress updates
+            progress_queue = asyncio.Queue()
+            generation_complete = asyncio.Event()
+
+            # Create callback to send progress updates to queue
+            async def progress_callback(progress, message):
+                await progress_queue.put((progress, message))
+
+            # Start generation in background task
+            async def generate():
+                try:
+                    result = await generate_multiple_settings(
+                        request.count,
+                        request.theme,
+                        progress_callback=progress_callback
+                    )
+                    return result
+                finally:
+                    generation_complete.set()
+
+            generation_task = asyncio.create_task(generate())
+
+            # Consume progress updates from queue and yield them
+            while not generation_complete.is_set() or not progress_queue.empty():
+                try:
+                    progress, message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    yield lore_pb2.SettingsStreamResponse(
+                        progress=lore_pb2.GenerationProgress(
+                            progress=progress,
+                            message=message
+                        )
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+            # Wait for generation to complete and get result
+            settings = await generation_task
+
+            # Yield: Generation complete
+            yield lore_pb2.SettingsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=90,
+                    message="Finalizing settings..."
+                )
+            )
+
+            grpc_pieces = [convert_to_grpc_lore_piece(piece) for piece in settings]
+            yield lore_pb2.SettingsStreamResponse(
+                final=lore_pb2.SettingsResponse(settings=grpc_pieces)
+            )
+
+        except Exception as e:
+            logger.error(f"Setting generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Setting generation failed: {str(e)}")
 
     async def GenerateEvents(self, request, context):
+        """Generate events with streaming progress updates."""
         try:
             setting = convert_lore_piece(request.selected_setting) if request.HasField("selected_setting") else None
             if not setting:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("selected_setting is required for event generation")
-                return lore_pb2.EventsResponse()
+                return
 
-            events = await generate_multiple_events(request.count, request.theme, setting)
+            # Yield: Starting generation
+            yield lore_pb2.EventsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=20,
+                    message="Generating events..."
+                )
+            )
+
+            # Create queue for progress updates
+            progress_queue = asyncio.Queue()
+            generation_complete = asyncio.Event()
+
+            # Create callback to send progress updates to queue
+            async def progress_callback(progress, message):
+                await progress_queue.put((progress, message))
+
+            # Start generation in background task
+            async def generate():
+                try:
+                    result = await generate_multiple_events(
+                        request.count,
+                        request.theme,
+                        setting,
+                        progress_callback=progress_callback
+                    )
+                    return result
+                finally:
+                    generation_complete.set()
+
+            generation_task = asyncio.create_task(generate())
+
+            # Consume progress updates from queue and yield them
+            while not generation_complete.is_set() or not progress_queue.empty():
+                try:
+                    progress, message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    yield lore_pb2.EventsStreamResponse(
+                        progress=lore_pb2.GenerationProgress(
+                            progress=progress,
+                            message=message
+                        )
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+            # Wait for generation to complete and get result
+            events = await generation_task
+
+            # Yield: Generation complete
+            yield lore_pb2.EventsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=90,
+                    message="Finalizing events..."
+                )
+            )
+
+            # Yield: Final result
             grpc_events = [convert_to_grpc_lore_piece(event) for event in events]
-            return lore_pb2.EventsResponse(events=grpc_events)
+            yield lore_pb2.EventsStreamResponse(
+                final=lore_pb2.EventsResponse(events=grpc_events)
+            )
         except Exception as e:
             logger.error(f"Event generation failed: {str(e)}", exc_info=True)
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Event generation failed: {str(e)}")
-            return lore_pb2.EventsResponse()
 
     async def GenerateRelics(self, request, context):
+        """Generate relics with streaming progress updates."""
         try:
             setting = convert_lore_piece(request.selected_setting) if request.HasField("selected_setting") else None
             event = convert_lore_piece(request.selected_event) if request.HasField("selected_event") else None
@@ -105,16 +335,73 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             if not setting or not event:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("selected_setting and selected_event are required for relic generation")
-                return lore_pb2.RelicsResponse()
+                return
 
-            relics = await generate_multiple_relics(request.count, request.theme, setting, event)
+            # Yield: Starting generation
+            yield lore_pb2.RelicsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=20,
+                    message="Generating relics..."
+                )
+            )
+
+            # Create queue for progress updates
+            progress_queue = asyncio.Queue()
+            generation_complete = asyncio.Event()
+
+            # Create callback to send progress updates to queue
+            async def progress_callback(progress, message):
+                await progress_queue.put((progress, message))
+
+            # Start generation in background task
+            async def generate():
+                try:
+                    result = await generate_multiple_relics(
+                        request.count,
+                        request.theme,
+                        setting,
+                        event,
+                        progress_callback=progress_callback
+                    )
+                    return result
+                finally:
+                    generation_complete.set()
+
+            generation_task = asyncio.create_task(generate())
+
+            # Consume progress updates from queue and yield them
+            while not generation_complete.is_set() or not progress_queue.empty():
+                try:
+                    progress, message = await asyncio.wait_for(progress_queue.get(), timeout=0.1)
+                    yield lore_pb2.RelicsStreamResponse(
+                        progress=lore_pb2.GenerationProgress(
+                            progress=progress,
+                            message=message
+                        )
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+            # Wait for generation to complete and get result
+            relics = await generation_task
+
+            # Yield: Generation complete
+            yield lore_pb2.RelicsStreamResponse(
+                progress=lore_pb2.GenerationProgress(
+                    progress=90,
+                    message="Finalizing relics..."
+                )
+            )
+
+            # Yield: Final result
             grpc_relics = [convert_to_grpc_lore_piece(relic) for relic in relics]
-            return lore_pb2.RelicsResponse(relics=grpc_relics)
+            yield lore_pb2.RelicsStreamResponse(
+                final=lore_pb2.RelicsResponse(relics=grpc_relics)
+            )
         except Exception as e:
             logger.error(f"Relic generation failed: {str(e)}", exc_info=True)
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Relic generation failed: {str(e)}")
-            return lore_pb2.RelicsResponse()
 
     async def GenerateAll(self, request, context):
         """Generate all lore types in parallel."""

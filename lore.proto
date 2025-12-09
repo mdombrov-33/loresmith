@@ -5,11 +5,11 @@ option go_package = "gen/lorepb";
 package lore;
 
 service LoreService {
-  rpc GenerateCharacters (CharactersRequest) returns (CharactersResponse);
-  rpc GenerateFactions (FactionsRequest) returns (FactionsResponse);
-  rpc GenerateSettings (SettingsRequest) returns (SettingsResponse);
-  rpc GenerateEvents (EventsRequest) returns (EventsResponse);
-  rpc GenerateRelics (RelicsRequest) returns (RelicsResponse);
+  rpc GenerateCharacters (CharactersRequest) returns (stream CharactersStreamResponse);
+  rpc GenerateFactions (FactionsRequest) returns (stream FactionsStreamResponse);
+  rpc GenerateSettings (SettingsRequest) returns (stream SettingsStreamResponse);
+  rpc GenerateEvents (EventsRequest) returns (stream EventsStreamResponse);
+  rpc GenerateRelics (RelicsRequest) returns (stream RelicsStreamResponse);
   rpc GenerateAll (AllRequest) returns (AllResponse);
   rpc GenerateFullStory (FullStoryRequest) returns (FullStoryResponse);
   rpc GenerateEmbedding (EmbeddingRequest) returns (EmbeddingResponse);
@@ -69,6 +69,48 @@ message EventsResponse {
 
 message RelicsResponse {
   repeated LorePiece relics = 1;
+}
+
+// Progress tracking for streaming responses
+message GenerationProgress {
+  int32 progress = 1;
+  string message = 2;
+}
+
+// Streaming response messages
+message CharactersStreamResponse {
+  oneof response {
+    GenerationProgress progress = 1;
+    CharactersResponse final = 2;
+  }
+}
+
+message FactionsStreamResponse {
+  oneof response {
+    GenerationProgress progress = 1;
+    FactionsResponse final = 2;
+  }
+}
+
+message SettingsStreamResponse {
+  oneof response {
+    GenerationProgress progress = 1;
+    SettingsResponse final = 2;
+  }
+}
+
+message EventsStreamResponse {
+  oneof response {
+    GenerationProgress progress = 1;
+    EventsResponse final = 2;
+  }
+}
+
+message RelicsStreamResponse {
+  oneof response {
+    GenerationProgress progress = 1;
+    RelicsResponse final = 2;
+  }
 }
 
 message AllRequest {

@@ -25,13 +25,20 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 
 @observe()
-async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
+async def generate_faction(theme: str = "post-apocalyptic", progress_callback=None) -> LorePiece:
     """
     Generate a faction by prompting for:
     name, ideology, appearance, and summary.
     Theme controls the genre/world setting.
+
+    Args:
+        theme: Theme for generation
+        progress_callback: Optional async callback(step, total_steps, message) for progress tracking
     """
     try:
+        total_steps = 4  # name, ideology, appearance, summary
+        current_step = 0
+
         # Load shared theme references
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
@@ -53,6 +60,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         name = clean_ai_text(name_raw)
         logger.info(f"Generated faction name: {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated names...")
+
         # Generate Ideology
         with open("generate/prompts/faction/faction_ideology.txt", "r") as f:
             ideology_prompt_text = f.read()
@@ -68,6 +79,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         )
         ideology = ideology_result.ideology
         logger.info(f"Generated ideology for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated ideologies...")
 
         # Generate Appearance
         with open("generate/prompts/faction/faction_appearance.txt", "r") as f:
@@ -92,6 +107,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         appearance = appearance_result.appearance
         logger.info(f"Generated appearance for {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated appearances...")
+
         # Generate Summary
         with open("generate/prompts/faction/faction_summary.txt", "r") as f:
             summary_prompt_text = f.read()
@@ -113,6 +132,10 @@ async def generate_faction(theme: str = "post-apocalyptic") -> LorePiece:
         )
         summary = summary_result.summary
         logger.info(f"Generated summary for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated summaries...")
 
         increment_success_counter()
         logger.info(f"Successfully generated faction: {name}")

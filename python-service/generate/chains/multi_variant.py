@@ -16,6 +16,7 @@ async def generate_multiple_generic(
     generate_func,
     count: int,
     theme: Theme,
+    progress_callback=None,
 ) -> list[LorePiece]:
     """
     Generic helper to generate multiple lore pieces.
@@ -25,21 +26,45 @@ async def generate_multiple_generic(
         generate_func: Async function to generate a single lore piece.
         count: Number of lore pieces to generate.
         theme: Theme for generation.
+        progress_callback: Optional async callback(progress, message) for tracking overall progress.
 
     Returns:
         List of LorePiece instances.
     """
-    # Generate items without caching
-    items = await asyncio.gather(*(generate_func(theme) for _ in range(count)))
+    # Track completed steps across all parallel generations
+    completed_steps = {"count": 0}
+    # We'll calculate total_steps dynamically based on first callback
+    total_steps = {"value": 0}
+
+    async def item_progress_callback(step, item_total_steps, message):
+        """Callback for individual item progress - aggregates to overall progress."""
+        # Set total_steps on first callback
+        if total_steps["value"] == 0:
+            total_steps["value"] = count * item_total_steps
+
+        completed_steps["count"] += 1
+
+        if progress_callback:
+            # Calculate overall progress: 20% at start, 90% when all done
+            progress = 20 + int((completed_steps["count"] / total_steps["value"]) * 70)
+
+            # Use the actual message from the generation function
+            await progress_callback(progress, message)
+
+    # Generate items in parallel, each with progress tracking
+    items = await asyncio.gather(*(
+        generate_func(theme, progress_callback=item_progress_callback)
+        for _ in range(count)
+    ))
     return items
 
 
 async def generate_multiple_characters(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, progress_callback=None
 ) -> list[LorePiece]:
     # Generate characters
     characters = await generate_multiple_generic(
-        "characters", generate_character, count, theme
+        "characters", generate_character, count, theme, progress_callback
     )
 
     # Publish portrait jobs to RabbitMQ
@@ -72,26 +97,40 @@ async def generate_multiple_characters(
 
 
 async def generate_multiple_factions(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, progress_callback=None
 ) -> list[LorePiece]:
-    return await generate_multiple_generic("factions", generate_faction, count, theme)
+    return await generate_multiple_generic("factions", generate_faction, count, theme, progress_callback)
 
 
 async def generate_multiple_settings(
-    count: int = 3, theme: Theme = Theme.post_apocalyptic
+    count: int = 3, theme: Theme = Theme.post_apocalyptic, progress_callback=None
 ) -> list[LorePiece]:
-    return await generate_multiple_generic("settings", generate_setting, count, theme)
+    return await generate_multiple_generic("settings", generate_setting, count, theme, progress_callback)
 
 
 async def generate_multiple_events(
     count: int,
     theme: Theme,
-    setting: LorePiece
+    setting: LorePiece,
+    progress_callback=None
 ) -> list[LorePiece]:
     events = []
-    for _ in range(count):
-        event = await generate_event(theme, setting=setting)
+    total_steps = count * 3  # Each event has 3 steps (name, description, impact)
+    completed_steps = {"count": 0}
+
+    async def item_progress_callback(step, item_total_steps, message):
+        """Callback for individual event progress - aggregates to overall progress."""
+        completed_steps["count"] += 1
+
+        if progress_callback:
+            # Calculate overall progress: 20% at start, 90% when all done
+            progress = 20 + int((completed_steps["count"] / total_steps) * 70)
+            await progress_callback(progress, message)
+
+    for i in range(count):
+        event = await generate_event(theme, setting=setting, progress_callback=item_progress_callback)
         events.append(event)
+
     return events
 
 
@@ -99,10 +138,24 @@ async def generate_multiple_relics(
     count: int,
     theme: Theme,
     setting: LorePiece,
-    event: LorePiece
+    event: LorePiece,
+    progress_callback=None
 ) -> list[LorePiece]:
     relics = []
-    for _ in range(count):
-        relic = await generate_relic(theme, setting=setting, event=event)
+    total_steps = count * 3  # Each relic has 3 steps (name, description, history)
+    completed_steps = {"count": 0}
+
+    async def item_progress_callback(step, item_total_steps, message):
+        """Callback for individual relic progress - aggregates to overall progress."""
+        completed_steps["count"] += 1
+
+        if progress_callback:
+            # Calculate overall progress: 20% at start, 90% when all done
+            progress = 20 + int((completed_steps["count"] / total_steps) * 70)
+            await progress_callback(progress, message)
+
+    for i in range(count):
+        relic = await generate_relic(theme, setting=setting, event=event, progress_callback=item_progress_callback)
         relics.append(relic)
+
     return relics

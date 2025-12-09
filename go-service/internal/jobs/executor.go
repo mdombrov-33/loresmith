@@ -102,20 +102,41 @@ func (e *GRPCExecutor) generateCharacters(ctx context.Context, job *Job) (interf
 		Message:  "Generating characters...",
 	})
 
-	//* Start background progress updates while LLM is generating (characters takes ~40s)
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 89, 45*time.Second, done)
-
-	resp, err := e.loreClient.GenerateCharacters(ctx, &lorepb.CharactersRequest{
+	//* Call streaming gRPC method
+	stream, err := e.loreClient.GenerateCharacters(ctx, &lorepb.CharactersRequest{
 		Theme: theme,
 		Count: count,
 	})
-
-	//* Stop background progress updates
-	close(done)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate characters - please try again")
+	}
+
+	//* Receive progress updates and final result from stream
+	var finalResponse *lorepb.CharactersResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to generate characters - please try again")
+		}
+
+		switch resp := msg.Response.(type) {
+		case *lorepb.CharactersStreamResponse_Progress:
+			//* Update job progress from Python's real generation progress
+			e.store.Update(ctx, job.ID, JobUpdate{
+				Progress: intPtr(int(resp.Progress.Progress)),
+				Message:  resp.Progress.Message,
+			})
+		case *lorepb.CharactersStreamResponse_Final:
+			//* Received final result
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		return nil, fmt.Errorf("failed to generate characters - no result received")
 	}
 
 	e.store.Update(ctx, job.ID, JobUpdate{
@@ -124,8 +145,8 @@ func (e *GRPCExecutor) generateCharacters(ctx context.Context, job *Job) (interf
 	})
 
 	//* Deserialize to frontend format
-	characters := make([]map[string]any, len(resp.Characters))
-	for i, piece := range resp.Characters {
+	characters := make([]map[string]any, len(finalResponse.Characters))
+	for i, piece := range finalResponse.Characters {
 		characters[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -146,19 +167,41 @@ func (e *GRPCExecutor) generateFactions(ctx context.Context, job *Job) (interfac
 		Message:  "Generating factions...",
 	})
 
-	//* Start background progress updates (factions takes ~20s)
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 89, 25*time.Second, done)
-
-	resp, err := e.loreClient.GenerateFactions(ctx, &lorepb.FactionsRequest{
+	//* Call streaming gRPC method
+	stream, err := e.loreClient.GenerateFactions(ctx, &lorepb.FactionsRequest{
 		Theme: theme,
 		Count: count,
 	})
-
-	close(done)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate factions - please try again")
+	}
+
+	//* Receive progress updates and final result from stream
+	var finalResponse *lorepb.FactionsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to generate factions - please try again")
+		}
+
+		switch resp := msg.Response.(type) {
+		case *lorepb.FactionsStreamResponse_Progress:
+			//* Update job progress from Python's real generation progress
+			e.store.Update(ctx, job.ID, JobUpdate{
+				Progress: intPtr(int(resp.Progress.Progress)),
+				Message:  resp.Progress.Message,
+			})
+		case *lorepb.FactionsStreamResponse_Final:
+			//* Received final result
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		return nil, fmt.Errorf("failed to generate factions - no result received")
 	}
 
 	e.store.Update(ctx, job.ID, JobUpdate{
@@ -167,8 +210,8 @@ func (e *GRPCExecutor) generateFactions(ctx context.Context, job *Job) (interfac
 	})
 
 	//* Deserialize to frontend format
-	factions := make([]map[string]any, len(resp.Factions))
-	for i, piece := range resp.Factions {
+	factions := make([]map[string]any, len(finalResponse.Factions))
+	for i, piece := range finalResponse.Factions {
 		factions[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -189,19 +232,41 @@ func (e *GRPCExecutor) generateSettings(ctx context.Context, job *Job) (interfac
 		Message:  "Generating settings...",
 	})
 
-	//* Start background progress updates (settings takes ~30s)
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 89, 35*time.Second, done)
-
-	resp, err := e.loreClient.GenerateSettings(ctx, &lorepb.SettingsRequest{
+	//* Call streaming gRPC method
+	stream, err := e.loreClient.GenerateSettings(ctx, &lorepb.SettingsRequest{
 		Theme: theme,
 		Count: count,
 	})
-
-	close(done)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate settings - please try again")
+	}
+
+	//* Receive progress updates and final result from stream
+	var finalResponse *lorepb.SettingsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to generate settings - please try again")
+		}
+
+		switch resp := msg.Response.(type) {
+		case *lorepb.SettingsStreamResponse_Progress:
+			//* Update job progress from Python's real generation progress
+			e.store.Update(ctx, job.ID, JobUpdate{
+				Progress: intPtr(int(resp.Progress.Progress)),
+				Message:  resp.Progress.Message,
+			})
+		case *lorepb.SettingsStreamResponse_Final:
+			//* Received final result
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		return nil, fmt.Errorf("failed to generate settings - no result received")
 	}
 
 	e.store.Update(ctx, job.ID, JobUpdate{
@@ -210,8 +275,8 @@ func (e *GRPCExecutor) generateSettings(ctx context.Context, job *Job) (interfac
 	})
 
 	//* Deserialize to frontend format
-	settings := make([]map[string]any, len(resp.Settings))
-	for i, piece := range resp.Settings {
+	settings := make([]map[string]any, len(finalResponse.Settings))
+	for i, piece := range finalResponse.Settings {
 		settings[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -238,20 +303,42 @@ func (e *GRPCExecutor) generateEvents(ctx context.Context, job *Job) (interface{
 		Message:  "Generating events...",
 	})
 
-	//* Start background progress updates (events takes ~20s)
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 89, 25*time.Second, done)
-
-	resp, err := e.loreClient.GenerateEvents(ctx, &lorepb.EventsRequest{
+	//* Call streaming gRPC method
+	stream, err := e.loreClient.GenerateEvents(ctx, &lorepb.EventsRequest{
 		Theme:           theme,
 		Count:           count,
 		SelectedSetting: selectedSetting,
 	})
-
-	close(done)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate events - please try again")
+	}
+
+	//* Receive progress updates and final result from stream
+	var finalResponse *lorepb.EventsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to generate events - please try again")
+		}
+
+		switch resp := msg.Response.(type) {
+		case *lorepb.EventsStreamResponse_Progress:
+			//* Update job progress from Python's real generation progress
+			e.store.Update(ctx, job.ID, JobUpdate{
+				Progress: intPtr(int(resp.Progress.Progress)),
+				Message:  resp.Progress.Message,
+			})
+		case *lorepb.EventsStreamResponse_Final:
+			//* Received final result
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		return nil, fmt.Errorf("failed to generate events - no result received")
 	}
 
 	e.store.Update(ctx, job.ID, JobUpdate{
@@ -260,8 +347,8 @@ func (e *GRPCExecutor) generateEvents(ctx context.Context, job *Job) (interface{
 	})
 
 	//* Deserialize to frontend format
-	events := make([]map[string]any, len(resp.Events))
-	for i, piece := range resp.Events {
+	events := make([]map[string]any, len(finalResponse.Events))
+	for i, piece := range finalResponse.Events {
 		events[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -293,21 +380,43 @@ func (e *GRPCExecutor) generateRelics(ctx context.Context, job *Job) (interface{
 		Message:  "Generating relics...",
 	})
 
-	//* Start background progress updates (relics takes ~20s)
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 89, 25*time.Second, done)
-
-	resp, err := e.loreClient.GenerateRelics(ctx, &lorepb.RelicsRequest{
+	//* Call streaming gRPC method
+	stream, err := e.loreClient.GenerateRelics(ctx, &lorepb.RelicsRequest{
 		Theme:           theme,
 		Count:           count,
 		SelectedSetting: selectedSetting,
 		SelectedEvent:   selectedEvent,
 	})
-
-	close(done)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate relics - please try again")
+	}
+
+	//* Receive progress updates and final result from stream
+	var finalResponse *lorepb.RelicsResponse
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("failed to generate relics - please try again")
+		}
+
+		switch resp := msg.Response.(type) {
+		case *lorepb.RelicsStreamResponse_Progress:
+			//* Update job progress from Python's real generation progress
+			e.store.Update(ctx, job.ID, JobUpdate{
+				Progress: intPtr(int(resp.Progress.Progress)),
+				Message:  resp.Progress.Message,
+			})
+		case *lorepb.RelicsStreamResponse_Final:
+			//* Received final result
+			finalResponse = resp.Final
+		}
+	}
+
+	if finalResponse == nil {
+		return nil, fmt.Errorf("failed to generate relics - no result received")
 	}
 
 	e.store.Update(ctx, job.ID, JobUpdate{
@@ -316,8 +425,8 @@ func (e *GRPCExecutor) generateRelics(ctx context.Context, job *Job) (interface{
 	})
 
 	//* Deserialize to frontend format
-	relics := make([]map[string]any, len(resp.Relics))
-	for i, piece := range resp.Relics {
+	relics := make([]map[string]any, len(finalResponse.Relics))
+	for i, piece := range finalResponse.Relics {
 		relics[i] = map[string]any{
 			"name":        piece.Name,
 			"description": piece.Description,
@@ -382,16 +491,10 @@ func (e *GRPCExecutor) createWorld(ctx context.Context, job *Job) (interface{}, 
 		Message:  "Creating world narrative...",
 	})
 
-	//* Start background progress updates for long story generation
-	done := make(chan bool)
-	go e.simulateProgress(ctx, job.ID, 20, 60, 5*time.Second, done)
-
 	storyCtx, storyCancel := utils.NewGRPCContext(utils.OpGenerateFullStory)
 	defer storyCancel()
 
 	grpcResp, err := e.loreClient.GenerateFullStory(storyCtx, grpcReq)
-
-	close(done)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate story: %w", err)
@@ -541,10 +644,10 @@ func (e *GRPCExecutor) deserializeDetails(details map[string]string) map[string]
 	for key, value := range details {
 		var parsed interface{}
 		if err := json.Unmarshal([]byte(value), &parsed); err == nil {
-			// Successfully parsed - it was a JSON string
+			//* Successfully parsed - it was a JSON string
 			result[key] = parsed
 		} else {
-			// Not JSON - keep as string
+			//* Not JSON - keep as string
 			result[key] = value
 		}
 	}
@@ -554,39 +657,4 @@ func (e *GRPCExecutor) deserializeDetails(details map[string]string) map[string]
 // * intPtr is a helper to create int pointers for JobUpdate.Progress
 func intPtr(i int) *int {
 	return &i
-}
-
-// * simulateProgress gradually updates progress while a blocking operation runs
-// * Runs in background goroutine until done channel is closed
-func (e *GRPCExecutor) simulateProgress(ctx context.Context, jobID string, startProgress, endProgress int, totalDuration time.Duration, done chan bool) {
-	if startProgress >= endProgress {
-		return
-	}
-
-	steps := endProgress - startProgress
-	stepDuration := totalDuration / time.Duration(steps)
-	currentProgress := startProgress
-
-	ticker := time.NewTicker(stepDuration)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-done:
-			//* Operation completed, stop updating
-			return
-		case <-ctx.Done():
-			//* Context cancelled
-			return
-		case <-ticker.C:
-			currentProgress++
-			//* Update progress without message (keep existing message)
-			e.store.Update(ctx, jobID, JobUpdate{
-				Progress: intPtr(currentProgress),
-			})
-			if currentProgress >= endProgress {
-				return
-			}
-		}
-	}
 }

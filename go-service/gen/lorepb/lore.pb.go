@@ -593,6 +593,470 @@ func (x *RelicsResponse) GetRelics() []*LorePiece {
 	return nil
 }
 
+// Progress tracking for streaming responses
+type GenerationProgress struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Progress      int32                  `protobuf:"varint,1,opt,name=progress,proto3" json:"progress,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerationProgress) Reset() {
+	*x = GenerationProgress{}
+	mi := &file_lore_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerationProgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerationProgress) ProtoMessage() {}
+
+func (x *GenerationProgress) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerationProgress.ProtoReflect.Descriptor instead.
+func (*GenerationProgress) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GenerationProgress) GetProgress() int32 {
+	if x != nil {
+		return x.Progress
+	}
+	return 0
+}
+
+func (x *GenerationProgress) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// Streaming response messages
+type CharactersStreamResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*CharactersStreamResponse_Progress
+	//	*CharactersStreamResponse_Final
+	Response      isCharactersStreamResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CharactersStreamResponse) Reset() {
+	*x = CharactersStreamResponse{}
+	mi := &file_lore_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CharactersStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharactersStreamResponse) ProtoMessage() {}
+
+func (x *CharactersStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharactersStreamResponse.ProtoReflect.Descriptor instead.
+func (*CharactersStreamResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CharactersStreamResponse) GetResponse() isCharactersStreamResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *CharactersStreamResponse) GetProgress() *GenerationProgress {
+	if x != nil {
+		if x, ok := x.Response.(*CharactersStreamResponse_Progress); ok {
+			return x.Progress
+		}
+	}
+	return nil
+}
+
+func (x *CharactersStreamResponse) GetFinal() *CharactersResponse {
+	if x != nil {
+		if x, ok := x.Response.(*CharactersStreamResponse_Final); ok {
+			return x.Final
+		}
+	}
+	return nil
+}
+
+type isCharactersStreamResponse_Response interface {
+	isCharactersStreamResponse_Response()
+}
+
+type CharactersStreamResponse_Progress struct {
+	Progress *GenerationProgress `protobuf:"bytes,1,opt,name=progress,proto3,oneof"`
+}
+
+type CharactersStreamResponse_Final struct {
+	Final *CharactersResponse `protobuf:"bytes,2,opt,name=final,proto3,oneof"`
+}
+
+func (*CharactersStreamResponse_Progress) isCharactersStreamResponse_Response() {}
+
+func (*CharactersStreamResponse_Final) isCharactersStreamResponse_Response() {}
+
+type FactionsStreamResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*FactionsStreamResponse_Progress
+	//	*FactionsStreamResponse_Final
+	Response      isFactionsStreamResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FactionsStreamResponse) Reset() {
+	*x = FactionsStreamResponse{}
+	mi := &file_lore_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FactionsStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FactionsStreamResponse) ProtoMessage() {}
+
+func (x *FactionsStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FactionsStreamResponse.ProtoReflect.Descriptor instead.
+func (*FactionsStreamResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FactionsStreamResponse) GetResponse() isFactionsStreamResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *FactionsStreamResponse) GetProgress() *GenerationProgress {
+	if x != nil {
+		if x, ok := x.Response.(*FactionsStreamResponse_Progress); ok {
+			return x.Progress
+		}
+	}
+	return nil
+}
+
+func (x *FactionsStreamResponse) GetFinal() *FactionsResponse {
+	if x != nil {
+		if x, ok := x.Response.(*FactionsStreamResponse_Final); ok {
+			return x.Final
+		}
+	}
+	return nil
+}
+
+type isFactionsStreamResponse_Response interface {
+	isFactionsStreamResponse_Response()
+}
+
+type FactionsStreamResponse_Progress struct {
+	Progress *GenerationProgress `protobuf:"bytes,1,opt,name=progress,proto3,oneof"`
+}
+
+type FactionsStreamResponse_Final struct {
+	Final *FactionsResponse `protobuf:"bytes,2,opt,name=final,proto3,oneof"`
+}
+
+func (*FactionsStreamResponse_Progress) isFactionsStreamResponse_Response() {}
+
+func (*FactionsStreamResponse_Final) isFactionsStreamResponse_Response() {}
+
+type SettingsStreamResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*SettingsStreamResponse_Progress
+	//	*SettingsStreamResponse_Final
+	Response      isSettingsStreamResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SettingsStreamResponse) Reset() {
+	*x = SettingsStreamResponse{}
+	mi := &file_lore_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SettingsStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SettingsStreamResponse) ProtoMessage() {}
+
+func (x *SettingsStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SettingsStreamResponse.ProtoReflect.Descriptor instead.
+func (*SettingsStreamResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SettingsStreamResponse) GetResponse() isSettingsStreamResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *SettingsStreamResponse) GetProgress() *GenerationProgress {
+	if x != nil {
+		if x, ok := x.Response.(*SettingsStreamResponse_Progress); ok {
+			return x.Progress
+		}
+	}
+	return nil
+}
+
+func (x *SettingsStreamResponse) GetFinal() *SettingsResponse {
+	if x != nil {
+		if x, ok := x.Response.(*SettingsStreamResponse_Final); ok {
+			return x.Final
+		}
+	}
+	return nil
+}
+
+type isSettingsStreamResponse_Response interface {
+	isSettingsStreamResponse_Response()
+}
+
+type SettingsStreamResponse_Progress struct {
+	Progress *GenerationProgress `protobuf:"bytes,1,opt,name=progress,proto3,oneof"`
+}
+
+type SettingsStreamResponse_Final struct {
+	Final *SettingsResponse `protobuf:"bytes,2,opt,name=final,proto3,oneof"`
+}
+
+func (*SettingsStreamResponse_Progress) isSettingsStreamResponse_Response() {}
+
+func (*SettingsStreamResponse_Final) isSettingsStreamResponse_Response() {}
+
+type EventsStreamResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*EventsStreamResponse_Progress
+	//	*EventsStreamResponse_Final
+	Response      isEventsStreamResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EventsStreamResponse) Reset() {
+	*x = EventsStreamResponse{}
+	mi := &file_lore_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EventsStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EventsStreamResponse) ProtoMessage() {}
+
+func (x *EventsStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EventsStreamResponse.ProtoReflect.Descriptor instead.
+func (*EventsStreamResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *EventsStreamResponse) GetResponse() isEventsStreamResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *EventsStreamResponse) GetProgress() *GenerationProgress {
+	if x != nil {
+		if x, ok := x.Response.(*EventsStreamResponse_Progress); ok {
+			return x.Progress
+		}
+	}
+	return nil
+}
+
+func (x *EventsStreamResponse) GetFinal() *EventsResponse {
+	if x != nil {
+		if x, ok := x.Response.(*EventsStreamResponse_Final); ok {
+			return x.Final
+		}
+	}
+	return nil
+}
+
+type isEventsStreamResponse_Response interface {
+	isEventsStreamResponse_Response()
+}
+
+type EventsStreamResponse_Progress struct {
+	Progress *GenerationProgress `protobuf:"bytes,1,opt,name=progress,proto3,oneof"`
+}
+
+type EventsStreamResponse_Final struct {
+	Final *EventsResponse `protobuf:"bytes,2,opt,name=final,proto3,oneof"`
+}
+
+func (*EventsStreamResponse_Progress) isEventsStreamResponse_Response() {}
+
+func (*EventsStreamResponse_Final) isEventsStreamResponse_Response() {}
+
+type RelicsStreamResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*RelicsStreamResponse_Progress
+	//	*RelicsStreamResponse_Final
+	Response      isRelicsStreamResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RelicsStreamResponse) Reset() {
+	*x = RelicsStreamResponse{}
+	mi := &file_lore_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RelicsStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RelicsStreamResponse) ProtoMessage() {}
+
+func (x *RelicsStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RelicsStreamResponse.ProtoReflect.Descriptor instead.
+func (*RelicsStreamResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *RelicsStreamResponse) GetResponse() isRelicsStreamResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *RelicsStreamResponse) GetProgress() *GenerationProgress {
+	if x != nil {
+		if x, ok := x.Response.(*RelicsStreamResponse_Progress); ok {
+			return x.Progress
+		}
+	}
+	return nil
+}
+
+func (x *RelicsStreamResponse) GetFinal() *RelicsResponse {
+	if x != nil {
+		if x, ok := x.Response.(*RelicsStreamResponse_Final); ok {
+			return x.Final
+		}
+	}
+	return nil
+}
+
+type isRelicsStreamResponse_Response interface {
+	isRelicsStreamResponse_Response()
+}
+
+type RelicsStreamResponse_Progress struct {
+	Progress *GenerationProgress `protobuf:"bytes,1,opt,name=progress,proto3,oneof"`
+}
+
+type RelicsStreamResponse_Final struct {
+	Final *RelicsResponse `protobuf:"bytes,2,opt,name=final,proto3,oneof"`
+}
+
+func (*RelicsStreamResponse_Progress) isRelicsStreamResponse_Response() {}
+
+func (*RelicsStreamResponse_Final) isRelicsStreamResponse_Response() {}
+
 type AllRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Theme         string                 `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
@@ -603,7 +1067,7 @@ type AllRequest struct {
 
 func (x *AllRequest) Reset() {
 	*x = AllRequest{}
-	mi := &file_lore_proto_msgTypes[11]
+	mi := &file_lore_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -615,7 +1079,7 @@ func (x *AllRequest) String() string {
 func (*AllRequest) ProtoMessage() {}
 
 func (x *AllRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[11]
+	mi := &file_lore_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -628,7 +1092,7 @@ func (x *AllRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllRequest.ProtoReflect.Descriptor instead.
 func (*AllRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{11}
+	return file_lore_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *AllRequest) GetTheme() string {
@@ -658,7 +1122,7 @@ type AllResponse struct {
 
 func (x *AllResponse) Reset() {
 	*x = AllResponse{}
-	mi := &file_lore_proto_msgTypes[12]
+	mi := &file_lore_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -670,7 +1134,7 @@ func (x *AllResponse) String() string {
 func (*AllResponse) ProtoMessage() {}
 
 func (x *AllResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[12]
+	mi := &file_lore_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -683,7 +1147,7 @@ func (x *AllResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllResponse.ProtoReflect.Descriptor instead.
 func (*AllResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{12}
+	return file_lore_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *AllResponse) GetCharacters() []*LorePiece {
@@ -734,7 +1198,7 @@ type SelectedLorePieces struct {
 
 func (x *SelectedLorePieces) Reset() {
 	*x = SelectedLorePieces{}
-	mi := &file_lore_proto_msgTypes[13]
+	mi := &file_lore_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -746,7 +1210,7 @@ func (x *SelectedLorePieces) String() string {
 func (*SelectedLorePieces) ProtoMessage() {}
 
 func (x *SelectedLorePieces) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[13]
+	mi := &file_lore_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -759,7 +1223,7 @@ func (x *SelectedLorePieces) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectedLorePieces.ProtoReflect.Descriptor instead.
 func (*SelectedLorePieces) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{13}
+	return file_lore_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *SelectedLorePieces) GetCharacter() *LorePiece {
@@ -809,7 +1273,7 @@ type FullStory struct {
 
 func (x *FullStory) Reset() {
 	*x = FullStory{}
-	mi := &file_lore_proto_msgTypes[14]
+	mi := &file_lore_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +1285,7 @@ func (x *FullStory) String() string {
 func (*FullStory) ProtoMessage() {}
 
 func (x *FullStory) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[14]
+	mi := &file_lore_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +1298,7 @@ func (x *FullStory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStory.ProtoReflect.Descriptor instead.
 func (*FullStory) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{14}
+	return file_lore_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *FullStory) GetContent() string {
@@ -875,7 +1339,7 @@ type FullStoryRequest struct {
 
 func (x *FullStoryRequest) Reset() {
 	*x = FullStoryRequest{}
-	mi := &file_lore_proto_msgTypes[15]
+	mi := &file_lore_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -887,7 +1351,7 @@ func (x *FullStoryRequest) String() string {
 func (*FullStoryRequest) ProtoMessage() {}
 
 func (x *FullStoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[15]
+	mi := &file_lore_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -900,7 +1364,7 @@ func (x *FullStoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStoryRequest.ProtoReflect.Descriptor instead.
 func (*FullStoryRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{15}
+	return file_lore_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *FullStoryRequest) GetPieces() *SelectedLorePieces {
@@ -926,7 +1390,7 @@ type FullStoryResponse struct {
 
 func (x *FullStoryResponse) Reset() {
 	*x = FullStoryResponse{}
-	mi := &file_lore_proto_msgTypes[16]
+	mi := &file_lore_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -938,7 +1402,7 @@ func (x *FullStoryResponse) String() string {
 func (*FullStoryResponse) ProtoMessage() {}
 
 func (x *FullStoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[16]
+	mi := &file_lore_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -951,7 +1415,7 @@ func (x *FullStoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullStoryResponse.ProtoReflect.Descriptor instead.
 func (*FullStoryResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{16}
+	return file_lore_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *FullStoryResponse) GetStory() *FullStory {
@@ -970,7 +1434,7 @@ type EmbeddingRequest struct {
 
 func (x *EmbeddingRequest) Reset() {
 	*x = EmbeddingRequest{}
-	mi := &file_lore_proto_msgTypes[17]
+	mi := &file_lore_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -982,7 +1446,7 @@ func (x *EmbeddingRequest) String() string {
 func (*EmbeddingRequest) ProtoMessage() {}
 
 func (x *EmbeddingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[17]
+	mi := &file_lore_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -995,7 +1459,7 @@ func (x *EmbeddingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmbeddingRequest.ProtoReflect.Descriptor instead.
 func (*EmbeddingRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{17}
+	return file_lore_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *EmbeddingRequest) GetText() string {
@@ -1014,7 +1478,7 @@ type EmbeddingResponse struct {
 
 func (x *EmbeddingResponse) Reset() {
 	*x = EmbeddingResponse{}
-	mi := &file_lore_proto_msgTypes[18]
+	mi := &file_lore_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1026,7 +1490,7 @@ func (x *EmbeddingResponse) String() string {
 func (*EmbeddingResponse) ProtoMessage() {}
 
 func (x *EmbeddingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[18]
+	mi := &file_lore_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1503,7 @@ func (x *EmbeddingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmbeddingResponse.ProtoReflect.Descriptor instead.
 func (*EmbeddingResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{18}
+	return file_lore_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *EmbeddingResponse) GetEmbedding() []float32 {
@@ -1062,7 +1526,7 @@ type WorldResult struct {
 
 func (x *WorldResult) Reset() {
 	*x = WorldResult{}
-	mi := &file_lore_proto_msgTypes[19]
+	mi := &file_lore_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1074,7 +1538,7 @@ func (x *WorldResult) String() string {
 func (*WorldResult) ProtoMessage() {}
 
 func (x *WorldResult) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[19]
+	mi := &file_lore_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1087,7 +1551,7 @@ func (x *WorldResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorldResult.ProtoReflect.Descriptor instead.
 func (*WorldResult) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{19}
+	return file_lore_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *WorldResult) GetTitle() string {
@@ -1136,7 +1600,7 @@ type RerankSearchRequest struct {
 
 func (x *RerankSearchRequest) Reset() {
 	*x = RerankSearchRequest{}
-	mi := &file_lore_proto_msgTypes[20]
+	mi := &file_lore_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1148,7 +1612,7 @@ func (x *RerankSearchRequest) String() string {
 func (*RerankSearchRequest) ProtoMessage() {}
 
 func (x *RerankSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[20]
+	mi := &file_lore_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1161,7 +1625,7 @@ func (x *RerankSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RerankSearchRequest.ProtoReflect.Descriptor instead.
 func (*RerankSearchRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{20}
+	return file_lore_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *RerankSearchRequest) GetQuery() string {
@@ -1194,7 +1658,7 @@ type RerankSearchResponse struct {
 
 func (x *RerankSearchResponse) Reset() {
 	*x = RerankSearchResponse{}
-	mi := &file_lore_proto_msgTypes[21]
+	mi := &file_lore_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1206,7 +1670,7 @@ func (x *RerankSearchResponse) String() string {
 func (*RerankSearchResponse) ProtoMessage() {}
 
 func (x *RerankSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[21]
+	mi := &file_lore_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1219,7 +1683,7 @@ func (x *RerankSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RerankSearchResponse.ProtoReflect.Descriptor instead.
 func (*RerankSearchResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{21}
+	return file_lore_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *RerankSearchResponse) GetRerankedWorlds() []*WorldResult {
@@ -1241,7 +1705,7 @@ type UploadImageRequest struct {
 
 func (x *UploadImageRequest) Reset() {
 	*x = UploadImageRequest{}
-	mi := &file_lore_proto_msgTypes[22]
+	mi := &file_lore_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1253,7 +1717,7 @@ func (x *UploadImageRequest) String() string {
 func (*UploadImageRequest) ProtoMessage() {}
 
 func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[22]
+	mi := &file_lore_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1266,7 +1730,7 @@ func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadImageRequest.ProtoReflect.Descriptor instead.
 func (*UploadImageRequest) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{22}
+	return file_lore_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UploadImageRequest) GetImageBase64() string {
@@ -1306,7 +1770,7 @@ type UploadImageResponse struct {
 
 func (x *UploadImageResponse) Reset() {
 	*x = UploadImageResponse{}
-	mi := &file_lore_proto_msgTypes[23]
+	mi := &file_lore_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1318,7 +1782,7 @@ func (x *UploadImageResponse) String() string {
 func (*UploadImageResponse) ProtoMessage() {}
 
 func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lore_proto_msgTypes[23]
+	mi := &file_lore_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1331,7 +1795,7 @@ func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadImageResponse.ProtoReflect.Descriptor instead.
 func (*UploadImageResponse) Descriptor() ([]byte, []int) {
-	return file_lore_proto_rawDescGZIP(), []int{23}
+	return file_lore_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UploadImageResponse) GetImageUrl() string {
@@ -1384,7 +1848,35 @@ const file_lore_proto_rawDesc = "" +
 	"\x0eEventsResponse\x12'\n" +
 	"\x06events\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06events\"9\n" +
 	"\x0eRelicsResponse\x12'\n" +
-	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"8\n" +
+	"\x06relics\x18\x01 \x03(\v2\x0f.lore.LorePieceR\x06relics\"J\n" +
+	"\x12GenerationProgress\x12\x1a\n" +
+	"\bprogress\x18\x01 \x01(\x05R\bprogress\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x90\x01\n" +
+	"\x18CharactersStreamResponse\x126\n" +
+	"\bprogress\x18\x01 \x01(\v2\x18.lore.GenerationProgressH\x00R\bprogress\x120\n" +
+	"\x05final\x18\x02 \x01(\v2\x18.lore.CharactersResponseH\x00R\x05finalB\n" +
+	"\n" +
+	"\bresponse\"\x8c\x01\n" +
+	"\x16FactionsStreamResponse\x126\n" +
+	"\bprogress\x18\x01 \x01(\v2\x18.lore.GenerationProgressH\x00R\bprogress\x12.\n" +
+	"\x05final\x18\x02 \x01(\v2\x16.lore.FactionsResponseH\x00R\x05finalB\n" +
+	"\n" +
+	"\bresponse\"\x8c\x01\n" +
+	"\x16SettingsStreamResponse\x126\n" +
+	"\bprogress\x18\x01 \x01(\v2\x18.lore.GenerationProgressH\x00R\bprogress\x12.\n" +
+	"\x05final\x18\x02 \x01(\v2\x16.lore.SettingsResponseH\x00R\x05finalB\n" +
+	"\n" +
+	"\bresponse\"\x88\x01\n" +
+	"\x14EventsStreamResponse\x126\n" +
+	"\bprogress\x18\x01 \x01(\v2\x18.lore.GenerationProgressH\x00R\bprogress\x12,\n" +
+	"\x05final\x18\x02 \x01(\v2\x14.lore.EventsResponseH\x00R\x05finalB\n" +
+	"\n" +
+	"\bresponse\"\x88\x01\n" +
+	"\x14RelicsStreamResponse\x126\n" +
+	"\bprogress\x18\x01 \x01(\v2\x18.lore.GenerationProgressH\x00R\bprogress\x12,\n" +
+	"\x05final\x18\x02 \x01(\v2\x14.lore.RelicsResponseH\x00R\x05finalB\n" +
+	"\n" +
+	"\bresponse\"8\n" +
 	"\n" +
 	"AllRequest\x12\x14\n" +
 	"\x05theme\x18\x01 \x01(\tR\x05theme\x12\x14\n" +
@@ -1441,13 +1933,13 @@ const file_lore_proto_rawDesc = "" +
 	"\n" +
 	"image_type\x18\x04 \x01(\tR\timageType\"2\n" +
 	"\x13UploadImageResponse\x12\x1b\n" +
-	"\timage_url\x18\x01 \x01(\tR\bimageUrl2\xa6\x05\n" +
-	"\vLoreService\x12G\n" +
-	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x18.lore.CharactersResponse\x12A\n" +
-	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x16.lore.FactionsResponse\x12A\n" +
-	"\x10GenerateSettings\x12\x15.lore.SettingsRequest\x1a\x16.lore.SettingsResponse\x12;\n" +
-	"\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x14.lore.EventsResponse\x12;\n" +
-	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x14.lore.RelicsResponse\x122\n" +
+	"\timage_url\x18\x01 \x01(\tR\bimageUrl2\xce\x05\n" +
+	"\vLoreService\x12O\n" +
+	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x1e.lore.CharactersStreamResponse0\x01\x12I\n" +
+	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x1c.lore.FactionsStreamResponse0\x01\x12I\n" +
+	"\x10GenerateSettings\x12\x15.lore.SettingsRequest\x1a\x1c.lore.SettingsStreamResponse0\x01\x12C\n" +
+	"\x0eGenerateEvents\x12\x13.lore.EventsRequest\x1a\x1a.lore.EventsStreamResponse0\x01\x12C\n" +
+	"\x0eGenerateRelics\x12\x13.lore.RelicsRequest\x1a\x1a.lore.RelicsStreamResponse0\x01\x122\n" +
 	"\vGenerateAll\x12\x10.lore.AllRequest\x1a\x11.lore.AllResponse\x12D\n" +
 	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x12D\n" +
 	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponse\x12F\n" +
@@ -1467,86 +1959,102 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_lore_proto_goTypes = []any{
-	(*CharactersRequest)(nil),    // 0: lore.CharactersRequest
-	(*FactionsRequest)(nil),      // 1: lore.FactionsRequest
-	(*SettingsRequest)(nil),      // 2: lore.SettingsRequest
-	(*EventsRequest)(nil),        // 3: lore.EventsRequest
-	(*RelicsRequest)(nil),        // 4: lore.RelicsRequest
-	(*LorePiece)(nil),            // 5: lore.LorePiece
-	(*CharactersResponse)(nil),   // 6: lore.CharactersResponse
-	(*FactionsResponse)(nil),     // 7: lore.FactionsResponse
-	(*SettingsResponse)(nil),     // 8: lore.SettingsResponse
-	(*EventsResponse)(nil),       // 9: lore.EventsResponse
-	(*RelicsResponse)(nil),       // 10: lore.RelicsResponse
-	(*AllRequest)(nil),           // 11: lore.AllRequest
-	(*AllResponse)(nil),          // 12: lore.AllResponse
-	(*SelectedLorePieces)(nil),   // 13: lore.SelectedLorePieces
-	(*FullStory)(nil),            // 14: lore.FullStory
-	(*FullStoryRequest)(nil),     // 15: lore.FullStoryRequest
-	(*FullStoryResponse)(nil),    // 16: lore.FullStoryResponse
-	(*EmbeddingRequest)(nil),     // 17: lore.EmbeddingRequest
-	(*EmbeddingResponse)(nil),    // 18: lore.EmbeddingResponse
-	(*WorldResult)(nil),          // 19: lore.WorldResult
-	(*RerankSearchRequest)(nil),  // 20: lore.RerankSearchRequest
-	(*RerankSearchResponse)(nil), // 21: lore.RerankSearchResponse
-	(*UploadImageRequest)(nil),   // 22: lore.UploadImageRequest
-	(*UploadImageResponse)(nil),  // 23: lore.UploadImageResponse
-	nil,                          // 24: lore.LorePiece.DetailsEntry
-	nil,                          // 25: lore.FullStory.QuestEntry
+	(*CharactersRequest)(nil),        // 0: lore.CharactersRequest
+	(*FactionsRequest)(nil),          // 1: lore.FactionsRequest
+	(*SettingsRequest)(nil),          // 2: lore.SettingsRequest
+	(*EventsRequest)(nil),            // 3: lore.EventsRequest
+	(*RelicsRequest)(nil),            // 4: lore.RelicsRequest
+	(*LorePiece)(nil),                // 5: lore.LorePiece
+	(*CharactersResponse)(nil),       // 6: lore.CharactersResponse
+	(*FactionsResponse)(nil),         // 7: lore.FactionsResponse
+	(*SettingsResponse)(nil),         // 8: lore.SettingsResponse
+	(*EventsResponse)(nil),           // 9: lore.EventsResponse
+	(*RelicsResponse)(nil),           // 10: lore.RelicsResponse
+	(*GenerationProgress)(nil),       // 11: lore.GenerationProgress
+	(*CharactersStreamResponse)(nil), // 12: lore.CharactersStreamResponse
+	(*FactionsStreamResponse)(nil),   // 13: lore.FactionsStreamResponse
+	(*SettingsStreamResponse)(nil),   // 14: lore.SettingsStreamResponse
+	(*EventsStreamResponse)(nil),     // 15: lore.EventsStreamResponse
+	(*RelicsStreamResponse)(nil),     // 16: lore.RelicsStreamResponse
+	(*AllRequest)(nil),               // 17: lore.AllRequest
+	(*AllResponse)(nil),              // 18: lore.AllResponse
+	(*SelectedLorePieces)(nil),       // 19: lore.SelectedLorePieces
+	(*FullStory)(nil),                // 20: lore.FullStory
+	(*FullStoryRequest)(nil),         // 21: lore.FullStoryRequest
+	(*FullStoryResponse)(nil),        // 22: lore.FullStoryResponse
+	(*EmbeddingRequest)(nil),         // 23: lore.EmbeddingRequest
+	(*EmbeddingResponse)(nil),        // 24: lore.EmbeddingResponse
+	(*WorldResult)(nil),              // 25: lore.WorldResult
+	(*RerankSearchRequest)(nil),      // 26: lore.RerankSearchRequest
+	(*RerankSearchResponse)(nil),     // 27: lore.RerankSearchResponse
+	(*UploadImageRequest)(nil),       // 28: lore.UploadImageRequest
+	(*UploadImageResponse)(nil),      // 29: lore.UploadImageResponse
+	nil,                              // 30: lore.LorePiece.DetailsEntry
+	nil,                              // 31: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
 	5,  // 0: lore.EventsRequest.selected_setting:type_name -> lore.LorePiece
 	5,  // 1: lore.RelicsRequest.selected_setting:type_name -> lore.LorePiece
 	5,  // 2: lore.RelicsRequest.selected_event:type_name -> lore.LorePiece
-	24, // 3: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	30, // 3: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 4: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 5: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 6: lore.SettingsResponse.settings:type_name -> lore.LorePiece
 	5,  // 7: lore.EventsResponse.events:type_name -> lore.LorePiece
 	5,  // 8: lore.RelicsResponse.relics:type_name -> lore.LorePiece
-	5,  // 9: lore.AllResponse.characters:type_name -> lore.LorePiece
-	5,  // 10: lore.AllResponse.factions:type_name -> lore.LorePiece
-	5,  // 11: lore.AllResponse.settings:type_name -> lore.LorePiece
-	5,  // 12: lore.AllResponse.events:type_name -> lore.LorePiece
-	5,  // 13: lore.AllResponse.relics:type_name -> lore.LorePiece
-	5,  // 14: lore.SelectedLorePieces.character:type_name -> lore.LorePiece
-	5,  // 15: lore.SelectedLorePieces.faction:type_name -> lore.LorePiece
-	5,  // 16: lore.SelectedLorePieces.setting:type_name -> lore.LorePiece
-	5,  // 17: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
-	5,  // 18: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
-	13, // 19: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	25, // 20: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
-	13, // 21: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
-	14, // 22: lore.FullStoryResponse.story:type_name -> lore.FullStory
-	19, // 23: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
-	19, // 24: lore.RerankSearchResponse.reranked_worlds:type_name -> lore.WorldResult
-	0,  // 25: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
-	1,  // 26: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
-	2,  // 27: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
-	3,  // 28: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
-	4,  // 29: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
-	11, // 30: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
-	15, // 31: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
-	17, // 32: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
-	20, // 33: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
-	22, // 34: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
-	6,  // 35: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersResponse
-	7,  // 36: lore.LoreService.GenerateFactions:output_type -> lore.FactionsResponse
-	8,  // 37: lore.LoreService.GenerateSettings:output_type -> lore.SettingsResponse
-	9,  // 38: lore.LoreService.GenerateEvents:output_type -> lore.EventsResponse
-	10, // 39: lore.LoreService.GenerateRelics:output_type -> lore.RelicsResponse
-	12, // 40: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	16, // 41: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	18, // 42: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
-	21, // 43: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
-	23, // 44: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
-	35, // [35:45] is the sub-list for method output_type
-	25, // [25:35] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	11, // 9: lore.CharactersStreamResponse.progress:type_name -> lore.GenerationProgress
+	6,  // 10: lore.CharactersStreamResponse.final:type_name -> lore.CharactersResponse
+	11, // 11: lore.FactionsStreamResponse.progress:type_name -> lore.GenerationProgress
+	7,  // 12: lore.FactionsStreamResponse.final:type_name -> lore.FactionsResponse
+	11, // 13: lore.SettingsStreamResponse.progress:type_name -> lore.GenerationProgress
+	8,  // 14: lore.SettingsStreamResponse.final:type_name -> lore.SettingsResponse
+	11, // 15: lore.EventsStreamResponse.progress:type_name -> lore.GenerationProgress
+	9,  // 16: lore.EventsStreamResponse.final:type_name -> lore.EventsResponse
+	11, // 17: lore.RelicsStreamResponse.progress:type_name -> lore.GenerationProgress
+	10, // 18: lore.RelicsStreamResponse.final:type_name -> lore.RelicsResponse
+	5,  // 19: lore.AllResponse.characters:type_name -> lore.LorePiece
+	5,  // 20: lore.AllResponse.factions:type_name -> lore.LorePiece
+	5,  // 21: lore.AllResponse.settings:type_name -> lore.LorePiece
+	5,  // 22: lore.AllResponse.events:type_name -> lore.LorePiece
+	5,  // 23: lore.AllResponse.relics:type_name -> lore.LorePiece
+	5,  // 24: lore.SelectedLorePieces.character:type_name -> lore.LorePiece
+	5,  // 25: lore.SelectedLorePieces.faction:type_name -> lore.LorePiece
+	5,  // 26: lore.SelectedLorePieces.setting:type_name -> lore.LorePiece
+	5,  // 27: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
+	5,  // 28: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
+	19, // 29: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
+	31, // 30: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	19, // 31: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
+	20, // 32: lore.FullStoryResponse.story:type_name -> lore.FullStory
+	25, // 33: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
+	25, // 34: lore.RerankSearchResponse.reranked_worlds:type_name -> lore.WorldResult
+	0,  // 35: lore.LoreService.GenerateCharacters:input_type -> lore.CharactersRequest
+	1,  // 36: lore.LoreService.GenerateFactions:input_type -> lore.FactionsRequest
+	2,  // 37: lore.LoreService.GenerateSettings:input_type -> lore.SettingsRequest
+	3,  // 38: lore.LoreService.GenerateEvents:input_type -> lore.EventsRequest
+	4,  // 39: lore.LoreService.GenerateRelics:input_type -> lore.RelicsRequest
+	17, // 40: lore.LoreService.GenerateAll:input_type -> lore.AllRequest
+	21, // 41: lore.LoreService.GenerateFullStory:input_type -> lore.FullStoryRequest
+	23, // 42: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
+	26, // 43: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
+	28, // 44: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
+	12, // 45: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersStreamResponse
+	13, // 46: lore.LoreService.GenerateFactions:output_type -> lore.FactionsStreamResponse
+	14, // 47: lore.LoreService.GenerateSettings:output_type -> lore.SettingsStreamResponse
+	15, // 48: lore.LoreService.GenerateEvents:output_type -> lore.EventsStreamResponse
+	16, // 49: lore.LoreService.GenerateRelics:output_type -> lore.RelicsStreamResponse
+	18, // 50: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	22, // 51: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	24, // 52: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	27, // 53: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
+	29, // 54: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
+	45, // [45:55] is the sub-list for method output_type
+	35, // [35:45] is the sub-list for method input_type
+	35, // [35:35] is the sub-list for extension type_name
+	35, // [35:35] is the sub-list for extension extendee
+	0,  // [0:35] is the sub-list for field type_name
 }
 
 func init() { file_lore_proto_init() }
@@ -1554,13 +2062,33 @@ func file_lore_proto_init() {
 	if File_lore_proto != nil {
 		return
 	}
+	file_lore_proto_msgTypes[12].OneofWrappers = []any{
+		(*CharactersStreamResponse_Progress)(nil),
+		(*CharactersStreamResponse_Final)(nil),
+	}
+	file_lore_proto_msgTypes[13].OneofWrappers = []any{
+		(*FactionsStreamResponse_Progress)(nil),
+		(*FactionsStreamResponse_Final)(nil),
+	}
+	file_lore_proto_msgTypes[14].OneofWrappers = []any{
+		(*SettingsStreamResponse_Progress)(nil),
+		(*SettingsStreamResponse_Final)(nil),
+	}
+	file_lore_proto_msgTypes[15].OneofWrappers = []any{
+		(*EventsStreamResponse_Progress)(nil),
+		(*EventsStreamResponse_Final)(nil),
+	}
+	file_lore_proto_msgTypes[16].OneofWrappers = []any{
+		(*RelicsStreamResponse_Progress)(nil),
+		(*RelicsStreamResponse_Final)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

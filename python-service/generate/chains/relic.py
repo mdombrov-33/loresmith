@@ -28,8 +28,21 @@ async def generate_relic(
     theme: str = "post-apocalyptic",
     setting: LorePiece | None = None,
     event: LorePiece | None = None,
+    progress_callback=None,
 ) -> LorePiece:
+    """
+    Generate a relic.
+
+    Args:
+        theme: Theme for generation
+        setting: Optional setting to connect the relic to
+        event: Optional event to connect the relic to
+        progress_callback: Optional async callback(step, total_steps, message) for progress tracking
+    """
     try:
+        total_steps = 3  # name, description, history
+        current_step = 0
+
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
 
@@ -58,6 +71,10 @@ async def generate_relic(
         name = clean_ai_text(name_raw)
         logger.info(f"Generated relic name: {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated names...")
+
         # Generate Description
         with open("generate/prompts/relic/relic_description.txt", "r") as f:
             description_prompt_text = f.read()
@@ -79,6 +96,10 @@ async def generate_relic(
         description = description_result.description
         logger.info(f"Generated description for {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated descriptions...")
+
         # Generate History
         with open("generate/prompts/relic/relic_history.txt", "r") as f:
             history_prompt_text = f.read()
@@ -99,6 +120,10 @@ async def generate_relic(
         )
         history = history_result.history
         logger.info(f"Generated history for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated histories...")
 
         increment_success_counter()
         logger.info(f"Successfully generated relic: {name}")

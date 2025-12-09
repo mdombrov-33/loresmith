@@ -25,9 +25,20 @@ blacklist_str = ", ".join(BLACKLIST["words"] + BLACKLIST["full_names"])
 
 @observe()
 async def generate_event(
-    theme: str = "post-apocalyptic", setting: LorePiece | None = None
+    theme: str = "post-apocalyptic", setting: LorePiece | None = None, progress_callback=None
 ) -> LorePiece:
+    """
+    Generate an event.
+
+    Args:
+        theme: Theme for generation
+        setting: Optional setting to connect the event to
+        progress_callback: Optional async callback(step, total_steps, message) for progress tracking
+    """
     try:
+        total_steps = 3  # name, description, impact
+        current_step = 0
+
         with open("generate/prompts/shared/theme_references.txt", "r") as f:
             theme_references = f.read()
 
@@ -52,6 +63,10 @@ async def generate_event(
         name = clean_ai_text(name_raw)
         logger.info(f"Generated event name: {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated names...")
+
         # Generate Description
         with open("generate/prompts/event/event_description.txt", "r") as f:
             description_prompt_text = f.read()
@@ -73,6 +88,10 @@ async def generate_event(
         description = description_result.description
         logger.info(f"Generated description for {name}")
 
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated descriptions...")
+
         # Generate Impact
         with open("generate/prompts/event/event_impact.txt", "r") as f:
             impact_prompt_text = f.read()
@@ -93,6 +112,10 @@ async def generate_event(
         )
         impact = impact_result.impact
         logger.info(f"Generated impact for {name}")
+
+        current_step += 1
+        if progress_callback:
+            await progress_callback(current_step, total_steps, "Generated impacts...")
 
         increment_success_counter()
         logger.info(f"Successfully generated event: {name}")

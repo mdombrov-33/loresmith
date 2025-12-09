@@ -34,30 +34,30 @@ class LoreServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GenerateCharacters = channel.unary_unary(
+        self.GenerateCharacters = channel.unary_stream(
                 '/lore.LoreService/GenerateCharacters',
                 request_serializer=lore__pb2.CharactersRequest.SerializeToString,
-                response_deserializer=lore__pb2.CharactersResponse.FromString,
+                response_deserializer=lore__pb2.CharactersStreamResponse.FromString,
                 _registered_method=True)
-        self.GenerateFactions = channel.unary_unary(
+        self.GenerateFactions = channel.unary_stream(
                 '/lore.LoreService/GenerateFactions',
                 request_serializer=lore__pb2.FactionsRequest.SerializeToString,
-                response_deserializer=lore__pb2.FactionsResponse.FromString,
+                response_deserializer=lore__pb2.FactionsStreamResponse.FromString,
                 _registered_method=True)
-        self.GenerateSettings = channel.unary_unary(
+        self.GenerateSettings = channel.unary_stream(
                 '/lore.LoreService/GenerateSettings',
                 request_serializer=lore__pb2.SettingsRequest.SerializeToString,
-                response_deserializer=lore__pb2.SettingsResponse.FromString,
+                response_deserializer=lore__pb2.SettingsStreamResponse.FromString,
                 _registered_method=True)
-        self.GenerateEvents = channel.unary_unary(
+        self.GenerateEvents = channel.unary_stream(
                 '/lore.LoreService/GenerateEvents',
                 request_serializer=lore__pb2.EventsRequest.SerializeToString,
-                response_deserializer=lore__pb2.EventsResponse.FromString,
+                response_deserializer=lore__pb2.EventsStreamResponse.FromString,
                 _registered_method=True)
-        self.GenerateRelics = channel.unary_unary(
+        self.GenerateRelics = channel.unary_stream(
                 '/lore.LoreService/GenerateRelics',
                 request_serializer=lore__pb2.RelicsRequest.SerializeToString,
-                response_deserializer=lore__pb2.RelicsResponse.FromString,
+                response_deserializer=lore__pb2.RelicsStreamResponse.FromString,
                 _registered_method=True)
         self.GenerateAll = channel.unary_unary(
                 '/lore.LoreService/GenerateAll',
@@ -152,30 +152,30 @@ class LoreServiceServicer(object):
 
 def add_LoreServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GenerateCharacters': grpc.unary_unary_rpc_method_handler(
+            'GenerateCharacters': grpc.unary_stream_rpc_method_handler(
                     servicer.GenerateCharacters,
                     request_deserializer=lore__pb2.CharactersRequest.FromString,
-                    response_serializer=lore__pb2.CharactersResponse.SerializeToString,
+                    response_serializer=lore__pb2.CharactersStreamResponse.SerializeToString,
             ),
-            'GenerateFactions': grpc.unary_unary_rpc_method_handler(
+            'GenerateFactions': grpc.unary_stream_rpc_method_handler(
                     servicer.GenerateFactions,
                     request_deserializer=lore__pb2.FactionsRequest.FromString,
-                    response_serializer=lore__pb2.FactionsResponse.SerializeToString,
+                    response_serializer=lore__pb2.FactionsStreamResponse.SerializeToString,
             ),
-            'GenerateSettings': grpc.unary_unary_rpc_method_handler(
+            'GenerateSettings': grpc.unary_stream_rpc_method_handler(
                     servicer.GenerateSettings,
                     request_deserializer=lore__pb2.SettingsRequest.FromString,
-                    response_serializer=lore__pb2.SettingsResponse.SerializeToString,
+                    response_serializer=lore__pb2.SettingsStreamResponse.SerializeToString,
             ),
-            'GenerateEvents': grpc.unary_unary_rpc_method_handler(
+            'GenerateEvents': grpc.unary_stream_rpc_method_handler(
                     servicer.GenerateEvents,
                     request_deserializer=lore__pb2.EventsRequest.FromString,
-                    response_serializer=lore__pb2.EventsResponse.SerializeToString,
+                    response_serializer=lore__pb2.EventsStreamResponse.SerializeToString,
             ),
-            'GenerateRelics': grpc.unary_unary_rpc_method_handler(
+            'GenerateRelics': grpc.unary_stream_rpc_method_handler(
                     servicer.GenerateRelics,
                     request_deserializer=lore__pb2.RelicsRequest.FromString,
-                    response_serializer=lore__pb2.RelicsResponse.SerializeToString,
+                    response_serializer=lore__pb2.RelicsStreamResponse.SerializeToString,
             ),
             'GenerateAll': grpc.unary_unary_rpc_method_handler(
                     servicer.GenerateAll,
@@ -224,12 +224,12 @@ class LoreService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/lore.LoreService/GenerateCharacters',
             lore__pb2.CharactersRequest.SerializeToString,
-            lore__pb2.CharactersResponse.FromString,
+            lore__pb2.CharactersStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -251,12 +251,12 @@ class LoreService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/lore.LoreService/GenerateFactions',
             lore__pb2.FactionsRequest.SerializeToString,
-            lore__pb2.FactionsResponse.FromString,
+            lore__pb2.FactionsStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -278,12 +278,12 @@ class LoreService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/lore.LoreService/GenerateSettings',
             lore__pb2.SettingsRequest.SerializeToString,
-            lore__pb2.SettingsResponse.FromString,
+            lore__pb2.SettingsStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -305,12 +305,12 @@ class LoreService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/lore.LoreService/GenerateEvents',
             lore__pb2.EventsRequest.SerializeToString,
-            lore__pb2.EventsResponse.FromString,
+            lore__pb2.EventsStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -332,12 +332,12 @@ class LoreService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/lore.LoreService/GenerateRelics',
             lore__pb2.RelicsRequest.SerializeToString,
-            lore__pb2.RelicsResponse.FromString,
+            lore__pb2.RelicsStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
