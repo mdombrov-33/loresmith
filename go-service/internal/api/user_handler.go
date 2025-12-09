@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -283,8 +284,11 @@ func (h *UserHandler) HandleGoogleCallback(w http.ResponseWriter, r *http.Reques
 	}
 
 	if user == nil {
+		// Extract username from email prefix to ensure uniqueness
+		emailPrefix := strings.Split(googleUser.Email, "@")[0]
+
 		user = &store.User{
-			Username:   googleUser.Name,
+			Username:   emailPrefix,
 			Email:      googleUser.Email,
 			Provider:   "google",
 			ProviderID: googleUser.ID,
