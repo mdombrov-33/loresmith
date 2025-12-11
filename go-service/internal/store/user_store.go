@@ -24,11 +24,25 @@ type password struct {
 	hash      []byte
 }
 
+type PasswordResetToken struct {
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
+	Used      bool      `json:"used"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type UserStore interface {
 	CreateUser(*User) error
 	GetUserByUsername(username string) (*User, error)
 	GetUserByID(id int64) (*User, error)
 	GetUserByEmailAndProvider(email, provider string) (*User, error)
+	GetUserByEmail(email string) (*User, error)
+	UpdatePassword(userID int64, newPasswordHash []byte) error
+	CreatePasswordResetToken(userID int64, token string, expiresAt time.Time) error
+	GetPasswordResetToken(token string) (*PasswordResetToken, error)
+	MarkTokenAsUsed(token string) error
 }
 
 type PostgresUserStore struct {
@@ -167,4 +181,96 @@ func (s *PostgresUserStore) GetUserByEmailAndProvider(email, provider string) (*
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *PostgresUserStore) GetUserByEmail(email string) (*User, error) {
+	user := &User{
+		PasswordHash: password{},
+	}
+
+	query := `
+	SELECT id, username, email, password_hash, provider, provider_id, created_at, updated_at
+	FROM users
+	WHERE email = $1
+	`
+
+	err := s.db.QueryRow(query, email).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.PasswordHash.hash,
+		&user.Provider,
+		&user.ProviderID,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (s *PostgresUserStore) UpdatePassword(userID int64, newPasswordHash []byte) error {
+	query := `
+	UPDATE users
+	SET password_hash = $1, updated_at = NOW()
+	WHERE id = $2
+	`
+
+	_, err := s.db.Exec(query, newPasswordHash, userID)
+	return err
+}
+
+func (s *PostgresUserStore) CreatePasswordResetToken(userID int64, token string, expiresAt time.Time) error {
+	query := `
+	INSERT INTO password_reset_tokens(user_id, token, expires_at)
+	VALUES($1, $2, $3)
+	`
+
+	_, err := s.db.Exec(query, userID, token, expiresAt)
+	return err
+}
+
+func (s *PostgresUserStore) GetPasswordResetToken(token string) (*PasswordResetToken, error) {
+	resetToken := &PasswordResetToken{}
+
+	query := `
+	SELECT id, user_id, token, expires_at, used, created_at
+	FROM password_reset_tokens
+	WHERE token = $1
+	`
+
+	err := s.db.QueryRow(query, token).Scan(
+		&resetToken.ID,
+		&resetToken.UserID,
+		&resetToken.Token,
+		&resetToken.ExpiresAt,
+		&resetToken.Used,
+		&resetToken.CreatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return resetToken, nil
+}
+
+func (s *PostgresUserStore) MarkTokenAsUsed(token string) error {
+	query := `
+	UPDATE password_reset_tokens
+	SET used = true
+	WHERE token = $1
+	`
+
+	_, err := s.db.Exec(query, token)
+	return err
 }

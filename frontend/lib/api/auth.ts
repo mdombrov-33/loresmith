@@ -1,4 +1,10 @@
-import { RegisterRequest, LoginRequest, AuthResponse, RegisterResponse, User } from "@/lib/schemas";
+import {
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+  RegisterResponse,
+  User,
+} from "@/lib/schemas";
 import { API_BASE_URL, fetchWithTimeout } from "./base";
 
 export async function registerUser(
@@ -63,3 +69,54 @@ export async function getCurrentUser(): Promise<{ user: User } | null> {
     return null;
   }
 }
+
+export async function forgotPassword(
+  email: string,
+): Promise<{ message: string }> {
+  const url = `${API_BASE_URL}/auth/forgot-password`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to send reset email");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+): Promise<{ message: string }> {
+  const url = `${API_BASE_URL}/auth/reset-password`;
+
+  const response = await fetchWithTimeout(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, new_password: newPassword }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to reset password");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+// TODO: Add changePassword for settings page
+// export async function changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+//   const url = `${API_BASE_URL}/auth/change-password`;
+//   // ... implementation when adding settings page
+// }

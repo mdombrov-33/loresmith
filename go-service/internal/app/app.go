@@ -7,10 +7,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
+	"github.com/mdombrov-33/loresmith/go-service/internal/email"
 	"github.com/mdombrov-33/loresmith/go-service/internal/jobs"
 	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
@@ -111,8 +113,25 @@ func NewApplication() (*Application, error) {
 	executor := jobs.NewGRPCExecutor(loreClient, jobStore, worldStore, portraitStore, logger)
 	jobManager := jobs.NewManager(jobStore, executor)
 
+	//* Email Service
+	smtpPort, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	if smtpPort == 0 {
+		smtpPort = 1025
+	}
+
+	emailService, err := email.NewEmailService(email.Config{
+		Provider:  os.Getenv("EMAIL_PROVIDER"),
+		SMTPHost:  os.Getenv("SMTP_HOST"),
+		SMTPPort:  smtpPort,
+		FromEmail: os.Getenv("EMAIL_FROM"),
+		FromName:  os.Getenv("EMAIL_FROM_NAME"),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize email service: %w", err)
+	}
+
 	//* Handlers
-	userHandler := api.NewUserHandler(userStore, logger)
+	userHandler := api.NewUserHandler(userStore, logger, emailService)
 	worldHandler := api.NewWorldHandler(loreClient, worldStore, adventureStore, portraitStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
 	adventureHandler := api.NewAdventureHandler(adventureStore, partyStore, worldStore, logger)

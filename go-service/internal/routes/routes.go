@@ -69,6 +69,12 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 	r.Post("/logout", app.UserHandler.HandleLogout)
 	r.Get("/auth/google", app.UserHandler.HandleGoogleLogin)
 	r.Get("/auth/google/callback", app.UserHandler.HandleGoogleCallback)
+	r.Post("/auth/forgot-password", app.UserHandler.HandleForgotPassword)
+	r.Post("/auth/reset-password", app.UserHandler.HandleResetPassword)
 	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait) //TODO: move it to Job routes and make connection by user id?
+
+	//TODO: add authenticated password change route when implementing settings page
+	// r.Post("/auth/change-password", app.Middleware.Authenticate(app.UserHandler.HandleChangePassword))
+
 	return r
 }

@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log"
@@ -12,9 +14,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mdombrov-33/loresmith/go-service/internal/email"
 	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -23,6 +27,7 @@ type UserHandler struct {
 	userStore    store.UserStore
 	logger       *log.Logger
 	oauth2Config *oauth2.Config
+	emailService email.EmailService
 }
 
 type registerUserRequest struct {
@@ -36,7 +41,7 @@ type loginUserRequest struct {
 	Password string `json:"password"`
 }
 
-func NewUserHandler(userStore store.UserStore, logger *log.Logger) *UserHandler {
+func NewUserHandler(userStore store.UserStore, logger *log.Logger, emailService email.EmailService) *UserHandler {
 	oauth2Config := &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
@@ -52,6 +57,7 @@ func NewUserHandler(userStore store.UserStore, logger *log.Logger) *UserHandler 
 		userStore:    userStore,
 		logger:       logger,
 		oauth2Config: oauth2Config,
+		emailService: emailService,
 	}
 }
 
@@ -78,6 +84,10 @@ func (h *UserHandler) validateRegisterRequest(req *registerUserRequest) error {
 		return errors.New("password is required")
 	}
 
+	if len(req.Password) < 6 {
+		return errors.New("password must be at least 6 characters")
+	}
+
 	return nil
 }
 
@@ -101,6 +111,7 @@ func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	user := &store.User{
 		Username: req.Username,
 		Email:    req.Email,
+		Provider: "local",
 	}
 
 	err = user.PasswordHash.Set(req.Password)
@@ -363,3 +374,171 @@ func (h *UserHandler) HandleGetCurrentUser(w http.ResponseWriter, r *http.Reques
 		},
 	})
 }
+
+// HandleForgotPassword generates a password reset token and sends reset email
+func (h *UserHandler) HandleForgotPassword(w http.ResponseWriter, r *http.Request) {
+	type ForgotPasswordRequest struct {
+		Email string `json:"email"`
+	}
+
+	var req ForgotPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request body"})
+		return
+	}
+
+	if req.Email == "" {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "email is required"})
+		return
+	}
+
+	// Get user by email (only for local provider - OAuth users can't reset password)
+	user, err := h.userStore.GetUserByEmailAndProvider(req.Email, "local")
+	if err != nil {
+		h.logger.Printf("ERROR: fetching user by email: %v", err)
+		// Don't reveal if email exists - always return success
+		utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+			"message": "If an account exists with this email, a password reset link has been sent",
+		})
+		return
+	}
+
+	// If user doesn't exist or is OAuth user, still return success (security best practice)
+	if user == nil {
+		utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+			"message": "If an account exists with this email, a password reset link has been sent",
+		})
+		return
+	}
+
+	// Generate secure random token
+	tokenBytes := make([]byte, 32)
+	if _, err := rand.Read(tokenBytes); err != nil {
+		h.logger.Printf("ERROR: generating reset token: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		return
+	}
+	token := hex.EncodeToString(tokenBytes)
+
+	// Token expires in 1 hour
+	expiresAt := time.Now().Add(time.Hour * 1)
+
+	// Store token in database
+	if err := h.userStore.CreatePasswordResetToken(user.ID, token, expiresAt); err != nil {
+		h.logger.Printf("ERROR: creating password reset token: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		return
+	}
+
+	// Build reset link
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
+	resetLink := frontendURL + "/reset-password?token=" + token
+
+	// Send email via configured email service (MailHog for dev, Resend for prod)
+	if err := h.emailService.SendPasswordReset(user.Email, resetLink); err != nil {
+		h.logger.Printf("ERROR: failed to send password reset email: %v", err)
+		// Don't fail the request - user doesn't need to know email failed
+		// In development with MailHog, check http://localhost:8025 to see the email
+	} else {
+		h.logger.Printf("Password reset email sent to %s (check MailHog at http://localhost:8025)", user.Email)
+	}
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+		"message": "If an account exists with this email, a password reset link has been sent",
+	})
+}
+
+// HandleResetPassword resets user password using a valid reset token
+func (h *UserHandler) HandleResetPassword(w http.ResponseWriter, r *http.Request) {
+	type ResetPasswordRequest struct {
+		Token       string `json:"token"`
+		NewPassword string `json:"new_password"`
+	}
+
+	var req ResetPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid request body"})
+		return
+	}
+
+	if req.Token == "" {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "token is required"})
+		return
+	}
+
+	if req.NewPassword == "" {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "new password is required"})
+		return
+	}
+
+	if len(req.NewPassword) < 6 {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "password must be at least 6 characters"})
+		return
+	}
+
+	// Get reset token from database
+	resetToken, err := h.userStore.GetPasswordResetToken(req.Token)
+	if err != nil {
+		h.logger.Printf("ERROR: fetching password reset token: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		return
+	}
+
+	// Validate token exists
+	if resetToken == nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid or expired token"})
+		return
+	}
+
+	// Validate token not used
+	if resetToken.Used {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "token has already been used"})
+		return
+	}
+
+	// Validate token not expired
+	if time.Now().After(resetToken.ExpiresAt) {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "token has expired"})
+		return
+	}
+
+	// Hash new password
+	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), 12)
+	if err != nil {
+		h.logger.Printf("ERROR: hashing new password: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		return
+	}
+
+	// Update user password
+	if err := h.userStore.UpdatePassword(resetToken.UserID, newPasswordHash); err != nil {
+		h.logger.Printf("ERROR: updating password: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "internal server error"})
+		return
+	}
+
+	// Mark token as used
+	if err := h.userStore.MarkTokenAsUsed(req.Token); err != nil {
+		h.logger.Printf("ERROR: marking token as used: %v", err)
+		// Don't fail the request - password is already updated
+	}
+
+	h.logger.Printf("Password successfully reset for user ID: %d", resetToken.UserID)
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{
+		"message": "Password reset successful",
+	})
+}
+
+// TODO: Add HandleChangePassword for authenticated users to change password in settings
+// This should be added when implementing the profile/settings page
+// Example implementation:
+// func (h *UserHandler) HandleChangePassword(w http.ResponseWriter, r *http.Request) {
+//     user := middleware.GetUser(r)  // Get authenticated user
+//     // Verify current password
+//     // Update to new password
+//     // Optionally invalidate all existing sessions/tokens
+// }
