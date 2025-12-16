@@ -50,27 +50,26 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
     ? world.image_url
     : world.portrait_url;
 
+  const currentImageType = world.active_image_type;
+
   return (
-    <section className="relative h-[500px] w-full overflow-hidden rounded-3xl">
-      {/* Background Image with Overlay */}
-      {displayImage && (
-        <>
+    <>
+      {/* World Scene Layout - Full width with overlay */}
+      {displayImage && currentImageType === "world_scene" && (
+        <section className="relative h-[500px] w-full overflow-hidden rounded-3xl">
           <div className="absolute inset-0">
             <Image
               fill
               src={displayImage}
               alt={world.full_story.quest?.title || "Featured world"}
-              className="h-full object-cover object-top"
+              className="h-full object-cover object-center"
               priority
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-        </>
-      )}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
+          <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
         {/* Featured Badge - Top */}
         <div className="flex items-center gap-2">
           <Sparkles className="text-primary h-4 w-4" />
@@ -129,7 +128,158 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
             Explore This World
           </PrimaryButton>
         </div>
-      </div>
-    </section>
+          </div>
+        </section>
+      )}
+
+      {/* Portrait Layout - Responsive: Stack on mobile, split on desktop */}
+      {displayImage && currentImageType === "portrait" && (
+        <section className="relative w-full overflow-hidden rounded-3xl">
+          {/* Mobile: Stacked layout */}
+          <div className="flex flex-col md:hidden">
+            {/* Portrait on top */}
+            <div className="relative aspect-[4/3] w-full">
+              <Image
+                fill
+                src={displayImage}
+                alt={world.full_story.quest?.title || "Featured world"}
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+
+            {/* Content below */}
+            <div className="bg-background flex flex-col gap-4 p-6">
+              {/* Featured Badge */}
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-primary h-4 w-4" />
+                <span className="text-primary text-xs font-semibold tracking-wider uppercase">
+                  Featured World
+                </span>
+              </div>
+
+              {/* Theme Badge */}
+              {themeOption && (
+                <Badge variant="outline" className="w-fit">
+                  {themeOption.label}
+                </Badge>
+              )}
+
+              {/* Title */}
+              <h1 className="text-2xl leading-tight font-bold">
+                {world.full_story.quest?.title || "Untitled World"}
+              </h1>
+
+              {/* Description */}
+              <p className="line-clamp-3 text-sm text-muted-foreground">
+                {world.full_story.quest?.description || "No description available"}
+              </p>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <span>by {world.user_name || "Unknown"}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  <span>{world.rating?.toFixed(1)}</span>
+                </div>
+                {world.active_sessions !== undefined &&
+                  world.active_sessions > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3 text-green-400" />
+                      <span className="text-green-400">
+                        {world.active_sessions} Active
+                      </span>
+                    </div>
+                  )}
+              </div>
+
+              {/* CTA */}
+              <PrimaryButton
+                onClick={() => router.push(`/worlds/${world.theme}/${world.id}`)}
+                className="w-fit text-sm"
+              >
+                Explore This World
+              </PrimaryButton>
+            </div>
+          </div>
+
+          {/* Desktop: Split layout */}
+          <div className="relative hidden h-[500px] md:block">
+            {/* Background gradient */}
+            <div className="from-background via-background/95 to-muted/90 absolute inset-0 bg-gradient-to-r" />
+
+            {/* Portrait on left side */}
+            <div className="absolute top-0 bottom-0 left-0 w-1/2">
+              <Image
+                fill
+                src={displayImage}
+                alt={world.full_story.quest?.title || "Featured world"}
+                className="object-cover object-center"
+                priority
+              />
+              <div className="to-background absolute inset-0 bg-gradient-to-r from-transparent" />
+            </div>
+
+            {/* Content on right side */}
+            <div className="absolute inset-y-0 right-0 flex w-1/2 flex-col justify-center gap-4 px-8 lg:px-12">
+              {/* Featured Badge */}
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-primary h-4 w-4" />
+                <span className="text-primary text-xs font-semibold tracking-wider uppercase">
+                  Featured World
+                </span>
+              </div>
+
+              {/* Theme Badge */}
+              {themeOption && (
+                <Badge variant="outline" className="w-fit">
+                  {themeOption.label}
+                </Badge>
+              )}
+
+              {/* Title */}
+              <h1 className="text-2xl leading-tight font-bold lg:text-3xl">
+                {world.full_story.quest?.title || "Untitled World"}
+              </h1>
+
+              {/* Description */}
+              <p className="line-clamp-3 text-sm text-muted-foreground">
+                {world.full_story.quest?.description || "No description available"}
+              </p>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <span>by {world.user_name || "Unknown"}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  <span>{world.rating?.toFixed(1)}</span>
+                </div>
+                {world.active_sessions !== undefined &&
+                  world.active_sessions > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3 text-green-400" />
+                      <span className="text-green-400">
+                        {world.active_sessions} Active
+                      </span>
+                    </div>
+                  )}
+              </div>
+
+              {/* CTA */}
+              <PrimaryButton
+                onClick={() => router.push(`/worlds/${world.theme}/${world.id}`)}
+                className="w-fit text-sm lg:text-base"
+              >
+                Explore This World
+              </PrimaryButton>
+            </div>
+          </div>
+        </section>
+      )}
+    </>
   );
 }

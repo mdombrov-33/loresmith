@@ -198,8 +198,8 @@ export default function SingleWorldHero({
               </div>
 
               {/* Dark gradient overlays for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
               {/* Title overlaid on image */}
               <div className="relative z-10 flex h-full flex-col justify-end p-6 md:p-8">
@@ -213,17 +213,16 @@ export default function SingleWorldHero({
           {displayImage && currentImageType === "portrait" && (
             // Split layout for character portraits
             <div className="hero-animate border-primary/20 relative aspect-[21/9] overflow-hidden rounded-xl border-2 shadow-2xl">
-              {imageLoading && (
-                <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
-                  <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
-                </div>
-              )}
-
               {/* Background gradient */}
               <div className="from-background via-background/95 to-muted/90 absolute inset-0 bg-gradient-to-r" />
 
               {/* Portrait on left side */}
               <div className="absolute top-0 bottom-0 left-0 w-1/2">
+                {imageLoading && (
+                  <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
+                  </div>
+                )}
                 <Image
                   key={displayImage}
                   src={displayImage}
@@ -241,7 +240,7 @@ export default function SingleWorldHero({
 
               {/* Title on right side */}
               <div className="absolute inset-y-0 right-0 flex w-1/2 items-center px-8 md:px-12">
-                <h1 className="font-heading text-foreground text-3xl font-bold md:text-4xl lg:text-5xl">
+                <h1 className="font-heading text-foreground text-xl font-bold md:text-3xl lg:text-4xl">
                   {parsedStory.quest?.title}
                 </h1>
               </div>
@@ -263,7 +262,7 @@ export default function SingleWorldHero({
             {/* Image toggle - show only if world scene exists */}
             {isOwner && currentWorldImageUrl && (
               <div className="border-border bg-background flex items-center gap-2 rounded-md border px-3 py-2">
-                <ImageIcon className="text-muted-foreground h-4 w-4" />
+                <ImageIcon className="h-4 w-4" />
                 <Label
                   htmlFor="image-toggle"
                   className="cursor-pointer text-sm"
