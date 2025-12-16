@@ -173,9 +173,45 @@ export default function SingleWorldHero({
   return (
     <>
       <div className="mb-10">
-        {/* Cinematic Hero - Letterbox Style */}
+        {/* Cinematic Hero - Conditional Layout */}
         <div className="relative mx-auto w-full max-w-6xl">
-          {displayImage && (
+          {displayImage && currentImageType === "world_scene" && (
+            // Full-width cinematic layout for world scenes
+            <div className="hero-animate border-primary/20 relative aspect-[21/9] w-full overflow-hidden rounded-xl border-2 shadow-2xl">
+              {imageLoading && (
+                <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
+                </div>
+              )}
+
+              {/* Full background image */}
+              <div className="absolute inset-0">
+                <Image
+                  key={displayImage}
+                  src={displayImage}
+                  alt={parsedStory.quest?.title || "World Scene"}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  onLoad={() => setImageLoading(false)}
+                />
+              </div>
+
+              {/* Dark gradient overlays for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+
+              {/* Title overlaid on image */}
+              <div className="relative z-10 flex h-full flex-col justify-end p-6 md:p-8">
+                <h1 className="font-heading text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+                  {parsedStory.quest?.title}
+                </h1>
+              </div>
+            </div>
+          )}
+
+          {displayImage && currentImageType === "portrait" && (
+            // Split layout for character portraits
             <div className="hero-animate border-primary/20 relative aspect-[21/9] overflow-hidden rounded-xl border-2 shadow-2xl">
               {imageLoading && (
                 <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
@@ -191,11 +227,7 @@ export default function SingleWorldHero({
                 <Image
                   key={displayImage}
                   src={displayImage}
-                  alt={
-                    currentImageType === "world_scene"
-                      ? parsedStory.quest?.title || "World Scene"
-                      : characterPiece?.name || "Character"
-                  }
+                  alt={characterPiece?.name || "Character"}
                   fill
                   className="object-cover object-center"
                   priority
