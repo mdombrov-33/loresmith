@@ -40,6 +40,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queries/keys";
 
 interface SingleWorldHeroProps {
   parsedStory: FullStory;
@@ -65,6 +67,7 @@ export default function SingleWorldHero({
     null,
   );
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAppStore();
   const deleteWorldMutation = useDeleteWorld();
   const deleteSessionMutation = useDeleteAdventureSession();
@@ -77,8 +80,14 @@ export default function SingleWorldHero({
       const data = result as { image_url?: string };
       const imageUrl = data?.image_url;
       if (imageUrl) {
-        setOptimisticImageUrl(imageUrl);
+        //* Optimistic UI update with cache-busting timestamp
+        const cacheBustedUrl = `${imageUrl}?t=${Date.now()}`;
+        setOptimisticImageUrl(cacheBustedUrl);
         setOptimisticImageType("world_scene");
+
+        //* Invalidate world query to fetch fresh data
+        queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
+        queryClient.invalidateQueries({ queryKey: ["worlds"] });
       }
     },
     (error) => {
