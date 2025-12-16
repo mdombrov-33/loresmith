@@ -159,14 +159,14 @@ export default function ExpandableWorldCards({
       </AnimatePresence>
       <AnimatePresence>
         {active ? (
-          <div className="fixed inset-0 z-[100] grid place-items-center">
+          <div className="fixed inset-0 z-[100] grid place-items-center p-4">
             <motion.button
               key={`button-${active.id}-${id}`}
               layout
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.05 } }}
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white lg:hidden"
+              className="absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-lg"
               onClick={() => {
                 document.body.style.overflow = "auto";
                 setActive(null);
@@ -177,7 +177,7 @@ export default function ExpandableWorldCards({
             <motion.div
               layoutId={`card-${active.id}-${id}`}
               ref={ref}
-              className="flex h-full w-full max-w-[500px] flex-col overflow-hidden bg-background dark:bg-neutral-900 md:h-fit md:max-h-[90%] sm:rounded-3xl"
+              className="flex w-full max-w-[500px] max-h-[90vh] flex-col overflow-hidden rounded-3xl bg-background shadow-2xl dark:bg-neutral-900"
             >
               <motion.div layoutId={`image-${active.id}-${id}`}>
                 {(() => {
