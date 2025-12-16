@@ -9,6 +9,7 @@ import ExpandableWorldCards from "@/components/discover/ExpandableWorldCards";
 import WorldFilters from "@/components/shared/WorldFilters";
 import { WorldGridSkeleton } from "@/components/discover/LoadingSkeletons";
 import { useAppStore } from "@/stores/appStore";
+import { World } from "@/lib/schemas";
 
 export default function MyWorlds() {
   const [activeTab, setActiveTab] = useState("my-worlds");
@@ -18,7 +19,9 @@ export default function MyWorlds() {
   const [playingTheme, setPlayingTheme] = useState("");
   const [playingStatus, setPlayingStatus] = useState("");
   const [playingSort, setPlayingSort] = useState("created_at_desc");
-  const [playingViewMode, setPlayingViewMode] = useState<"grid" | "row">("grid");
+  const [playingViewMode, setPlayingViewMode] = useState<"grid" | "row">(
+    "grid",
+  );
 
   // Use unified hook for my-worlds scope
   const {
@@ -34,8 +37,10 @@ export default function MyWorlds() {
     isAllWorldsLoading: myWorldsLoading,
   } = useWorldsLogic({ scope: "my", appStage: "my-worlds" });
 
-  // Filter to only worlds created by the current user
-  const myWorlds = myWorldsData.filter((world) => world.user_id === user?.id);
+  //* Filter to only worlds created by the current user
+  const myWorlds = myWorldsData.filter(
+    (world: World) => world.user_id === user?.id,
+  );
 
   //* Fetch playing worlds from "my" scope (includes private worlds with sessions, but no usernames)
   const { data: myPlayingWorldsData, isLoading: myPlayingWorldsLoading } =
@@ -48,35 +53,38 @@ export default function MyWorlds() {
     });
 
   //* Fetch playing worlds from "global" scope (published worlds with sessions + usernames)
-  const { data: globalPlayingWorldsData, isLoading: globalPlayingWorldsLoading } =
-    useWorlds({
-      scope: "global",
-      theme: playingTheme || undefined,
-      status: playingStatus || undefined,
-      sort: playingSort || undefined,
-      limit: 50,
-    });
+  const {
+    data: globalPlayingWorldsData,
+    isLoading: globalPlayingWorldsLoading,
+  } = useWorlds({
+    scope: "global",
+    theme: playingTheme || undefined,
+    status: playingStatus || undefined,
+    sort: playingSort || undefined,
+    limit: 50,
+  });
 
   const myPlayingWorlds = myPlayingWorldsData?.worlds || [];
   const globalPlayingWorlds = globalPlayingWorldsData?.worlds || [];
 
   //* Combine both, preferring "global" version (has usernames) over "my" version
   const worldMap = new Map();
-  // Add "my" worlds first (no usernames)
-  myPlayingWorlds.forEach((world) => {
+  //* Add "my" worlds first (no usernames)
+  myPlayingWorlds.forEach((world: World) => {
     if (world.session_id) {
       worldMap.set(world.id, world);
     }
   });
-  // Overwrite with "global" worlds (has usernames) if they exist
-  globalPlayingWorlds.forEach((world) => {
+  //* Overwrite with "global" worlds (has usernames) if they exist
+  globalPlayingWorlds.forEach((world: World) => {
     if (world.session_id) {
       worldMap.set(world.id, world);
     }
   });
   const activePlayingWorlds = Array.from(worldMap.values());
 
-  const playingWorldsLoading = myPlayingWorldsLoading || globalPlayingWorldsLoading;
+  const playingWorldsLoading =
+    myPlayingWorldsLoading || globalPlayingWorldsLoading;
 
   return (
     <main className="bg-background min-h-screen">
