@@ -552,12 +552,27 @@ func (e *GRPCExecutor) createWorld(ctx context.Context, job *Job) (interface{}, 
 					continue
 				}
 
-				portraitCtx, portraitCancel := context.WithTimeout(context.Background(), 5*time.Second)
-				base64Data, err := e.portraitStore.GetPortrait(portraitCtx, uuid)
-				portraitCancel()
+				// Retry fetching portrait from Redis up to 10 times (30 seconds total)
+				// Handles case where user selected character before portrait finished generating
+				var base64Data string
+				maxRetries := 10
+				for attempt := 0; attempt < maxRetries; attempt++ {
+					portraitCtx, portraitCancel := context.WithTimeout(context.Background(), 5*time.Second)
+					base64Data, err = e.portraitStore.GetPortrait(portraitCtx, uuid)
+					portraitCancel()
 
-				if err != nil || base64Data == "" {
-					e.logger.Printf("WARN: Portrait not ready for %s (UUID: %s)", piece.Name, uuid)
+					if err == nil && base64Data != "" {
+						break
+					}
+
+					if attempt < maxRetries-1 {
+						e.logger.Printf("Portrait not ready for %s (attempt %d/%d), waiting 3s...", piece.Name, attempt+1, maxRetries)
+						time.Sleep(3 * time.Second)
+					}
+				}
+
+				if base64Data == "" {
+					e.logger.Printf("WARN: Portrait still not ready after %d attempts for %s (UUID: %s)", maxRetries, piece.Name, uuid)
 					continue
 				}
 
