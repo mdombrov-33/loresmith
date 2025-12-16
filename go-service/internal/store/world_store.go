@@ -20,10 +20,12 @@ type World struct {
 	Theme          string          `json:"theme"`
 	FullStory      json.RawMessage `json:"full_story"`
 	LorePieces     []*LorePiece    `json:"lore_pieces,omitempty"`
-	SessionID      *int            `json:"session_id,omitempty"`
-	ActiveSessions *int            `json:"active_sessions,omitempty"`
-	PortraitURL    *string         `json:"portrait_url,omitempty"`
-	Visibility     string          `json:"visibility"`
+	SessionID       *int            `json:"session_id,omitempty"`
+	ActiveSessions  *int            `json:"active_sessions,omitempty"`
+	PortraitURL     *string         `json:"portrait_url,omitempty"`
+	ImageURL        *string         `json:"image_url,omitempty"`
+	ActiveImageType string          `json:"active_image_type"`
+	Visibility      string          `json:"visibility"`
 	Rating         *float64        `json:"rating,omitempty"`
 	UserRating     *int            `json:"user_rating,omitempty"`
 	RatingCount    *int            `json:"rating_count,omitempty"`
@@ -53,6 +55,8 @@ type WorldStore interface {
 	GetProtagonistForWorld(worldID int) (*LorePiece, error)
 	UpdateWorldStatus(worldID int, status string) error
 	UpdateWorldVisibility(worldID int, visibility string) error
+	UpdateWorldImage(worldID int, imageURL string) error
+	UpdateActiveImageType(worldID int, activeImageType string) error
 	UpdateLorePieceDetails(pieceID int, details map[string]interface{}) error
 	RateWorld(userID int, worldID int, rating int) error
 	GetWorldRating(worldID int) (*float64, *int, error)
@@ -214,11 +218,11 @@ func (s *PostgresWorldStore) CreateWorldWithEmbedding(userID int, theme string, 
 func (s *PostgresWorldStore) GetWorldById(worldID int) (*World, error) {
 	var world World
 	err := s.db.QueryRow(`
-        SELECT w.id, w.user_id, u.username, w.status, w.theme, w.full_story, w.visibility, w.created_at, w.updated_at
+        SELECT w.id, w.user_id, u.username, w.status, w.theme, w.full_story, w.image_url, w.active_image_type, w.visibility, w.created_at, w.updated_at
         FROM worlds w
         LEFT JOIN users u ON w.user_id = u.id
         WHERE w.id = $1
-    `, worldID).Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
+    `, worldID).Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &world.ImageURL, &world.ActiveImageType, &world.Visibility, &world.CreatedAt, &world.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -279,6 +283,8 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                 ORDER BY created_at DESC LIMIT 1) as session_id,
                w.visibility, w.created_at, w.updated_at,
                lp.details->>'image_portrait' as portrait_url,
+               w.image_url,
+               w.active_image_type,
                w.rating,
                (SELECT COUNT(DISTINCT user_id) FROM adventure_sessions
                 WHERE world_id = w.id AND status IN ('initializing', 'active')) as active_sessions_count
@@ -299,6 +305,8 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
                 ORDER BY created_at DESC LIMIT 1) as session_id,
                w.visibility, w.created_at, w.updated_at,
                lp.details->>'image_portrait' as portrait_url,
+               w.image_url,
+               w.active_image_type,
                w.rating,
                (SELECT COUNT(DISTINCT user_id) FROM adventure_sessions
                 WHERE world_id = w.id AND status IN ('initializing', 'active')) as active_sessions_count
@@ -389,9 +397,10 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		var world World
 		var sessionID sql.NullInt64
 		var portraitURL sql.NullString
+		var imageURL sql.NullString
 		var rating sql.NullFloat64
 		var activeSessions sql.NullInt64
-		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt, &portraitURL, &rating, &activeSessions)
+		err := rows.Scan(&world.ID, &world.UserID, &world.UserName, &world.Status, &world.Theme, &world.FullStory, &sessionID, &world.Visibility, &world.CreatedAt, &world.UpdatedAt, &portraitURL, &imageURL, &world.ActiveImageType, &rating, &activeSessions)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -401,6 +410,9 @@ func (s *PostgresWorldStore) GetWorldsByFilters(userID *int, theme *string, stat
 		}
 		if portraitURL.Valid && portraitURL.String != "" {
 			world.PortraitURL = &portraitURL.String
+		}
+		if imageURL.Valid && imageURL.String != "" {
+			world.ImageURL = &imageURL.String
 		}
 		if rating.Valid {
 			ratingFloat := rating.Float64
@@ -454,7 +466,9 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		        WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
 		        ORDER BY created_at DESC LIMIT 1) as session_id,
 		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding,
-		       lp.details->>'image_portrait' as portrait_url
+		       lp.details->>'image_portrait' as portrait_url,
+		       w.image_url,
+		       w.active_image_type
 		FROM worlds w
 		JOIN users u ON w.user_id = u.id
 		LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
@@ -471,7 +485,9 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		        WHERE world_id = w.id AND user_id = %d AND status IN ('initializing', 'active')
 		        ORDER BY created_at DESC LIMIT 1) as session_id,
 		       w.visibility, w.created_at, w.updated_at, (1 - (%s <=> $1))::float8 as relevance, w.%s as embedding,
-		       lp.details->>'image_portrait' as portrait_url
+		       lp.details->>'image_portrait' as portrait_url,
+		       w.image_url,
+		       w.active_image_type
 		FROM worlds w
 		LEFT JOIN lore_pieces lp ON w.id = lp.world_id AND lp.type = 'character'
 		WHERE w.%s IS NOT NULL`, currentUserID, column, column, column)
@@ -539,6 +555,7 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		var sessionID sql.NullInt64
 		var embedding pgvector.Vector
 		var portraitURL sql.NullString
+		var imageURL sql.NullString
 		err := rows.Scan(
 			&world.ID,
 			&world.UserID,
@@ -553,6 +570,8 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 			&world.Relevance,
 			&embedding,
 			&portraitURL,
+			&imageURL,
+			&world.ActiveImageType,
 		)
 		if err != nil {
 			return nil, 0, err
@@ -566,6 +585,9 @@ func (s *PostgresWorldStore) SearchWorldsByEmbedding(embedding []float32, userID
 		}
 		if portraitURL.Valid && portraitURL.String != "" {
 			world.PortraitURL = &portraitURL.String
+		}
+		if imageURL.Valid && imageURL.String != "" {
+			world.ImageURL = &imageURL.String
 		}
 		worlds = append(worlds, &world)
 	}
@@ -628,6 +650,26 @@ func (s *PostgresWorldStore) UpdateWorldVisibility(worldID int, visibility strin
 	WHERE id = $2
 	`
 	_, err := s.db.Exec(query, visibility, worldID)
+	return err
+}
+
+func (s *PostgresWorldStore) UpdateWorldImage(worldID int, imageURL string) error {
+	query := `
+	UPDATE worlds
+	SET image_url = $1, updated_at = NOW()
+	WHERE id = $2
+	`
+	_, err := s.db.Exec(query, imageURL, worldID)
+	return err
+}
+
+func (s *PostgresWorldStore) UpdateActiveImageType(worldID int, activeImageType string) error {
+	query := `
+	UPDATE worlds
+	SET active_image_type = $1, updated_at = NOW()
+	WHERE id = $2
+	`
+	_, err := s.db.Exec(query, activeImageType, worldID)
 	return err
 }
 

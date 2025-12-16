@@ -277,3 +277,23 @@ class UploadImageResponse(_message.Message):
     IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
     image_url: str
     def __init__(self, image_url: _Optional[str] = ...) -> None: ...
+
+class GenerateWorldImageRequest(_message.Message):
+    __slots__ = ("world_title", "full_story", "theme", "setting_description", "use_replicate")
+    WORLD_TITLE_FIELD_NUMBER: _ClassVar[int]
+    FULL_STORY_FIELD_NUMBER: _ClassVar[int]
+    THEME_FIELD_NUMBER: _ClassVar[int]
+    SETTING_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    USE_REPLICATE_FIELD_NUMBER: _ClassVar[int]
+    world_title: str
+    full_story: str
+    theme: str
+    setting_description: str
+    use_replicate: bool
+    def __init__(self, world_title: _Optional[str] = ..., full_story: _Optional[str] = ..., theme: _Optional[str] = ..., setting_description: _Optional[str] = ..., use_replicate: bool = ...) -> None: ...
+
+class GenerateWorldImageResponse(_message.Message):
+    __slots__ = ("image_base64",)
+    IMAGE_BASE64_FIELD_NUMBER: _ClassVar[int]
+    image_base64: str
+    def __init__(self, image_base64: _Optional[str] = ...) -> None: ...

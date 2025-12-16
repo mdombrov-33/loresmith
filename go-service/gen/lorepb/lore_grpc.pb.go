@@ -29,6 +29,7 @@ const (
 	LoreService_GenerateEmbedding_FullMethodName  = "/lore.LoreService/GenerateEmbedding"
 	LoreService_RerankResults_FullMethodName      = "/lore.LoreService/RerankResults"
 	LoreService_UploadImageToR2_FullMethodName    = "/lore.LoreService/UploadImageToR2"
+	LoreService_GenerateWorldImage_FullMethodName = "/lore.LoreService/GenerateWorldImage"
 )
 
 // LoreServiceClient is the client API for LoreService service.
@@ -45,6 +46,7 @@ type LoreServiceClient interface {
 	GenerateEmbedding(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error)
 	RerankResults(ctx context.Context, in *RerankSearchRequest, opts ...grpc.CallOption) (*RerankSearchResponse, error)
 	UploadImageToR2(ctx context.Context, in *UploadImageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
+	GenerateWorldImage(ctx context.Context, in *GenerateWorldImageRequest, opts ...grpc.CallOption) (*GenerateWorldImageResponse, error)
 }
 
 type loreServiceClient struct {
@@ -200,6 +202,16 @@ func (c *loreServiceClient) UploadImageToR2(ctx context.Context, in *UploadImage
 	return out, nil
 }
 
+func (c *loreServiceClient) GenerateWorldImage(ctx context.Context, in *GenerateWorldImageRequest, opts ...grpc.CallOption) (*GenerateWorldImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateWorldImageResponse)
+	err := c.cc.Invoke(ctx, LoreService_GenerateWorldImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LoreServiceServer is the server API for LoreService service.
 // All implementations must embed UnimplementedLoreServiceServer
 // for forward compatibility.
@@ -214,6 +226,7 @@ type LoreServiceServer interface {
 	GenerateEmbedding(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error)
 	RerankResults(context.Context, *RerankSearchRequest) (*RerankSearchResponse, error)
 	UploadImageToR2(context.Context, *UploadImageRequest) (*UploadImageResponse, error)
+	GenerateWorldImage(context.Context, *GenerateWorldImageRequest) (*GenerateWorldImageResponse, error)
 	mustEmbedUnimplementedLoreServiceServer()
 }
 
@@ -253,6 +266,9 @@ func (UnimplementedLoreServiceServer) RerankResults(context.Context, *RerankSear
 }
 func (UnimplementedLoreServiceServer) UploadImageToR2(context.Context, *UploadImageRequest) (*UploadImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadImageToR2 not implemented")
+}
+func (UnimplementedLoreServiceServer) GenerateWorldImage(context.Context, *GenerateWorldImageRequest) (*GenerateWorldImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateWorldImage not implemented")
 }
 func (UnimplementedLoreServiceServer) mustEmbedUnimplementedLoreServiceServer() {}
 func (UnimplementedLoreServiceServer) testEmbeddedByValue()                     {}
@@ -420,6 +436,24 @@ func _LoreService_UploadImageToR2_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LoreService_GenerateWorldImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateWorldImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LoreServiceServer).GenerateWorldImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LoreService_GenerateWorldImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LoreServiceServer).GenerateWorldImage(ctx, req.(*GenerateWorldImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LoreService_ServiceDesc is the grpc.ServiceDesc for LoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -446,6 +480,10 @@ var LoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadImageToR2",
 			Handler:    _LoreService_UploadImageToR2_Handler,
+		},
+		{
+			MethodName: "GenerateWorldImage",
+			Handler:    _LoreService_GenerateWorldImage_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

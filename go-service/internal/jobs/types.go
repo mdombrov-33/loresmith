@@ -11,6 +11,7 @@ const (
 	JobTypeGenerateEvents     JobType = "generate_events"
 	JobTypeGenerateRelics     JobType = "generate_relics"
 	JobTypeCreateWorld        JobType = "create_world"
+	JobTypeGenerateWorldImage JobType = "generate_world_image"
 )
 
 type JobStatus string

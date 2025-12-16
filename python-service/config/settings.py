@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     AWS_ENDPOINT_URL: str = ""
     R2_PORTRAITS_BUCKET_NAME: str = ""
     R2_PORTRAITS_PUBLIC_URL: str = ""
+    R2_WORLD_IMAGES_BUCKET_NAME: str = ""
+    R2_WORLD_IMAGES_PUBLIC_URL: str = ""
 
 
 @lru_cache()

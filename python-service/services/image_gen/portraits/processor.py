@@ -116,8 +116,8 @@ async def upload_image_to_r2(
     Args:
         image_data: Raw image bytes
         world_id: Real world ID from database
-        character_id: Character UUID
-        image_type: "portrait" or "card"
+        character_id: Character UUID or "world" for world images
+        image_type: "portrait", "card", or "world_scene"
 
     Returns:
         Full R2 public URL
@@ -125,21 +125,29 @@ async def upload_image_to_r2(
     if not s3_client:
         raise Exception("R2 client not initialized. Check AWS credentials in .env")
 
-    # Object key: portraits/{world_id}/{character_id}_portrait.png
-    key = f"portraits/{world_id}/{character_id}_{image_type}.png"
+    # Select bucket and build key based on image type
+    if image_type == "world_scene":
+        bucket = settings.R2_WORLD_IMAGES_BUCKET_NAME
+        public_url = settings.R2_WORLD_IMAGES_PUBLIC_URL
+        key = f"worlds/{world_id}/scene.png"
+    else:
+        # Portrait or card images
+        bucket = settings.R2_PORTRAITS_BUCKET_NAME
+        public_url = settings.R2_PORTRAITS_PUBLIC_URL
+        key = f"portraits/{world_id}/{character_id}_{image_type}.png"
 
     try:
         # Upload to R2
         s3_client.put_object(
-            Bucket=settings.R2_PORTRAITS_BUCKET_NAME,
+            Bucket=bucket,
             Key=key,
             Body=image_data,
             ContentType="image/png",
         )
-        logger.info(f"Uploaded image to R2: {key}")
+        logger.info(f"Uploaded {image_type} image to R2: {key}")
 
         # Return full public URL
-        return f"{settings.R2_PORTRAITS_PUBLIC_URL}/{key}"
+        return f"{public_url}/{key}"
 
     except ClientError as e:
         logger.error(f"Failed to upload to R2: {e}")

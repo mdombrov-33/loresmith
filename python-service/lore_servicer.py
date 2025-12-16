@@ -26,6 +26,7 @@ from services.embedding_client import (
     generate_content_embedding,
 )
 from services.image_gen.portraits.processor import upload_image_to_r2
+from services.image_gen.worlds.generator import generate_world_image
 
 
 class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
@@ -594,6 +595,41 @@ class LoreServicer(lore_pb2_grpc.LoreServiceServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Image upload failed: {str(e)}")
             return lore_pb2.UploadImageResponse()
+
+    async def GenerateWorldImage(self, request, context):
+        """
+        Generate a world scene/environment image based on world story.
+
+        NOTE: Uses whatever model is loaded in Automatic1111 (local) or
+        SDXL via Replicate API. For better results with Automatic1111,
+        load a landscape/environment-focused model before calling.
+        """
+        try:
+            if not request.world_title or not request.full_story:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("world_title and full_story are required")
+                return lore_pb2.GenerateWorldImageResponse()
+
+            # Determine provider (default to Automatic1111)
+            use_replicate = getattr(request, "use_replicate", False)
+
+            # Generate world image
+            image_base64 = await generate_world_image(
+                world_title=request.world_title,
+                full_story=request.full_story,
+                theme=request.theme or "fantasy",
+                setting_description=getattr(request, "setting_description", ""),
+                use_replicate=use_replicate,
+            )
+
+            logger.info(f"World image generated for '{request.world_title}'")
+            return lore_pb2.GenerateWorldImageResponse(image_base64=image_base64)
+
+        except Exception as e:
+            logger.error(f"World image generation failed: {str(e)}", exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"World image generation failed: {str(e)}")
+            return lore_pb2.GenerateWorldImageResponse()
 
     # * Adventure Methods
     # TODO: Add adventure session management methods

@@ -180,16 +180,22 @@ export default function ExpandableWorldCards({
               className="flex h-full w-full max-w-[500px] flex-col overflow-hidden bg-background dark:bg-neutral-900 md:h-fit md:max-h-[90%] sm:rounded-3xl"
             >
               <motion.div layoutId={`image-${active.id}-${id}`}>
-                {active.portrait_url && (
-                  <div className="relative h-80 w-full overflow-hidden lg:h-80 sm:rounded-tl-lg sm:rounded-tr-lg">
-                    <Image
-                      fill
-                      src={active.portrait_url}
-                      alt={active.full_story.quest?.title || "World portrait"}
-                      className="object-cover object-[50%_20%]"
-                    />
-                  </div>
-                )}
+                {(() => {
+                  const displayImage = active.active_image_type === "world_scene" && active.image_url
+                    ? active.image_url
+                    : active.portrait_url;
+
+                  return displayImage ? (
+                    <div className="relative h-80 w-full overflow-hidden lg:h-80 sm:rounded-tl-lg sm:rounded-tr-lg">
+                      <Image
+                        fill
+                        src={displayImage}
+                        alt={active.full_story.quest?.title || "World image"}
+                        className="object-cover object-[50%_20%]"
+                      />
+                    </div>
+                  ) : null;
+                })()}
               </motion.div>
 
               <div>
@@ -331,17 +337,23 @@ export default function ExpandableWorldCards({
               >
                 <div className="flex flex-row items-center gap-3 md:gap-4">
                   <motion.div layoutId={`image-${world.id}-${id}`}>
-                    {world.portrait_url && (
-                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg md:h-20 md:w-20">
-                        <Image
-                          fill
-                          src={world.portrait_url}
-                          alt={world.full_story.quest?.title || "World portrait"}
-                          className="object-cover object-[50%_20%]"
-                          sizes="80px"
-                        />
-                      </div>
-                    )}
+                    {(() => {
+                      const displayImage = world.active_image_type === "world_scene" && world.image_url
+                        ? world.image_url
+                        : world.portrait_url;
+
+                      return displayImage ? (
+                        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg md:h-20 md:w-20">
+                          <Image
+                            fill
+                            src={displayImage}
+                            alt={world.full_story.quest?.title || "World image"}
+                            className="object-cover object-[50%_20%]"
+                            sizes="80px"
+                          />
+                        </div>
+                      ) : null;
+                    })()}
                   </motion.div>
                   <div className="flex flex-1 flex-col gap-1 md:gap-2">
                     <motion.h3
@@ -416,17 +428,23 @@ export default function ExpandableWorldCards({
             >
               <div className="flex w-full flex-col gap-4">
                 <motion.div layoutId={`image-${world.id}-${id}`}>
-                  {world.portrait_url && (
-                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
-                      <Image
-                        fill
-                        src={world.portrait_url}
-                        alt={world.full_story.quest?.title || "World portrait"}
-                        className="object-cover object-[50%_20%]"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    </div>
-                  )}
+                  {(() => {
+                    const displayImage = world.active_image_type === "world_scene" && world.image_url
+                      ? world.image_url
+                      : world.portrait_url;
+
+                    return displayImage ? (
+                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                        <Image
+                          fill
+                          src={displayImage}
+                          alt={world.full_story.quest?.title || "World image"}
+                          className="object-cover object-[50%_20%]"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    ) : null;
+                  })()}
                 </motion.div>
                 <div className="flex flex-col items-center justify-center gap-2">
                   <motion.h3

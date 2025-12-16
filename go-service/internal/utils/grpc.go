@@ -12,6 +12,7 @@ const (
 	OpGenerateLore       OperationType = "generate_lore"        //* 5 minutes - LLM calls + image generation
 	OpGenerateFullStory  OperationType = "generate_full_story"  //* 5 minutes - full quest generation
 	OpGenerateSceneBatch OperationType = "generate_scene_batch" //* 5 minutes - multiple scenes with branches
+	OpGenerateWorldImage OperationType = "generate_world_image" //* 3 minutes - world scene generation
 
 	//* Medium operations
 	OpGenerateBeats     OperationType = "generate_beats"     //* 1 minute - expand scene beats
@@ -30,6 +31,7 @@ var operationTimeouts = map[OperationType]time.Duration{
 	OpGenerateLore:       5 * time.Minute,
 	OpGenerateFullStory:  5 * time.Minute,
 	OpGenerateSceneBatch: 5 * time.Minute,
+	OpGenerateWorldImage: 3 * time.Minute, //* World scene generation
 
 	//* Medium operations (1 minute)
 	OpGenerateBeats:     1 * time.Minute,

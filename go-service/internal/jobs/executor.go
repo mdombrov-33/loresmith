@@ -69,6 +69,8 @@ func (e *GRPCExecutor) Execute(ctx context.Context, job *Job) error {
 		result, err = e.generateRelics(ctx, job)
 	case JobTypeCreateWorld:
 		result, err = e.createWorld(ctx, job)
+	case JobTypeGenerateWorldImage:
+		result, err = e.generateWorldImage(ctx, job)
 	default:
 		return fmt.Errorf("unknown job type: %s", job.Type)
 	}
@@ -552,8 +554,8 @@ func (e *GRPCExecutor) createWorld(ctx context.Context, job *Job) (interface{}, 
 					continue
 				}
 
-				// Retry fetching portrait from Redis up to 10 times (30 seconds total)
-				// Handles case where user selected character before portrait finished generating
+				//* Retry fetching portrait from Redis up to 10 times (30 seconds total)
+				//* Handles case where user selected character before portrait finished generating
 				var base64Data string
 				maxRetries := 10
 				for attempt := 0; attempt < maxRetries; attempt++ {
@@ -602,6 +604,115 @@ func (e *GRPCExecutor) createWorld(ctx context.Context, job *Job) (interface{}, 
 
 	result := map[string]interface{}{
 		"world_id": worldID,
+	}
+
+	return result, nil
+}
+
+func (e *GRPCExecutor) generateWorldImage(ctx context.Context, job *Job) (interface{}, error) {
+	worldID := e.getIntPayload(job, "world_id", 0)
+	if worldID == 0 {
+		return nil, fmt.Errorf("world_id is required")
+	}
+
+	e.store.Update(ctx, job.ID, JobUpdate{
+		Progress: intPtr(10),
+		Message:  "Fetching world data...",
+	})
+
+	//* Fetch world from database
+	world, err := e.worldStore.GetWorldById(worldID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch world: %w", err)
+	}
+	if world == nil {
+		return nil, fmt.Errorf("world not found: %d", worldID)
+	}
+
+	//* Parse FullStory JSON to extract title and content
+	var fullStory struct {
+		Content string            `json:"content"`
+		Quest   map[string]string `json:"quest"`
+	}
+	if err := json.Unmarshal(world.FullStory, &fullStory); err != nil {
+		return nil, fmt.Errorf("failed to parse full story: %w", err)
+	}
+
+	worldTitle := fullStory.Quest["title"]
+	if worldTitle == "" {
+		worldTitle = "Untitled World"
+	}
+
+	e.store.Update(ctx, job.ID, JobUpdate{
+		Progress: intPtr(20),
+		Message:  "Generating world image...",
+	})
+
+	//* Extract setting description from lore pieces
+	settingDescription := ""
+	for _, piece := range world.LorePieces {
+		if piece.Type == "setting" {
+			settingDescription = piece.Description
+			break
+		}
+	}
+
+	//* Call Python service to generate world image
+	grpcCtx, grpcCancel := utils.NewGRPCContext(utils.OpGenerateWorldImage)
+	defer grpcCancel()
+
+	grpcResp, err := e.loreClient.GenerateWorldImage(grpcCtx, &lorepb.GenerateWorldImageRequest{
+		WorldTitle:         worldTitle,
+		FullStory:          fullStory.Content,
+		Theme:              world.Theme,
+		SettingDescription: settingDescription,
+		UseReplicate:       false, //* Default to Automatic1111
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate world image: %w", err)
+	}
+
+	if grpcResp.ImageBase64 == "" {
+		return nil, fmt.Errorf("no image returned from Python service")
+	}
+
+	e.store.Update(ctx, job.ID, JobUpdate{
+		Progress: intPtr(70),
+		Message:  "Uploading world image to R2...",
+	})
+
+	//* Upload image to R2
+	uploadCtx, uploadCancel := utils.NewGRPCContext(utils.OpUploadImage)
+	defer uploadCancel()
+
+	uploadResp, err := e.loreClient.UploadImageToR2(uploadCtx, &lorepb.UploadImageRequest{
+		ImageBase64: grpcResp.ImageBase64,
+		WorldId:     int64(worldID),
+		CharacterId: "world",       //* Use "world" as identifier for world images
+		ImageType:   "world_scene", //* Different type from character portraits
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload world image: %w", err)
+	}
+
+	e.store.Update(ctx, job.ID, JobUpdate{
+		Progress: intPtr(90),
+		Message:  "Updating world record...",
+	})
+
+	//* Update world with image URL
+	if err := e.worldStore.UpdateWorldImage(worldID, uploadResp.ImageUrl); err != nil {
+		return nil, fmt.Errorf("failed to update world image: %w", err)
+	}
+
+	//* Auto-switch to world_scene after generation
+	if err := e.worldStore.UpdateActiveImageType(worldID, "world_scene"); err != nil {
+		return nil, fmt.Errorf("failed to update active image type: %w", err)
+	}
+
+	result := map[string]interface{}{
+		"world_id":  worldID,
+		"image_url": uploadResp.ImageUrl,
 	}
 
 	return result, nil

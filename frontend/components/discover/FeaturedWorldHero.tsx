@@ -46,15 +46,19 @@ export default function FeaturedWorldHero({ world }: FeaturedWorldHeroProps) {
 
   const themeOption = THEME_OPTIONS.find((t) => t.value === world.theme);
 
+  const displayImage = world.active_image_type === "world_scene" && world.image_url
+    ? world.image_url
+    : world.portrait_url;
+
   return (
     <section className="relative h-[500px] w-full overflow-hidden rounded-3xl">
       {/* Background Image with Overlay */}
-      {world.portrait_url && (
+      {displayImage && (
         <>
           <div className="absolute inset-0">
             <Image
               fill
-              src={world.portrait_url}
+              src={displayImage}
               alt={world.full_story.quest?.title || "Featured world"}
               className="h-full object-cover object-top"
               priority

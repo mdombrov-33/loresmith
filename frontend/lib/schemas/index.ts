@@ -90,6 +90,8 @@ export const worldSchema = z.object({
   session_id: z.number().optional(),
   active_sessions: z.number().optional(),
   portrait_url: z.string().optional(),
+  image_url: z.string().optional(),
+  active_image_type: z.string(),
   visibility: z.string(),
   rating: z.number().optional(),
   user_rating: z.number().optional(),

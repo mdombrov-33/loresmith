@@ -4,11 +4,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, Eye, EyeOff } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Loader2,
+  Trash2,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Image as ImageIcon,
+} from "lucide-react";
 import { FullStory, LorePiece, World } from "@/lib/schemas";
 import { useAppStore } from "@/stores/appStore";
-import { useDeleteWorld, useUpdateWorldVisibility } from "@/lib/queries/world";
-import { useCheckActiveSession, useDeleteAdventureSession } from "@/lib/queries/adventure";
+import {
+  useDeleteWorld,
+  useUpdateWorldVisibility,
+  useUpdateActiveImageType,
+} from "@/lib/queries/world";
+import {
+  useCheckActiveSession,
+  useDeleteAdventureSession,
+} from "@/lib/queries/adventure";
+import { useGenerateWorldImage } from "@/lib/queries/worldImage";
 import {
   Dialog,
   DialogContent,
@@ -40,12 +57,34 @@ export default function SingleWorldHero({
 }: SingleWorldHeroProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isTogglingImage, setIsTogglingImage] = useState(false);
+  const [optimisticImageType, setOptimisticImageType] = useState<string | null>(
+    null,
+  );
+  const [optimisticImageUrl, setOptimisticImageUrl] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
   const { user } = useAppStore();
   const deleteWorldMutation = useDeleteWorld();
   const deleteSessionMutation = useDeleteAdventureSession();
   const updateVisibilityMutation = useUpdateWorldVisibility();
+  const updateActiveImageTypeMutation = useUpdateActiveImageType();
   const { data: sessionCheck } = useCheckActiveSession(worldId);
+
+  const { generate: generateWorldImage, isGenerating } = useGenerateWorldImage(
+    (result: unknown) => {
+      const data = result as { image_url?: string };
+      const imageUrl = data?.image_url;
+      if (imageUrl) {
+        setOptimisticImageUrl(imageUrl);
+        setOptimisticImageType("world_scene");
+      }
+    },
+    (error) => {
+      console.error("World image generation failed:", error);
+    },
+  );
 
   const isOwner = world && user && world.user_id === user.id;
   const hasSession = sessionCheck?.has_active_session ?? false;
@@ -53,12 +92,22 @@ export default function SingleWorldHero({
   const characterImage = (characterPiece?.details?.image_portrait ||
     characterPiece?.details?.image) as string | undefined;
 
+  //* Use optimistic state if available, otherwise use database value
+  const currentImageType = optimisticImageType ?? world?.active_image_type;
+  const currentWorldImageUrl = optimisticImageUrl ?? world?.image_url;
+
+  //* Determine which image to display
+  const displayImage =
+    currentImageType === "world_scene" && currentWorldImageUrl
+      ? currentWorldImageUrl
+      : characterImage;
+
   const handleDeleteClick = () => {
     setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    // If user has an active session, delete the session instead of the world
+    //* If user has an active session, delete the session instead of the world
     if (hasSession && sessionCheck?.session?.id) {
       deleteSessionMutation.mutate(sessionCheck.session.id, {
         onSuccess: () => {
@@ -67,7 +116,7 @@ export default function SingleWorldHero({
         },
       });
     } else if (world) {
-      // No active session, delete the world
+      //* No active session, delete the world
       deleteWorldMutation.mutate(world.id, {
         onSuccess: () => {
           setIsDeleteDialogOpen(false);
@@ -88,12 +137,45 @@ export default function SingleWorldHero({
     }
   };
 
+  const handleGenerateWorldImage = () => {
+    if (world) {
+      generateWorldImage(world.id);
+    }
+  };
+
+  const handleToggleImage = (checked: boolean) => {
+    if (!world) return;
+
+    const activeImageType = checked ? "world_scene" : "portrait";
+
+    //* Optimistically update UI immediately
+    setOptimisticImageType(activeImageType);
+    setIsTogglingImage(true);
+    setImageLoading(true);
+
+    updateActiveImageTypeMutation.mutate(
+      { worldId: world.id, activeImageType },
+      {
+        onSuccess: () => {
+          //* Success - optimistic state is correct
+          setIsTogglingImage(false);
+        },
+        onError: (error) => {
+          console.error("Failed to toggle image:", error);
+          //* Rollback optimistic update on failure
+          setOptimisticImageType(world.active_image_type);
+          setIsTogglingImage(false);
+        },
+      },
+    );
+  };
+
   return (
     <>
       <div className="mb-10">
         {/* Cinematic Hero - Letterbox Style */}
         <div className="relative mx-auto w-full max-w-6xl">
-          {characterImage && (
+          {displayImage && (
             <div className="hero-animate border-primary/20 relative aspect-[21/9] overflow-hidden rounded-xl border-2 shadow-2xl">
               {imageLoading && (
                 <div className="bg-muted/30 absolute inset-0 flex items-center justify-center">
@@ -107,8 +189,13 @@ export default function SingleWorldHero({
               {/* Portrait on left side */}
               <div className="absolute top-0 bottom-0 left-0 w-1/2">
                 <Image
-                  src={characterImage}
-                  alt={characterPiece?.name || "Character"}
+                  key={displayImage}
+                  src={displayImage}
+                  alt={
+                    currentImageType === "world_scene"
+                      ? parsedStory.quest?.title || "World Scene"
+                      : characterPiece?.name || "Character"
+                  }
                   fill
                   className="object-cover object-center"
                   priority
@@ -129,7 +216,7 @@ export default function SingleWorldHero({
             </div>
           )}
 
-          {!characterImage && (
+          {!displayImage && (
             <div className="hero-animate mx-auto max-w-4xl py-8">
               <h1 className="from-foreground to-foreground/70 font-heading bg-gradient-to-br bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl lg:text-5xl">
                 {parsedStory.quest?.title}
@@ -141,6 +228,27 @@ export default function SingleWorldHero({
         {/* Owner/Session actions */}
         {(isOwner || hasSession) && (
           <div className="mx-auto mt-6 flex max-w-6xl flex-wrap items-center justify-start gap-3 px-2">
+            {/* Image toggle - show only if world scene exists */}
+            {isOwner && currentWorldImageUrl && (
+              <div className="border-border bg-background flex items-center gap-2 rounded-md border px-3 py-2">
+                <ImageIcon className="text-muted-foreground h-4 w-4" />
+                <Label
+                  htmlFor="image-toggle"
+                  className="cursor-pointer text-sm"
+                >
+                  {currentImageType === "world_scene"
+                    ? "World Scene"
+                    : "Character Portrait"}
+                </Label>
+                <Switch
+                  id="image-toggle"
+                  checked={currentImageType === "world_scene"}
+                  onCheckedChange={handleToggleImage}
+                  disabled={isTogglingImage}
+                />
+              </div>
+            )}
+
             {/* Visibility toggle - only for owners */}
             {isOwner && (
               <TooltipProvider>
@@ -174,12 +282,47 @@ export default function SingleWorldHero({
                 </Tooltip>
               </TooltipProvider>
             )}
+
+            {/* Generate World Image button - only for owners */}
+            {isOwner && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateWorldImage}
+                      disabled={isGenerating}
+                      className="gap-2"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Generate Image
+                        </>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Generate a world scene image based on your story
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
             {/* Delete button - for owners (delete world) or sessions (end adventure) */}
             <Button
               variant="outline"
               size="sm"
               onClick={handleDeleteClick}
-              disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
+              disabled={
+                deleteWorldMutation.isPending || deleteSessionMutation.isPending
+              }
               className="gap-2"
             >
               <Trash2 className="h-4 w-4" />
@@ -193,15 +336,20 @@ export default function SingleWorldHero({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{hasSession ? "End Adventure" : "Delete World"}</DialogTitle>
+            <DialogTitle>
+              {hasSession ? "End Adventure" : "Delete World"}
+            </DialogTitle>
             <DialogDescription>
               {hasSession ? (
                 <>
-                  Are you sure you want to end your adventure session in &quot;{parsedStory.quest?.title || "this world"}&quot;?
+                  Are you sure you want to end your adventure session in &quot;
+                  {parsedStory.quest?.title || "this world"}&quot;?
                 </>
               ) : (
                 <>
-                  Are you sure you want to delete &quot;{parsedStory.quest?.title || "this world"}&quot;? This action cannot be undone.
+                  Are you sure you want to delete &quot;
+                  {parsedStory.quest?.title || "this world"}&quot;? This action
+                  cannot be undone.
                 </>
               )}
             </DialogDescription>
@@ -210,16 +358,24 @@ export default function SingleWorldHero({
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
+              disabled={
+                deleteWorldMutation.isPending || deleteSessionMutation.isPending
+              }
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              disabled={deleteWorldMutation.isPending || deleteSessionMutation.isPending}
+              disabled={
+                deleteWorldMutation.isPending || deleteSessionMutation.isPending
+              }
             >
-              {(deleteWorldMutation.isPending || deleteSessionMutation.isPending) ? "Deleting..." : (hasSession ? "End Adventure" : "Delete World")}
+              {deleteWorldMutation.isPending || deleteSessionMutation.isPending
+                ? "Deleting..."
+                : hasSession
+                  ? "End Adventure"
+                  : "Delete World"}
             </Button>
           </DialogFooter>
         </DialogContent>

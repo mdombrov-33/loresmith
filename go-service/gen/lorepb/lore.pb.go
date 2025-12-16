@@ -1805,6 +1805,126 @@ func (x *UploadImageResponse) GetImageUrl() string {
 	return ""
 }
 
+type GenerateWorldImageRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	WorldTitle         string                 `protobuf:"bytes,1,opt,name=world_title,json=worldTitle,proto3" json:"world_title,omitempty"`
+	FullStory          string                 `protobuf:"bytes,2,opt,name=full_story,json=fullStory,proto3" json:"full_story,omitempty"`
+	Theme              string                 `protobuf:"bytes,3,opt,name=theme,proto3" json:"theme,omitempty"`
+	SettingDescription string                 `protobuf:"bytes,4,opt,name=setting_description,json=settingDescription,proto3" json:"setting_description,omitempty"`
+	UseReplicate       bool                   `protobuf:"varint,5,opt,name=use_replicate,json=useReplicate,proto3" json:"use_replicate,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *GenerateWorldImageRequest) Reset() {
+	*x = GenerateWorldImageRequest{}
+	mi := &file_lore_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateWorldImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateWorldImageRequest) ProtoMessage() {}
+
+func (x *GenerateWorldImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateWorldImageRequest.ProtoReflect.Descriptor instead.
+func (*GenerateWorldImageRequest) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GenerateWorldImageRequest) GetWorldTitle() string {
+	if x != nil {
+		return x.WorldTitle
+	}
+	return ""
+}
+
+func (x *GenerateWorldImageRequest) GetFullStory() string {
+	if x != nil {
+		return x.FullStory
+	}
+	return ""
+}
+
+func (x *GenerateWorldImageRequest) GetTheme() string {
+	if x != nil {
+		return x.Theme
+	}
+	return ""
+}
+
+func (x *GenerateWorldImageRequest) GetSettingDescription() string {
+	if x != nil {
+		return x.SettingDescription
+	}
+	return ""
+}
+
+func (x *GenerateWorldImageRequest) GetUseReplicate() bool {
+	if x != nil {
+		return x.UseReplicate
+	}
+	return false
+}
+
+type GenerateWorldImageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ImageBase64   string                 `protobuf:"bytes,1,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateWorldImageResponse) Reset() {
+	*x = GenerateWorldImageResponse{}
+	mi := &file_lore_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateWorldImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateWorldImageResponse) ProtoMessage() {}
+
+func (x *GenerateWorldImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lore_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateWorldImageResponse.ProtoReflect.Descriptor instead.
+func (*GenerateWorldImageResponse) Descriptor() ([]byte, []int) {
+	return file_lore_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GenerateWorldImageResponse) GetImageBase64() string {
+	if x != nil {
+		return x.ImageBase64
+	}
+	return ""
+}
+
 var File_lore_proto protoreflect.FileDescriptor
 
 const file_lore_proto_rawDesc = "" +
@@ -1933,7 +2053,17 @@ const file_lore_proto_rawDesc = "" +
 	"\n" +
 	"image_type\x18\x04 \x01(\tR\timageType\"2\n" +
 	"\x13UploadImageResponse\x12\x1b\n" +
-	"\timage_url\x18\x01 \x01(\tR\bimageUrl2\xce\x05\n" +
+	"\timage_url\x18\x01 \x01(\tR\bimageUrl\"\xc7\x01\n" +
+	"\x19GenerateWorldImageRequest\x12\x1f\n" +
+	"\vworld_title\x18\x01 \x01(\tR\n" +
+	"worldTitle\x12\x1d\n" +
+	"\n" +
+	"full_story\x18\x02 \x01(\tR\tfullStory\x12\x14\n" +
+	"\x05theme\x18\x03 \x01(\tR\x05theme\x12/\n" +
+	"\x13setting_description\x18\x04 \x01(\tR\x12settingDescription\x12#\n" +
+	"\ruse_replicate\x18\x05 \x01(\bR\fuseReplicate\"?\n" +
+	"\x1aGenerateWorldImageResponse\x12!\n" +
+	"\fimage_base64\x18\x01 \x01(\tR\vimageBase642\xa7\x06\n" +
 	"\vLoreService\x12O\n" +
 	"\x12GenerateCharacters\x12\x17.lore.CharactersRequest\x1a\x1e.lore.CharactersStreamResponse0\x01\x12I\n" +
 	"\x10GenerateFactions\x12\x15.lore.FactionsRequest\x1a\x1c.lore.FactionsStreamResponse0\x01\x12I\n" +
@@ -1944,7 +2074,8 @@ const file_lore_proto_rawDesc = "" +
 	"\x11GenerateFullStory\x12\x16.lore.FullStoryRequest\x1a\x17.lore.FullStoryResponse\x12D\n" +
 	"\x11GenerateEmbedding\x12\x16.lore.EmbeddingRequest\x1a\x17.lore.EmbeddingResponse\x12F\n" +
 	"\rRerankResults\x12\x19.lore.RerankSearchRequest\x1a\x1a.lore.RerankSearchResponse\x12F\n" +
-	"\x0fUploadImageToR2\x12\x18.lore.UploadImageRequest\x1a\x19.lore.UploadImageResponseB\fZ\n" +
+	"\x0fUploadImageToR2\x12\x18.lore.UploadImageRequest\x1a\x19.lore.UploadImageResponse\x12W\n" +
+	"\x12GenerateWorldImage\x12\x1f.lore.GenerateWorldImageRequest\x1a .lore.GenerateWorldImageResponseB\fZ\n" +
 	"gen/lorepbb\x06proto3"
 
 var (
@@ -1959,46 +2090,48 @@ func file_lore_proto_rawDescGZIP() []byte {
 	return file_lore_proto_rawDescData
 }
 
-var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_lore_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_lore_proto_goTypes = []any{
-	(*CharactersRequest)(nil),        // 0: lore.CharactersRequest
-	(*FactionsRequest)(nil),          // 1: lore.FactionsRequest
-	(*SettingsRequest)(nil),          // 2: lore.SettingsRequest
-	(*EventsRequest)(nil),            // 3: lore.EventsRequest
-	(*RelicsRequest)(nil),            // 4: lore.RelicsRequest
-	(*LorePiece)(nil),                // 5: lore.LorePiece
-	(*CharactersResponse)(nil),       // 6: lore.CharactersResponse
-	(*FactionsResponse)(nil),         // 7: lore.FactionsResponse
-	(*SettingsResponse)(nil),         // 8: lore.SettingsResponse
-	(*EventsResponse)(nil),           // 9: lore.EventsResponse
-	(*RelicsResponse)(nil),           // 10: lore.RelicsResponse
-	(*GenerationProgress)(nil),       // 11: lore.GenerationProgress
-	(*CharactersStreamResponse)(nil), // 12: lore.CharactersStreamResponse
-	(*FactionsStreamResponse)(nil),   // 13: lore.FactionsStreamResponse
-	(*SettingsStreamResponse)(nil),   // 14: lore.SettingsStreamResponse
-	(*EventsStreamResponse)(nil),     // 15: lore.EventsStreamResponse
-	(*RelicsStreamResponse)(nil),     // 16: lore.RelicsStreamResponse
-	(*AllRequest)(nil),               // 17: lore.AllRequest
-	(*AllResponse)(nil),              // 18: lore.AllResponse
-	(*SelectedLorePieces)(nil),       // 19: lore.SelectedLorePieces
-	(*FullStory)(nil),                // 20: lore.FullStory
-	(*FullStoryRequest)(nil),         // 21: lore.FullStoryRequest
-	(*FullStoryResponse)(nil),        // 22: lore.FullStoryResponse
-	(*EmbeddingRequest)(nil),         // 23: lore.EmbeddingRequest
-	(*EmbeddingResponse)(nil),        // 24: lore.EmbeddingResponse
-	(*WorldResult)(nil),              // 25: lore.WorldResult
-	(*RerankSearchRequest)(nil),      // 26: lore.RerankSearchRequest
-	(*RerankSearchResponse)(nil),     // 27: lore.RerankSearchResponse
-	(*UploadImageRequest)(nil),       // 28: lore.UploadImageRequest
-	(*UploadImageResponse)(nil),      // 29: lore.UploadImageResponse
-	nil,                              // 30: lore.LorePiece.DetailsEntry
-	nil,                              // 31: lore.FullStory.QuestEntry
+	(*CharactersRequest)(nil),          // 0: lore.CharactersRequest
+	(*FactionsRequest)(nil),            // 1: lore.FactionsRequest
+	(*SettingsRequest)(nil),            // 2: lore.SettingsRequest
+	(*EventsRequest)(nil),              // 3: lore.EventsRequest
+	(*RelicsRequest)(nil),              // 4: lore.RelicsRequest
+	(*LorePiece)(nil),                  // 5: lore.LorePiece
+	(*CharactersResponse)(nil),         // 6: lore.CharactersResponse
+	(*FactionsResponse)(nil),           // 7: lore.FactionsResponse
+	(*SettingsResponse)(nil),           // 8: lore.SettingsResponse
+	(*EventsResponse)(nil),             // 9: lore.EventsResponse
+	(*RelicsResponse)(nil),             // 10: lore.RelicsResponse
+	(*GenerationProgress)(nil),         // 11: lore.GenerationProgress
+	(*CharactersStreamResponse)(nil),   // 12: lore.CharactersStreamResponse
+	(*FactionsStreamResponse)(nil),     // 13: lore.FactionsStreamResponse
+	(*SettingsStreamResponse)(nil),     // 14: lore.SettingsStreamResponse
+	(*EventsStreamResponse)(nil),       // 15: lore.EventsStreamResponse
+	(*RelicsStreamResponse)(nil),       // 16: lore.RelicsStreamResponse
+	(*AllRequest)(nil),                 // 17: lore.AllRequest
+	(*AllResponse)(nil),                // 18: lore.AllResponse
+	(*SelectedLorePieces)(nil),         // 19: lore.SelectedLorePieces
+	(*FullStory)(nil),                  // 20: lore.FullStory
+	(*FullStoryRequest)(nil),           // 21: lore.FullStoryRequest
+	(*FullStoryResponse)(nil),          // 22: lore.FullStoryResponse
+	(*EmbeddingRequest)(nil),           // 23: lore.EmbeddingRequest
+	(*EmbeddingResponse)(nil),          // 24: lore.EmbeddingResponse
+	(*WorldResult)(nil),                // 25: lore.WorldResult
+	(*RerankSearchRequest)(nil),        // 26: lore.RerankSearchRequest
+	(*RerankSearchResponse)(nil),       // 27: lore.RerankSearchResponse
+	(*UploadImageRequest)(nil),         // 28: lore.UploadImageRequest
+	(*UploadImageResponse)(nil),        // 29: lore.UploadImageResponse
+	(*GenerateWorldImageRequest)(nil),  // 30: lore.GenerateWorldImageRequest
+	(*GenerateWorldImageResponse)(nil), // 31: lore.GenerateWorldImageResponse
+	nil,                                // 32: lore.LorePiece.DetailsEntry
+	nil,                                // 33: lore.FullStory.QuestEntry
 }
 var file_lore_proto_depIdxs = []int32{
 	5,  // 0: lore.EventsRequest.selected_setting:type_name -> lore.LorePiece
 	5,  // 1: lore.RelicsRequest.selected_setting:type_name -> lore.LorePiece
 	5,  // 2: lore.RelicsRequest.selected_event:type_name -> lore.LorePiece
-	30, // 3: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
+	32, // 3: lore.LorePiece.details:type_name -> lore.LorePiece.DetailsEntry
 	5,  // 4: lore.CharactersResponse.characters:type_name -> lore.LorePiece
 	5,  // 5: lore.FactionsResponse.factions:type_name -> lore.LorePiece
 	5,  // 6: lore.SettingsResponse.settings:type_name -> lore.LorePiece
@@ -2025,7 +2158,7 @@ var file_lore_proto_depIdxs = []int32{
 	5,  // 27: lore.SelectedLorePieces.event:type_name -> lore.LorePiece
 	5,  // 28: lore.SelectedLorePieces.relic:type_name -> lore.LorePiece
 	19, // 29: lore.FullStory.pieces:type_name -> lore.SelectedLorePieces
-	31, // 30: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
+	33, // 30: lore.FullStory.quest:type_name -> lore.FullStory.QuestEntry
 	19, // 31: lore.FullStoryRequest.pieces:type_name -> lore.SelectedLorePieces
 	20, // 32: lore.FullStoryResponse.story:type_name -> lore.FullStory
 	25, // 33: lore.RerankSearchRequest.worlds:type_name -> lore.WorldResult
@@ -2040,18 +2173,20 @@ var file_lore_proto_depIdxs = []int32{
 	23, // 42: lore.LoreService.GenerateEmbedding:input_type -> lore.EmbeddingRequest
 	26, // 43: lore.LoreService.RerankResults:input_type -> lore.RerankSearchRequest
 	28, // 44: lore.LoreService.UploadImageToR2:input_type -> lore.UploadImageRequest
-	12, // 45: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersStreamResponse
-	13, // 46: lore.LoreService.GenerateFactions:output_type -> lore.FactionsStreamResponse
-	14, // 47: lore.LoreService.GenerateSettings:output_type -> lore.SettingsStreamResponse
-	15, // 48: lore.LoreService.GenerateEvents:output_type -> lore.EventsStreamResponse
-	16, // 49: lore.LoreService.GenerateRelics:output_type -> lore.RelicsStreamResponse
-	18, // 50: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
-	22, // 51: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
-	24, // 52: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
-	27, // 53: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
-	29, // 54: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
-	45, // [45:55] is the sub-list for method output_type
-	35, // [35:45] is the sub-list for method input_type
+	30, // 45: lore.LoreService.GenerateWorldImage:input_type -> lore.GenerateWorldImageRequest
+	12, // 46: lore.LoreService.GenerateCharacters:output_type -> lore.CharactersStreamResponse
+	13, // 47: lore.LoreService.GenerateFactions:output_type -> lore.FactionsStreamResponse
+	14, // 48: lore.LoreService.GenerateSettings:output_type -> lore.SettingsStreamResponse
+	15, // 49: lore.LoreService.GenerateEvents:output_type -> lore.EventsStreamResponse
+	16, // 50: lore.LoreService.GenerateRelics:output_type -> lore.RelicsStreamResponse
+	18, // 51: lore.LoreService.GenerateAll:output_type -> lore.AllResponse
+	22, // 52: lore.LoreService.GenerateFullStory:output_type -> lore.FullStoryResponse
+	24, // 53: lore.LoreService.GenerateEmbedding:output_type -> lore.EmbeddingResponse
+	27, // 54: lore.LoreService.RerankResults:output_type -> lore.RerankSearchResponse
+	29, // 55: lore.LoreService.UploadImageToR2:output_type -> lore.UploadImageResponse
+	31, // 56: lore.LoreService.GenerateWorldImage:output_type -> lore.GenerateWorldImageResponse
+	46, // [46:57] is the sub-list for method output_type
+	35, // [35:46] is the sub-list for method input_type
 	35, // [35:35] is the sub-list for extension type_name
 	35, // [35:35] is the sub-list for extension extendee
 	0,  // [0:35] is the sub-list for field type_name
@@ -2088,7 +2223,7 @@ func file_lore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lore_proto_rawDesc), len(file_lore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   32,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

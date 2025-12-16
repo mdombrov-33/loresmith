@@ -597,6 +597,54 @@ func (h *WorldHandler) HandleUpdateWorldVisibility(w http.ResponseWriter, r *htt
 	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true, "visibility": req.Visibility})
 }
 
+func (h *WorldHandler) HandleUpdateActiveImageType(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch {
+		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})
+		return
+	}
+
+	worldIDStr := chi.URLParam(r, "id")
+	worldID, err := strconv.Atoi(worldIDStr)
+	if err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid world ID"})
+		return
+	}
+
+	var req struct {
+		ActiveImageType string `json:"active_image_type"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "invalid JSON body"})
+		return
+	}
+
+	if req.ActiveImageType != "portrait" && req.ActiveImageType != "world_scene" {
+		utils.WriteResponseJSON(w, http.StatusBadRequest, utils.ResponseEnvelope{"error": "active_image_type must be 'portrait' or 'world_scene'"})
+		return
+	}
+
+	currentUser := middleware.GetUser(r)
+	world, err := h.worldStore.GetWorldById(worldID)
+	if err != nil {
+		utils.WriteResponseJSON(w, http.StatusNotFound, utils.ResponseEnvelope{"error": "world not found"})
+		return
+	}
+
+	if world.UserID != int(currentUser.ID) {
+		utils.WriteResponseJSON(w, http.StatusForbidden, utils.ResponseEnvelope{"error": "not authorized to update this world"})
+		return
+	}
+
+	err = h.worldStore.UpdateActiveImageType(worldID, req.ActiveImageType)
+	if err != nil {
+		h.logger.Printf("ERROR: failed to update active image type: %v", err)
+		utils.WriteResponseJSON(w, http.StatusInternalServerError, utils.ResponseEnvelope{"error": "failed to update active image type"})
+		return
+	}
+
+	utils.WriteResponseJSON(w, http.StatusOK, utils.ResponseEnvelope{"success": true, "active_image_type": req.ActiveImageType})
+}
+
 func (h *WorldHandler) HandleRateWorld(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPatch {
 		utils.WriteResponseJSON(w, http.StatusMethodNotAllowed, utils.ResponseEnvelope{"error": "method not allowed"})

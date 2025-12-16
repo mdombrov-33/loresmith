@@ -164,3 +164,28 @@ export function useRateWorld() {
     },
   });
 }
+
+export function useUpdateActiveImageType() {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ worldId, activeImageType }: { worldId: number; activeImageType: "portrait" | "world_scene" }) => {
+      const token = await getToken();
+      const url = `${API_BASE_URL}/worlds/${worldId}/active-image-type`;
+      const response = await fetchWithTimeout(url, {
+        method: "PATCH",
+        headers: await getAuthHeaders(token),
+        body: JSON.stringify({ active_image_type: activeImageType }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to update active image type: ${response.statusText}`);
+      }
+    },
+    onSuccess: (_, { worldId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.world(worldId) });
+      queryClient.invalidateQueries({ queryKey: ["worlds"] });
+    },
+  });
+}

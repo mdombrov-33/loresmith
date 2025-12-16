@@ -100,7 +100,6 @@ def get_llm(
             num_predict=max_tokens,
             temperature=temperature,
             callbacks=callbacks,
-            timeout=180,  # 3 minute timeout for Ollama model loading + generation
         )
 
     elif provider == "openrouter":
