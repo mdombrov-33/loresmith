@@ -47,14 +47,12 @@ func TestCreateUser(t *testing.T) {
 	store := NewPostgresUserStore(db)
 
 	user := &User{
-		Username: "testuser",
-		Email:    "test@example.com",
+		ClerkUserID: "user_test123",
+		Username:    "testuser",
+		Email:       "test@example.com",
 	}
 
-	err := user.PasswordHash.Set("password123")
-	require.NoError(t, err, "Password hashing should succeed")
-
-	err = store.CreateUser(user)
+	err := store.CreateUser(user)
 	assert.NoError(t, err, "CreateUser should not fail for valid user")
 
 	assert.NotZero(t, user.ID, "User ID should be auto-generated and set")
@@ -65,34 +63,56 @@ func TestCreateUser(t *testing.T) {
 	require.NoError(t, err, "GetUserByID should succeed")
 	assert.Equal(t, "testuser", retrieved.Username, "Username should match")
 	assert.Equal(t, "test@example.com", retrieved.Email, "Email should match")
+	assert.Equal(t, "user_test123", retrieved.ClerkUserID, "ClerkUserID should match")
 }
 
-func TestGetUserByUsername(t *testing.T) {
+func TestGetUserByClerkID(t *testing.T) {
 	db := setupTestDB(t)
 	defer db.Close()
 
 	store := NewPostgresUserStore(db)
 
 	user := &User{
-		Username: "testuser",
-		Email:    "test@example.com",
+		ClerkUserID: "user_clerk456",
+		Username:    "clerkuser",
+		Email:       "clerk@example.com",
 	}
 
-	err := user.PasswordHash.Set("password123")
-	require.NoError(t, err, "Password hashing should succeed")
-
-	err = store.CreateUser(user)
+	err := store.CreateUser(user)
 	require.NoError(t, err, "CreateUser should succeed")
 
-	retrieved, err := store.GetUserByUsername("testuser")
-	require.NoError(t, err, "GetUserByUsername should succeed")
+	retrieved, err := store.GetUserByClerkID("user_clerk456")
+	require.NoError(t, err, "GetUserByClerkID should succeed")
 	assert.NotNil(t, retrieved, "User should be found")
-	assert.Equal(t, "testuser", retrieved.Username, "Username should match")
-	assert.Equal(t, "test@example.com", retrieved.Email, "Email should match")
+	assert.Equal(t, "clerkuser", retrieved.Username, "Username should match")
+	assert.Equal(t, "clerk@example.com", retrieved.Email, "Email should match")
 
-	nonExistent, err := store.GetUserByUsername("nonexistent")
-	assert.NoError(t, err, "GetUserByUsername should not error for non-existent user")
+	nonExistent, err := store.GetUserByClerkID("user_nonexistent")
+	assert.NoError(t, err, "GetUserByClerkID should not error for non-existent user")
 	assert.Nil(t, nonExistent, "Non-existent user should return nil")
+}
+
+func TestCreateUserDuplicateClerkID(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	store := NewPostgresUserStore(db)
+
+	user1 := &User{
+		ClerkUserID: "user_duplicate",
+		Username:    "testuser1",
+		Email:       "test1@example.com",
+	}
+	err := store.CreateUser(user1)
+	require.NoError(t, err)
+
+	user2 := &User{
+		ClerkUserID: "user_duplicate",
+		Username:    "testuser2",
+		Email:       "test2@example.com",
+	}
+	err = store.CreateUser(user2)
+	assert.Error(t, err, "CreateUser should fail for duplicate clerk_user_id")
 }
 
 func TestCreateUserDuplicateUsername(t *testing.T) {
@@ -102,20 +122,18 @@ func TestCreateUserDuplicateUsername(t *testing.T) {
 	store := NewPostgresUserStore(db)
 
 	user1 := &User{
-		Username: "testuser",
-		Email:    "test1@example.com",
+		ClerkUserID: "user_test1",
+		Username:    "sameusername",
+		Email:       "test1@example.com",
 	}
-	err := user1.PasswordHash.Set("password123")
-	require.NoError(t, err)
-	err = store.CreateUser(user1)
+	err := store.CreateUser(user1)
 	require.NoError(t, err)
 
 	user2 := &User{
-		Username: "testuser",
-		Email:    "test2@example.com",
+		ClerkUserID: "user_test2",
+		Username:    "sameusername",
+		Email:       "test2@example.com",
 	}
-	err = user2.PasswordHash.Set("password456")
-	require.NoError(t, err)
 	err = store.CreateUser(user2)
 	assert.Error(t, err, "CreateUser should fail for duplicate username")
 }
@@ -129,20 +147,4 @@ func TestGetUserByIDNonExistent(t *testing.T) {
 	user, err := store.GetUserByID(999)
 	assert.NoError(t, err, "GetUserByID should not error for non-existent ID")
 	assert.Nil(t, user, "Non-existent ID should return nil")
-}
-
-func TestPasswordHashing(t *testing.T) {
-	var p password
-
-	err := p.Set("mypassword")
-	assert.NoError(t, err, "Password hashing should succeed")
-	assert.NotEmpty(t, p.hash, "Hash should be set")
-
-	matches, err := p.Matches("mypassword")
-	assert.NoError(t, err, "Password matching should not error")
-	assert.True(t, matches, "Correct password should match")
-
-	matches, err = p.Matches("wrongpassword")
-	assert.NoError(t, err, "Password matching should not error")
-	assert.False(t, matches, "Incorrect password should not match")
 }

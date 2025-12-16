@@ -1,10 +1,20 @@
+import { getApiToken } from "./token-manager";
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const REQUEST_TIMEOUT = 300000; //* 300 seconds (5 minutes) - Image generation can take 2-3 minutes
 
-export async function getAuthHeaders() {
+/**
+ * Get authentication headers with Clerk session token
+ * Automatically uses token from token manager if not provided
+ */
+export async function getAuthHeaders(
+  token?: string | null,
+): Promise<HeadersInit> {
+  const authToken = token ?? getApiToken();
   return {
     "Content-Type": "application/json",
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   };
 }
 
@@ -28,7 +38,7 @@ export async function fetchWithTimeout(
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
-      credentials: "include", //* Include cookies for HTTP-only auth
+      credentials: "include", //* Include cookies for Clerk session
     });
     clearTimeout(timeoutId);
     return response;

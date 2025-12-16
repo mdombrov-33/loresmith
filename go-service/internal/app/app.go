@@ -7,12 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/mdombrov-33/loresmith/go-service/gen/lorepb"
 	"github.com/mdombrov-33/loresmith/go-service/internal/api"
-	"github.com/mdombrov-33/loresmith/go-service/internal/email"
 	"github.com/mdombrov-33/loresmith/go-service/internal/jobs"
 	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
@@ -23,17 +21,18 @@ import (
 )
 
 type Application struct {
-	Logger           *log.Logger
-	UserHandler      *api.UserHandler
-	LoreHandler      *api.LoreHandler
-	WorldHandler     *api.WorldHandler
-	AdventureHandler *api.AdventureHandler
-	PortraitHandler  *api.PortraitHandler
-	JobHandler       *api.JobHandler
-	LoreClient       lorepb.LoreServiceClient
-	Middleware       middleware.UserMiddleware
-	DB               *sql.DB
-	Redis            *redis.Client
+	Logger              *log.Logger
+	UserHandler         *api.UserHandler
+	LoreHandler         *api.LoreHandler
+	WorldHandler        *api.WorldHandler
+	AdventureHandler    *api.AdventureHandler
+	PortraitHandler     *api.PortraitHandler
+	JobHandler          *api.JobHandler
+	ClerkWebhookHandler *api.ClerkWebhookHandler
+	LoreClient          lorepb.LoreServiceClient
+	Middleware          *middleware.Middleware
+	DB                  *sql.DB
+	Redis               *redis.Client
 }
 
 func NewApplication() (*Application, error) {
@@ -50,8 +49,8 @@ func NewApplication() (*Application, error) {
 	logger := log.New((os.Stdout), "", log.Ldate|log.Ltime)
 
 	//* Increase max message size to 20MB to handle base64-encoded images
-	maxMsgSize := 20 * 1024 * 1024 // 20MB
-	
+	maxMsgSize := 20 * 1024 * 1024 //* 20MB
+
 	//* gRPC
 	grpcHost := os.Getenv("GRPC_HOST")
 	if grpcHost == "" {
@@ -113,44 +112,40 @@ func NewApplication() (*Application, error) {
 	executor := jobs.NewGRPCExecutor(loreClient, jobStore, worldStore, portraitStore, logger)
 	jobManager := jobs.NewManager(jobStore, executor)
 
-	//* Email Service
-	smtpPort, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
-	if smtpPort == 0 {
-		smtpPort = 1025
-	}
-
-	emailService, err := email.NewEmailService(email.Config{
-		Provider:  os.Getenv("EMAIL_PROVIDER"),
-		SMTPHost:  os.Getenv("SMTP_HOST"),
-		SMTPPort:  smtpPort,
-		FromEmail: os.Getenv("EMAIL_FROM"),
-		FromName:  os.Getenv("EMAIL_FROM_NAME"),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize email service: %w", err)
+	//* Auth Middleware
+	authMiddleware := &middleware.Middleware{
+		UserStore: userStore,
+		Logger:    logger,
 	}
 
 	//* Handlers
-	userHandler := api.NewUserHandler(userStore, logger, emailService)
+	userHandler := api.NewUserHandler(userStore, logger)
 	worldHandler := api.NewWorldHandler(loreClient, worldStore, adventureStore, portraitStore, logger)
 	loreHandler := api.NewLoreHandler(loreClient, logger)
 	adventureHandler := api.NewAdventureHandler(adventureStore, partyStore, worldStore, logger)
 	portraitHandler := api.NewPortraitHandler(portraitStore, logger)
 	jobHandler := api.NewJobHandler(jobManager)
-	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
+
+	//* Clerk Webhook Handler
+	clerkWebhookSecret := os.Getenv("CLERK_WEBHOOK_SECRET")
+	if clerkWebhookSecret == "" {
+		logger.Printf("WARNING: CLERK_WEBHOOK_SECRET not set - webhooks will fail verification")
+	}
+	clerkWebhookHandler := api.NewClerkWebhookHandler(userStore, logger, clerkWebhookSecret)
 
 	app := &Application{
-		Logger:           logger,
-		LoreClient:       loreClient,
-		LoreHandler:      loreHandler,
-		WorldHandler:     worldHandler,
-		AdventureHandler: adventureHandler,
-		PortraitHandler:  portraitHandler,
-		JobHandler:       jobHandler,
-		UserHandler:      userHandler,
-		Middleware:       middlewareHandler,
-		DB:               pgDB,
-		Redis:            redisClient,
+		Logger:              logger,
+		LoreClient:          loreClient,
+		LoreHandler:         loreHandler,
+		WorldHandler:        worldHandler,
+		AdventureHandler:    adventureHandler,
+		PortraitHandler:     portraitHandler,
+		JobHandler:          jobHandler,
+		UserHandler:         userHandler,
+		ClerkWebhookHandler: clerkWebhookHandler,
+		Middleware:          authMiddleware,
+		DB:                  pgDB,
+		Redis:               redisClient,
 	}
 
 	return app, nil

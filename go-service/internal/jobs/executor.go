@@ -607,6 +607,9 @@ func (e *GRPCExecutor) getIntPayload(job *Job, key string, defaultValue int) int
 	if val, ok := job.Payload[key].(int); ok {
 		return val
 	}
+	if val, ok := job.Payload[key].(int64); ok {
+		return int(val)
+	}
 	return defaultValue
 }
 

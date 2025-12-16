@@ -102,13 +102,13 @@ export const useAppStore = create<AppState>((set) => ({
   setIsRegisterModalOpen: (open: boolean) => set({ isRegisterModalOpen: open }),
 }));
 
-//* Manual persistence
+//* Manual persistence (excluding user - fetched from API instead)
 useAppStore.subscribe((state) => {
   if (typeof window === "undefined") return; //* Skip on server
   const partial = {
     theme: state.theme,
     audioTheme: state.audioTheme,
-    user: state.user,
+    //* user is NOT persisted - it's fetched from API on load
     selectedLore: state.selectedLore,
     searchScope: state.searchScope,
     searchTheme: state.searchTheme,
@@ -131,6 +131,9 @@ if (typeof window !== "undefined") {
         );
         partial.audioTheme = partial.theme;
       }
+
+      //* Remove user if it somehow exists in old localStorage (migration)
+      delete partial.user;
 
       useAppStore.setState({ ...partial, isHydrated: true });
     } catch (e) {

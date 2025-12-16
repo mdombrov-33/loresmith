@@ -1,8 +1,12 @@
 import { Suspense } from "react";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { Providers } from "./providers";
 import AppLayout from "@/components/shared/AppLayout";
 import Footer from "@/components/footer/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthTokenProvider } from "@/components/providers/AuthTokenProvider";
+import { UserSyncProvider } from "@/components/providers/UserSyncProvider";
 import {
   Cinzel,
   Inter,
@@ -46,9 +50,13 @@ const fjallaOne = Fjalla_One({
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="bg-background min-h-screen" />}>
-      <Providers>
-        <AppLayout>{children}</AppLayout>
-      </Providers>
+      <AuthTokenProvider>
+        <UserSyncProvider>
+          <Providers>
+            <AppLayout>{children}</AppLayout>
+          </Providers>
+        </UserSyncProvider>
+      </AuthTokenProvider>
     </Suspense>
   );
 }
@@ -59,16 +67,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`min-h-screen ${fjallaOne.variable} ${oswald.variable} ${inter.variable} ${cinzel.variable} ${jetbrainsMono.variable}`}
-      >
-        <ThemeWrapper>
-          {children}
-          <Footer />
-        </ThemeWrapper>
-        <Toaster theme="dark" />
-      </body>
-    </html>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: {
+          colorPrimary: "#4DBFD9",
+          borderRadius: "0.5rem",
+        },
+      }}
+    >
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`min-h-screen ${fjallaOne.variable} ${oswald.variable} ${inter.variable} ${cinzel.variable} ${jetbrainsMono.variable}`}
+        >
+          <ThemeWrapper>
+            {children}
+            <Footer />
+          </ThemeWrapper>
+          <Toaster theme="dark" />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

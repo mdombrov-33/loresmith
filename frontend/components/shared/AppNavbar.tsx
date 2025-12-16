@@ -1,34 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Home,
   Globe,
   CreditCard,
-  User,
   Sparkles,
   Bell,
-  LogOut,
 } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import Logo from "@/components/shared/Logo";
 import { PrimaryButton } from "@/components/shared/buttons";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/stores/appStore";
 import { AudioToggle } from "@/components/navbar/AudioToggle";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 export default function AppNavbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout } = useAppStore();
 
   //* Hide Create button on these pages
   const hideCreateButton =
@@ -60,22 +49,6 @@ export default function AppNavbar() {
       href: "/plans",
     },
   ];
-
-  const handleLogout = async () => {
-    //* Clear backend cookie
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-
-    //* Clear zustand state
-    logout();
-    router.push("/");
-  };
 
   return (
     <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
@@ -129,50 +102,10 @@ export default function AppNavbar() {
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
-            {/* Notification badge placeholder */}
-            {/* <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">3</span> */}
           </Button>
 
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <div className="bg-primary/20 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-                  <User className="h-4 w-4" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="flex items-center gap-2 p-2">
-                <div className="bg-primary/20 text-primary flex h-8 w-8 items-center justify-center rounded-full">
-                  <User className="h-4 w-4" />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">
-                    {user?.username || "User"}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {user?.email || ""}
-                  </p>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="cursor-pointer text-red-500"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Clerk User Button */}
+          <UserButton />
         </div>
       </div>
     </header>

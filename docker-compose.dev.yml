@@ -56,14 +56,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: loresmith-mailhog
-    ports:
-      - "1025:1025"  # SMTP server
-      - "8025:8025"  # Web UI
-    restart: unless-stopped
-
   postgres:
     image: pgvector/pgvector:pg12
     container_name: loresmith-postgres

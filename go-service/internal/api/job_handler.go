@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mdombrov-33/loresmith/go-service/internal/jobs"
+	"github.com/mdombrov-33/loresmith/go-service/internal/middleware"
 )
 
 type JobHandler struct {
@@ -22,6 +23,16 @@ func (h *JobHandler) CreateJob(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	//* Extract authenticated user from context (set by Clerk middleware)
+	user := middleware.GetUser(r)
+
+	//* Override user_id in payload with authenticated user's ID
+	//* This ensures we use the REAL authenticated user, not whatever the frontend sends
+	if req.Payload == nil {
+		req.Payload = make(map[string]interface{})
+	}
+	req.Payload["user_id"] = user.ID
 
 	job, err := h.manager.CreateJob(r.Context(), req)
 	if err != nil {

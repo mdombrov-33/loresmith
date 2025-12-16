@@ -22,7 +22,6 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 
 	r.Use(middleware.Logger)
 
-	//TODO: add /api prefix to routes?
 	//* Authenticated routes
 	r.Group(func(r chi.Router) {
 		r.Use(app.Middleware.Authenticate)
@@ -43,7 +42,7 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		r.Get("/worlds", app.WorldHandler.HandleGetWorldsByFilters)
 		r.Get("/worlds/search", app.WorldHandler.HandleSearchWorlds)
 		r.Get("/worlds/{id}", app.WorldHandler.HandleGetWorldById)
-		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld) //TODO: nuke /draft part? change to just /worlds?
+		r.Post("/worlds/draft", app.WorldHandler.HandleCreateDraftWorld) //TODO: nuke /draft part later? leave just /worlds?
 		r.Delete("/worlds/{id}", app.WorldHandler.HandleDeleteWorldById)
 		r.Patch("/worlds/{id}/visibility", app.WorldHandler.HandleUpdateWorldVisibility)
 		r.Patch("/worlds/{id}/rate", app.WorldHandler.HandleRateWorld)
@@ -64,17 +63,8 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 
 	//* Public routes
 	r.Get("/health", app.HealthCheck)
-	r.Post("/register", app.UserHandler.HandleRegisterUser)
-	r.Post("/login", app.UserHandler.HandleLoginUser)
-	r.Post("/logout", app.UserHandler.HandleLogout)
-	r.Get("/auth/google", app.UserHandler.HandleGoogleLogin)
-	r.Get("/auth/google/callback", app.UserHandler.HandleGoogleCallback)
-	r.Post("/auth/forgot-password", app.UserHandler.HandleForgotPassword)
-	r.Post("/auth/reset-password", app.UserHandler.HandleResetPassword)
-	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait) //TODO: move it to Job routes and make connection by user id?
-
-	//TODO: add authenticated password change route when implementing settings page
-	// r.Post("/auth/change-password", app.Middleware.Authenticate(app.UserHandler.HandleChangePassword))
+	r.Post("/webhooks/clerk", app.ClerkWebhookHandler.HandleWebhook)           //* clerk webhooks for user sync
+	r.Get("/temp-portraits/{uuid}", app.PortraitHandler.HandleGetTempPortrait) //TODO: I think we can move it to authenticated routes later? and check by user ID?
 
 	return r
 }
