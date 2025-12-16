@@ -47,6 +47,7 @@ export default function ExpandableWorldCards({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
+  const cardTriggerRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const { user } = useAppStore();
   const deleteWorldMutation = useDeleteWorld();
@@ -58,12 +59,48 @@ export default function ExpandableWorldCards({
       if (event.key === "Escape") {
         setActive(null);
       }
+
+      //* Trap focus within expanded card
+      if (active && event.key === "Tab") {
+        const focusableElements = ref.current?.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        if (focusableElements && focusableElements.length > 0) {
+          const firstElement = focusableElements[0] as HTMLElement;
+          const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+          if (event.shiftKey) {
+            // Shift+Tab: if on first element, go to last
+            if (document.activeElement === firstElement) {
+              event.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            // Tab: if on last element, go to first
+            if (document.activeElement === lastElement) {
+              event.preventDefault();
+              firstElement.focus();
+            }
+          }
+        }
+      }
     }
 
     if (active) {
       document.body.style.overflow = "hidden";
+
+      //* Focus the expanded card container
+      setTimeout(() => {
+        ref.current?.focus();
+      }, 100);
     } else {
       document.body.style.overflow = "auto";
+
+      //* Restore focus to the card that was clicked
+      if (cardTriggerRef.current) {
+        cardTriggerRef.current.focus();
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -76,6 +113,19 @@ export default function ExpandableWorldCards({
       setActive(null);
     }
   });
+
+  const handleCardClick = (world: World, element: HTMLDivElement) => {
+    cardTriggerRef.current = element;
+    setActive(world);
+  };
+
+  const handleCardKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, world: World) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      cardTriggerRef.current = event.currentTarget;
+      setActive(world);
+    }
+  };
 
   const handleViewWorld = (world: World) => {
     // IMPORTANT: Reset body overflow before navigating away!
@@ -177,7 +227,11 @@ export default function ExpandableWorldCards({
             <motion.div
               layoutId={`card-${active.id}-${id}`}
               ref={ref}
-              className="flex w-full max-w-[500px] max-h-[90vh] flex-col overflow-hidden rounded-3xl bg-background shadow-2xl dark:bg-neutral-900"
+              tabIndex={-1}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`card-title-${active.id}`}
+              className="flex w-full max-w-[500px] max-h-[90vh] flex-col overflow-hidden rounded-3xl bg-background shadow-2xl dark:bg-neutral-900 focus:outline-none"
             >
               <motion.div layoutId={`image-${active.id}-${id}`}>
                 {(() => {
@@ -202,6 +256,7 @@ export default function ExpandableWorldCards({
                 <div className="flex items-start justify-between gap-4 p-4">
                   <div className="flex-1 min-w-0">
                     <motion.h3
+                      id={`card-title-${active.id}`}
                       layoutId={`title-${active.id}-${id}`}
                       className="text-base font-bold text-foreground"
                     >
@@ -332,8 +387,12 @@ export default function ExpandableWorldCards({
               <motion.div
                 layoutId={`card-${world.id}-${id}`}
                 key={`card-${world.id}-${id}`}
-                onClick={() => setActive(world)}
-                className="flex cursor-pointer flex-col justify-between rounded-xl p-3 transition-colors hover:bg-muted/50 md:flex-row md:items-center md:p-4"
+                onClick={(e) => handleCardClick(world, e.currentTarget)}
+                onKeyDown={(e) => handleCardKeyDown(e, world)}
+                tabIndex={0}
+                role="button"
+                aria-label={`View details for ${world.full_story.quest?.title || "Untitled World"}`}
+                className="flex cursor-pointer flex-col justify-between rounded-xl p-3 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary md:flex-row md:items-center md:p-4"
               >
                 <div className="flex flex-row items-center gap-3 md:gap-4">
                   <motion.div layoutId={`image-${world.id}-${id}`}>
@@ -423,8 +482,12 @@ export default function ExpandableWorldCards({
             <motion.div
               layoutId={`card-${world.id}-${id}`}
               key={world.id}
-              onClick={() => setActive(world)}
-              className="flex cursor-pointer flex-col rounded-xl p-4 transition-colors hover:bg-muted/50"
+              onClick={(e) => handleCardClick(world, e.currentTarget)}
+              onKeyDown={(e) => handleCardKeyDown(e, world)}
+              tabIndex={0}
+              role="button"
+              aria-label={`View details for ${world.full_story.quest?.title || "Untitled World"}`}
+              className="flex cursor-pointer flex-col rounded-xl p-4 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <div className="flex w-full flex-col gap-4">
                 <motion.div layoutId={`image-${world.id}-${id}`}>
