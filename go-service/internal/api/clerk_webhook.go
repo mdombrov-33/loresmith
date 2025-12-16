@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	goaway "github.com/TwiN/go-away"
 	"github.com/mdombrov-33/loresmith/go-service/internal/store"
 	"github.com/mdombrov-33/loresmith/go-service/internal/utils"
 	svix "github.com/svix/svix-webhooks/go"
@@ -24,6 +25,18 @@ func NewClerkWebhookHandler(userStore store.UserStore, logger *log.Logger, webho
 		logger:        logger,
 		webhookSecret: webhookSecret,
 	}
+}
+
+// * sanitizeUsername checks for profanity and returns sanitized username
+func sanitizeUsername(username, clerkUserID string) string {
+	if goaway.IsProfane(username) {
+		//* If profanity detected, use last 8 chars of Clerk ID
+		if len(clerkUserID) >= 8 {
+			return "user_" + clerkUserID[len(clerkUserID)-8:]
+		}
+		return "user_" + clerkUserID
+	}
+	return username
 }
 
 // * HandleWebhook processes Clerk webhook events
@@ -129,9 +142,15 @@ func (h *ClerkWebhookHandler) handleUserCreated(event map[string]interface{}) {
 		return
 	}
 
+	//* Sanitize username for profanity
+	sanitizedUsername := sanitizeUsername(username, clerkUserID)
+	if sanitizedUsername != username {
+		h.logger.Printf("INFO: Profanity detected in username '%s', replaced with '%s'", username, sanitizedUsername)
+	}
+
 	user := &store.User{
 		ClerkUserID: clerkUserID,
-		Username:    username,
+		Username:    sanitizedUsername,
 		Email:       email,
 	}
 
@@ -185,13 +204,19 @@ func (h *ClerkWebhookHandler) handleUserUpdated(event map[string]interface{}) {
 		return
 	}
 
+	//* Sanitize username for profanity
+	sanitizedUsername := sanitizeUsername(username, clerkUserID)
+	if sanitizedUsername != username {
+		h.logger.Printf("INFO: Profanity detected in username update '%s', replaced with '%s'", username, sanitizedUsername)
+	}
+
 	//* Update local user
-	if err := h.userStore.UpdateUserByClerkID(clerkUserID, username, email); err != nil {
+	if err := h.userStore.UpdateUserByClerkID(clerkUserID, sanitizedUsername, email); err != nil {
 		h.logger.Printf("ERROR: Failed to update user for Clerk ID %s: %v", clerkUserID, err)
 		return
 	}
 
-	h.logger.Printf("INFO: Updated local user for Clerk user: %s (username: %s, email: %s)", clerkUserID, username, email)
+	h.logger.Printf("INFO: Updated local user for Clerk user: %s (username: %s, email: %s)", clerkUserID, sanitizedUsername, email)
 }
 
 func (h *ClerkWebhookHandler) handleUserDeleted(event map[string]interface{}) {
