@@ -9,6 +9,7 @@ export interface User {
 
 export type AppStage =
   | "home"
+  | "select-theme"
   | "my-worlds"
   | "discover"
   | "generating"
